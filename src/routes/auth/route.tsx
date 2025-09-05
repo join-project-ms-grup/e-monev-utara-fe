@@ -7,7 +7,6 @@ export const Route = createFileRoute('/auth')({
 function RouteComponent() {
   return (
     <>
-    <h4>Ini Layout Auth</h4>
     <Outlet />
     </>
   )
