@@ -1,0 +1,130 @@
+@import url("https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+:root {
+  font-family: "Roboto", sans-serif;
+  background-color: #f8f8f8;
+
+  /* Heading */
+  --heading-color: #222;
+  --heading-line-height: 1.2;
+  --h1-size: 2.5rem;
+  --h2-size: 2rem;
+  --h3-size: 1.75rem;
+  --h4-size: 1.5rem;
+  --h5-size: 1.25rem;
+  --h6-size: 1rem;
+}
+/* Container */
+.container {
+  @apply w-full max-w-[1200px] box-border;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Heading */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--heading-font);
+  /* color: var(--heading-color); */
+  line-height: var(--heading-line-height);
+  /* margin-top: 1.5rem; */
+  /* margin-bottom: 0.5rem; */
+  font-weight: 700;
+}
+h1 {
+  font-size: var(--h1-size);
+}
+h2 {
+  font-size: var(--h2-size);
+}
+h3 {
+  font-size: var(--h3-size);
+}
+h4 {
+  font-size: var(--h4-size);
+}
+h5 {
+  font-size: var(--h5-size);
+}
+h6 {
+  font-size: var(--h6-size);
+}
+/* Button */
+button {
+  cursor: pointer;
+}
+/* Link */
+a {
+  opacity: 1;
+  /* color: #1e88e5; */
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  font-weight: 500;
+}
+a:hover {
+  opacity: 0.7;
+}
+/* Topbar */
+.topbar {
+  @apply h-[70px] text-gray-800 p-4 flex justify-between items-center space-x-4 border-b-1 border-gray-200;
+}
+/* Sidebar */
+.sidebar {
+  transition: width 0.2s ease;
+  @apply w-72 bg-white text-[#333] p-4 relative whitespace-break-spaces;
+}
+.sidebar.close {
+  @apply w-20;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: theme("colors.gray.400");
+  border-radius: 6px;
+}
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: theme("colors.gray.400") transparent;
+}
+.sidetitle {
+  @apply block text-nowrap text-center;
+}
+.sidetitle.close {
+  @apply hidden;
+}
+.sidelogo {
+  @apply mr-2;
+}
+.sidelogo.close {
+  @apply mr-0;
+}
+/* Nav Link Sidebar */
+.sidelink {
+  transition: width 0.1s ease;
+  @apply flex flex-row relative text-[#333333] block py-2 px-4 rounded gap-2 items-center min-h-12 font-semibold whitespace-pre;
+}
+.sidelink span {
+  @apply text-left;
+}
+.sidelink.active,
+.sidelink:hover {
+  @apply text-[#721027] bg-[#72102741] box-border;
+}
+.sidelink.active::before,
+.sidelink:hover::before {
+  content: "";
+  @apply absolute left-0 top-0 bottom-0 w-0 bg-[#721027] rounded-tr-lg rounded-br-lg;
+  transition: width 0.1s ease;
+}
+.sidelink.active::before {
+  @apply w-[6px];
+}
+.sidelink span.close {
+  @apply hidden;
+}
