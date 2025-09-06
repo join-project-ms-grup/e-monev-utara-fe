@@ -13,6 +13,7 @@ import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
+import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
 import { Route as DashboardRenstraRouteRouteImport } from './routes/_dashboard/renstra/route'
 import { Route as DashboardMasterRouteRouteImport } from './routes/_dashboard/master/route'
 import { Route as DashboardKonfigurasiRouteRouteImport } from './routes/_dashboard/konfigurasi/route'
@@ -55,6 +56,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
+} as any)
+const AuthLogoutRoute = AuthLogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 const DashboardRenstraRouteRoute = DashboardRenstraRouteRouteImport.update({
   id: '/renstra',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/konfigurasi': typeof DashboardKonfigurasiRouteRouteWithChildren
   '/master': typeof DashboardMasterRouteRouteWithChildren
   '/renstra': typeof DashboardRenstraRouteRouteWithChildren
+  '/auth/logout': typeof AuthLogoutRoute
   '/': typeof DashboardIndexRoute
   '/auth/': typeof AuthIndexRoute
   '/iku/iku_capaian': typeof DashboardIkuIku_capaianRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/renstra/': typeof DashboardRenstraIndexRoute
 }
 export interface FileRoutesByTo {
+  '/auth/logout': typeof AuthLogoutRoute
   '/': typeof DashboardIndexRoute
   '/auth': typeof AuthIndexRoute
   '/iku/iku_capaian': typeof DashboardIkuIku_capaianRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/_dashboard/konfigurasi': typeof DashboardKonfigurasiRouteRouteWithChildren
   '/_dashboard/master': typeof DashboardMasterRouteRouteWithChildren
   '/_dashboard/renstra': typeof DashboardRenstraRouteRouteWithChildren
+  '/auth/logout': typeof AuthLogoutRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/auth/': typeof AuthIndexRoute
   '/_dashboard/iku/iku_capaian': typeof DashboardIkuIku_capaianRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/konfigurasi'
     | '/master'
     | '/renstra'
+    | '/auth/logout'
     | '/'
     | '/auth/'
     | '/iku/iku_capaian'
@@ -289,6 +299,7 @@ export interface FileRouteTypes {
     | '/renstra/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/auth/logout'
     | '/'
     | '/auth'
     | '/iku/iku_capaian'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/_dashboard/konfigurasi'
     | '/_dashboard/master'
     | '/_dashboard/renstra'
+    | '/auth/logout'
     | '/_dashboard/'
     | '/auth/'
     | '/_dashboard/iku/iku_capaian'
@@ -375,6 +387,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/auth/logout': {
+      id: '/auth/logout'
+      path: '/logout'
+      fullPath: '/auth/logout'
+      preLoaderRoute: typeof AuthLogoutRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/_dashboard/renstra': {
       id: '/_dashboard/renstra'
@@ -641,10 +660,12 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
 )
 
 interface AuthRouteRouteChildren {
+  AuthLogoutRoute: typeof AuthLogoutRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthLogoutRoute: AuthLogoutRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
 

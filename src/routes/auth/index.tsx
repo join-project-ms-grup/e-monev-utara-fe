@@ -1,10 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { SITE_NAME } from '../../configs/config';
 import { useState } from 'react';
 import InputText from '../../components/inputs/InputText';
 import { MdEmail, MdKey } from 'react-icons/md';
+import InputButton from '../../components/inputs/InputButton';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const Route = createFileRoute('/auth/')({
+  beforeLoad: ({ context }) => {
+    const { token } = context.auth
+    if (token) {
+      throw redirect({ to: "/" })
+    }
+  },
   head: () => ({
     meta: [
       {
@@ -19,12 +27,14 @@ export const Route = createFileRoute('/auth/')({
 })
 
 function RouteComponent() {
+  const auth = useAuth()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log({ email, password });
+    auth.loginDummy();
   };
 
   return (
@@ -44,7 +54,7 @@ function RouteComponent() {
         </div>
         <div className="w-full md:w-2/3 flex flex-col justify-center items-center p-8">
           <div className="h-4/5 max-w-md w-full mx-auto flex flex-col justify-center items-center p-8">
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Masuk</h2>
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6 uppercase">Masuk</h2>
             <form onSubmit={handleSubmit} className="space-y-4 w-full">
               <div>
                 <InputText
@@ -66,12 +76,9 @@ function RouteComponent() {
                   required
                 />
               </div>
-              <button
-                type="submit"
-                className="w-full bg-[#FF6B6B] text-white py-2 rounded-md hover:bg-[#FF5E5E] transition"
-              >
+              <InputButton type='submit'>
                 Masuk
-              </button>
+              </InputButton>
             </form>
             <p className="mt-4 text-center text-gray-600">
               Belum punya akun? <a href="#" className="text-[#E63946]">Hubungi admin</a>
@@ -82,7 +89,6 @@ function RouteComponent() {
             <p>&copy; 2025 Kabupaten Bengkulu Utara</p>
           </div>
         </div>
-
       </div>
     </div>
   );

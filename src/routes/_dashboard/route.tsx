@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { useState } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Breadcrumb from '../../components/Breadcrumb';
@@ -6,6 +6,12 @@ import Footer from '../../components/Footer';
 import TopBar from '../../components/Topbar';
 
 export const Route = createFileRoute('/_dashboard')({
+    beforeLoad: ({ context }) => {
+        const { token } = context.auth
+        if (!token) {
+            throw redirect({ to: "/auth" })
+        }
+    },
     component: RouteComponent,
 })
 

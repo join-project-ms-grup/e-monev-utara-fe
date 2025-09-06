@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type JSX } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
-import { MdDashboard, MdViewList, MdSettings, MdKeyboardArrowDown, MdInsights, MdLibraryBooks, MdInventory, MdAssignmentTurnedIn } from "react-icons/md"
+import { MdDashboard, MdViewList, MdSettings, MdKeyboardArrowDown, MdInsights, MdLibraryBooks, MdInventory, MdAssignmentTurnedIn, MdFiberManualRecord } from "react-icons/md"
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -41,7 +41,7 @@ const menus: MenuItem[] = [
     label: 'Renstra',
     icon: <MdLibraryBooks />,
     submenu: [
-      { label: 'Indikator Outcome Program', to: '/renstra/iop' },
+      { label: 'Indikator Outcome\nProgram', to: '/renstra/iop' },
       { label: 'Indikator Output Kegiatan', to: '/renstra/iok' },
       { label: 'Indikator Output Sub\nKegiatan', to: '/renstra/iosk' },
     ]
@@ -135,13 +135,26 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             </div>
             {sidebarOpen && <MdKeyboardArrowDown className={`transition-transform ${openMenus[menu.label] ? "rotate-180" : ""}`} />}
           </button>
-          {openMenus[menu.label] && sidebarOpen && (
-            <div className="ml-6 flex flex-col space-y-2 mt-2">
+          {sidebarOpen && (
+            <div
+              className={`ml-6 flex flex-col space-y-2 mt-2 overflow-hidden transition-all duration-200 ease-in-out
+      ${openMenus[menu.label] ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+            >
               {menu.submenu.map(sub => (
-                <Link key={sub.label} to={sub.to!} className="sidelink"><span className={`${sidebarOpen ? "" : "close"}`}>{sub.label}</span></Link>
+                <Link
+                  key={sub.label}
+                  to={sub.to!}
+                  className="sidelink"
+                >
+                  <span className={`flex flex-row gap-2 items-center ${sidebarOpen ? "" : "close"}`}>
+                    <MdFiberManualRecord />
+                    {sub.label}
+                  </span>
+                </Link>
               ))}
             </div>
           )}
+
         </div>
       )
     }
@@ -158,7 +171,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <aside
       className={`flex flex-col sidebar ${sidebarOpen ? "" : "close"}`}>
-      <div className='mb-4 flex flex-row items-center justify-center h-[60px]'>
+      <div className='flex flex-row items-center justify-center p-4'>
         <div className={`aspect-auto sidelogo ${sidebarOpen ? "" : "close"}`}>
           <img src="/bengkulu-utara-logo.webp" alt="" className='max-w-[32px]' />
         </div>
@@ -167,7 +180,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           <span>Kabupaten Bengkulu Utara</span><br />
         </div>
       </div>
-      <nav className='overflow-y-auto overflow-x-hidden sidebar-scroll space-y-2'>
+      <nav className='overflow-y-auto overflow-x-hidden sidebar-scroll space-y-2 p-4'>
         {menus.map(renderMenu)}
       </nav>
     </aside>

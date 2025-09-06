@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 Akun.txt
+.tanstack
 
 # Editor directories and files
 .vscode/*

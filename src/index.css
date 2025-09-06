@@ -76,7 +76,7 @@ a:hover {
 /* Sidebar */
 .sidebar {
   transition: width 0.2s ease;
-  @apply w-72 bg-white text-[#333] p-4 relative whitespace-break-spaces;
+  @apply w-72 bg-white text-[#333] relative whitespace-break-spaces;
 }
 .sidebar.close {
   @apply w-20;
@@ -93,7 +93,7 @@ a:hover {
   scrollbar-color: theme("colors.gray.400") transparent;
 }
 .sidetitle {
-  @apply block text-nowrap text-center;
+  @apply block text-nowrap text-center cursor-default;
 }
 .sidetitle.close {
   @apply hidden;
