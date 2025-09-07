@@ -18,6 +18,7 @@ import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
 } from 'react-icons/md';
+import InputSelectBox from '../inputs/InputSelectBox';
 
 const OrganisasiTable = () => {
   const columnHelper = createColumnHelper<Organisasi>();
@@ -37,7 +38,7 @@ const OrganisasiTable = () => {
     }),
     columnHelper.accessor((row) => row.tahun, {
       id: 'lastName',
-      cell: (info) => <i>{info.getValue()}</i>,
+      cell: (info) => info.getValue(),
       header: 'Tahun',
       footer: (info) => info.column.id,
     }),
@@ -56,6 +57,13 @@ const OrganisasiTable = () => {
     }),
     columnHelper.accessor('status', {
       header: 'Status',
+      cell: (info) => (
+        <span
+          className={`${info.getValue().includes('Aktif') ? ' text-green-700' : 'text-red-700'}`}
+        >
+          {info.getValue()}
+        </span>
+      ),
       footer: (info) => info.column.id,
     }),
   ];
@@ -74,18 +82,9 @@ const OrganisasiTable = () => {
 
   return (
     <div className='table-responsive'>
-      <div className='flex gap-2 mb-2 items-center'>
+      <div className='inline-flex gap-2 mb-2 items-center'>
         <span>Tahun Anggaran</span>
-        <select
-          className='border border-[#ccc] rounded px-2 py-1 focus:border-[#FFCCCC]'
-          onChange={(e) => console.log(e.target.value)}
-        >
-          {[2025, 2024, 2023, 2022, 2021].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              {pageSize}
-            </option>
-          ))}
-        </select>
+        <InputSelectBox options={[2025, 2024, 2023, 2022, 2021]} onChange={(e) => console.log(e)} />
       </div>
       <table className='table-auto'>
         <thead>
@@ -97,7 +96,7 @@ const OrganisasiTable = () => {
                     <div
                       {...{
                         className: header.column.getCanSort()
-                          ? 'flex flex-row justify-center items-center cursor-pointer select-none'
+                          ? 'flex flex-row justify-center items-center'
                           : '',
                         onClick: header.column.getToggleSortingHandler(),
                       }}
@@ -132,19 +131,7 @@ const OrganisasiTable = () => {
       <div className='flex flex-row items-center justify-between mt-2'>
         <div className='flex items-center gap-2'>
           <span className='opacity-85'>Menampilkan</span>
-          <select
-            className='pagination-select'
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => {
-              table.setPageSize(Number(e.target.value));
-            }}
-          >
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                {pageSize}
-              </option>
-            ))}
-          </select>
+          <InputSelectBox value={table.getState().pagination.pageSize} options={[10, 20, 30, 40, 50]} onChange={(value) => table.setPageSize(value)} />
           <span className='opacity-85'>
             dari {table.getRowCount().toLocaleString()} data
           </span>

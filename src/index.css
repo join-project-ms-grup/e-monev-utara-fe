@@ -181,24 +181,42 @@ a:hover {
   width: 100%;
   overflow-x: auto;
 }
-
 .table-responsive table {
   width: 100%;
   border-collapse: collapse;
   min-width: 600px;
 }
-
+.table-responsive tbody {
+  border-bottom: 2px solid #921733;
+}
+.table-responsive thead {
+  position: relative;
+  box-shadow: 0 6px 6px -2px rgba(0, 0, 0, 0.1);
+}
 .table-responsive th,
 .table-responsive td {
   padding: 12px 15px;
-  border: 1px solid #ddd;
-  text-align: left;
+  border: none;
+  text-align: center;
+}
+.table-responsive th {
+  color: #ffcccc;
+  background-color: #921733;
+  font-weight: bold;
+  cursor: pointer;
+}
+.table-responsive tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+.table-responsive tbody tr:nth-child(odd) {
+  background-color: #ffffff;
 }
 
-.table-responsive th {
-  background-color: #f4f4f4;
-  font-weight: bold;
-  cursor: default;
+.table-responsive tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.table-responsive tbody tr:hover {
+  background-color: #ffcccc;
 }
 @media (max-width: 768px) {
   .table-responsive table,
@@ -239,7 +257,7 @@ a:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 0.4rem 0.6rem;
-  background-color: #f9f9f9;
+  background-color: white;
   cursor: pointer;
   transition:
     background-color 0.2s,
@@ -247,8 +265,8 @@ a:hover {
 }
 
 .pagination-button:hover:not(:disabled) {
-  background-color: #FFCCCC;
-  color: #921733;
+  background-color: #FF6B6B;
+  color: white;
 }
 
 .pagination-button:disabled {
@@ -264,24 +282,10 @@ a:hover {
   border-radius: 4px;
   text-align: center;
   transition: border-color 0.2s;
+  background-color: white;
 }
 
 .pagination-input:focus {
-  border-color: #FFCCCC;
-  outline: none;
-}
-
-/* Select page size */
-.pagination-select {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.pagination-select:focus {
-  border-color: #FFCCCC;
+  border-color: #FF6B6B;
   outline: none;
 }
