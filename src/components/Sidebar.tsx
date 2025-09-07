@@ -170,7 +170,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   return (
     <aside
-      className={`flex flex-col sidebar ${sidebarOpen ? "" : "close"}`}>
+      className={`sidebar ${sidebarOpen ? "" : "close"}`}>
       <div className='flex flex-row items-center justify-center p-4'>
         <div className={`aspect-auto sidelogo ${sidebarOpen ? "" : "close"}`}>
           <img src="/bengkulu-utara-logo.webp" alt="" className='max-w-[32px]' />

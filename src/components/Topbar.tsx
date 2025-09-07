@@ -23,11 +23,11 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
                 <h4>{pageTitle}</h4>
             </div>
             <Menu>
-                <MenuButton className={'bg-[#FFCCCC] text-[#921733] flex flex-row justify-center items-center gap-2 rounded-full p-1 focus-visible:outline-0'}>
-                    <div className='rounded-full overflow-hidden bg-[#921733]'>
+                <MenuButton className={'text-[#921733] flex flex-row justify-center items-center gap-2 px-2 py-2 focus-visible:outline-0'}>
+                    {/* <div className='rounded-full overflow-hidden bg-[#921733]'>
                         <img src='/avatar/default-avatar.png' width={32} />
-                    </div>
-                    <span className='font-medium'>Idris Gatra Putra</span>
+                    </div> */}
+                    <span className='font-medium'>Administrator</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-caret-down" viewBox="0 0 16 16">
                         <path d="M8 12l-6-6h12z" />
                     </svg>

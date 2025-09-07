@@ -1,8 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import 'tailwindcss';
 
 :root {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   background-color: #f8f8f8;
 
   /* Heading */
@@ -71,12 +71,12 @@ a:hover {
 }
 /* Topbar */
 .topbar {
-  @apply h-[70px] text-gray-800 p-4 flex justify-between items-center space-x-4 border-b-1 border-gray-200;
+  @apply sticky top-0 h-[70px] text-gray-800 p-4 flex justify-between items-center space-x-4 border-b-1 border-gray-200 bg-[#f8f8f8];
 }
 /* Sidebar */
 .sidebar {
   transition: width 0.2s ease;
-  @apply w-72 bg-white text-[#333] relative whitespace-break-spaces;
+  @apply flex flex-col w-72 bg-white text-[#333] sticky top-0 whitespace-break-spaces h-screen;
 }
 .sidebar.close {
   @apply w-20;
@@ -85,12 +85,12 @@ a:hover {
   width: 6px;
 }
 .sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: theme("colors.gray.400");
+  background-color: theme('colors.gray.400');
   border-radius: 6px;
 }
 .sidebar-scroll {
   scrollbar-width: thin;
-  scrollbar-color: theme("colors.gray.400") transparent;
+  scrollbar-color: theme('colors.gray.400') transparent;
 }
 .sidetitle {
   @apply block text-nowrap text-center cursor-default;
@@ -118,7 +118,7 @@ a:hover {
 }
 .sidelink.active::before,
 .sidelink:hover::before {
-  content: "";
+  content: '';
   @apply absolute left-0 top-0 bottom-0 w-0 bg-[#721027] rounded-tr-lg rounded-br-lg;
   transition: width 0.1s ease;
 }
@@ -137,16 +137,151 @@ a:hover {
 .authbg::before {
   content: '';
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: 
-    radial-gradient(circle, transparent 20%, #e5e5f7 20%, #e5e5f7 80%, transparent 80%, transparent) 0 0,
-    radial-gradient(circle, transparent 20%, #e5e5f7 20%, #e5e5f7 80%, transparent 80%, transparent) 25px 25px,
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(
+        circle,
+        transparent 20%,
+        #e5e5f7 20%,
+        #e5e5f7 80%,
+        transparent 80%,
+        transparent
+      )
+      0 0,
+    radial-gradient(
+        circle,
+        transparent 20%,
+        #e5e5f7 20%,
+        #e5e5f7 80%,
+        transparent 80%,
+        transparent
+      )
+      25px 25px,
     linear-gradient(#f74444 2px, transparent 2px) 0 -1px,
     linear-gradient(90deg, #f74444 2px, #e5e5f7 2px) -1px 0;
-  background-size: 50px 50px, 50px 50px, 25px 25px, 25px 25px;
+  background-size:
+    50px 50px,
+    50px 50px,
+    25px 25px,
+    25px 25px;
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2),
+    transparent
+  );
   z-index: -1;
   pointer-events: none;
+}
+/* Tabel */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-responsive table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.table-responsive th,
+.table-responsive td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.table-responsive th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  cursor: default;
+}
+@media (max-width: 768px) {
+  .table-responsive table,
+  .table-responsive thead,
+  .table-responsive tbody,
+  .table-responsive th,
+  .table-responsive td,
+  .table-responsive tr {
+    display: block;
+  }
+
+  .table-responsive thead tr {
+    display: none;
+  }
+
+  .table-responsive tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    padding: 10px;
+  }
+  .table-responsive td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    text-align: right;
+    position: relative;
+  }
+  .table-responsive td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    text-align: left;
+    font-weight: bold;
+  }
+}
+/* Paginasi Tabel */
+.pagination-button {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #FFCCCC;
+  color: #921733;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Input page number */
+.pagination-input {
+  width: auto;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.pagination-input:focus {
+  border-color: #FFCCCC;
+  outline: none;
+}
+
+/* Select page size */
+.pagination-select {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.pagination-select:focus {
+  border-color: #FFCCCC;
+  outline: none;
 }

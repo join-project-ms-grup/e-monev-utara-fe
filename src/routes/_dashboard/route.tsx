@@ -22,7 +22,7 @@ function RouteComponent() {
 
     return (
         <>
-            <div className="flex h-screen">
+            <div className="flex min-h-screen">
                 {/* Sidebar */}
                 <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 

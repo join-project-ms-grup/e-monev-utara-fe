@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { SITE_NAME } from '../../../configs/config'
+import { createFileRoute } from '@tanstack/react-router';
+import { SITE_NAME } from '../../../configs/config';
+import OrganisasiTable from '../../../components/tables/OrganisasiTable';
 
 export const Route = createFileRoute('/_dashboard/master/organisasi')({
   head: () => ({
@@ -13,13 +14,12 @@ export const Route = createFileRoute('/_dashboard/master/organisasi')({
     title: 'Organisasi',
   },
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-    return (
-        <>
-            <h4>Master - Organisasi</h4>
-            <span>Ini halaman master organisasi</span>
-        </>
-    )
+  return (
+    <>
+      <OrganisasiTable />
+    </>
+  );
 }

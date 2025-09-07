@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { SITE_NAME } from '../../configs/config';
 import { useState } from 'react';
 import InputText from '../../components/inputs/InputText';
-import { MdEmail, MdKey } from 'react-icons/md';
+import { MdKey, MdPerson } from 'react-icons/md';
 import InputButton from '../../components/inputs/InputButton';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -28,12 +28,12 @@ export const Route = createFileRoute('/auth/')({
 
 function RouteComponent() {
   const auth = useAuth()
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({ email, password });
+    console.log({ username, password });
     auth.loginDummy();
   };
 
@@ -47,7 +47,7 @@ function RouteComponent() {
               <img src="/bengkulu-utara-logo.webp" alt="" className='h-16' />
             </div>
             <div>
-              <h1 className="text-4xl font-bold mb-4 z-10">E-MONEV RKPD</h1>
+              <h1 className="text-4xl font-bold mb-4 z-10">E-MONEV</h1>
               <p className='uppercase font-semibold -mt-4'>Kabupaten Bengkulu Utara</p>
             </div>
           </div>
@@ -58,11 +58,11 @@ function RouteComponent() {
             <form onSubmit={handleSubmit} className="space-y-4 w-full">
               <div>
                 <InputText
-                  label="Email"
-                  Icon={MdEmail}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
+                  label="Username"
+                  Icon={MdPerson}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  type="text"
                   required
                 />
               </div>
