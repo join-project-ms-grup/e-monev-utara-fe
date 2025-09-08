@@ -1,53 +1,71 @@
-import { Link, useMatches } from '@tanstack/react-router'
-import React from 'react'
-import { MdChevronRight, MdHome } from 'react-icons/md'
+import { Link, useMatches } from '@tanstack/react-router';
+import React from 'react';
+import { MdChevronRight, MdHome } from 'react-icons/md';
 
-const Breadcrumb = () => {
-  const matches = useMatches()
+interface Breadcrumb extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
+
+const Breadcrumb = ({...props}: Breadcrumb) => {
+  const matches = useMatches();
 
   const crumbs = matches
-    .map(m => ({
+    .map((m) => ({
       id: m.id,
       path: m.pathname,
       title: m.staticData?.title,
       disabled: m.staticData?.isDisabled,
     }))
-    .filter(m => m.title)
+    .filter((m) => m.title);
 
   return (
-    <nav aria-label="breadcrumb">
-      <ol className='list-none inline-flex p-0 m-0 flex-wrap items-center bg-white px-2 rounded-sm shadow-sm'>
+    <nav aria-label='breadcrumb' {...props}>
+      <ol className='list-none inline-flex p-0 m-0 flex-wrap items-center'>
         <li className='py-1'>
-          <Link to="/"><MdHome className='size-6 text-[#721027]' /></Link>
+          <Link to='/' className='hover:text-[#FF5E5E]'>
+            <MdHome className='size-6 ' />
+          </Link>
         </li>
         <li>
-          {crumbs.length > 0 && <span><MdChevronRight className='size-10 text-[#72102741] -mx-2 -my-2' /></span>}
+          {crumbs.length > 0 && (
+            <span>
+              <MdChevronRight className='text-2xl opacity-50' />
+            </span>
+          )}
         </li>
         {crumbs.map((match, i) => {
-          const isLast = i === crumbs.length - 1
-          const isDisabled = match.disabled || isLast
+          const isLast = i === crumbs.length - 1;
+          const isDisabled = match.disabled || isLast;
 
           return (
             <React.Fragment key={match.id}>
-              <li className="flex items-center">
+              <li className='flex items-center'>
                 {i !== crumbs.length - 1 && !isDisabled ? (
                   <>
-                    <Link to={match.path} className="capitalize text-[#721027]">{match.title}</Link>
-
+                    <Link to={match.path} className='capitalize hover:text-[#FF5E5E]'>
+                      {match.title}
+                    </Link>
                   </>
                 ) : (
-                  <span className="capitalize text-gray-500">{match.title}</span>
+                  <span className='capitalize opacity-50 cursor-default'>
+                    {match.title}
+                  </span>
                 )}
               </li>
               <li>
-                {i !== crumbs.length - 1 && <span><MdChevronRight className='size-10 text-[#72102741] -mx-2 -my-2' /></span>}
+                {i !== crumbs.length - 1 && (
+                  <span>
+                    <MdChevronRight className='text-2xl opacity-50' />
+                    {/* <MdChevronRight className='size-10 text-[#72102741] -mx-2 -my-2' /> */}
+                  </span>
+                )}
               </li>
             </React.Fragment>
-          )
+          );
         })}
       </ol>
     </nav>
-  )
-}
+  );
+};
 
-export default Breadcrumb
+export default Breadcrumb;

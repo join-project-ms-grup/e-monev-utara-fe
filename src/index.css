@@ -4,6 +4,7 @@
 :root {
   font-family: 'Roboto', sans-serif;
   background-color: #f8f8f8;
+  color: #333;
 
   /* Heading */
   --heading-color: #222;
@@ -63,7 +64,7 @@ a {
   opacity: 1;
   /* color: #1e88e5; */
   text-decoration: none;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
   font-weight: 500;
 }
 a:hover {
@@ -200,10 +201,13 @@ a:hover {
   text-align: center;
 }
 .table-responsive th {
-  color: #ffcccc;
-  background-color: #921733;
+  color: white;
+  background-color: #FF6B6B;
   font-weight: bold;
   cursor: pointer;
+}
+.table-responsive th:hover{
+  background-color: #FF5E5E;
 }
 .table-responsive tbody tr {
   border-bottom: 1px solid #ddd;
