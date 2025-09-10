@@ -2,9 +2,19 @@
 @import 'tailwindcss';
 
 :root {
+  /* Main Color */
+  --bg-color: #f8f8f8;
+  --color-1: #dc143c;
+  --color-2: #f75270;
+  --color-3: #f7cac9;
+  --color-4: #fdebd0;
+  --text-1: #333;
+  --text-2: #ccc;
+  --text-3: #f8f8f8;
+
   font-family: 'Roboto', sans-serif;
-  background-color: #f8f8f8;
-  color: #333;
+  background-color: var(--bg-color);
+  color: var(--text-1);
 
   /* Heading */
   --heading-color: #222;
@@ -31,10 +41,7 @@ h4,
 h5,
 h6 {
   font-family: var(--heading-font);
-  /* color: var(--heading-color); */
   line-height: var(--heading-line-height);
-  /* margin-top: 1.5rem; */
-  /* margin-bottom: 0.5rem; */
   font-weight: 700;
 }
 h1 {
@@ -107,20 +114,20 @@ a:hover {
 }
 /* Nav Link Sidebar */
 .sidelink {
-  transition: width 0.1s ease;
-  @apply flex flex-row relative text-[#333333] block py-2 px-4 rounded gap-2 items-center min-h-12 font-semibold whitespace-pre;
+  transition: all 0.1s ease;
+  @apply flex flex-row relative text-[#333333] py-2 px-4 rounded gap-2 items-center min-h-12 font-semibold whitespace-pre;
 }
 .sidelink span {
   @apply text-left;
 }
 .sidelink.active,
 .sidelink:hover {
-  @apply text-[#921733] bg-[#FFCCCC] box-border;
+  @apply text-[var(--text-3)] bg-[var(--color-2)] box-border;
 }
 .sidelink.active::before,
 .sidelink:hover::before {
   content: '';
-  @apply absolute left-0 top-0 bottom-0 w-0 bg-[#721027] rounded-tr-lg rounded-br-lg;
+  @apply absolute left-0 top-0 bottom-0 w-0 bg-[var(--color-1)] rounded-tr-lg rounded-br-lg;
   transition: width 0.1s ease;
 }
 .sidelink.active::before {
@@ -188,7 +195,7 @@ a:hover {
   min-width: 600px;
 }
 .table-responsive tbody {
-  border-bottom: 2px solid #921733;
+  border-bottom: 2px solid var(--color-2);
 }
 .table-responsive thead {
   position: relative;
@@ -198,30 +205,35 @@ a:hover {
 .table-responsive td {
   padding: 12px 15px;
   border: none;
-  text-align: center;
+  /* text-align: center; */
 }
 .table-responsive th {
-  color: white;
-  background-color: #FF6B6B;
+  color: var(--text-3);
+  background-color: var(--color-2);
   font-weight: bold;
   cursor: pointer;
 }
-.table-responsive th:hover{
-  background-color: #FF5E5E;
+.table-responsive th:hover {
+  background-color: var(--color-1);
 }
 .table-responsive tbody tr {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--color-3);
 }
 .table-responsive tbody tr:nth-child(odd) {
-  background-color: #ffffff;
+  background-color: white;
 }
 
 .table-responsive tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: var(--bg-color);
 }
 .table-responsive tbody tr:hover {
-  background-color: #ffcccc;
+  background-color: var(--color-4);
 }
+/* .table-responsive td[data-column-id="aksi"],
+.table-responsive th[data-column-id="aksi"] {
+  width: 10%;
+  white-space: nowrap;
+} */
 @media (max-width: 768px) {
   .table-responsive table,
   .table-responsive thead,
@@ -258,7 +270,7 @@ a:hover {
 }
 /* Paginasi Tabel */
 .pagination-button {
-  border: 1px solid #ccc;
+  border: 1px solid var(--text-2);
   border-radius: 4px;
   padding: 0.4rem 0.6rem;
   background-color: white;
@@ -269,8 +281,8 @@ a:hover {
 }
 
 .pagination-button:hover:not(:disabled) {
-  background-color: #FF6B6B;
-  color: white;
+  background-color: var(--color-2);
+  color: var(--text-3);
 }
 
 .pagination-button:disabled {
@@ -282,7 +294,7 @@ a:hover {
 .pagination-input {
   width: auto;
   padding: 0.25rem 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--text-2);
   border-radius: 4px;
   text-align: center;
   transition: border-color 0.2s;
@@ -290,6 +302,6 @@ a:hover {
 }
 
 .pagination-input:focus {
-  border-color: #FF6B6B;
+  border-color: var(--color-2);
   outline: none;
 }

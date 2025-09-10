@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SITE_NAME } from '../../../configs/config'
+import { SITE_NAME } from '../../../lib/config'
+import JadwalTable from '../../../components/tables/JadwalTable'
 
 export const Route = createFileRoute('/_dashboard/master/jadwal')({
   head: () => ({
@@ -21,8 +22,7 @@ export const Route = createFileRoute('/_dashboard/master/jadwal')({
 function RouteComponent() {
     return (
         <>
-            <h4>Master - Jadwal</h4>
-            <span>Ini halaman master jadwal</span>
+            <JadwalTable />
         </>
     )
 }

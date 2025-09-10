@@ -1,23 +1,51 @@
-import { HeadContent, Outlet, createRootRouteWithContext, useRouter } from '@tanstack/react-router'
-import type { AuthContextType } from '../contexts/AuthContext'
+import {
+  HeadContent,
+  Outlet,
+  createRootRouteWithContext,
+} from '@tanstack/react-router';
+import toast, { ToastBar, Toaster } from 'react-hot-toast';
+import { MdClose } from 'react-icons/md';
 
-interface AuthType{
-  auth: AuthContextType
+interface AuthType {
+  token: string | null;
 }
 
 export const Route = createRootRouteWithContext<AuthType>()({
   component: RootComponent,
-})
+});
 
 function RootComponent() {
-  const router = useRouter();
-  const user = router.options.context.auth;
-  console.log(user)
-
   return (
     <>
       <HeadContent />
       <Outlet />
+      <Toaster
+        position='top-right'
+        toastOptions={{
+          duration: 5000
+        }}
+      >
+        {(t) => (
+          <ToastBar toast={t}>
+            {({ icon, message }) => (
+              <>
+                {icon}
+                {message}
+                {t.type !== 'loading' && (
+                  <>
+                    <button
+                      className='text-red-400 transition-all hover:text-red-300 active:scale-90'
+                      onClick={() => toast.dismiss(t.id)}
+                    >
+                      <MdClose />
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+          </ToastBar>
+        )}
+      </Toaster>
     </>
-  )
+  );
 }

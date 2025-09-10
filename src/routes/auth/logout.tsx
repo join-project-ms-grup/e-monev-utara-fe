@@ -1,27 +1,33 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useAuth } from '../../contexts/AuthContext'
-import { useEffect } from 'react'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { useAuth } from '../../contexts/AuthContext';
+import { useEffect, useState } from 'react';
 
 export const Route = createFileRoute('/auth/logout')({
-    beforeLoad: ({ context }) => {
-        const { token } = context.auth
-        if (!token) {
-            throw redirect({ to: "/auth" })
-        }
-    },
-    component: RouteComponent,
-})
+  beforeLoad: ({ context }) => {
+    const { token } = context;
+    if (!token) {
+      throw redirect({ to: '/auth' });
+    }
+  },
+  component: RouteComponent,
+});
 
 function RouteComponent() {
-    const { logout } = useAuth()
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [isLogout, setIsLogout] = useState(false);
 
-    useEffect(() => {
-        logout()
-    }, [logout])
+  useEffect(() => {
+    if (!isLogout) {
+      logout();
+      navigate({ to: '/auth' });
+      setIsLogout(true);
+    }
+  }, [logout, navigate]);
 
-    return (
-        <>
-            <span>Logout...</span>
-        </>
-    )
+  return (
+    <>
+      <span>Logout...</span>
+    </>
+  );
 }

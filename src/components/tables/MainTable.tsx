@@ -1,74 +1,37 @@
-import { useState } from 'react';
-import { organisasiDummy, type OrganisasiType } from '../../dummy/dummy_data';
 import {
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type ColumnDef,
   type PaginationState,
 } from '@tanstack/react-table';
 import {
-  MdArrowDropDown,
   MdArrowDropUp,
+  MdArrowDropDown,
+  MdKeyboardDoubleArrowLeft,
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight,
-  MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
 } from 'react-icons/md';
 import InputSelectBox from '../inputs/InputSelectBox';
+import { useState } from 'react';
 
-const OrganisasiTable = () => {
-  const columnHelper = createColumnHelper<OrganisasiType>();
-  const [data, _setData] = useState(() => [...organisasiDummy]);
+interface MainTableProps<TData> {
+  data: TData[];
+  columns: ColumnDef<TData, any>[];
+}
+
+const MainTable = <TData,>({ data, columns }: MainTableProps<TData>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const columns = [
-    columnHelper.accessor('id', {
-      header: 'No',
-      cell: (info) => (
-        <span className='flex justify-center'>{info.getValue()}</span>
-      ),
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor((row) => row.tahun, {
-      id: 'lastName',
-      cell: (info) => info.getValue(),
-      header: 'Tahun',
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('kode_org', {
-      header: 'Kode Organisasi',
-      cell: (info) => info.renderValue(),
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('org', {
-      header: 'Organisasi',
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('bidang', {
-      header: 'Bidang',
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('status', {
-      header: 'Status',
-      cell: (info) => (
-        <span
-          className={`${info.getValue().includes('Aktif') ? ' text-green-700' : 'text-red-700'}`}
-        >
-          {info.getValue()}
-        </span>
-      ),
-      footer: (info) => info.column.id,
-    }),
-  ];
   const table = useReactTable({
-    data,
-    columns,
+    data: data,
+    columns: columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -83,7 +46,10 @@ const OrganisasiTable = () => {
     <div className='table-responsive'>
       <div className='inline-flex gap-2 mb-2 items-center'>
         <span>Tahun Anggaran</span>
-        <InputSelectBox options={[2025, 2024, 2023, 2022, 2021]} onChange={(e) => console.log(e)} />
+        <InputSelectBox
+          options={[2025, 2024, 2023, 2022, 2021]}
+          onChange={(e) => console.log(e)}
+        />
       </div>
       <table className='table-auto'>
         <thead>
@@ -130,7 +96,11 @@ const OrganisasiTable = () => {
       <div className='flex flex-row items-center justify-between mt-2'>
         <div className='flex items-center gap-2'>
           <span className='opacity-85'>Menampilkan</span>
-          <InputSelectBox value={table.getState().pagination.pageSize} options={[10, 20, 30, 40, 50]} onChange={(value) => table.setPageSize(value)} />
+          <InputSelectBox
+            value={table.getState().pagination.pageSize}
+            options={[10, 20, 30, 40, 50]}
+            onChange={(value) => table.setPageSize(value)}
+          />
           <span className='opacity-85'>
             dari {table.getRowCount().toLocaleString()} data
           </span>
@@ -186,4 +156,4 @@ const OrganisasiTable = () => {
   );
 };
 
-export default OrganisasiTable;
+export default MainTable;

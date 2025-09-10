@@ -1,48 +1,59 @@
-import { createContext, useContext, useState } from "react"
-import router from "../router"
+import { createContext, useContext, useState } from 'react';
+import Cookies from 'js-cookie';
+import toast from 'react-hot-toast';
+
+export interface UserDataType {
+  nama: string;
+  roleId: string | null;
+  roleName: string | null;
+  opdId: number | null;
+  username: string;
+}
 
 export interface AuthContextType {
   token: string | null
-  login: (newToken: string) => void
+  user: UserDataType | null
+  login: (data: { token: string; user: UserDataType }) => void
   logout: () => void
-  loginDummy: () => void
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem("token")
-  })
+    return Cookies.get('token') || null;
+  });
+  const [user, setUser] = useState<UserDataType | null>(() => {
+    const saved = Cookies.get('user');
+    return saved ? JSON.parse(saved) : null;
+  });
 
-  const login = (newToken: string) => {
-    localStorage.setItem("token", newToken)
-    setToken(newToken)
-    router.navigate({ to: "/" })
-  }
+  const login = (data: { token: string; user: UserDataType }) => {
+    Cookies.set('token', data.token, { expires: 1, sameSite: 'strict' });
+    Cookies.set('user', JSON.stringify(data.user), {
+      expires: 1,
+      sameSite: 'strict',
+    });
+    setToken(data.token);
+    setUser(data.user);
+    toast.success('Autentikasi berhasil');
+  };
 
   const logout = () => {
-    localStorage.removeItem("token")
-    setToken(null)
-    router.navigate({ to: "/auth" })
-  }
-
-  const loginDummy = () => {
-    const dummy = "dummy-token-123"
-    localStorage.setItem("token", dummy)
-    setToken(dummy)
-    console.log('AUTHCONTEXT')
-    router.navigate({ to: "/" })
-  }
+    Cookies.remove('token');
+    Cookies.remove('user');
+    setToken(null);
+    setUser(null);
+    toast.success('Logout berhasil');
+  };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, loginDummy }}>
+    <AuthContext.Provider value={{ token, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error("useAuth must be used inside AuthProvider")

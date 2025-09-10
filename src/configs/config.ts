@@ -1,1 +1,0 @@
-export const SITE_NAME: string = "e-MONEV RKPD";

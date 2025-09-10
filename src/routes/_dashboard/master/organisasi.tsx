@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { SITE_NAME } from '../../../configs/config';
+import { SITE_NAME } from '../../../lib/config';
 import OrganisasiTable from '../../../components/tables/OrganisasiTable';
 
 export const Route = createFileRoute('/_dashboard/master/organisasi')({
