@@ -2,71 +2,69 @@ import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import type {
-  SKPDAddType,
-  SKPDDeleteype,
-  SKPDEditType,
-  SKPDType,
+  RoleAdminType,
+  RoleDevType,
+  RoleEditType,
 } from '../../types/data';
 import Spinner from '../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
-import {
-  getSKPD,
-  addSKPD,
-  deleteSKPD,
-  updateSKPD,
-} from '../../services/SKPDService';
 import { useState } from 'react';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
-import FormSKPD from '../forms/FormSKPD';
+import {
+  addRole,
+  deleteRole,
+  getRoleDev,
+  updateRole,
+} from '../../services/RoleService';
+import FormRole from '../forms/FormRole';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
 
-const SKPDTable = () => {
+const RoleTable = () => {
   // Modal
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   // Form Data
-  const initialFormData: SKPDAddType = {
+  const initialFormData: RoleAdminType = {
     kode: '',
     name: '',
-    shortname: '',
   };
-  const initialFormEdit: SKPDEditType = {
+  const initialFormEdit: RoleEditType = {
     id: 0,
     kode: '',
     name: '',
-    shortname: '',
-    status: '',
   };
-  const initialFormDelete: SKPDDeleteype = {
+  const initialFormDelete: Pick<RoleDevType, 'id' | 'name'> = {
     id: 0,
     name: '',
   };
 
-  const [formData, setFormData] = useState<SKPDAddType>(initialFormData);
-  const [formEdit, setFormEdit] = useState<SKPDEditType>(initialFormEdit);
+  const [formData, setFormData] = useState<RoleAdminType>(initialFormData);
+  const [formEdit, setFormEdit] = useState<
+    RoleAdminType & Pick<RoleDevType, 'id'>
+  >(initialFormEdit);
   const [formDelete, setFormDelete] =
-    useState<SKPDDeleteype>(initialFormDelete);
+    useState<Pick<RoleDevType, 'id' | 'name'>>(initialFormDelete);
 
   // Data fetching
   const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_skpd'],
-    queryFn: getSKPD,
+    queryKey: ['tabel_role'],
+    queryFn: getRoleDev,
   });
 
   const queryClient = useQueryClient();
   // Add
   const addMutation = useMutation({
-    mutationFn: async (payload: SKPDAddType) => {
+    mutationFn: async (payload: RoleAdminType) => {
       setLoadingMutation(true);
-      return addSKPD(payload);
+      return addRole(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
+      queryClient.invalidateQueries({ queryKey: ['tabel_role'] });
       toast.success('Data berhasil ditambahkan');
     },
     onSettled: () => {
@@ -82,13 +80,13 @@ const SKPDTable = () => {
       payload,
     }: {
       id: number;
-      payload: Omit<SKPDEditType, 'id'>;
+      payload: RoleAdminType;
     }) => {
       setLoadingMutation(true);
-      return updateSKPD(id, payload);
+      return updateRole(id, payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
+      queryClient.invalidateQueries({ queryKey: ['tabel_role'] });
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
@@ -104,10 +102,10 @@ const SKPDTable = () => {
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       setLoadingMutation(true);
-      return deleteSKPD(id);
+      return deleteRole(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
+      queryClient.invalidateQueries({ queryKey: ['tabel_role'] });
       toast.success('Data berhasil dihapus');
     },
     onError: () => {
@@ -121,7 +119,7 @@ const SKPDTable = () => {
   });
 
   // Kolom
-  const columnHelper = createColumnHelper<SKPDType>();
+  const columnHelper = createColumnHelper<RoleDevType>();
   const columns = [
     columnHelper.display({
       header: 'No',
@@ -134,23 +132,8 @@ const SKPDTable = () => {
     columnHelper.accessor('kode', {
       header: 'Kode',
     }),
-    columnHelper.accessor('shortname', {
-      header: 'Singkatan',
-    }),
     columnHelper.accessor('name', {
       header: 'Nama',
-    }),
-    columnHelper.accessor('status', {
-      header: 'Status',
-      cell: (info) => (
-        <>
-          {Number(info.getValue()) === 1 ? (
-            <span className='text-green-700'>Aktif</span>
-          ) : (
-            <span className='text-red-700'>Nonaktif</span>
-          )}
-        </>
-      ),
     }),
     columnHelper.display({
       header: 'Aksi',
@@ -165,8 +148,6 @@ const SKPDTable = () => {
                   id: row.original.id,
                   kode: row.original.kode,
                   name: row.original.name,
-                  shortname: row.original.shortname,
-                  status: row.original.status.toString(),
                 });
                 setOpenEdit(true);
               }}
@@ -227,21 +208,20 @@ const SKPDTable = () => {
         tabletop={<TableTopbar />}
       />
       <DialogModal
-        title='Tambah data SKPD'
+        title='Tambah data Role'
         isOpen={openAdd}
         onClose={() => setOpenAdd(false)}
       >
-        <FormSKPD
+        <FormRole
           type='Add'
           formData={formData}
           setFormData={setFormData}
-          onSubmit={(data: SKPDAddType) => {
+          onSubmit={(data: RoleAdminType) => {
             console.log('Data dari form modal:', data);
             // addMutation.mutate(data);
             addMutation.mutate({
               kode: Number(data.kode),
               name: data.name,
-              shortname: data.shortname,
             });
           }}
         >
@@ -254,26 +234,24 @@ const SKPDTable = () => {
               Simpan
             </InputButton>
           </div>
-        </FormSKPD>
+        </FormRole>
       </DialogModal>
       <DialogModal
-        title='Ubah data SKPD'
+        title='Ubah data Role'
         isOpen={openEdit}
         onClose={() => setOpenEdit(false)}
       >
-        <FormSKPD
+        <FormRole
           type='Edit'
           formData={formEdit}
           setFormData={setFormEdit}
-          onSubmit={(data: SKPDEditType) => {
+          onSubmit={(data: RoleEditType) => {
             console.log('Data dari form modal:', data);
             updateMutation.mutate({
               id: data.id,
               payload: {
-                kode: data.kode,
+                kode: Number(data.kode),
                 name: data.name,
-                shortname: data.shortname,
-                status: data.status === 'true',
               },
             });
           }}
@@ -287,10 +265,10 @@ const SKPDTable = () => {
               Simpan
             </InputButton>
           </div>
-        </FormSKPD>
+        </FormRole>
       </DialogModal>
       <DialogModal
-        title='Hapus data SKPD'
+        title='Hapus data Role'
         isOpen={openDelete}
         onClose={() => setOpenDelete(false)}
       >
@@ -314,4 +292,4 @@ const SKPDTable = () => {
   );
 };
 
-export default SKPDTable;
+export default RoleTable;

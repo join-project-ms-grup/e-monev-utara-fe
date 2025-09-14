@@ -1,11 +1,11 @@
-import api from "../lib/api";
+import api, { type ApiResponse } from "../lib/api";
 import type { SKPDAddType, SKPDEditType, SKPDType } from "../types/data";
 
-type ApiResponse<T> = {
-  success: boolean;
-  message: string;
-  data: T;
-};
+// type ApiResponse<T> = {
+//   success: boolean;
+//   message: string;
+//   data: T;
+// };
 
 export const getSKPD = async (): Promise<SKPDType[]> => {
   const response = await api.get<ApiResponse<SKPDType[]>>("/skpd/list");

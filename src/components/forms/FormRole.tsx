@@ -2,27 +2,27 @@ import React, { useState } from 'react';
 import InputButton from '../inputs/InputButton';
 import InputText from '../inputs/InputText';
 import InputSelectBox from '../inputs/InputSelectBox';
-import type { SKPDAddType, SKPDEditType } from '../../types/data';
+import type { RoleAdminType, RoleEditType } from '../../types/data';
 
 interface FormAddProps {
   type: 'Add';
   children?: React.ReactElement;
-  onSubmit: (data: SKPDAddType) => void;
-  formData: SKPDAddType;
-  setFormData: React.Dispatch<React.SetStateAction<SKPDAddType>>;
+  onSubmit: (data: RoleAdminType) => void;
+  formData: RoleAdminType;
+  setFormData: React.Dispatch<React.SetStateAction<RoleAdminType>>;
 }
 
 interface FormEditProps {
   type: 'Edit';
   children?: React.ReactElement;
-  onSubmit: (data: SKPDEditType) => void;
-  formData: SKPDEditType;
-  setFormData: React.Dispatch<React.SetStateAction<SKPDEditType>>;
+  onSubmit: (data: RoleEditType) => void;
+  formData: RoleEditType;
+  setFormData: React.Dispatch<React.SetStateAction<RoleEditType>>;
 }
 
 type FormProps = FormAddProps | FormEditProps;
 
-const FormSKPD: React.FC<FormProps> = ({
+const FormRole: React.FC<FormProps> = ({
   type,
   children,
   onSubmit,
@@ -80,38 +80,6 @@ const FormSKPD: React.FC<FormProps> = ({
           required
         />
       </div>
-      <div className='grid grid-cols-4 items-center gap-2'>
-        <label htmlFor='shortname'>Singkatan</label>
-        <InputText
-          id='shortname'
-          label='Singkatan'
-          name='shortname'
-          value={formData.shortname}
-          onChange={handleChange}
-          className='col-span-3'
-          required
-        />
-      </div>
-      {type == 'Edit' && (
-        <div className='grid grid-cols-4 items-center gap-2'>
-          <label htmlFor='status'>Status</label>
-          <InputSelectBox
-            id='status'
-            name='status'
-            options={[
-              { label: 'Ya', value: 'true' },
-              { label: 'Tidak', value: 'false' },
-            ]}
-            value={(formData as SKPDEditType).status.toString()}
-            onChange={(val) =>
-              setFormData({ ...(formData as SKPDEditType), status: val })
-            }
-            defaultOptionLabel='Pilih Status'
-            className='col-span-3'
-            required
-          />
-        </div>
-      )}
       {children ? (
         children
       ) : (
@@ -123,4 +91,4 @@ const FormSKPD: React.FC<FormProps> = ({
   );
 };
 
-export default FormSKPD;
+export default FormRole;

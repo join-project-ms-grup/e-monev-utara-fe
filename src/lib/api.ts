@@ -2,6 +2,12 @@ import axios from "axios"
 import Cookies from "js-cookie"
 import { SITE_URL } from "./config"
 
+export type ApiResponse<T> = {
+    success: boolean;
+    message: string;
+    data: T;
+};
+
 const api = axios.create({
   baseURL: SITE_URL,
   headers: {
