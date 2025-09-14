@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from 'react';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 
-export interface UserDataType {
+export interface LoggedUserType {
   nama: string;
   roleId: string | null;
   roleName: string | null;
@@ -12,8 +12,8 @@ export interface UserDataType {
 
 export interface AuthContextType {
   token: string | null
-  user: UserDataType | null
-  login: (data: { token: string; user: UserDataType }) => void
+  user: LoggedUserType | null
+  login: (data: { token: string; user: LoggedUserType }) => void
   logout: () => void
 }
 
@@ -23,15 +23,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => {
     return Cookies.get('token') || null;
   });
-  const [user, setUser] = useState<UserDataType | null>(() => {
-    const saved = Cookies.get('user');
+  const [user, setUser] = useState<LoggedUserType | null>(() => {
+    const saved = Cookies.get('me');
     return saved ? JSON.parse(saved) : null;
   });
 
-  const login = (data: { token: string; user: UserDataType }) => {
-    Cookies.set('token', data.token, { expires: 1, sameSite: 'strict' });
-    Cookies.set('user', JSON.stringify(data.user), {
-      expires: 1,
+  const login = (data: { token: string; user: LoggedUserType }) => {
+    Cookies.set('token', data.token, { sameSite: 'strict' });
+    Cookies.set('me', JSON.stringify(data.user), {
       sameSite: 'strict',
     });
     setToken(data.token);
@@ -41,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     Cookies.remove('token');
-    Cookies.remove('user');
+    Cookies.remove('me');
     setToken(null);
     setUser(null);
     toast.success('Logout berhasil');

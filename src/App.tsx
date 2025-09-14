@@ -3,7 +3,7 @@ import router from './router';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 function RouterWithAuth() {
   const { token, user } = useAuth();

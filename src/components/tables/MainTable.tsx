@@ -7,6 +7,7 @@ import {
   useReactTable,
   type ColumnDef,
   type PaginationState,
+  type RowData,
 } from '@tanstack/react-table';
 import {
   MdArrowDropUp,
@@ -17,14 +18,27 @@ import {
   MdKeyboardDoubleArrowRight,
 } from 'react-icons/md';
 import InputSelectBox from '../inputs/InputSelectBox';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
+import InputButton from '../inputs/InputButton';
 
 interface MainTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData, any>[];
+  tabletop?: ReactNode;
 }
 
-const MainTable = <TData,>({ data, columns }: MainTableProps<TData>) => {
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    tdClassNames?: string;
+    thClassNames?: string;
+  }
+}
+
+const MainTable = <TData,>({
+  data,
+  columns,
+  tabletop,
+}: MainTableProps<TData>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -43,21 +57,25 @@ const MainTable = <TData,>({ data, columns }: MainTableProps<TData>) => {
   });
 
   return (
-    <div className='table-responsive'>
-      <div className='inline-flex gap-2 mb-2 items-center'>
-        <span>Tahun Anggaran</span>
-        <InputSelectBox
-          options={[2025, 2024, 2023, 2022, 2021]}
-          onChange={(e) => console.log(e)}
-        />
-      </div>
+    <div className='table-responsive py-2'>
+      {tabletop && (
+        <>
+          <div className='flex mb-2'>{tabletop}</div>
+        </>
+      )}
       <table className='table-auto'>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <th key={header.id} colSpan={header.colSpan}>
+                  <th
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    {...(header.column.columnDef.meta?.thClassNames
+                      ? { className: header.column.columnDef.meta.thClassNames }
+                      : {})}
+                  >
                     <div
                       {...{
                         className: header.column.getCanSort()
@@ -85,7 +103,12 @@ const MainTable = <TData,>({ data, columns }: MainTableProps<TData>) => {
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>
+                <td
+                  key={cell.id}
+                  {...(cell.column.columnDef.meta?.tdClassNames
+                    ? { className: cell.column.columnDef.meta.tdClassNames }
+                    : {})}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -95,61 +118,78 @@ const MainTable = <TData,>({ data, columns }: MainTableProps<TData>) => {
       </table>
       <div className='flex flex-row items-center justify-between mt-2'>
         <div className='flex items-center gap-2'>
-          <span className='opacity-85'>Menampilkan</span>
+          <span className='opacity-85'>Tampilkan</span>
           <InputSelectBox
-            value={table.getState().pagination.pageSize}
-            options={[10, 20, 30, 40, 50]}
-            onChange={(value) => table.setPageSize(value)}
+            className='h-9'
+            value={table.getState().pagination.pageSize.toString()}
+            options={[
+              { label: '10', value: '10' },
+              { label: '20', value: '20' },
+              { label: '30', value: '30' },
+              { label: '40', value: '40' },
+              { label: '50', value: '50' },
+            ]}
+            onChange={(value) => table.setPageSize(Number(value))}
           />
           <span className='opacity-85'>
             dari {table.getRowCount().toLocaleString()} data
           </span>
         </div>
         <div className='flex flex-row gap-2'>
-          <button
-            className='pagination-button'
+          <InputButton
+            className='w-9 h-9'
             onClick={() => table.firstPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <MdKeyboardDoubleArrowLeft />
-          </button>
-          <button
-            className='pagination-button'
+          </InputButton>
+          <InputButton
+            className='w-9 h-9'
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <MdKeyboardArrowLeft />
-          </button>
+          </InputButton>
           <div className='flex items-center gap-2'>
             <input
               type='number'
               min='1'
               max={table.getPageCount()}
               value={table.getState().pagination.pageIndex + 1}
+              // onChange={(e) => {
+              //   const page = e.target.value ? Number(e.target.value) - 1 : 0;
+              //   table.setPageIndex(page);
+              // }}
               onChange={(e) => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                let page = Number(e.target.value) - 1;
+
+                if (isNaN(page)) page = 0;
+                if (page < 0) page = 0;
+                if (page >= table.getPageCount())
+                  page = table.getPageCount() - 1;
+
                 table.setPageIndex(page);
               }}
-              className='pagination-input'
+              className='pagination-input h-9'
             />
             <span className='opacity-85'>
               dari {table.getPageCount().toLocaleString()}
             </span>
           </div>
-          <button
-            className='pagination-button'
+          <InputButton
+            className='w-9 h-9'
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             <MdKeyboardArrowRight />
-          </button>
-          <button
-            className='pagination-button'
+          </InputButton>
+          <InputButton
+            className='w-9 h-9'
             onClick={() => table.lastPage()}
             disabled={!table.getCanNextPage()}
           >
             <MdKeyboardDoubleArrowRight />
-          </button>
+          </InputButton>
         </div>
       </div>
     </div>

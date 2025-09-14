@@ -1,6 +1,6 @@
 import { Link, useMatches } from '@tanstack/react-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { MdMenu } from 'react-icons/md';
+import { MdKeyboardArrowDown, MdMenu } from 'react-icons/md';
 import { useAuth } from '../contexts/AuthContext';
 
 type TopbarProps = {
@@ -14,7 +14,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
   const pageTitle = matches[matches.length - 1].staticData?.title;
 
   return (
-    <header className='topbar z-10'>
+    <header className='z-10 sticky top-0 h-[70px] text-gray-800 p-4 flex justify-between items-center space-x-4 border-b-1 border-gray-200 bg-[#f8f8f8]'>
       <button
         className='transition-all active:scale-80 hover:opacity-60'
         onClick={toggleSidebar}
@@ -27,7 +27,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
       <Menu>
         <MenuButton
           className={
-            'text-[#921733] flex flex-row justify-center items-center gap-2 px-2 py-2 focus-visible:outline-0'
+            'flex flex-row justify-center items-center gap-2 px-2 py-2 focus-visible:outline-0'
           }
         >
           {/* <div className='rounded-full overflow-hidden bg-[#921733]'>
@@ -37,16 +37,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
             <span className='font-medium'>{user?.nama}</span>
             <span className='text-sm'>{user?.roleName}</span>
           </div>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='18'
-            height='18'
-            fill='currentColor'
-            className='bi bi-caret-down'
-            viewBox='0 0 16 16'
-          >
-            <path d='M8 12l-6-6h12z' />
-          </svg>
+          <MdKeyboardArrowDown />
         </MenuButton>
         <MenuItems
           anchor='bottom'

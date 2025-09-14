@@ -5,60 +5,114 @@ import {
   ListboxOption,
 } from '@headlessui/react';
 import { MdKeyboardArrowDown } from 'react-icons/md';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
-export interface InputSelectBox<T> {
-  value?: T;
-  defaultValue?: T;
-  onChange?: (value: T) => void;
-  options: T[];
-  className?: string;
-  renderOption?: (option: T) => React.ReactNode;
+export interface OptionItem {
+  label: string;
+  value: string;
 }
 
-export default function InputSelectBox<T extends string | number>({
+export interface InputSelectBoxProps {
+  id?: string;
+  name?: string;
+  value?: string;
+  defaultValue?: string;
+  defaultOptionLabel?: string;
+  onChange?: (
+    value: string,
+    event?: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
+  options: OptionItem[];
+  className?: string;
+  btnclassName?: string;
+  required?: boolean;
+  disabled?: boolean;
+}
+
+export default function InputSelectBox({
+  id,
+  name,
   value,
   defaultValue,
+  defaultOptionLabel,
   onChange,
   options,
-  className = '',
-  renderOption,
-}: InputSelectBox<T>) {
-  const [internalValue, setInternalValue] = useState<T>(
-    defaultValue ?? options[0],
+  className,
+  btnclassName,
+  required = false,
+  disabled = false,
+}: InputSelectBoxProps) {
+  const allOptions = defaultOptionLabel
+    ? [{ label: defaultOptionLabel, value: '' }, ...options]
+    : options;
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const [internalValue, setInternalValue] = useState<string>(
+    defaultValue ?? '',
   );
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : internalValue;
 
-  const handleChange = (val: T) => {
-    if (!isControlled) {
-      setInternalValue(val);
-    }
-    onChange?.(val);
+  const handleChange = (val: string) => {
+    if (!isControlled) setInternalValue(val);
+
+    const fakeEvent = {
+      target: { name, value: val },
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
+
+    onChange?.(val, fakeEvent);
   };
 
+  const currentLabel =
+    allOptions.find((o) => o.value === currentValue)?.label ?? '';
+
   return (
-    <Listbox value={currentValue} onChange={handleChange}>
-      <ListboxButton
-        className={`inline-flex items-center gap-1 bg-white border border-[#ccc] focus:border-[#FF6B6B] py-1 px-2 rounded transition-colors focus:outline-0 ${className}`}
-      >
-        {renderOption ? renderOption(currentValue) : currentValue}{' '}
-        <MdKeyboardArrowDown />
-      </ListboxButton>
-      <ListboxOptions
-        anchor='bottom'
-        className='w-(--button-width) p-1 bg-white border border-[#ccc] rounded shadow-lg focus-visible:outline-0'
-      >
-        {options.map((option) => (
-          <ListboxOption
-            key={String(option)}
-            value={option}
-            className='data-focus:bg-[#ffcccc] cursor-pointer py-1 px-2 rounded'
-          >
-            {renderOption ? renderOption(option) : option}
-          </ListboxOption>
-        ))}
-      </ListboxOptions>
-    </Listbox>
+    <div className={`relative flex ${className}`}>
+      <Listbox value={currentValue} onChange={handleChange} disabled={disabled}>
+        <ListboxButton
+          id={id}
+          ref={buttonRef}
+          className={`w-full inline-flex justify-between items-center gap-1 bg-white border border-[#ccc] focus:border-[var(--color-2)] data-open:border-[var(--color-2)] focus:outline-none py-2 px-3 rounded transition-colors ${btnclassName}`}
+        >
+          {currentLabel} <MdKeyboardArrowDown />
+        </ListboxButton>
+        <ListboxOptions
+          anchor='bottom'
+          className='w-(--button-width) p-1 bg-white border border-[#ccc] rounded shadow-lg focus-visible:outline-0 z-[9999]'
+        >
+          {allOptions.map((option) => (
+            <ListboxOption
+              disabled={option.value === ''}
+              key={String(option.value)}
+              value={option.value}
+              className={`data-focus:bg-[#ffcccc] cursor-pointer py-1 px-2 rounded ${
+                option.value === '' ? 'text-gray-400' : ''
+              }`}
+            >
+              {option.label}
+            </ListboxOption>
+          ))}
+        </ListboxOptions>
+      </Listbox>
+      {required && (
+        <select
+          name={name}
+          required={required}
+          disabled={disabled}
+          tabIndex={-1}
+          aria-hidden='true'
+          value={currentValue}
+          onChange={() => {}}
+          className='absolute left-0 bottom-0 w-full h-px opacity-0 pointer-events-none'
+        >
+          {allOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
   );
 }

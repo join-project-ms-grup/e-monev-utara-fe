@@ -27,6 +27,7 @@ import { Route as DashboardIkuIndexRouteImport } from './routes/_dashboard/iku/i
 import { Route as DashboardRenstraIoskRouteImport } from './routes/_dashboard/renstra/iosk'
 import { Route as DashboardRenstraIopRouteImport } from './routes/_dashboard/renstra/iop'
 import { Route as DashboardRenstraIokRouteImport } from './routes/_dashboard/renstra/iok'
+import { Route as DashboardMasterSkpdRouteImport } from './routes/_dashboard/master/skpd'
 import { Route as DashboardMasterOrganisasiRouteImport } from './routes/_dashboard/master/organisasi'
 import { Route as DashboardMasterJadwalRouteImport } from './routes/_dashboard/master/jadwal'
 import { Route as DashboardKonfigurasiUserRouteImport } from './routes/_dashboard/konfigurasi/user'
@@ -133,6 +134,11 @@ const DashboardRenstraIokRoute = DashboardRenstraIokRouteImport.update({
   path: '/iok',
   getParentRoute: () => DashboardRenstraRouteRoute,
 } as any)
+const DashboardMasterSkpdRoute = DashboardMasterSkpdRouteImport.update({
+  id: '/skpd',
+  path: '/skpd',
+  getParentRoute: () => DashboardMasterRouteRoute,
+} as any)
 const DashboardMasterOrganisasiRoute =
   DashboardMasterOrganisasiRouteImport.update({
     id: '/organisasi',
@@ -231,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/master/jadwal': typeof DashboardMasterJadwalRoute
   '/master/organisasi': typeof DashboardMasterOrganisasiRoute
+  '/master/skpd': typeof DashboardMasterSkpdRoute
   '/renstra/iok': typeof DashboardRenstraIokRoute
   '/renstra/iop': typeof DashboardRenstraIopRoute
   '/renstra/iosk': typeof DashboardRenstraIoskRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/master/jadwal': typeof DashboardMasterJadwalRoute
   '/master/organisasi': typeof DashboardMasterOrganisasiRoute
+  '/master/skpd': typeof DashboardMasterSkpdRoute
   '/renstra/iok': typeof DashboardRenstraIokRoute
   '/renstra/iop': typeof DashboardRenstraIopRoute
   '/renstra/iosk': typeof DashboardRenstraIoskRoute
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/_dashboard/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/_dashboard/master/jadwal': typeof DashboardMasterJadwalRoute
   '/_dashboard/master/organisasi': typeof DashboardMasterOrganisasiRoute
+  '/_dashboard/master/skpd': typeof DashboardMasterSkpdRoute
   '/_dashboard/renstra/iok': typeof DashboardRenstraIokRoute
   '/_dashboard/renstra/iop': typeof DashboardRenstraIopRoute
   '/_dashboard/renstra/iosk': typeof DashboardRenstraIoskRoute
@@ -328,6 +337,7 @@ export interface FileRouteTypes {
     | '/konfigurasi/user'
     | '/master/jadwal'
     | '/master/organisasi'
+    | '/master/skpd'
     | '/renstra/iok'
     | '/renstra/iop'
     | '/renstra/iosk'
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/konfigurasi/user'
     | '/master/jadwal'
     | '/master/organisasi'
+    | '/master/skpd'
     | '/renstra/iok'
     | '/renstra/iop'
     | '/renstra/iosk'
@@ -389,6 +400,7 @@ export interface FileRouteTypes {
     | '/_dashboard/konfigurasi/user'
     | '/_dashboard/master/jadwal'
     | '/_dashboard/master/organisasi'
+    | '/_dashboard/master/skpd'
     | '/_dashboard/renstra/iok'
     | '/_dashboard/renstra/iop'
     | '/_dashboard/renstra/iosk'
@@ -538,6 +550,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/renstra/iok'
       preLoaderRoute: typeof DashboardRenstraIokRouteImport
       parentRoute: typeof DashboardRenstraRouteRoute
+    }
+    '/_dashboard/master/skpd': {
+      id: '/_dashboard/master/skpd'
+      path: '/skpd'
+      fullPath: '/master/skpd'
+      preLoaderRoute: typeof DashboardMasterSkpdRouteImport
+      parentRoute: typeof DashboardMasterRouteRoute
     }
     '/_dashboard/master/organisasi': {
       id: '/_dashboard/master/organisasi'
@@ -705,6 +724,7 @@ interface DashboardMasterRouteRouteChildren {
   DashboardMasterRekeningRouteRoute: typeof DashboardMasterRekeningRouteRouteWithChildren
   DashboardMasterJadwalRoute: typeof DashboardMasterJadwalRoute
   DashboardMasterOrganisasiRoute: typeof DashboardMasterOrganisasiRoute
+  DashboardMasterSkpdRoute: typeof DashboardMasterSkpdRoute
   DashboardMasterIndexRoute: typeof DashboardMasterIndexRoute
 }
 
@@ -713,6 +733,7 @@ const DashboardMasterRouteRouteChildren: DashboardMasterRouteRouteChildren = {
     DashboardMasterRekeningRouteRouteWithChildren,
   DashboardMasterJadwalRoute: DashboardMasterJadwalRoute,
   DashboardMasterOrganisasiRoute: DashboardMasterOrganisasiRoute,
+  DashboardMasterSkpdRoute: DashboardMasterSkpdRoute,
   DashboardMasterIndexRoute: DashboardMasterIndexRoute,
 }
 

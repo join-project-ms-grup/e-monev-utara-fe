@@ -2,29 +2,32 @@ import React, { useState, type ChangeEvent } from 'react'
 import type { IconType } from 'react-icons/lib';
 
 interface InputTextProps {
-    type?: string;
+    type?: 'text' | 'password' | 'email';
     id?: string;
     label: string;
+    name: string;
     Icon?: IconType;
-    value: string;
+    value: string | number;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
+    className?: string;
 }
 
-const InputText = ({ type = 'text', label, Icon, value, onChange, required, id = `input-${label.replace(/\s+/g, '-')}` }: InputTextProps) => {
+const InputText = ({ type = 'text', label, name, Icon, value, onChange, required, id = `input-${label.replace(/\s+/g, '-')}`, className }: InputTextProps) => {
     const [focused, setFocused] = useState(false);
 
     return (
-        <div className="relative w-full">
+        <div className={`relative w-full ${className}`}>
             <input
                 id={id}
                 type={type}
                 value={value}
+                name={name}
                 required={required}
                 onChange={onChange}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
-                className="w-full border border-gray-300 rounded px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6B6B]"
+                className="w-full border border-[#ccc] rounded px-3 py-2 focus:border-[var(--color-2)] focus:outline-none"
                 style={{ lineHeight: '1.5rem' }}
             />
             <label

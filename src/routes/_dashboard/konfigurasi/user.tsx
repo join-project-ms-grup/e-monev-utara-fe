@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_NAME } from '../../../lib/config'
+import UserTable from '../../../components/tables/UserTable'
 
 export const Route = createFileRoute('/_dashboard/konfigurasi/user')({
     head: () => ({
@@ -18,8 +19,7 @@ export const Route = createFileRoute('/_dashboard/konfigurasi/user')({
 function RouteComponent() {
     return (
         <>
-            <h4>Konfigurasi - User</h4>
-            <span>Ini halaman konfigurasi user</span>
+            <UserTable />
         </>
     )
 }

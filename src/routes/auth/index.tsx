@@ -89,6 +89,7 @@ function RouteComponent() {
               <div>
                 <InputText
                   label='Username'
+                  name='username'
                   Icon={MdPerson}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -99,6 +100,7 @@ function RouteComponent() {
               <div>
                 <InputText
                   label='Password'
+                  name='password'
                   Icon={MdKey}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -110,6 +112,7 @@ function RouteComponent() {
                 type='submit'
                 disabled={mutation.isPending}
                 isLoading={mutation.isPending}
+                className='w-full'
               >
                 Masuk
               </InputButton>

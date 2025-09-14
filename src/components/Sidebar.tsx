@@ -43,6 +43,9 @@ const menus: MenuItem[] = [
     label: 'Master',
     icon: <MdInventory />,
     submenu: [
+      { label: 'Role', to: '/master/role' },
+      { label: 'Periode', to: '/master/periode' },
+      { label: 'SKPD', to: '/master/skpd' },
       { label: 'Organisasi', to: '/master/organisasi' },
       {
         label: 'Rekening',
@@ -214,19 +217,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   };
 
   return (
-    <aside className={`sidebar ${sidebarOpen ? '' : 'close'}`}>
+    <aside className={`flex flex-col bg-white text-[#333] sticky top-0 whitespace-break-spaces h-screen transition-all duration-200 ${sidebarOpen ? 'w-72' : 'w-20'}`}>
       <div className='flex flex-row items-center justify-center p-4'>
-        <div className={`aspect-auto sidelogo ${sidebarOpen ? '' : 'close'}`}>
+        <div className={`aspect-auto ${sidebarOpen ? 'mr-2' : 'mr-0'}`}>
           <img
             src='/bengkulu-utara-logo.webp'
             alt=''
             className='max-w-[32px]'
           />
         </div>
-        <div className={`sidetitle ${sidebarOpen ? '' : 'close'}`}>
-          <h4>e-MONEV RKPD</h4>
-          <span>Kabupaten Bengkulu Utara</span>
-          <br />
+        <div className={`block text-nowrap text-center cursor-default ${sidebarOpen ? '' : 'hidden'}`}>
+          <h4>E-MONEV</h4>
+          {/* <span>Kabupaten Bengkulu Utara</span> */}
         </div>
       </div>
       <nav className='overflow-y-auto overflow-x-hidden sidebar-scroll space-y-2 p-4'>

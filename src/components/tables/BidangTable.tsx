@@ -172,14 +172,14 @@ const BidangTable = () => {
 
         <div className='flex flex-row gap-2'>
           <button
-            className='pagination-button'
+            className='table-button'
             onClick={() => table.firstPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <MdKeyboardDoubleArrowLeft />
           </button>
           <button
-            className='pagination-button'
+            className='table-button'
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -202,14 +202,14 @@ const BidangTable = () => {
             </span>
           </div>
           <button
-            className='pagination-button'
+            className='table-button'
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
             <MdKeyboardArrowRight />
           </button>
           <button
-            className='pagination-button'
+            className='table-button'
             onClick={() => table.lastPage()}
             disabled={!table.getCanNextPage()}
           >

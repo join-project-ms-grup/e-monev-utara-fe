@@ -14,38 +14,44 @@ export const Route = createRootRouteWithContext<AuthType>()({
   component: RootComponent,
 });
 
+const ToastComponent = () => {
+  return (
+    <Toaster
+      position='top-right'
+      toastOptions={{
+        duration: 5000,
+      }}
+    >
+      {(t) => (
+        <ToastBar toast={t}>
+          {({ icon, message }) => (
+            <>
+              {icon}
+              {message}
+              {t.type !== 'loading' && (
+                <>
+                  <button
+                    className='text-red-400 transition-all hover:text-red-300 active:scale-90'
+                    onClick={() => toast.dismiss(t.id)}
+                  >
+                    <MdClose />
+                  </button>
+                </>
+              )}
+            </>
+          )}
+        </ToastBar>
+      )}
+    </Toaster>
+  );
+};
+
 function RootComponent() {
   return (
     <>
       <HeadContent />
       <Outlet />
-      <Toaster
-        position='top-right'
-        toastOptions={{
-          duration: 5000
-        }}
-      >
-        {(t) => (
-          <ToastBar toast={t}>
-            {({ icon, message }) => (
-              <>
-                {icon}
-                {message}
-                {t.type !== 'loading' && (
-                  <>
-                    <button
-                      className='text-red-400 transition-all hover:text-red-300 active:scale-90'
-                      onClick={() => toast.dismiss(t.id)}
-                    >
-                      <MdClose />
-                    </button>
-                  </>
-                )}
-              </>
-            )}
-          </ToastBar>
-        )}
-      </Toaster>
+      <ToastComponent />
     </>
   );
 }

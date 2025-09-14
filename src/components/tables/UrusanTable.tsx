@@ -26,6 +26,8 @@ const UrusanTable = () => {
     }),
   ];
 
+  console.log(urusanDummy)
+
   return (
     <>
       <MainTable data={urusanDummy} columns={columns} />

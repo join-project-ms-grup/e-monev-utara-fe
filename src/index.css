@@ -77,18 +77,7 @@ a {
 a:hover {
   opacity: 0.7;
 }
-/* Topbar */
-.topbar {
-  @apply sticky top-0 h-[70px] text-gray-800 p-4 flex justify-between items-center space-x-4 border-b-1 border-gray-200 bg-[#f8f8f8];
-}
 /* Sidebar */
-.sidebar {
-  transition: width 0.2s ease;
-  @apply flex flex-col w-72 bg-white text-[#333] sticky top-0 whitespace-break-spaces h-screen;
-}
-.sidebar.close {
-  @apply w-20;
-}
 .sidebar-scroll::-webkit-scrollbar {
   width: 6px;
 }
@@ -99,18 +88,6 @@ a:hover {
 .sidebar-scroll {
   scrollbar-width: thin;
   scrollbar-color: theme('colors.gray.400') transparent;
-}
-.sidetitle {
-  @apply block text-nowrap text-center cursor-default;
-}
-.sidetitle.close {
-  @apply hidden;
-}
-.sidelogo {
-  @apply mr-2;
-}
-.sidelogo.close {
-  @apply mr-0;
 }
 /* Nav Link Sidebar */
 .sidelink {
@@ -140,7 +117,7 @@ a:hover {
 .authbg {
   position: relative;
   background-color: #f8f8f8;
-  z-index: 0; /* konten tetap di atas */
+  z-index: 0;
 }
 .authbg::before {
   content: '';
@@ -269,25 +246,32 @@ a:hover {
   }
 }
 /* Paginasi Tabel */
-.pagination-button {
+.table-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   border: 1px solid var(--text-2);
   border-radius: 4px;
   padding: 0.4rem 0.6rem;
   background-color: white;
   cursor: pointer;
   transition:
-    background-color 0.2s,
+    all 0.2s,
     color 0.2s;
 }
 
-.pagination-button:hover:not(:disabled) {
+.table-button:hover:not(:disabled) {
   background-color: var(--color-2);
   color: var(--text-3);
 }
 
-.pagination-button:disabled {
+.table-button:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.table-button:active{
+  transform: scale(90%);
 }
 
 /* Input page number */
@@ -304,4 +288,54 @@ a:hover {
 .pagination-input:focus {
   border-color: var(--color-2);
   outline: none;
+}
+/* Button */
+.btn.btn-theme {
+  @apply bg-[var(--color-2)] text-white;
+}
+.btn.btn-primary {
+  @apply bg-blue-600 text-white;
+}
+
+.btn.btn-success {
+  @apply bg-green-600 text-white;
+}
+
+.btn.btn-danger {
+  @apply bg-red-600 text-white;
+}
+
+.btn.btn-warning {
+  @apply bg-yellow-500 text-gray-800;
+}
+
+.btn.btn-info {
+  @apply bg-blue-400 text-white;
+}
+
+.btn.btn-secondary {
+  @apply bg-gray-500 text-white;
+}
+
+.btn.btn-light {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.btn.btn-dark {
+  @apply bg-gray-800 text-white;
+}
+
+.btn.btn-neutral {
+  @apply bg-gray-300 text-gray-700;
+}
+
+.btn.btn-accent {
+  @apply bg-purple-600 text-white;
+}
+
+.btn.btn-primary-alt {
+  @apply bg-indigo-600 text-white;
+}
+.btn:hover{
+  opacity: 90%;
 }
