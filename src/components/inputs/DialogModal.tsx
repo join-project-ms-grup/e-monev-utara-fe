@@ -7,6 +7,7 @@ interface DialogModalProps {
   isOpen: boolean;
   children: React.ReactNode;
   onClose: () => void;
+  closeOnOverlay?: boolean;
 }
 
 const DialogModal: FC<DialogModalProps> = ({
@@ -14,6 +15,7 @@ const DialogModal: FC<DialogModalProps> = ({
   isOpen,
   children,
   onClose,
+  closeOnOverlay = false
 }) => {
   const [show, setShow] = useState(isOpen);
   const [animateIn, setAnimateIn] = useState(false);
@@ -33,7 +35,7 @@ const DialogModal: FC<DialogModalProps> = ({
 
   return createPortal(
     <div
-      onClick={onClose}
+      onClick={closeOnOverlay ? () => onClose() : () => {}}
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
         animateIn ? 'opacity-100' : 'opacity-0'
       }`}

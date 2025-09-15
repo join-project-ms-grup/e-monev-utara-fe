@@ -39,10 +39,10 @@ const FormSKPD: React.FC<FormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.kode || !formData.name) {
-      setError('Kode dan Nama wajib diisi.');
-      return;
-    }
+    // if (!formData.kode || !formData.name) {
+    //   setError('Kode dan Nama wajib diisi.');
+    //   return;
+    // }
 
     setError(null);
 
@@ -59,22 +59,12 @@ const FormSKPD: React.FC<FormProps> = ({
       <div className='grid grid-cols-4 items-center gap-2'>
         <label htmlFor='kode'>Kode</label>
         <InputText
+          type='number'
           id='kode'
           label='Kode'
           name='kode'
+          min={1}
           value={formData.kode}
-          onChange={handleChange}
-          className='col-span-3'
-          required
-        />
-      </div>
-      <div className='grid grid-cols-4 items-center gap-2'>
-        <label htmlFor='name'>Nama</label>
-        <InputText
-          id='name'
-          label='Nama'
-          name='name'
-          value={formData.name}
           onChange={handleChange}
           className='col-span-3'
           required
@@ -87,6 +77,18 @@ const FormSKPD: React.FC<FormProps> = ({
           label='Singkatan'
           name='shortname'
           value={formData.shortname}
+          onChange={handleChange}
+          className='col-span-3'
+          required
+        />
+      </div>
+      <div className='grid grid-cols-4 items-center gap-2'>
+        <label htmlFor='name'>Nama</label>
+        <InputText
+          id='name'
+          label='Nama'
+          name='name'
+          value={formData.name}
           onChange={handleChange}
           className='col-span-3'
           required

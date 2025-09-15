@@ -28,7 +28,7 @@ export interface DataUserType {
 // Type Role
 export interface RoleDevType {
   id: number;
-  kode: string | number;
+  kode: number | null;
   name: string;
   author_id: number;
   created_at: string;
@@ -48,7 +48,7 @@ export type RoleEditType = Pick<
 // Type SKPD
 export interface SKPDType {
   id: number;
-  kode: string | number;
+  kode: number | null;
   name: string;
   shortname: string;
   status: string | boolean;

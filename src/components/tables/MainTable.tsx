@@ -100,20 +100,31 @@ const MainTable = <TData,>({
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  {...(cell.column.columnDef.meta?.tdClassNames
-                    ? { className: cell.column.columnDef.meta.tdClassNames }
-                    : {})}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+          {table.getRowModel().rows.length > 0 ? (
+            table.getRowModel().rows.map((row) => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    {...(cell.column.columnDef.meta?.tdClassNames
+                      ? { className: cell.column.columnDef.meta.tdClassNames }
+                      : {})}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={table.getAllLeafColumns().length}
+                className='text-center py-4'
+              >
+                Tidak ada data
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
       <div className='flex flex-row items-center justify-between mt-2'>
@@ -156,10 +167,6 @@ const MainTable = <TData,>({
               min='1'
               max={table.getPageCount()}
               value={table.getState().pagination.pageIndex + 1}
-              // onChange={(e) => {
-              //   const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              //   table.setPageIndex(page);
-              // }}
               onChange={(e) => {
                 let page = Number(e.target.value) - 1;
 

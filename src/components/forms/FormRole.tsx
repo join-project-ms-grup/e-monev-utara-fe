@@ -59,9 +59,11 @@ const FormRole: React.FC<FormProps> = ({
       <div className='grid grid-cols-4 items-center gap-2'>
         <label htmlFor='kode'>Kode</label>
         <InputText
+          type='number'
           id='kode'
           label='Kode'
           name='kode'
+          min={1}
           value={formData.kode}
           onChange={handleChange}
           className='col-span-3'

@@ -29,12 +29,12 @@ const RoleTable = () => {
   const [openDelete, setOpenDelete] = useState(false);
   // Form Data
   const initialFormData: RoleAdminType = {
-    kode: '',
+    kode: null,
     name: '',
   };
   const initialFormEdit: RoleEditType = {
     id: 0,
-    kode: '',
+    kode: null,
     name: '',
   };
   const initialFormDelete: Pick<RoleDevType, 'id' | 'name'> = {
@@ -66,6 +66,9 @@ const RoleTable = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_role'] });
       toast.success('Data berhasil ditambahkan');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
     },
     onSettled: () => {
       setLoadingMutation(false);
@@ -108,8 +111,8 @@ const RoleTable = () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_role'] });
       toast.success('Data berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus data');
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
     },
     onSettled: () => {
       setLoadingMutation(false);

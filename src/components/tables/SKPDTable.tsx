@@ -30,13 +30,13 @@ const SKPDTable = () => {
   const [openDelete, setOpenDelete] = useState(false);
   // Form Data
   const initialFormData: SKPDAddType = {
-    kode: '',
+    kode: null,
     name: '',
     shortname: '',
   };
   const initialFormEdit: SKPDEditType = {
     id: 0,
-    kode: '',
+    kode: null,
     name: '',
     shortname: '',
     status: '',
@@ -68,6 +68,9 @@ const SKPDTable = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
       toast.success('Data berhasil ditambahkan');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
     },
     onSettled: () => {
       setLoadingMutation(false);
@@ -110,8 +113,8 @@ const SKPDTable = () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
       toast.success('Data berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus data');
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
     },
     onSettled: () => {
       setLoadingMutation(false);
@@ -134,11 +137,11 @@ const SKPDTable = () => {
     columnHelper.accessor('kode', {
       header: 'Kode',
     }),
-    columnHelper.accessor('shortname', {
-      header: 'Singkatan',
-    }),
     columnHelper.accessor('name', {
       header: 'Nama',
+    }),
+    columnHelper.accessor('shortname', {
+      header: 'Singkatan',
     }),
     columnHelper.accessor('status', {
       header: 'Status',
@@ -270,7 +273,7 @@ const SKPDTable = () => {
             updateMutation.mutate({
               id: data.id,
               payload: {
-                kode: data.kode,
+                kode: Number(data.kode),
                 name: data.name,
                 shortname: data.shortname,
                 status: data.status === 'true',
