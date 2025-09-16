@@ -206,11 +206,6 @@ a:hover {
 .table-responsive tbody tr:hover {
   background-color: var(--color-4);
 }
-/* .table-responsive td[data-column-id="aksi"],
-.table-responsive th[data-column-id="aksi"] {
-  width: 10%;
-  white-space: nowrap;
-} */
 @media (max-width: 768px) {
   .table-responsive table,
   .table-responsive thead,
@@ -270,7 +265,7 @@ a:hover {
   cursor: default;
 }
 
-.table-button:active{
+.table-button:active {
   transform: scale(90%);
 }
 
@@ -336,6 +331,16 @@ a:hover {
 .btn.btn-primary-alt {
   @apply bg-indigo-600 text-white;
 }
-.btn:hover{
+.btn:hover {
   opacity: 90%;
+}
+/* Input */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

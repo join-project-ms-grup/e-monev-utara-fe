@@ -4,7 +4,6 @@ import Sidebar from '../../components/Sidebar';
 import Breadcrumb from '../../components/Breadcrumb';
 import Footer from '../../components/Footer';
 import TopBar from '../../components/Topbar';
-import { useAuth } from '../../contexts/AuthContext';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {

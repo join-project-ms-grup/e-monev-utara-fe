@@ -12,15 +12,11 @@ import toast from 'react-hot-toast';
 import { useState } from 'react';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
-import {
-  addRole,
-  deleteRole,
-  getRoleDev,
-  updateRole,
-} from '../../services/RoleService';
+import { addRole, deleteRole, getRoleAdmin, getRoleDev, updateRole } from '../../services/RoleService';
 import FormRole from '../forms/FormRole';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
+import { getRoleId } from '../../lib/usercookie';
 
 const RoleTable = () => {
   // Modal
@@ -53,8 +49,10 @@ const RoleTable = () => {
   const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_role'],
-    queryFn: getRoleDev,
+    queryFn: () => (getRoleId() === 1 ? getRoleDev() : getRoleAdmin())
   });
+
+  const data2 = data as RoleDevType[] | RoleAdminType[];
 
   const queryClient = useQueryClient();
   // Add
@@ -122,9 +120,11 @@ const RoleTable = () => {
   });
 
   // Kolom
-  const columnHelper = createColumnHelper<RoleDevType>();
-  const columns = [
-    columnHelper.display({
+  const devColumnHelper = createColumnHelper<RoleDevType>();
+  const adminColumnHelper = createColumnHelper<RoleAdminType>();
+
+  const devColumns = [
+    devColumnHelper.display({
       header: 'No',
       cell: ({ row }) => `${row.index + 1}`,
       meta: {
@@ -132,13 +132,13 @@ const RoleTable = () => {
         tdClassNames: 'text-center',
       },
     }),
-    columnHelper.accessor('kode', {
+    devColumnHelper.accessor('kode', {
       header: 'Kode',
     }),
-    columnHelper.accessor('name', {
+    devColumnHelper.accessor('name', {
       header: 'Nama',
     }),
-    columnHelper.display({
+    devColumnHelper.display({
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) => (
@@ -178,6 +178,25 @@ const RoleTable = () => {
     }),
   ];
 
+  const adminColumns = [
+    adminColumnHelper.display({
+      header: 'No',
+      cell: ({ row }) => `${row.index + 1}`,
+      meta: {
+        thClassNames: 'w-[5%]',
+        tdClassNames: 'text-center',
+      },
+    }),
+    adminColumnHelper.accessor('kode', {
+      header: 'Kode',
+    }),
+    adminColumnHelper.accessor('name', {
+      header: 'Nama',
+    }),
+  ];
+
+  const columns = getRoleId() === 1 ? devColumns : adminColumns;
+
   const TableTopbar = () => {
     return (
       <>
@@ -207,7 +226,7 @@ const RoleTable = () => {
     <>
       <MainTable
         data={data || []}
-        columns={columns}
+        columns={columns as any}
         tabletop={<TableTopbar />}
       />
       <DialogModal

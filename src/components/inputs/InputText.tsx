@@ -13,6 +13,7 @@ interface InputTextProps {
   className?: string;
   min?: number;
   max?: number;
+  tooltip?: string; // tambahan
 }
 
 const InputText = ({
@@ -27,8 +28,10 @@ const InputText = ({
   className,
   min,
   max,
+  tooltip,
 }: InputTextProps) => {
   const [focused, setFocused] = useState(false);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (type === 'number') {
       const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
@@ -47,7 +50,7 @@ const InputText = ({
   };
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={`relative w-full group ${className}`}>
       <input
         id={id}
         type={type}
@@ -82,6 +85,14 @@ const InputText = ({
         )}
         {label}
       </label>
+
+      {tooltip && (
+        <span
+          className='absolute -top-8 right-0 px-2 py-1 text-sm text-[var(--text-3)] bg-[var(--color-2)] rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-default'
+        >
+          {tooltip}
+        </span>
+      )}
     </div>
   );
 };

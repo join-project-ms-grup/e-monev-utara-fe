@@ -12,6 +12,7 @@ import {
   MdFiberManualRecord,
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
+import { getRoleId } from '../lib/usercookie';
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -23,6 +24,7 @@ type MenuItem = {
   label: string;
   icon?: JSX.Element;
   to?: string;
+  akses?: number;
   submenu?: SubMenuItem[];
 };
 
@@ -30,10 +32,12 @@ type SubMenuItem = {
   label: string;
   to?: string;
   icon?: JSX.Element;
+  akses?: number;
   submenu?: SubMenuItem[];
 };
 
-const menus: MenuItem[] = [
+// Base Menu
+const menuUtama: MenuItem[] = [
   { label: 'Dashboard', icon: <MdDashboard />, to: '/' },
   {
     type: 'separator',
@@ -43,7 +47,7 @@ const menus: MenuItem[] = [
     label: 'Master',
     icon: <MdInventory />,
     submenu: [
-      { label: 'Role', to: '/master/role' },
+      { label: 'Role', to: '/master/role', akses: 1 && 2 },
       { label: 'Periode', to: '/master/periode' },
       { label: 'SKPD', to: '/master/skpd' },
       { label: 'Organisasi', to: '/master/organisasi' },
@@ -62,27 +66,6 @@ const menus: MenuItem[] = [
       { label: 'Jadwal', to: '/master/jadwal' },
     ],
   },
-
-  {
-    label: 'Renstra',
-    icon: <MdLibraryBooks />,
-    submenu: [
-      { label: 'Indikator Outcome\nProgram', to: '/renstra/iop' },
-      { label: 'Indikator Output Kegiatan', to: '/renstra/iok' },
-      { label: 'Indikator Output Sub\nKegiatan', to: '/renstra/iosk' },
-    ],
-  },
-  {
-    label: 'Indikator Kinerja Utama',
-    icon: <MdInsights />,
-    submenu: [
-      { label: 'Tagging Indikator', to: '/iku/iku_tagging' },
-      { label: 'Indikator IKU', to: '/iku/iku_list' },
-      { label: 'Capaian Indikator IKU', to: '/iku/iku_capaian' },
-    ],
-  },
-  { label: 'Renja', icon: <MdViewList />, to: '/renja' },
-  { label: 'Realisasi', icon: <MdAssignmentTurnedIn />, to: '/Realisasi' },
   {
     label: 'Konfigurasi',
     icon: <MdSettings />,
@@ -92,6 +75,62 @@ const menus: MenuItem[] = [
     ],
   },
 ];
+
+// Menu RKPD
+const menuRKPD: MenuItem[] = [
+  {
+    type: 'separator',
+    label: 'MENU RKPD',
+    akses: 3,
+  },
+  {
+    label: 'Renstra',
+    icon: <MdLibraryBooks />,
+    submenu: [
+      { label: 'Indikator Outcome\nProgram', to: '/rkpd/renstra/iop' },
+      { label: 'Indikator Output Kegiatan', to: '/rkpd/renstra/iok' },
+      { label: 'Indikator Output Sub\nKegiatan', to: '/rkpd/renstra/iosk' },
+    ],
+    akses: 3,
+  },
+  {
+    label: 'Indikator Kinerja Utama',
+    icon: <MdInsights />,
+    submenu: [
+      { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
+      { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
+      { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
+    ],
+    akses: 3,
+  },
+  { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
+  {
+    label: 'Realisasi',
+    icon: <MdAssignmentTurnedIn />,
+    to: '/rkpd/realisasi',
+    akses: 3,
+  },
+];
+
+// Menu DAK
+const menuDAK: MenuItem[] = [
+  {
+    type: 'separator',
+    label: 'MENU DAK',
+    akses: 4,
+  },
+  {
+    label: 'DAK Kabupaten',
+    icon: <MdInsights />,
+    submenu: [
+      { label: 'Identifikasi DAK', to: '/dak/kabupaten/identifikasi' },
+      { label: 'Monitoring DAK', to: '/dak/kabupaten/monitoring' },
+    ],
+    akses: 4,
+  },
+  { label: 'Daftar dan Jenis DAK', icon: <MdViewList />, to: '/dak/daftardak', akses: 4 },
+];
+const menus = [...menuUtama, ...menuRKPD, ...menuDAK];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
@@ -136,6 +175,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       return menu.submenu.some((sub) => checkIsActive(sub, path));
     }
     return false;
+  };
+
+  const canAccess = (menu: MenuItem | SubMenuItem, roleId: number): boolean => {
+    if (roleId === 1 || roleId === 2) return true;
+    if (menu.akses && menu.akses !== roleId) {
+      return false;
+    }
+    if (menu.submenu) {
+      menu.submenu = menu.submenu
+        .map((sub) => ({ ...sub }))
+        .filter((sub) => canAccess(sub, roleId));
+      return menu.submenu.length > 0;
+    }
+    return true;
   };
 
   const renderMenu = (menu: MenuItem) => {
@@ -216,8 +269,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     );
   };
 
+  const filteredMenus = menus
+    .map((menu) => ({ ...menu }))
+    .filter((menu) => canAccess(menu, getRoleId()!));
+
   return (
-    <aside className={`flex flex-col bg-white text-[#333] sticky top-0 whitespace-break-spaces h-screen transition-all duration-200 ${sidebarOpen ? 'w-72' : 'w-20'}`}>
+    <aside
+      className={`flex flex-col bg-white text-[#333] sticky top-0 whitespace-break-spaces h-screen transition-all duration-200 ${sidebarOpen ? 'w-72' : 'w-20'}`}
+    >
       <div className='flex flex-row items-center justify-center p-4'>
         <div className={`aspect-auto ${sidebarOpen ? 'mr-2' : 'mr-0'}`}>
           <img
@@ -226,13 +285,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             className='max-w-[32px]'
           />
         </div>
-        <div className={`block text-nowrap text-center cursor-default ${sidebarOpen ? '' : 'hidden'}`}>
+        <div
+          className={`block text-nowrap text-center cursor-default ${sidebarOpen ? '' : 'hidden'}`}
+        >
           <h4>E-MONEV</h4>
           {/* <span>Kabupaten Bengkulu Utara</span> */}
         </div>
       </div>
       <nav className='overflow-y-auto overflow-x-hidden sidebar-scroll space-y-2 p-4'>
-        {menus.map(renderMenu)}
+        {/* {menus.map(renderMenu)} */}
+        {filteredMenus.map(renderMenu)}
       </nav>
     </aside>
   );

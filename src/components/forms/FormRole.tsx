@@ -39,10 +39,10 @@ const FormRole: React.FC<FormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.kode || !formData.name) {
-      setError('Kode dan Nama wajib diisi.');
-      return;
-    }
+    // if (!formData.kode || !formData.name) {
+    //   setError('Kode dan Nama wajib diisi.');
+    //   return;
+    // }
 
     setError(null);
 

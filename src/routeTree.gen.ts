@@ -14,35 +14,44 @@ import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
-import { Route as DashboardRenstraRouteRouteImport } from './routes/_dashboard/renstra/route'
+import { Route as DashboardRkpdRouteRouteImport } from './routes/_dashboard/rkpd/route'
 import { Route as DashboardMasterRouteRouteImport } from './routes/_dashboard/master/route'
 import { Route as DashboardKonfigurasiRouteRouteImport } from './routes/_dashboard/konfigurasi/route'
-import { Route as DashboardIkuRouteRouteImport } from './routes/_dashboard/iku/route'
-import { Route as DashboardRenstraIndexRouteImport } from './routes/_dashboard/renstra/index'
-import { Route as DashboardRenjaIndexRouteImport } from './routes/_dashboard/renja/index'
-import { Route as DashboardRealisasiIndexRouteImport } from './routes/_dashboard/realisasi/index'
+import { Route as DashboardDakRouteRouteImport } from './routes/_dashboard/dak/route'
+import { Route as DashboardRkpdIndexRouteImport } from './routes/_dashboard/rkpd/index'
 import { Route as DashboardMasterIndexRouteImport } from './routes/_dashboard/master/index'
 import { Route as DashboardKonfigurasiIndexRouteImport } from './routes/_dashboard/konfigurasi/index'
-import { Route as DashboardIkuIndexRouteImport } from './routes/_dashboard/iku/index'
-import { Route as DashboardRenstraIoskRouteImport } from './routes/_dashboard/renstra/iosk'
-import { Route as DashboardRenstraIopRouteImport } from './routes/_dashboard/renstra/iop'
-import { Route as DashboardRenstraIokRouteImport } from './routes/_dashboard/renstra/iok'
+import { Route as DashboardDakIndexRouteImport } from './routes/_dashboard/dak/index'
+import { Route as DashboardRkpdRenjaRouteImport } from './routes/_dashboard/rkpd/renja'
+import { Route as DashboardRkpdRealisasiRouteImport } from './routes/_dashboard/rkpd/realisasi'
 import { Route as DashboardMasterSkpdRouteImport } from './routes/_dashboard/master/skpd'
 import { Route as DashboardMasterRoleRouteImport } from './routes/_dashboard/master/role'
 import { Route as DashboardMasterOrganisasiRouteImport } from './routes/_dashboard/master/organisasi'
 import { Route as DashboardMasterJadwalRouteImport } from './routes/_dashboard/master/jadwal'
 import { Route as DashboardKonfigurasiUserRouteImport } from './routes/_dashboard/konfigurasi/user'
 import { Route as DashboardKonfigurasiTransferdataRouteImport } from './routes/_dashboard/konfigurasi/transferdata'
-import { Route as DashboardIkuIku_taggingRouteImport } from './routes/_dashboard/iku/iku_tagging'
-import { Route as DashboardIkuIku_listRouteImport } from './routes/_dashboard/iku/iku_list'
-import { Route as DashboardIkuIku_capaianRouteImport } from './routes/_dashboard/iku/iku_capaian'
+import { Route as DashboardDakDaftardakRouteImport } from './routes/_dashboard/dak/daftardak'
+import { Route as DashboardRkpdRenstraRouteRouteImport } from './routes/_dashboard/rkpd/renstra/route'
+import { Route as DashboardRkpdIkuRouteRouteImport } from './routes/_dashboard/rkpd/iku/route'
 import { Route as DashboardMasterRekeningRouteRouteImport } from './routes/_dashboard/master/rekening/route'
+import { Route as DashboardDakKabupatenRouteRouteImport } from './routes/_dashboard/dak/kabupaten/route'
+import { Route as DashboardRkpdRenstraIndexRouteImport } from './routes/_dashboard/rkpd/renstra/index'
+import { Route as DashboardRkpdIkuIndexRouteImport } from './routes/_dashboard/rkpd/iku/index'
 import { Route as DashboardMasterRekeningIndexRouteImport } from './routes/_dashboard/master/rekening/index'
+import { Route as DashboardDakKabupatenIndexRouteImport } from './routes/_dashboard/dak/kabupaten/index'
+import { Route as DashboardRkpdRenstraIoskRouteImport } from './routes/_dashboard/rkpd/renstra/iosk'
+import { Route as DashboardRkpdRenstraIopRouteImport } from './routes/_dashboard/rkpd/renstra/iop'
+import { Route as DashboardRkpdRenstraIokRouteImport } from './routes/_dashboard/rkpd/renstra/iok'
+import { Route as DashboardRkpdIkuIku_taggingRouteImport } from './routes/_dashboard/rkpd/iku/iku_tagging'
+import { Route as DashboardRkpdIkuIku_listRouteImport } from './routes/_dashboard/rkpd/iku/iku_list'
+import { Route as DashboardRkpdIkuIku_capaianRouteImport } from './routes/_dashboard/rkpd/iku/iku_capaian'
 import { Route as DashboardMasterRekeningUrusanRouteImport } from './routes/_dashboard/master/rekening/urusan'
 import { Route as DashboardMasterRekeningSubkegiatanRouteImport } from './routes/_dashboard/master/rekening/subkegiatan'
 import { Route as DashboardMasterRekeningProgramRouteImport } from './routes/_dashboard/master/rekening/program'
 import { Route as DashboardMasterRekeningKegiatanRouteImport } from './routes/_dashboard/master/rekening/kegiatan'
 import { Route as DashboardMasterRekeningBidangRouteImport } from './routes/_dashboard/master/rekening/bidang'
+import { Route as DashboardDakKabupatenMonitoringRouteImport } from './routes/_dashboard/dak/kabupaten/monitoring'
+import { Route as DashboardDakKabupatenIdentifikasiRouteImport } from './routes/_dashboard/dak/kabupaten/identifikasi'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -68,9 +77,9 @@ const AuthLogoutRoute = AuthLogoutRouteImport.update({
   path: '/logout',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const DashboardRenstraRouteRoute = DashboardRenstraRouteRouteImport.update({
-  id: '/renstra',
-  path: '/renstra',
+const DashboardRkpdRouteRoute = DashboardRkpdRouteRouteImport.update({
+  id: '/rkpd',
+  path: '/rkpd',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardMasterRouteRoute = DashboardMasterRouteRouteImport.update({
@@ -84,25 +93,15 @@ const DashboardKonfigurasiRouteRoute =
     path: '/konfigurasi',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
-const DashboardIkuRouteRoute = DashboardIkuRouteRouteImport.update({
-  id: '/iku',
-  path: '/iku',
+const DashboardDakRouteRoute = DashboardDakRouteRouteImport.update({
+  id: '/dak',
+  path: '/dak',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardRenstraIndexRoute = DashboardRenstraIndexRouteImport.update({
+const DashboardRkpdIndexRoute = DashboardRkpdIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardRenstraRouteRoute,
-} as any)
-const DashboardRenjaIndexRoute = DashboardRenjaIndexRouteImport.update({
-  id: '/renja/',
-  path: '/renja/',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const DashboardRealisasiIndexRoute = DashboardRealisasiIndexRouteImport.update({
-  id: '/realisasi/',
-  path: '/realisasi/',
-  getParentRoute: () => DashboardRouteRoute,
+  getParentRoute: () => DashboardRkpdRouteRoute,
 } as any)
 const DashboardMasterIndexRoute = DashboardMasterIndexRouteImport.update({
   id: '/',
@@ -115,25 +114,20 @@ const DashboardKonfigurasiIndexRoute =
     path: '/',
     getParentRoute: () => DashboardKonfigurasiRouteRoute,
   } as any)
-const DashboardIkuIndexRoute = DashboardIkuIndexRouteImport.update({
+const DashboardDakIndexRoute = DashboardDakIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardIkuRouteRoute,
+  getParentRoute: () => DashboardDakRouteRoute,
 } as any)
-const DashboardRenstraIoskRoute = DashboardRenstraIoskRouteImport.update({
-  id: '/iosk',
-  path: '/iosk',
-  getParentRoute: () => DashboardRenstraRouteRoute,
+const DashboardRkpdRenjaRoute = DashboardRkpdRenjaRouteImport.update({
+  id: '/renja',
+  path: '/renja',
+  getParentRoute: () => DashboardRkpdRouteRoute,
 } as any)
-const DashboardRenstraIopRoute = DashboardRenstraIopRouteImport.update({
-  id: '/iop',
-  path: '/iop',
-  getParentRoute: () => DashboardRenstraRouteRoute,
-} as any)
-const DashboardRenstraIokRoute = DashboardRenstraIokRouteImport.update({
-  id: '/iok',
-  path: '/iok',
-  getParentRoute: () => DashboardRenstraRouteRoute,
+const DashboardRkpdRealisasiRoute = DashboardRkpdRealisasiRouteImport.update({
+  id: '/realisasi',
+  path: '/realisasi',
+  getParentRoute: () => DashboardRkpdRouteRoute,
 } as any)
 const DashboardMasterSkpdRoute = DashboardMasterSkpdRouteImport.update({
   id: '/skpd',
@@ -168,20 +162,21 @@ const DashboardKonfigurasiTransferdataRoute =
     path: '/transferdata',
     getParentRoute: () => DashboardKonfigurasiRouteRoute,
   } as any)
-const DashboardIkuIku_taggingRoute = DashboardIkuIku_taggingRouteImport.update({
-  id: '/iku_tagging',
-  path: '/iku_tagging',
-  getParentRoute: () => DashboardIkuRouteRoute,
+const DashboardDakDaftardakRoute = DashboardDakDaftardakRouteImport.update({
+  id: '/daftardak',
+  path: '/daftardak',
+  getParentRoute: () => DashboardDakRouteRoute,
 } as any)
-const DashboardIkuIku_listRoute = DashboardIkuIku_listRouteImport.update({
-  id: '/iku_list',
-  path: '/iku_list',
-  getParentRoute: () => DashboardIkuRouteRoute,
-} as any)
-const DashboardIkuIku_capaianRoute = DashboardIkuIku_capaianRouteImport.update({
-  id: '/iku_capaian',
-  path: '/iku_capaian',
-  getParentRoute: () => DashboardIkuRouteRoute,
+const DashboardRkpdRenstraRouteRoute =
+  DashboardRkpdRenstraRouteRouteImport.update({
+    id: '/renstra',
+    path: '/renstra',
+    getParentRoute: () => DashboardRkpdRouteRoute,
+  } as any)
+const DashboardRkpdIkuRouteRoute = DashboardRkpdIkuRouteRouteImport.update({
+  id: '/iku',
+  path: '/iku',
+  getParentRoute: () => DashboardRkpdRouteRoute,
 } as any)
 const DashboardMasterRekeningRouteRoute =
   DashboardMasterRekeningRouteRouteImport.update({
@@ -189,11 +184,68 @@ const DashboardMasterRekeningRouteRoute =
     path: '/rekening',
     getParentRoute: () => DashboardMasterRouteRoute,
   } as any)
+const DashboardDakKabupatenRouteRoute =
+  DashboardDakKabupatenRouteRouteImport.update({
+    id: '/kabupaten',
+    path: '/kabupaten',
+    getParentRoute: () => DashboardDakRouteRoute,
+  } as any)
+const DashboardRkpdRenstraIndexRoute =
+  DashboardRkpdRenstraIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardRkpdRenstraRouteRoute,
+  } as any)
+const DashboardRkpdIkuIndexRoute = DashboardRkpdIkuIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRkpdIkuRouteRoute,
+} as any)
 const DashboardMasterRekeningIndexRoute =
   DashboardMasterRekeningIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => DashboardMasterRekeningRouteRoute,
+  } as any)
+const DashboardDakKabupatenIndexRoute =
+  DashboardDakKabupatenIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardDakKabupatenRouteRoute,
+  } as any)
+const DashboardRkpdRenstraIoskRoute =
+  DashboardRkpdRenstraIoskRouteImport.update({
+    id: '/iosk',
+    path: '/iosk',
+    getParentRoute: () => DashboardRkpdRenstraRouteRoute,
+  } as any)
+const DashboardRkpdRenstraIopRoute = DashboardRkpdRenstraIopRouteImport.update({
+  id: '/iop',
+  path: '/iop',
+  getParentRoute: () => DashboardRkpdRenstraRouteRoute,
+} as any)
+const DashboardRkpdRenstraIokRoute = DashboardRkpdRenstraIokRouteImport.update({
+  id: '/iok',
+  path: '/iok',
+  getParentRoute: () => DashboardRkpdRenstraRouteRoute,
+} as any)
+const DashboardRkpdIkuIku_taggingRoute =
+  DashboardRkpdIkuIku_taggingRouteImport.update({
+    id: '/iku_tagging',
+    path: '/iku_tagging',
+    getParentRoute: () => DashboardRkpdIkuRouteRoute,
+  } as any)
+const DashboardRkpdIkuIku_listRoute =
+  DashboardRkpdIkuIku_listRouteImport.update({
+    id: '/iku_list',
+    path: '/iku_list',
+    getParentRoute: () => DashboardRkpdIkuRouteRoute,
+  } as any)
+const DashboardRkpdIkuIku_capaianRoute =
+  DashboardRkpdIkuIku_capaianRouteImport.update({
+    id: '/iku_capaian',
+    path: '/iku_capaian',
+    getParentRoute: () => DashboardRkpdIkuRouteRoute,
   } as any)
 const DashboardMasterRekeningUrusanRoute =
   DashboardMasterRekeningUrusanRouteImport.update({
@@ -225,209 +277,269 @@ const DashboardMasterRekeningBidangRoute =
     path: '/bidang',
     getParentRoute: () => DashboardMasterRekeningRouteRoute,
   } as any)
+const DashboardDakKabupatenMonitoringRoute =
+  DashboardDakKabupatenMonitoringRouteImport.update({
+    id: '/monitoring',
+    path: '/monitoring',
+    getParentRoute: () => DashboardDakKabupatenRouteRoute,
+  } as any)
+const DashboardDakKabupatenIdentifikasiRoute =
+  DashboardDakKabupatenIdentifikasiRouteImport.update({
+    id: '/identifikasi',
+    path: '/identifikasi',
+    getParentRoute: () => DashboardDakKabupatenRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRouteWithChildren
-  '/iku': typeof DashboardIkuRouteRouteWithChildren
+  '/dak': typeof DashboardDakRouteRouteWithChildren
   '/konfigurasi': typeof DashboardKonfigurasiRouteRouteWithChildren
   '/master': typeof DashboardMasterRouteRouteWithChildren
-  '/renstra': typeof DashboardRenstraRouteRouteWithChildren
+  '/rkpd': typeof DashboardRkpdRouteRouteWithChildren
   '/auth/logout': typeof AuthLogoutRoute
   '/': typeof DashboardIndexRoute
   '/auth/': typeof AuthIndexRoute
+  '/dak/kabupaten': typeof DashboardDakKabupatenRouteRouteWithChildren
   '/master/rekening': typeof DashboardMasterRekeningRouteRouteWithChildren
-  '/iku/iku_capaian': typeof DashboardIkuIku_capaianRoute
-  '/iku/iku_list': typeof DashboardIkuIku_listRoute
-  '/iku/iku_tagging': typeof DashboardIkuIku_taggingRoute
+  '/rkpd/iku': typeof DashboardRkpdIkuRouteRouteWithChildren
+  '/rkpd/renstra': typeof DashboardRkpdRenstraRouteRouteWithChildren
+  '/dak/daftardak': typeof DashboardDakDaftardakRoute
   '/konfigurasi/transferdata': typeof DashboardKonfigurasiTransferdataRoute
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/master/jadwal': typeof DashboardMasterJadwalRoute
   '/master/organisasi': typeof DashboardMasterOrganisasiRoute
   '/master/role': typeof DashboardMasterRoleRoute
   '/master/skpd': typeof DashboardMasterSkpdRoute
-  '/renstra/iok': typeof DashboardRenstraIokRoute
-  '/renstra/iop': typeof DashboardRenstraIopRoute
-  '/renstra/iosk': typeof DashboardRenstraIoskRoute
-  '/iku/': typeof DashboardIkuIndexRoute
+  '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
+  '/rkpd/renja': typeof DashboardRkpdRenjaRoute
+  '/dak/': typeof DashboardDakIndexRoute
   '/konfigurasi/': typeof DashboardKonfigurasiIndexRoute
   '/master/': typeof DashboardMasterIndexRoute
-  '/realisasi': typeof DashboardRealisasiIndexRoute
-  '/renja': typeof DashboardRenjaIndexRoute
-  '/renstra/': typeof DashboardRenstraIndexRoute
+  '/rkpd/': typeof DashboardRkpdIndexRoute
+  '/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
+  '/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
   '/master/rekening/bidang': typeof DashboardMasterRekeningBidangRoute
   '/master/rekening/kegiatan': typeof DashboardMasterRekeningKegiatanRoute
   '/master/rekening/program': typeof DashboardMasterRekeningProgramRoute
   '/master/rekening/subkegiatan': typeof DashboardMasterRekeningSubkegiatanRoute
   '/master/rekening/urusan': typeof DashboardMasterRekeningUrusanRoute
+  '/rkpd/iku/iku_capaian': typeof DashboardRkpdIkuIku_capaianRoute
+  '/rkpd/iku/iku_list': typeof DashboardRkpdIkuIku_listRoute
+  '/rkpd/iku/iku_tagging': typeof DashboardRkpdIkuIku_taggingRoute
+  '/rkpd/renstra/iok': typeof DashboardRkpdRenstraIokRoute
+  '/rkpd/renstra/iop': typeof DashboardRkpdRenstraIopRoute
+  '/rkpd/renstra/iosk': typeof DashboardRkpdRenstraIoskRoute
+  '/dak/kabupaten/': typeof DashboardDakKabupatenIndexRoute
   '/master/rekening/': typeof DashboardMasterRekeningIndexRoute
+  '/rkpd/iku/': typeof DashboardRkpdIkuIndexRoute
+  '/rkpd/renstra/': typeof DashboardRkpdRenstraIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth/logout': typeof AuthLogoutRoute
   '/': typeof DashboardIndexRoute
   '/auth': typeof AuthIndexRoute
-  '/iku/iku_capaian': typeof DashboardIkuIku_capaianRoute
-  '/iku/iku_list': typeof DashboardIkuIku_listRoute
-  '/iku/iku_tagging': typeof DashboardIkuIku_taggingRoute
+  '/dak/daftardak': typeof DashboardDakDaftardakRoute
   '/konfigurasi/transferdata': typeof DashboardKonfigurasiTransferdataRoute
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/master/jadwal': typeof DashboardMasterJadwalRoute
   '/master/organisasi': typeof DashboardMasterOrganisasiRoute
   '/master/role': typeof DashboardMasterRoleRoute
   '/master/skpd': typeof DashboardMasterSkpdRoute
-  '/renstra/iok': typeof DashboardRenstraIokRoute
-  '/renstra/iop': typeof DashboardRenstraIopRoute
-  '/renstra/iosk': typeof DashboardRenstraIoskRoute
-  '/iku': typeof DashboardIkuIndexRoute
+  '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
+  '/rkpd/renja': typeof DashboardRkpdRenjaRoute
+  '/dak': typeof DashboardDakIndexRoute
   '/konfigurasi': typeof DashboardKonfigurasiIndexRoute
   '/master': typeof DashboardMasterIndexRoute
-  '/realisasi': typeof DashboardRealisasiIndexRoute
-  '/renja': typeof DashboardRenjaIndexRoute
-  '/renstra': typeof DashboardRenstraIndexRoute
+  '/rkpd': typeof DashboardRkpdIndexRoute
+  '/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
+  '/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
   '/master/rekening/bidang': typeof DashboardMasterRekeningBidangRoute
   '/master/rekening/kegiatan': typeof DashboardMasterRekeningKegiatanRoute
   '/master/rekening/program': typeof DashboardMasterRekeningProgramRoute
   '/master/rekening/subkegiatan': typeof DashboardMasterRekeningSubkegiatanRoute
   '/master/rekening/urusan': typeof DashboardMasterRekeningUrusanRoute
+  '/rkpd/iku/iku_capaian': typeof DashboardRkpdIkuIku_capaianRoute
+  '/rkpd/iku/iku_list': typeof DashboardRkpdIkuIku_listRoute
+  '/rkpd/iku/iku_tagging': typeof DashboardRkpdIkuIku_taggingRoute
+  '/rkpd/renstra/iok': typeof DashboardRkpdRenstraIokRoute
+  '/rkpd/renstra/iop': typeof DashboardRkpdRenstraIopRoute
+  '/rkpd/renstra/iosk': typeof DashboardRkpdRenstraIoskRoute
+  '/dak/kabupaten': typeof DashboardDakKabupatenIndexRoute
   '/master/rekening': typeof DashboardMasterRekeningIndexRoute
+  '/rkpd/iku': typeof DashboardRkpdIkuIndexRoute
+  '/rkpd/renstra': typeof DashboardRkpdRenstraIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_dashboard': typeof DashboardRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
-  '/_dashboard/iku': typeof DashboardIkuRouteRouteWithChildren
+  '/_dashboard/dak': typeof DashboardDakRouteRouteWithChildren
   '/_dashboard/konfigurasi': typeof DashboardKonfigurasiRouteRouteWithChildren
   '/_dashboard/master': typeof DashboardMasterRouteRouteWithChildren
-  '/_dashboard/renstra': typeof DashboardRenstraRouteRouteWithChildren
+  '/_dashboard/rkpd': typeof DashboardRkpdRouteRouteWithChildren
   '/auth/logout': typeof AuthLogoutRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/auth/': typeof AuthIndexRoute
+  '/_dashboard/dak/kabupaten': typeof DashboardDakKabupatenRouteRouteWithChildren
   '/_dashboard/master/rekening': typeof DashboardMasterRekeningRouteRouteWithChildren
-  '/_dashboard/iku/iku_capaian': typeof DashboardIkuIku_capaianRoute
-  '/_dashboard/iku/iku_list': typeof DashboardIkuIku_listRoute
-  '/_dashboard/iku/iku_tagging': typeof DashboardIkuIku_taggingRoute
+  '/_dashboard/rkpd/iku': typeof DashboardRkpdIkuRouteRouteWithChildren
+  '/_dashboard/rkpd/renstra': typeof DashboardRkpdRenstraRouteRouteWithChildren
+  '/_dashboard/dak/daftardak': typeof DashboardDakDaftardakRoute
   '/_dashboard/konfigurasi/transferdata': typeof DashboardKonfigurasiTransferdataRoute
   '/_dashboard/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/_dashboard/master/jadwal': typeof DashboardMasterJadwalRoute
   '/_dashboard/master/organisasi': typeof DashboardMasterOrganisasiRoute
   '/_dashboard/master/role': typeof DashboardMasterRoleRoute
   '/_dashboard/master/skpd': typeof DashboardMasterSkpdRoute
-  '/_dashboard/renstra/iok': typeof DashboardRenstraIokRoute
-  '/_dashboard/renstra/iop': typeof DashboardRenstraIopRoute
-  '/_dashboard/renstra/iosk': typeof DashboardRenstraIoskRoute
-  '/_dashboard/iku/': typeof DashboardIkuIndexRoute
+  '/_dashboard/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
+  '/_dashboard/rkpd/renja': typeof DashboardRkpdRenjaRoute
+  '/_dashboard/dak/': typeof DashboardDakIndexRoute
   '/_dashboard/konfigurasi/': typeof DashboardKonfigurasiIndexRoute
   '/_dashboard/master/': typeof DashboardMasterIndexRoute
-  '/_dashboard/realisasi/': typeof DashboardRealisasiIndexRoute
-  '/_dashboard/renja/': typeof DashboardRenjaIndexRoute
-  '/_dashboard/renstra/': typeof DashboardRenstraIndexRoute
+  '/_dashboard/rkpd/': typeof DashboardRkpdIndexRoute
+  '/_dashboard/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
+  '/_dashboard/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
   '/_dashboard/master/rekening/bidang': typeof DashboardMasterRekeningBidangRoute
   '/_dashboard/master/rekening/kegiatan': typeof DashboardMasterRekeningKegiatanRoute
   '/_dashboard/master/rekening/program': typeof DashboardMasterRekeningProgramRoute
   '/_dashboard/master/rekening/subkegiatan': typeof DashboardMasterRekeningSubkegiatanRoute
   '/_dashboard/master/rekening/urusan': typeof DashboardMasterRekeningUrusanRoute
+  '/_dashboard/rkpd/iku/iku_capaian': typeof DashboardRkpdIkuIku_capaianRoute
+  '/_dashboard/rkpd/iku/iku_list': typeof DashboardRkpdIkuIku_listRoute
+  '/_dashboard/rkpd/iku/iku_tagging': typeof DashboardRkpdIkuIku_taggingRoute
+  '/_dashboard/rkpd/renstra/iok': typeof DashboardRkpdRenstraIokRoute
+  '/_dashboard/rkpd/renstra/iop': typeof DashboardRkpdRenstraIopRoute
+  '/_dashboard/rkpd/renstra/iosk': typeof DashboardRkpdRenstraIoskRoute
+  '/_dashboard/dak/kabupaten/': typeof DashboardDakKabupatenIndexRoute
   '/_dashboard/master/rekening/': typeof DashboardMasterRekeningIndexRoute
+  '/_dashboard/rkpd/iku/': typeof DashboardRkpdIkuIndexRoute
+  '/_dashboard/rkpd/renstra/': typeof DashboardRkpdRenstraIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/auth'
-    | '/iku'
+    | '/dak'
     | '/konfigurasi'
     | '/master'
-    | '/renstra'
+    | '/rkpd'
     | '/auth/logout'
     | '/'
     | '/auth/'
+    | '/dak/kabupaten'
     | '/master/rekening'
-    | '/iku/iku_capaian'
-    | '/iku/iku_list'
-    | '/iku/iku_tagging'
+    | '/rkpd/iku'
+    | '/rkpd/renstra'
+    | '/dak/daftardak'
     | '/konfigurasi/transferdata'
     | '/konfigurasi/user'
     | '/master/jadwal'
     | '/master/organisasi'
     | '/master/role'
     | '/master/skpd'
-    | '/renstra/iok'
-    | '/renstra/iop'
-    | '/renstra/iosk'
-    | '/iku/'
+    | '/rkpd/realisasi'
+    | '/rkpd/renja'
+    | '/dak/'
     | '/konfigurasi/'
     | '/master/'
-    | '/realisasi'
-    | '/renja'
-    | '/renstra/'
+    | '/rkpd/'
+    | '/dak/kabupaten/identifikasi'
+    | '/dak/kabupaten/monitoring'
     | '/master/rekening/bidang'
     | '/master/rekening/kegiatan'
     | '/master/rekening/program'
     | '/master/rekening/subkegiatan'
     | '/master/rekening/urusan'
+    | '/rkpd/iku/iku_capaian'
+    | '/rkpd/iku/iku_list'
+    | '/rkpd/iku/iku_tagging'
+    | '/rkpd/renstra/iok'
+    | '/rkpd/renstra/iop'
+    | '/rkpd/renstra/iosk'
+    | '/dak/kabupaten/'
     | '/master/rekening/'
+    | '/rkpd/iku/'
+    | '/rkpd/renstra/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth/logout'
     | '/'
     | '/auth'
-    | '/iku/iku_capaian'
-    | '/iku/iku_list'
-    | '/iku/iku_tagging'
+    | '/dak/daftardak'
     | '/konfigurasi/transferdata'
     | '/konfigurasi/user'
     | '/master/jadwal'
     | '/master/organisasi'
     | '/master/role'
     | '/master/skpd'
-    | '/renstra/iok'
-    | '/renstra/iop'
-    | '/renstra/iosk'
-    | '/iku'
+    | '/rkpd/realisasi'
+    | '/rkpd/renja'
+    | '/dak'
     | '/konfigurasi'
     | '/master'
-    | '/realisasi'
-    | '/renja'
-    | '/renstra'
+    | '/rkpd'
+    | '/dak/kabupaten/identifikasi'
+    | '/dak/kabupaten/monitoring'
     | '/master/rekening/bidang'
     | '/master/rekening/kegiatan'
     | '/master/rekening/program'
     | '/master/rekening/subkegiatan'
     | '/master/rekening/urusan'
+    | '/rkpd/iku/iku_capaian'
+    | '/rkpd/iku/iku_list'
+    | '/rkpd/iku/iku_tagging'
+    | '/rkpd/renstra/iok'
+    | '/rkpd/renstra/iop'
+    | '/rkpd/renstra/iosk'
+    | '/dak/kabupaten'
     | '/master/rekening'
+    | '/rkpd/iku'
+    | '/rkpd/renstra'
   id:
     | '__root__'
     | '/_dashboard'
     | '/auth'
-    | '/_dashboard/iku'
+    | '/_dashboard/dak'
     | '/_dashboard/konfigurasi'
     | '/_dashboard/master'
-    | '/_dashboard/renstra'
+    | '/_dashboard/rkpd'
     | '/auth/logout'
     | '/_dashboard/'
     | '/auth/'
+    | '/_dashboard/dak/kabupaten'
     | '/_dashboard/master/rekening'
-    | '/_dashboard/iku/iku_capaian'
-    | '/_dashboard/iku/iku_list'
-    | '/_dashboard/iku/iku_tagging'
+    | '/_dashboard/rkpd/iku'
+    | '/_dashboard/rkpd/renstra'
+    | '/_dashboard/dak/daftardak'
     | '/_dashboard/konfigurasi/transferdata'
     | '/_dashboard/konfigurasi/user'
     | '/_dashboard/master/jadwal'
     | '/_dashboard/master/organisasi'
     | '/_dashboard/master/role'
     | '/_dashboard/master/skpd'
-    | '/_dashboard/renstra/iok'
-    | '/_dashboard/renstra/iop'
-    | '/_dashboard/renstra/iosk'
-    | '/_dashboard/iku/'
+    | '/_dashboard/rkpd/realisasi'
+    | '/_dashboard/rkpd/renja'
+    | '/_dashboard/dak/'
     | '/_dashboard/konfigurasi/'
     | '/_dashboard/master/'
-    | '/_dashboard/realisasi/'
-    | '/_dashboard/renja/'
-    | '/_dashboard/renstra/'
+    | '/_dashboard/rkpd/'
+    | '/_dashboard/dak/kabupaten/identifikasi'
+    | '/_dashboard/dak/kabupaten/monitoring'
     | '/_dashboard/master/rekening/bidang'
     | '/_dashboard/master/rekening/kegiatan'
     | '/_dashboard/master/rekening/program'
     | '/_dashboard/master/rekening/subkegiatan'
     | '/_dashboard/master/rekening/urusan'
+    | '/_dashboard/rkpd/iku/iku_capaian'
+    | '/_dashboard/rkpd/iku/iku_list'
+    | '/_dashboard/rkpd/iku/iku_tagging'
+    | '/_dashboard/rkpd/renstra/iok'
+    | '/_dashboard/rkpd/renstra/iop'
+    | '/_dashboard/rkpd/renstra/iosk'
+    | '/_dashboard/dak/kabupaten/'
     | '/_dashboard/master/rekening/'
+    | '/_dashboard/rkpd/iku/'
+    | '/_dashboard/rkpd/renstra/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -472,11 +584,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLogoutRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/_dashboard/renstra': {
-      id: '/_dashboard/renstra'
-      path: '/renstra'
-      fullPath: '/renstra'
-      preLoaderRoute: typeof DashboardRenstraRouteRouteImport
+    '/_dashboard/rkpd': {
+      id: '/_dashboard/rkpd'
+      path: '/rkpd'
+      fullPath: '/rkpd'
+      preLoaderRoute: typeof DashboardRkpdRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/_dashboard/master': {
@@ -493,33 +605,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardKonfigurasiRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/_dashboard/iku': {
-      id: '/_dashboard/iku'
-      path: '/iku'
-      fullPath: '/iku'
-      preLoaderRoute: typeof DashboardIkuRouteRouteImport
+    '/_dashboard/dak': {
+      id: '/_dashboard/dak'
+      path: '/dak'
+      fullPath: '/dak'
+      preLoaderRoute: typeof DashboardDakRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/_dashboard/renstra/': {
-      id: '/_dashboard/renstra/'
+    '/_dashboard/rkpd/': {
+      id: '/_dashboard/rkpd/'
       path: '/'
-      fullPath: '/renstra/'
-      preLoaderRoute: typeof DashboardRenstraIndexRouteImport
-      parentRoute: typeof DashboardRenstraRouteRoute
-    }
-    '/_dashboard/renja/': {
-      id: '/_dashboard/renja/'
-      path: '/renja'
-      fullPath: '/renja'
-      preLoaderRoute: typeof DashboardRenjaIndexRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/_dashboard/realisasi/': {
-      id: '/_dashboard/realisasi/'
-      path: '/realisasi'
-      fullPath: '/realisasi'
-      preLoaderRoute: typeof DashboardRealisasiIndexRouteImport
-      parentRoute: typeof DashboardRouteRoute
+      fullPath: '/rkpd/'
+      preLoaderRoute: typeof DashboardRkpdIndexRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
     }
     '/_dashboard/master/': {
       id: '/_dashboard/master/'
@@ -535,33 +633,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardKonfigurasiIndexRouteImport
       parentRoute: typeof DashboardKonfigurasiRouteRoute
     }
-    '/_dashboard/iku/': {
-      id: '/_dashboard/iku/'
+    '/_dashboard/dak/': {
+      id: '/_dashboard/dak/'
       path: '/'
-      fullPath: '/iku/'
-      preLoaderRoute: typeof DashboardIkuIndexRouteImport
-      parentRoute: typeof DashboardIkuRouteRoute
+      fullPath: '/dak/'
+      preLoaderRoute: typeof DashboardDakIndexRouteImport
+      parentRoute: typeof DashboardDakRouteRoute
     }
-    '/_dashboard/renstra/iosk': {
-      id: '/_dashboard/renstra/iosk'
-      path: '/iosk'
-      fullPath: '/renstra/iosk'
-      preLoaderRoute: typeof DashboardRenstraIoskRouteImport
-      parentRoute: typeof DashboardRenstraRouteRoute
+    '/_dashboard/rkpd/renja': {
+      id: '/_dashboard/rkpd/renja'
+      path: '/renja'
+      fullPath: '/rkpd/renja'
+      preLoaderRoute: typeof DashboardRkpdRenjaRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
     }
-    '/_dashboard/renstra/iop': {
-      id: '/_dashboard/renstra/iop'
-      path: '/iop'
-      fullPath: '/renstra/iop'
-      preLoaderRoute: typeof DashboardRenstraIopRouteImport
-      parentRoute: typeof DashboardRenstraRouteRoute
-    }
-    '/_dashboard/renstra/iok': {
-      id: '/_dashboard/renstra/iok'
-      path: '/iok'
-      fullPath: '/renstra/iok'
-      preLoaderRoute: typeof DashboardRenstraIokRouteImport
-      parentRoute: typeof DashboardRenstraRouteRoute
+    '/_dashboard/rkpd/realisasi': {
+      id: '/_dashboard/rkpd/realisasi'
+      path: '/realisasi'
+      fullPath: '/rkpd/realisasi'
+      preLoaderRoute: typeof DashboardRkpdRealisasiRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
     }
     '/_dashboard/master/skpd': {
       id: '/_dashboard/master/skpd'
@@ -605,26 +696,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardKonfigurasiTransferdataRouteImport
       parentRoute: typeof DashboardKonfigurasiRouteRoute
     }
-    '/_dashboard/iku/iku_tagging': {
-      id: '/_dashboard/iku/iku_tagging'
-      path: '/iku_tagging'
-      fullPath: '/iku/iku_tagging'
-      preLoaderRoute: typeof DashboardIkuIku_taggingRouteImport
-      parentRoute: typeof DashboardIkuRouteRoute
+    '/_dashboard/dak/daftardak': {
+      id: '/_dashboard/dak/daftardak'
+      path: '/daftardak'
+      fullPath: '/dak/daftardak'
+      preLoaderRoute: typeof DashboardDakDaftardakRouteImport
+      parentRoute: typeof DashboardDakRouteRoute
     }
-    '/_dashboard/iku/iku_list': {
-      id: '/_dashboard/iku/iku_list'
-      path: '/iku_list'
-      fullPath: '/iku/iku_list'
-      preLoaderRoute: typeof DashboardIkuIku_listRouteImport
-      parentRoute: typeof DashboardIkuRouteRoute
+    '/_dashboard/rkpd/renstra': {
+      id: '/_dashboard/rkpd/renstra'
+      path: '/renstra'
+      fullPath: '/rkpd/renstra'
+      preLoaderRoute: typeof DashboardRkpdRenstraRouteRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
     }
-    '/_dashboard/iku/iku_capaian': {
-      id: '/_dashboard/iku/iku_capaian'
-      path: '/iku_capaian'
-      fullPath: '/iku/iku_capaian'
-      preLoaderRoute: typeof DashboardIkuIku_capaianRouteImport
-      parentRoute: typeof DashboardIkuRouteRoute
+    '/_dashboard/rkpd/iku': {
+      id: '/_dashboard/rkpd/iku'
+      path: '/iku'
+      fullPath: '/rkpd/iku'
+      preLoaderRoute: typeof DashboardRkpdIkuRouteRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
     }
     '/_dashboard/master/rekening': {
       id: '/_dashboard/master/rekening'
@@ -633,12 +724,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardMasterRekeningRouteRouteImport
       parentRoute: typeof DashboardMasterRouteRoute
     }
+    '/_dashboard/dak/kabupaten': {
+      id: '/_dashboard/dak/kabupaten'
+      path: '/kabupaten'
+      fullPath: '/dak/kabupaten'
+      preLoaderRoute: typeof DashboardDakKabupatenRouteRouteImport
+      parentRoute: typeof DashboardDakRouteRoute
+    }
+    '/_dashboard/rkpd/renstra/': {
+      id: '/_dashboard/rkpd/renstra/'
+      path: '/'
+      fullPath: '/rkpd/renstra/'
+      preLoaderRoute: typeof DashboardRkpdRenstraIndexRouteImport
+      parentRoute: typeof DashboardRkpdRenstraRouteRoute
+    }
+    '/_dashboard/rkpd/iku/': {
+      id: '/_dashboard/rkpd/iku/'
+      path: '/'
+      fullPath: '/rkpd/iku/'
+      preLoaderRoute: typeof DashboardRkpdIkuIndexRouteImport
+      parentRoute: typeof DashboardRkpdIkuRouteRoute
+    }
     '/_dashboard/master/rekening/': {
       id: '/_dashboard/master/rekening/'
       path: '/'
       fullPath: '/master/rekening/'
       preLoaderRoute: typeof DashboardMasterRekeningIndexRouteImport
       parentRoute: typeof DashboardMasterRekeningRouteRoute
+    }
+    '/_dashboard/dak/kabupaten/': {
+      id: '/_dashboard/dak/kabupaten/'
+      path: '/'
+      fullPath: '/dak/kabupaten/'
+      preLoaderRoute: typeof DashboardDakKabupatenIndexRouteImport
+      parentRoute: typeof DashboardDakKabupatenRouteRoute
+    }
+    '/_dashboard/rkpd/renstra/iosk': {
+      id: '/_dashboard/rkpd/renstra/iosk'
+      path: '/iosk'
+      fullPath: '/rkpd/renstra/iosk'
+      preLoaderRoute: typeof DashboardRkpdRenstraIoskRouteImport
+      parentRoute: typeof DashboardRkpdRenstraRouteRoute
+    }
+    '/_dashboard/rkpd/renstra/iop': {
+      id: '/_dashboard/rkpd/renstra/iop'
+      path: '/iop'
+      fullPath: '/rkpd/renstra/iop'
+      preLoaderRoute: typeof DashboardRkpdRenstraIopRouteImport
+      parentRoute: typeof DashboardRkpdRenstraRouteRoute
+    }
+    '/_dashboard/rkpd/renstra/iok': {
+      id: '/_dashboard/rkpd/renstra/iok'
+      path: '/iok'
+      fullPath: '/rkpd/renstra/iok'
+      preLoaderRoute: typeof DashboardRkpdRenstraIokRouteImport
+      parentRoute: typeof DashboardRkpdRenstraRouteRoute
+    }
+    '/_dashboard/rkpd/iku/iku_tagging': {
+      id: '/_dashboard/rkpd/iku/iku_tagging'
+      path: '/iku_tagging'
+      fullPath: '/rkpd/iku/iku_tagging'
+      preLoaderRoute: typeof DashboardRkpdIkuIku_taggingRouteImport
+      parentRoute: typeof DashboardRkpdIkuRouteRoute
+    }
+    '/_dashboard/rkpd/iku/iku_list': {
+      id: '/_dashboard/rkpd/iku/iku_list'
+      path: '/iku_list'
+      fullPath: '/rkpd/iku/iku_list'
+      preLoaderRoute: typeof DashboardRkpdIkuIku_listRouteImport
+      parentRoute: typeof DashboardRkpdIkuRouteRoute
+    }
+    '/_dashboard/rkpd/iku/iku_capaian': {
+      id: '/_dashboard/rkpd/iku/iku_capaian'
+      path: '/iku_capaian'
+      fullPath: '/rkpd/iku/iku_capaian'
+      preLoaderRoute: typeof DashboardRkpdIkuIku_capaianRouteImport
+      parentRoute: typeof DashboardRkpdIkuRouteRoute
     }
     '/_dashboard/master/rekening/urusan': {
       id: '/_dashboard/master/rekening/urusan'
@@ -675,25 +836,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardMasterRekeningBidangRouteImport
       parentRoute: typeof DashboardMasterRekeningRouteRoute
     }
+    '/_dashboard/dak/kabupaten/monitoring': {
+      id: '/_dashboard/dak/kabupaten/monitoring'
+      path: '/monitoring'
+      fullPath: '/dak/kabupaten/monitoring'
+      preLoaderRoute: typeof DashboardDakKabupatenMonitoringRouteImport
+      parentRoute: typeof DashboardDakKabupatenRouteRoute
+    }
+    '/_dashboard/dak/kabupaten/identifikasi': {
+      id: '/_dashboard/dak/kabupaten/identifikasi'
+      path: '/identifikasi'
+      fullPath: '/dak/kabupaten/identifikasi'
+      preLoaderRoute: typeof DashboardDakKabupatenIdentifikasiRouteImport
+      parentRoute: typeof DashboardDakKabupatenRouteRoute
+    }
   }
 }
 
-interface DashboardIkuRouteRouteChildren {
-  DashboardIkuIku_capaianRoute: typeof DashboardIkuIku_capaianRoute
-  DashboardIkuIku_listRoute: typeof DashboardIkuIku_listRoute
-  DashboardIkuIku_taggingRoute: typeof DashboardIkuIku_taggingRoute
-  DashboardIkuIndexRoute: typeof DashboardIkuIndexRoute
+interface DashboardDakKabupatenRouteRouteChildren {
+  DashboardDakKabupatenIdentifikasiRoute: typeof DashboardDakKabupatenIdentifikasiRoute
+  DashboardDakKabupatenMonitoringRoute: typeof DashboardDakKabupatenMonitoringRoute
+  DashboardDakKabupatenIndexRoute: typeof DashboardDakKabupatenIndexRoute
 }
 
-const DashboardIkuRouteRouteChildren: DashboardIkuRouteRouteChildren = {
-  DashboardIkuIku_capaianRoute: DashboardIkuIku_capaianRoute,
-  DashboardIkuIku_listRoute: DashboardIkuIku_listRoute,
-  DashboardIkuIku_taggingRoute: DashboardIkuIku_taggingRoute,
-  DashboardIkuIndexRoute: DashboardIkuIndexRoute,
+const DashboardDakKabupatenRouteRouteChildren: DashboardDakKabupatenRouteRouteChildren =
+  {
+    DashboardDakKabupatenIdentifikasiRoute:
+      DashboardDakKabupatenIdentifikasiRoute,
+    DashboardDakKabupatenMonitoringRoute: DashboardDakKabupatenMonitoringRoute,
+    DashboardDakKabupatenIndexRoute: DashboardDakKabupatenIndexRoute,
+  }
+
+const DashboardDakKabupatenRouteRouteWithChildren =
+  DashboardDakKabupatenRouteRoute._addFileChildren(
+    DashboardDakKabupatenRouteRouteChildren,
+  )
+
+interface DashboardDakRouteRouteChildren {
+  DashboardDakKabupatenRouteRoute: typeof DashboardDakKabupatenRouteRouteWithChildren
+  DashboardDakDaftardakRoute: typeof DashboardDakDaftardakRoute
+  DashboardDakIndexRoute: typeof DashboardDakIndexRoute
 }
 
-const DashboardIkuRouteRouteWithChildren =
-  DashboardIkuRouteRoute._addFileChildren(DashboardIkuRouteRouteChildren)
+const DashboardDakRouteRouteChildren: DashboardDakRouteRouteChildren = {
+  DashboardDakKabupatenRouteRoute: DashboardDakKabupatenRouteRouteWithChildren,
+  DashboardDakDaftardakRoute: DashboardDakDaftardakRoute,
+  DashboardDakIndexRoute: DashboardDakIndexRoute,
+}
+
+const DashboardDakRouteRouteWithChildren =
+  DashboardDakRouteRoute._addFileChildren(DashboardDakRouteRouteChildren)
 
 interface DashboardKonfigurasiRouteRouteChildren {
   DashboardKonfigurasiTransferdataRoute: typeof DashboardKonfigurasiTransferdataRoute
@@ -761,43 +953,78 @@ const DashboardMasterRouteRouteChildren: DashboardMasterRouteRouteChildren = {
 const DashboardMasterRouteRouteWithChildren =
   DashboardMasterRouteRoute._addFileChildren(DashboardMasterRouteRouteChildren)
 
-interface DashboardRenstraRouteRouteChildren {
-  DashboardRenstraIokRoute: typeof DashboardRenstraIokRoute
-  DashboardRenstraIopRoute: typeof DashboardRenstraIopRoute
-  DashboardRenstraIoskRoute: typeof DashboardRenstraIoskRoute
-  DashboardRenstraIndexRoute: typeof DashboardRenstraIndexRoute
+interface DashboardRkpdIkuRouteRouteChildren {
+  DashboardRkpdIkuIku_capaianRoute: typeof DashboardRkpdIkuIku_capaianRoute
+  DashboardRkpdIkuIku_listRoute: typeof DashboardRkpdIkuIku_listRoute
+  DashboardRkpdIkuIku_taggingRoute: typeof DashboardRkpdIkuIku_taggingRoute
+  DashboardRkpdIkuIndexRoute: typeof DashboardRkpdIkuIndexRoute
 }
 
-const DashboardRenstraRouteRouteChildren: DashboardRenstraRouteRouteChildren = {
-  DashboardRenstraIokRoute: DashboardRenstraIokRoute,
-  DashboardRenstraIopRoute: DashboardRenstraIopRoute,
-  DashboardRenstraIoskRoute: DashboardRenstraIoskRoute,
-  DashboardRenstraIndexRoute: DashboardRenstraIndexRoute,
+const DashboardRkpdIkuRouteRouteChildren: DashboardRkpdIkuRouteRouteChildren = {
+  DashboardRkpdIkuIku_capaianRoute: DashboardRkpdIkuIku_capaianRoute,
+  DashboardRkpdIkuIku_listRoute: DashboardRkpdIkuIku_listRoute,
+  DashboardRkpdIkuIku_taggingRoute: DashboardRkpdIkuIku_taggingRoute,
+  DashboardRkpdIkuIndexRoute: DashboardRkpdIkuIndexRoute,
 }
 
-const DashboardRenstraRouteRouteWithChildren =
-  DashboardRenstraRouteRoute._addFileChildren(
-    DashboardRenstraRouteRouteChildren,
+const DashboardRkpdIkuRouteRouteWithChildren =
+  DashboardRkpdIkuRouteRoute._addFileChildren(
+    DashboardRkpdIkuRouteRouteChildren,
   )
 
+interface DashboardRkpdRenstraRouteRouteChildren {
+  DashboardRkpdRenstraIokRoute: typeof DashboardRkpdRenstraIokRoute
+  DashboardRkpdRenstraIopRoute: typeof DashboardRkpdRenstraIopRoute
+  DashboardRkpdRenstraIoskRoute: typeof DashboardRkpdRenstraIoskRoute
+  DashboardRkpdRenstraIndexRoute: typeof DashboardRkpdRenstraIndexRoute
+}
+
+const DashboardRkpdRenstraRouteRouteChildren: DashboardRkpdRenstraRouteRouteChildren =
+  {
+    DashboardRkpdRenstraIokRoute: DashboardRkpdRenstraIokRoute,
+    DashboardRkpdRenstraIopRoute: DashboardRkpdRenstraIopRoute,
+    DashboardRkpdRenstraIoskRoute: DashboardRkpdRenstraIoskRoute,
+    DashboardRkpdRenstraIndexRoute: DashboardRkpdRenstraIndexRoute,
+  }
+
+const DashboardRkpdRenstraRouteRouteWithChildren =
+  DashboardRkpdRenstraRouteRoute._addFileChildren(
+    DashboardRkpdRenstraRouteRouteChildren,
+  )
+
+interface DashboardRkpdRouteRouteChildren {
+  DashboardRkpdIkuRouteRoute: typeof DashboardRkpdIkuRouteRouteWithChildren
+  DashboardRkpdRenstraRouteRoute: typeof DashboardRkpdRenstraRouteRouteWithChildren
+  DashboardRkpdRealisasiRoute: typeof DashboardRkpdRealisasiRoute
+  DashboardRkpdRenjaRoute: typeof DashboardRkpdRenjaRoute
+  DashboardRkpdIndexRoute: typeof DashboardRkpdIndexRoute
+}
+
+const DashboardRkpdRouteRouteChildren: DashboardRkpdRouteRouteChildren = {
+  DashboardRkpdIkuRouteRoute: DashboardRkpdIkuRouteRouteWithChildren,
+  DashboardRkpdRenstraRouteRoute: DashboardRkpdRenstraRouteRouteWithChildren,
+  DashboardRkpdRealisasiRoute: DashboardRkpdRealisasiRoute,
+  DashboardRkpdRenjaRoute: DashboardRkpdRenjaRoute,
+  DashboardRkpdIndexRoute: DashboardRkpdIndexRoute,
+}
+
+const DashboardRkpdRouteRouteWithChildren =
+  DashboardRkpdRouteRoute._addFileChildren(DashboardRkpdRouteRouteChildren)
+
 interface DashboardRouteRouteChildren {
-  DashboardIkuRouteRoute: typeof DashboardIkuRouteRouteWithChildren
+  DashboardDakRouteRoute: typeof DashboardDakRouteRouteWithChildren
   DashboardKonfigurasiRouteRoute: typeof DashboardKonfigurasiRouteRouteWithChildren
   DashboardMasterRouteRoute: typeof DashboardMasterRouteRouteWithChildren
-  DashboardRenstraRouteRoute: typeof DashboardRenstraRouteRouteWithChildren
+  DashboardRkpdRouteRoute: typeof DashboardRkpdRouteRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardRealisasiIndexRoute: typeof DashboardRealisasiIndexRoute
-  DashboardRenjaIndexRoute: typeof DashboardRenjaIndexRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
-  DashboardIkuRouteRoute: DashboardIkuRouteRouteWithChildren,
+  DashboardDakRouteRoute: DashboardDakRouteRouteWithChildren,
   DashboardKonfigurasiRouteRoute: DashboardKonfigurasiRouteRouteWithChildren,
   DashboardMasterRouteRoute: DashboardMasterRouteRouteWithChildren,
-  DashboardRenstraRouteRoute: DashboardRenstraRouteRouteWithChildren,
+  DashboardRkpdRouteRoute: DashboardRkpdRouteRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardRealisasiIndexRoute: DashboardRealisasiIndexRoute,
-  DashboardRenjaIndexRoute: DashboardRenjaIndexRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

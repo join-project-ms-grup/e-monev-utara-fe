@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SITE_NAME } from '../../../lib/config'
+import { SITE_NAME } from '../../../../lib/config'
 
-export const Route = createFileRoute('/_dashboard/renstra/iosk')({
+export const Route = createFileRoute('/_dashboard/rkpd/renstra/iosk')({
     head: () => ({
     meta: [
       {

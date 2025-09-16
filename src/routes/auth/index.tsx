@@ -29,7 +29,7 @@ export const Route = createFileRoute('/auth/')({
 });
 
 function RouteComponent() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { login } = useAuth();
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin123');
@@ -50,7 +50,7 @@ function RouteComponent() {
           username: data.username,
         },
       });
-      navigate({ to: '/' })
+      navigate({ to: '/' });
     },
   });
 
@@ -123,6 +123,44 @@ function RouteComponent() {
                 Hubungi admin
               </a>
             </p>
+          </div>
+          <div className='inline-flex gap-2'>
+            <button
+              className='text-red-200 hover:text-red-100 transition-all'
+              onClick={() => {
+                setUsername('admin');
+                setPassword('admin123');
+              }}
+            >
+              Developer
+            </button>
+            <button
+              className='text-red-200 hover:text-red-100 transition-all'
+              onClick={() => {
+                setUsername('admin2');
+                setPassword('admin123');
+              }}
+            >
+              Admin2
+            </button>
+            <button
+              className='text-red-200 hover:text-red-100 transition-all'
+              onClick={() => {
+                setUsername('rkpd');
+                setPassword('rkpd123');
+              }}
+            >
+              RKPD
+            </button>
+            <button
+              className='text-red-200 hover:text-red-100 transition-all'
+              onClick={() => {
+                setUsername('dak');
+                setPassword('dak123');
+              }}
+            >
+              DAK
+            </button>
           </div>
           <div className='h-1/5 text-center w-full flex flex-col items-center justify-center opacity-50 text-[0.9rem]'>
             <p>BAPPELITBANGDA</p>

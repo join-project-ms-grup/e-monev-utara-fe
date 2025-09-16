@@ -1,0 +1,19 @@
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { getRoleId } from '../../../lib/usercookie';
+import toast from 'react-hot-toast';
+
+export const Route = createFileRoute('/_dashboard/dak')({
+  beforeLoad: () => {
+    const roleId = getRoleId();
+    if (roleId) {
+      if ([3].includes(roleId)) {
+        toast.error('Tidak memiliki izin akses.');
+        throw redirect({ to: '/', replace: true });
+      }
+    }
+  },
+  staticData: {
+    title: 'DAK',
+  },
+  component: Outlet,
+});
