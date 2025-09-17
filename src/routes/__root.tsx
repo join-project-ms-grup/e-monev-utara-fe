@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-router';
 import toast, { ToastBar, Toaster } from 'react-hot-toast';
 import { MdClose } from 'react-icons/md';
+import { Tooltip } from 'react-tooltip';
 
 interface AuthType {
   token: string | null;
@@ -51,6 +52,7 @@ function RootComponent() {
     <>
       <HeadContent />
       <Outlet />
+      <Tooltip id='tooltip' />
       <ToastComponent />
     </>
   );

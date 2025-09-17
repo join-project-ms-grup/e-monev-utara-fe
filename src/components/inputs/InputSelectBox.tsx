@@ -73,7 +73,7 @@ export default function InputSelectBox({
         <ListboxButton
           id={id}
           ref={buttonRef}
-          className={`w-full inline-flex justify-between items-center gap-1 bg-white border border-[#ccc] focus:border-[var(--color-2)] data-open:border-[var(--color-2)] focus:outline-none py-2 px-3 rounded transition-colors ${btnclassName}`}
+          className={`w-full inline-flex justify-between items-center gap-1 bg-white border border-[#ccc] hover:border-[var(--color-2)] focus:border-[var(--color-2)] data-open:border-[var(--color-2)] focus:outline-none py-2 px-3 rounded transition-colors ${btnclassName}`}
         >
           {currentLabel} <MdKeyboardArrowDown />
         </ListboxButton>

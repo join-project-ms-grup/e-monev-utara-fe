@@ -12,7 +12,13 @@ import toast from 'react-hot-toast';
 import { useState } from 'react';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
-import { addRole, deleteRole, getRoleAdmin, getRoleDev, updateRole } from '../../services/RoleService';
+import {
+  addRole,
+  deleteRole,
+  getRoleAdmin,
+  getRoleDev,
+  updateRole,
+} from '../../services/RoleService';
 import FormRole from '../forms/FormRole';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
@@ -49,7 +55,7 @@ const RoleTable = () => {
   const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_role'],
-    queryFn: () => (getRoleId() === 1 ? getRoleDev() : getRoleAdmin())
+    queryFn: () => (getRoleId() === 1 ? getRoleDev() : getRoleAdmin()),
   });
 
   const data2 = data as RoleDevType[] | RoleAdminType[];
@@ -126,6 +132,7 @@ const RoleTable = () => {
   const devColumns = [
     devColumnHelper.display({
       header: 'No',
+      enableSorting: true,
       cell: ({ row }) => `${row.index + 1}`,
       meta: {
         thClassNames: 'w-[5%]',

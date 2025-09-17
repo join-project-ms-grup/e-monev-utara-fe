@@ -22,7 +22,7 @@ const Breadcrumb = ({...props}: Breadcrumb) => {
     <nav aria-label='breadcrumb' {...props}>
       <ol className='list-none inline-flex p-0 m-0 flex-wrap items-center'>
         <li className='py-1'>
-          <Link to='/' className='hover:text-[#FF5E5E]'>
+          <Link to='/' className='hover:text-[var(--color-1)]'>
             <MdHome className='size-6 ' />
           </Link>
         </li>
@@ -42,7 +42,7 @@ const Breadcrumb = ({...props}: Breadcrumb) => {
               <li className='flex items-center'>
                 {i !== crumbs.length - 1 && !isDisabled ? (
                   <>
-                    <Link to={match.path} className='capitalize hover:text-[#FF5E5E]'>
+                    <Link to={match.path} className='capitalize hover:text-[var(--color-1)]'>
                       {match.title}
                     </Link>
                   </>

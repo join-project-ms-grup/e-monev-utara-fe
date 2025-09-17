@@ -331,7 +331,13 @@ a:hover {
 .btn.btn-primary-alt {
   @apply bg-indigo-600 text-white;
 }
-.btn:hover {
+.btn.btn-theme {
+  @apply bg-white text-[var(--text-1)] border border-[var(--text-2)];
+}
+.btn.btn-theme:hover:not(:disabled) {
+  @apply bg-[var(--color-2)] text-[var(--text-3)];
+}
+.btn:hover:not(:disabled) {
   opacity: 90%;
 }
 /* Input */

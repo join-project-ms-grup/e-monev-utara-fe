@@ -22,6 +22,7 @@ import { useState, type ReactNode } from 'react';
 import InputButton from '../inputs/InputButton';
 
 interface MainTableProps<TData> {
+  sorting?: boolean;
   data: TData[];
   columns: ColumnDef<TData, any>[];
   tabletop?: ReactNode;
@@ -35,6 +36,7 @@ declare module '@tanstack/react-table' {
 }
 
 const MainTable = <TData,>({
+  sorting = true,
   data,
   columns,
   tabletop,
@@ -46,6 +48,9 @@ const MainTable = <TData,>({
   const table = useReactTable({
     data: data,
     columns: columns,
+    defaultColumn: {
+      enableSorting: sorting,
+    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -57,13 +62,13 @@ const MainTable = <TData,>({
   });
 
   return (
-    <div className='table-responsive py-2'>
+    <div className='py-2'>
       {tabletop && (
         <>
           <div className='flex mb-2'>{tabletop}</div>
         </>
       )}
-      <table className='table-auto'>
+      <table className='table-auto table-responsive'>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -128,7 +133,7 @@ const MainTable = <TData,>({
         </tbody>
       </table>
       <div className='flex flex-row items-center justify-between mt-2'>
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-1'>
           <span className='opacity-85'>Tampilkan</span>
           <InputSelectBox
             className='h-9'
@@ -146,7 +151,7 @@ const MainTable = <TData,>({
             dari {table.getRowCount().toLocaleString()} data
           </span>
         </div>
-        <div className='flex flex-row gap-2'>
+        <div className='flex flex-row gap-1'>
           <InputButton
             className='w-9 h-9'
             onClick={() => table.firstPage()}
@@ -161,7 +166,7 @@ const MainTable = <TData,>({
           >
             <MdKeyboardArrowLeft />
           </InputButton>
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-1'>
             <input
               type='number'
               min='1'

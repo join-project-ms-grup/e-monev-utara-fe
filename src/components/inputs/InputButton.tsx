@@ -10,6 +10,8 @@ interface InputButtonType
   loadingColor?: string;
   isLoading?: boolean;
   Icon?: IconType;
+  tooltip?: string;
+  tooltipId?: string;
 }
 
 // #FF6B6B #FF5E5E
@@ -22,13 +24,17 @@ const InputButton = ({
   loadingColor = '#fff',
   isLoading = false,
   Icon,
+  tooltip,
+  tooltipId = 'tooltip',
   ...props
 }: InputButtonType) => {
   return (
     <button
+      {...(tooltip ? { 'data-tooltip-id': tooltipId } : {})}
+      {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
       className={`${className} flex flex-row items-center justify-center
         gap-2 bg-[var(--color-1)] text-white py-2 rounded-md
-        hover:opacity-80 active:scale-[98%] disabled:opacity-50 transition-all duration-100`}
+        hover:opacity-80 active:scale-[95%] disabled:opacity-50 transition-all duration-100`}
       {...props}
     >
       {Icon && <Icon className={iconClassName} />}

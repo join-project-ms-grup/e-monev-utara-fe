@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
+import { DaftarDakTable } from '../../../components/tables/dak/DaftarDakTable';
 
 export const Route = createFileRoute('/_dashboard/dak/daftardak')({
   head: () => ({
@@ -16,5 +17,9 @@ export const Route = createFileRoute('/_dashboard/dak/daftardak')({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_dashboard/dak/daftardak"!</div>;
+  return (
+    <>
+      <DaftarDakTable />
+    </>
+  );
 }
