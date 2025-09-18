@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import InputButton from '../inputs/InputButton';
 import InputText from '../inputs/InputText';
-import InputSelectBox from '../inputs/InputSelectBox';
-import type { RoleAdminType, RoleEditType } from '../../types/data';
+import type { RoleForm, RoleFormState } from '../../types/data';
+import { InputField } from '../inputs/InputField';
 
-interface FormAddProps {
-  type: 'Add';
+interface BaseFormProps {
   children?: React.ReactElement;
-  onSubmit: (data: RoleAdminType) => void;
-  formData: RoleAdminType;
-  setFormData: React.Dispatch<React.SetStateAction<RoleAdminType>>;
+  formData: RoleFormState;
+  setFormData: React.Dispatch<React.SetStateAction<RoleFormState>>;
 }
 
-interface FormEditProps {
+interface FormAddProps extends BaseFormProps {
+  type: 'Add';
+  onSubmit: (data: RoleForm) => void;
+}
+
+interface FormEditProps extends BaseFormProps {
   type: 'Edit';
-  children?: React.ReactElement;
-  onSubmit: (data: RoleEditType) => void;
-  formData: RoleEditType;
-  setFormData: React.Dispatch<React.SetStateAction<RoleEditType>>;
+  onSubmit: (data: { id: number; payload: RoleForm }) => void;
 }
 
 type FormProps = FormAddProps | FormEditProps;
@@ -39,17 +39,22 @@ const FormRole: React.FC<FormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // if (!formData.kode || !formData.name) {
-    //   setError('Kode dan Nama wajib diisi.');
-    //   return;
-    // }
+    if (!formData.kode || !formData.name) {
+      setError('Kode dan Nama wajib diisi.');
+      return;
+    }
 
     setError(null);
 
     if (type === 'Add') {
       onSubmit(formData);
     } else {
-      onSubmit({ ...formData, id: (formData as any).id });
+      if (formData.id == null) {
+        setError('ID tidak ditemukan untuk mode edit.');
+        return;
+      }
+      const { id, ...payload } = formData;
+      onSubmit({ id, payload });
     }
   };
 
@@ -58,13 +63,14 @@ const FormRole: React.FC<FormProps> = ({
       {error && <div className='text-red-600 text-sm mb-2'>{error}</div>}
       <div className='grid grid-cols-4 items-center gap-2'>
         <label htmlFor='kode'>Kode</label>
-        <InputText
-          type='number'
+        <InputField
+          type='text'
+          inputMode='numeric'
           id='kode'
           label='Kode'
           name='kode'
-          min={1}
-          value={formData.kode}
+          maxLength={10}
+          value={formData.kode!}
           onChange={handleChange}
           className='col-span-3'
           required
@@ -72,7 +78,7 @@ const FormRole: React.FC<FormProps> = ({
       </div>
       <div className='grid grid-cols-4 items-center gap-2'>
         <label htmlFor='name'>Nama</label>
-        <InputText
+        <InputField
           id='name'
           label='Nama'
           name='name'
@@ -86,7 +92,7 @@ const FormRole: React.FC<FormProps> = ({
         children
       ) : (
         <InputButton type='submit'>
-          {type === 'Add' ? 'Tambah' : 'Simpan Perubahan'}
+          {type === 'Add' ? 'Tambah' : 'Simpan'}
         </InputButton>
       )}
     </form>

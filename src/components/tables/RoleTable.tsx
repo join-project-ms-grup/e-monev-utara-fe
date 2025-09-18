@@ -2,14 +2,15 @@ import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import type {
-  RoleAdminType,
-  RoleDevType,
-  RoleEditType,
+  RoleDeleteForm,
+  RoleForm,
+  RoleFormState,
+  RoleType,
 } from '../../types/data';
 import Spinner from '../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
 import {
@@ -25,31 +26,45 @@ import type { ApiResponse } from '../../lib/api';
 import { getRoleId } from '../../lib/usercookie';
 
 const RoleTable = () => {
+  const queryClient = useQueryClient();
   // Modal
-  const [openAdd, setOpenAdd] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
+  const [modalState, setModalState] = useState<'Add' | 'Edit' | 'Delete'>(
+    'Add',
+  );
+  const [openModal, setOpenModal] = useState(false);
+
   // Form Data
-  const initialFormData: RoleAdminType = {
-    kode: null,
+  const initialFormData: RoleFormState = {
+    id: null,
     name: '',
-  };
-  const initialFormEdit: RoleEditType = {
-    id: 0,
     kode: null,
-    name: '',
   };
-  const initialFormDelete: Pick<RoleDevType, 'id' | 'name'> = {
+  const initialFormDelete: RoleDeleteForm = {
     id: 0,
     name: '',
   };
 
-  const [formData, setFormData] = useState<RoleAdminType>(initialFormData);
-  const [formEdit, setFormEdit] = useState<
-    RoleAdminType & Pick<RoleDevType, 'id'>
-  >(initialFormEdit);
+  const [formData, setFormData] = useState<
+    RoleForm | (RoleForm & { id: number | null })
+  >(initialFormData);
   const [formDelete, setFormDelete] =
-    useState<Pick<RoleDevType, 'id' | 'name'>>(initialFormDelete);
+    useState<RoleDeleteForm>(initialFormDelete);
+
+  // Clear form
+  useEffect(() => {
+    if (!openModal) {
+      const timeout = setTimeout(() => {
+        if (modalState === 'Delete') {
+          setFormDelete(initialFormDelete);
+        } else {
+          setFormData(initialFormData);
+        }
+      }, 200);
+      return () => clearTimeout(timeout);
+    } else {
+      console.log(formData);
+    }
+  }, [openModal]);
 
   // Data fetching
   const [loadingMutation, setLoadingMutation] = useState(false);
@@ -58,51 +73,45 @@ const RoleTable = () => {
     queryFn: () => (getRoleId() === 1 ? getRoleDev() : getRoleAdmin()),
   });
 
-  const data2 = data as RoleDevType[] | RoleAdminType[];
-
-  const queryClient = useQueryClient();
   // Add
   const addMutation = useMutation({
-    mutationFn: async (payload: RoleAdminType) => {
+    mutationFn: async (payload: RoleForm) => {
       setLoadingMutation(true);
       return addRole(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_role'] });
+      setFormData(initialFormData);
+      setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+      if (error.status === 400) {
+        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+      }
     },
     onSettled: () => {
       setLoadingMutation(false);
-      setFormData(initialFormData);
-      setOpenAdd(false);
     },
   });
   // Update
   const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: RoleAdminType;
-    }) => {
+    mutationFn: async ({ id, payload }: { id: number; payload: RoleForm }) => {
       setLoadingMutation(true);
       return updateRole(id, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_role'] });
+      setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      if (error.status === 400) {
+        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      }
     },
     onSettled: () => {
       setLoadingMutation(false);
-      setFormEdit(initialFormEdit);
-      setOpenEdit(false);
     },
   });
   // Delete
@@ -120,17 +129,15 @@ const RoleTable = () => {
     },
     onSettled: () => {
       setLoadingMutation(false);
-      setFormDelete(initialFormDelete);
-      setOpenDelete(false);
+      setOpenModal(false);
     },
   });
 
   // Kolom
-  const devColumnHelper = createColumnHelper<RoleDevType>();
-  const adminColumnHelper = createColumnHelper<RoleAdminType>();
+  const columnHelper = createColumnHelper<RoleFormState>();
 
-  const devColumns = [
-    devColumnHelper.display({
+  const columns = [
+    columnHelper.display({
       header: 'No',
       enableSorting: true,
       cell: ({ row }) => `${row.index + 1}`,
@@ -139,83 +146,74 @@ const RoleTable = () => {
         tdClassNames: 'text-center',
       },
     }),
-    devColumnHelper.accessor('kode', {
+    columnHelper.accessor('kode', {
       header: 'Kode',
     }),
-    devColumnHelper.accessor('name', {
+    columnHelper.accessor('name', {
       header: 'Nama',
     }),
-    devColumnHelper.display({
-      header: 'Aksi',
-      enableSorting: false,
-      cell: ({ row }) => (
-        <>
-          <div className='inline-flex gap-1'>
-            <button
-              className='p-1 transition-all rounded-full hover:bg-blue-400 hover:text-[var(--text-3)] active:scale-90'
-              onClick={() => {
-                setFormEdit({
-                  id: row.original.id,
-                  kode: row.original.kode,
-                  name: row.original.name,
-                });
-                setOpenEdit(true);
-              }}
-            >
-              <MdEdit className='text-xl' />
-            </button>
-            <button
-              className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
-              onClick={() => {
-                setFormDelete({
-                  id: row.original.id,
-                  name: row.original.name,
-                });
-                setOpenDelete(true);
-              }}
-            >
-              <MdDelete className='text-xl' />
-            </button>
-          </div>
-        </>
-      ),
-      meta: {
-        tdClassNames: 'text-center',
-      },
-    }),
+    ...(getRoleId() === 1
+      ? [
+          columnHelper.display({
+            header: 'Aksi',
+            enableSorting: false,
+            cell: ({ row }) => (
+              <>
+                <div className='inline-flex gap-1'>
+                  <button
+                    className='p-1 transition-all rounded-full hover:bg-blue-400 hover:text-[var(--text-3)] active:scale-90'
+                    onClick={() => {
+                      setModalState('Edit');
+                      setFormData({
+                        id: row.original.id,
+                        kode: row.original.kode,
+                        name: row.original.name,
+                      });
+                      setOpenModal(true);
+                    }}
+                  >
+                    <MdEdit className='text-xl' />
+                  </button>
+                  <button
+                    className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
+                    onClick={() => {
+                      setModalState('Delete');
+                      setFormDelete({
+                        id: row.original.id!,
+                        name: row.original.name,
+                      });
+                      setOpenModal(true);
+                    }}
+                  >
+                    <MdDelete className='text-xl' />
+                  </button>
+                </div>
+              </>
+            ),
+            meta: {
+              thClassNames: 'w-[10%]',
+              tdClassNames: 'text-center',
+            },
+          }),
+        ]
+      : []),
   ];
-
-  const adminColumns = [
-    adminColumnHelper.display({
-      header: 'No',
-      cell: ({ row }) => `${row.index + 1}`,
-      meta: {
-        thClassNames: 'w-[5%]',
-        tdClassNames: 'text-center',
-      },
-    }),
-    adminColumnHelper.accessor('kode', {
-      header: 'Kode',
-    }),
-    adminColumnHelper.accessor('name', {
-      header: 'Nama',
-    }),
-  ];
-
-  const columns = getRoleId() === 1 ? devColumns : adminColumns;
 
   const TableTopbar = () => {
     return (
       <>
         <div className='inline-flex flex-1 gap-2 justify-end'>
-          <button
-            className='table-button w-9 h-9'
-            onClick={() => {
-              setOpenAdd(true);
-            }}
-          >
-            <MdAdd />
-          </button>
+          {getRoleId() === 1 && (
+            <button
+              className='table-button w-9 h-9'
+              onClick={() => {
+                setModalState('Add');
+                setOpenModal(true);
+              }}
+            >
+              <MdAdd />
+            </button>
+          )}
 
           <button
             className='table-button w-9 h-9'
@@ -233,90 +231,95 @@ const RoleTable = () => {
     <>
       <MainTable
         data={data || []}
-        columns={columns as any}
+        columns={columns}
         tabletop={<TableTopbar />}
       />
-      <DialogModal
-        title='Tambah data Role'
-        isOpen={openAdd}
-        onClose={() => setOpenAdd(false)}
-      >
-        <FormRole
-          type='Add'
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={(data: RoleAdminType) => {
-            console.log('Data dari form modal:', data);
-            // addMutation.mutate(data);
-            addMutation.mutate({
-              kode: Number(data.kode),
-              name: data.name,
-            });
+      {modalState === 'Add' && (
+        <DialogModal
+          title='Tambah data Role'
+          isOpen={openModal}
+          onClose={() => {
+            setFormData(initialFormData);
+            setOpenModal(false);
           }}
         >
-          <div className='flex gap-2 justify-end'>
-            <InputButton
-              type='submit'
-              className='btn btn-theme w-24'
-              isLoading={loadingMutation}
-            >
-              Simpan
-            </InputButton>
-          </div>
-        </FormRole>
-      </DialogModal>
-      <DialogModal
-        title='Ubah data Role'
-        isOpen={openEdit}
-        onClose={() => setOpenEdit(false)}
-      >
-        <FormRole
-          type='Edit'
-          formData={formEdit}
-          setFormData={setFormEdit}
-          onSubmit={(data: RoleEditType) => {
-            console.log('Data dari form modal:', data);
-            updateMutation.mutate({
-              id: data.id,
-              payload: {
+          <FormRole
+            type='Add'
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={(data: RoleForm) => {
+              console.log('Data dari form modal:', data);
+              addMutation.mutate({
                 kode: Number(data.kode),
                 name: data.name,
-              },
-            });
-          }}
-        >
-          <div className='flex gap-2 justify-end'>
-            <InputButton
-              type='submit'
-              className='btn btn-theme w-24'
-              isLoading={loadingMutation}
-            >
-              Simpan
-            </InputButton>
-          </div>
-        </FormRole>
-      </DialogModal>
-      <DialogModal
-        title='Hapus data Role'
-        isOpen={openDelete}
-        onClose={() => setOpenDelete(false)}
-      >
-        <p>
-          Yakin ingin menghapus data <i>{formDelete.name}</i> ?
-        </p>
-        <div className='flex gap-2 justify-end'>
-          <InputButton
-            type='button'
-            className='btn btn-theme w-24'
-            isLoading={loadingMutation}
-            onClick={() => {
-              deleteMutation.mutate(formDelete.id);
+              });
             }}
           >
-            Hapus
-          </InputButton>
-        </div>
-      </DialogModal>
+            <div className='flex gap-2 justify-end'>
+              <InputButton
+                type='submit'
+                className='btn btn-theme w-24'
+                isLoading={loadingMutation}
+              >
+                Simpan
+              </InputButton>
+            </div>
+          </FormRole>
+        </DialogModal>
+      )}
+      {modalState === 'Edit' && (
+        <DialogModal
+          title='Ubah data Role'
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+        >
+          <FormRole
+            type='Edit'
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={({ id, payload }) => {
+              console.log('Data dari form modal:', data);
+              updateMutation.mutate({
+                id,
+                payload: { kode: Number(payload.kode), name: payload.name },
+              });
+            }}
+          >
+            <div className='flex gap-2 justify-end'>
+              <InputButton
+                type='submit'
+                className='btn btn-theme w-24'
+                isLoading={loadingMutation}
+              >
+                Simpan
+              </InputButton>
+            </div>
+          </FormRole>
+        </DialogModal>
+      )}
+      {modalState === 'Delete' && (
+        <DialogModal
+          title='Hapus data Role'
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+        >
+          <p>
+            Yakin ingin menghapus data <i>{formDelete.name}</i> ?
+          </p>
+          <div className='flex gap-2 justify-end'>
+            <InputButton
+              type='button'
+              className='btn btn-theme w-24'
+              isLoading={loadingMutation}
+              onClick={() => {
+                deleteMutation.mutate(formDelete.id);
+              }}
+            >
+              Hapus
+            </InputButton>
+          </div>
+        </DialogModal>
+      )}
     </>
   );
 };

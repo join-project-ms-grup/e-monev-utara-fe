@@ -1,77 +1,58 @@
 import React, { useState, type ChangeEvent } from 'react';
 import type { IconType } from 'react-icons/lib';
 
-interface InputTextProps {
-  type?: 'text' | 'password' | 'email' | 'number';
-  id?: string;
+interface InputTextProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  name: string;
   Icon?: IconType;
-  value: string | number | null;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  className?: string;
-  min?: number;
-  max?: number;
-  tooltip?: string; // tambahan
+  tooltip?: string;
 }
 
-const InputText = ({
+export const InputField = ({
   type = 'text',
   label,
-  name,
   Icon,
+  tooltip,
+  className,
   value,
   onChange,
-  required,
-  id = `input-${label.replace(/\s+/g, '-')}`,
-  className,
-  min,
-  max,
-  tooltip,
+  inputMode,
+  ...rest
 }: InputTextProps) => {
   const [focused, setFocused] = useState(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (type === 'number') {
-      const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
-      if (onlyNumbers !== '') {
-        const num = Number(onlyNumbers);
-        if (
-          (min !== undefined && num < min) ||
-          (max !== undefined && num > max)
-        ) {
-          return;
-        }
+const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    if (inputMode === 'numeric') {
+      const onlyNumbers = rawValue.replace(/[^0-9]/g, '');
+      if (onlyNumbers !== rawValue) {
+        const syntheticEvent = {
+          ...e,
+          target: {
+            ...e.target,
+            value: onlyNumbers,
+          },
+        } as ChangeEvent<HTMLInputElement>;
+        onChange?.(syntheticEvent);
+        return;
       }
-      const modifiedEvent = {
-        ...e,
-        target: {
-          ...e.target,
-          value: onlyNumbers,
-        },
-      } as ChangeEvent<HTMLInputElement>;
-      onChange(modifiedEvent);
     }
-
-    onChange(e);
+    onChange?.(e);
   };
 
+  const id = rest.id ?? `input-${label.replace(/\s+/g, '-')}`;
+
   return (
-    <div className={`relative w-full group ${className}`}>
+    <div className={`relative w-full group ${className ?? ''}`}>
       <input
         id={id}
         type={type}
         value={value == null ? '' : value}
-        name={name}
-        required={required}
         onChange={handleChange}
-        min={min}
-        max={max}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className='w-full border border-[#ccc] rounded px-3 py-2 focus:border-[var(--color-2)] focus:outline-none'
         style={{ lineHeight: '1.5rem' }}
+        {...rest}
       />
       <label
         htmlFor={id}
@@ -102,5 +83,3 @@ const InputText = ({
     </div>
   );
 };
-
-export default InputText;

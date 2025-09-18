@@ -1,19 +1,142 @@
 import MainTable from './MainTable';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import { getUsers } from '../../services/UserService';
-import type { DataUserType } from '../../types/data';
+import {
+  addUser,
+  deleteUser,
+  getUsers,
+  updateUser,
+} from '../../services/UserService';
+import type {
+  UserDeleteForm,
+  UserForm,
+  UserFormState,
+  UserType,
+} from '../../types/data';
 import Spinner from '../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
+import DialogModal from '../inputs/DialogModal';
+import InputButton from '../inputs/InputButton';
+import { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
+import type { ApiResponse } from '../../lib/api';
+import { FormUser } from '../forms/FormUser';
 
 const UserTable = () => {
-  const { data, isLoading, isError, refetch, isFetching } = useQuery({
-    queryKey: ['users'],
+  const queryClient = useQueryClient();
+  // Modal
+  const [modalState, setModalState] = useState<'Add' | 'Edit' | 'Delete'>(
+    'Add',
+  );
+  const [openModal, setOpenModal] = useState(false);
+
+  // Form Data
+  const initialFormData: UserFormState = {
+    id: null,
+    email: '',
+    fullname: '',
+    name: '',
+    password: '',
+    role_id: null,
+    skpd_id: null,
+  };
+  const initialFormDelete: UserDeleteForm = {
+    id: 0,
+    fullname: '',
+  };
+  const [formData, setFormData] = useState<
+    UserForm | (UserForm & { id: number | null })
+  >(initialFormData);
+  const [formDelete, setFormDelete] =
+    useState<UserDeleteForm>(initialFormDelete);
+
+  // Clear form
+  useEffect(() => {
+    if (!openModal) {
+      const timeout = setTimeout(() => {
+        if (modalState === 'Delete') {
+          setFormDelete(initialFormDelete);
+        } else {
+          setFormData(initialFormData);
+        }
+      }, 200);
+      return () => clearTimeout(timeout);
+    } else {
+      console.log(formData);
+    }
+  }, [openModal]);
+
+  // Data fetching
+  const [loadingMutation, setLoadingMutation] = useState(false);
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ['tabel_user'],
     queryFn: getUsers,
   });
 
-  const columnHelper = createColumnHelper<DataUserType>();
+  // Add
+  const addMutation = useMutation({
+    mutationFn: async (payload: UserForm) => {
+      setLoadingMutation(true);
+      return addUser(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_user'] });
+      setOpenModal(false);
+      toast.success('Data berhasil ditambahkan');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+    },
+  });
+  // Update
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: UserForm }) => {
+      setLoadingMutation(true);
+      return updateUser(id, payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_user'] });
+      setOpenModal(false);
+      toast.success('Data berhasil diperbarui');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+    },
+  });
+  // Delete
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      setLoadingMutation(true);
+      return deleteUser(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_user'] });
+      toast.success('Data berhasil dihapus');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+      setOpenModal(false);
+    },
+  });
+
+  // Kolom
+  const columnHelper = createColumnHelper<UserType>();
   const columns = [
     columnHelper.display({
       header: 'No',
@@ -25,27 +148,15 @@ const UserTable = () => {
     }),
     columnHelper.accessor('fullname', {
       header: 'Nama',
-      // meta: {
-      //   tdClassNames: 'text-center',
-      // },
     }),
     columnHelper.accessor('name', {
       header: 'Username',
-      // meta: {
-      //   tdClassNames: 'text-center',
-      // },
     }),
     columnHelper.accessor('email', {
       header: 'Email',
-      // meta: {
-      //   tdClassNames: 'text-center',
-      // },
     }),
     columnHelper.accessor('userRole.name', {
       header: 'Role',
-      // meta: {
-      //   tdClassNames: 'text-center',
-      // },
     }),
     columnHelper.display({
       header: 'Aksi',
@@ -54,13 +165,32 @@ const UserTable = () => {
         <div className='inline-flex gap-1'>
           <button
             className='p-1 transition-all rounded-full hover:bg-blue-400 hover:text-[var(--text-3)] active:scale-90'
-            onClick={() => toast.success(`Edit, ${row.original.fullname}`)}
+            onClick={() => {
+              setModalState('Edit');
+              setFormData({
+                id: row.original.id,
+                email: row.original.email,
+                fullname: row.original.fullname,
+                name: row.original.name,
+                password: '',
+                role_id: row.original.role_id,
+                skpd_id: row.original.skpd_id,
+              });
+              setOpenModal(true);
+            }}
           >
             <MdEdit className='text-xl' />
           </button>
           <button
             className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
-            onClick={() => toast.success(`Hapus, ${row.original.fullname}`)}
+            onClick={() => {
+              setModalState('Delete');
+              setFormDelete({
+                id: row.original.id,
+                fullname: row.original.fullname,
+              });
+              setOpenModal(true);
+            }}
           >
             <MdDelete className='text-xl' />
           </button>
@@ -78,7 +208,10 @@ const UserTable = () => {
         <div className='inline-flex flex-1 gap-2 justify-end'>
           <button
             className='table-button w-9 h-9'
-            onClick={() => toast.success('Tambah data')}
+            onClick={() => {
+              setModalState('Add');
+              setOpenModal(true);
+            }}
           >
             <MdAdd />
           </button>
@@ -102,6 +235,96 @@ const UserTable = () => {
         columns={columns}
         tabletop={<TableTopbar />}
       />
+      {modalState === 'Add' && (
+        <DialogModal
+          title='Tambah data User'
+          isOpen={openModal}
+          onClose={() => {
+            setFormData(initialFormData);
+            setOpenModal(false);
+          }}
+        >
+          <FormUser
+            type='Add'
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={(data: UserForm) => {
+              console.log('Data dari form modal:', data);
+              addMutation.mutate({
+                email: data.email,
+                fullname: data.fullname,
+                name: data.name,
+                password: data.password,
+                role_id: data.role_id,
+                skpd_id: data.skpd_id,
+              });
+            }}
+          >
+            <div className='flex gap-2 justify-end'>
+              <InputButton
+                type='submit'
+                className='btn btn-theme w-24'
+                isLoading={loadingMutation}
+              >
+                Simpan
+              </InputButton>
+            </div>
+          </FormUser>
+        </DialogModal>
+      )}
+      {modalState === 'Edit' && (
+        <DialogModal
+          title='Ubah data User'
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+        >
+          <FormUser
+            type='Edit'
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={({ id, payload }) => {
+              console.log('Data dari form modal:', data);
+              updateMutation.mutate({
+                id,
+                payload,
+              });
+            }}
+          >
+            <div className='flex gap-2 justify-end'>
+              <InputButton
+                type='submit'
+                className='btn btn-theme w-24'
+                isLoading={loadingMutation}
+              >
+                Simpan
+              </InputButton>
+            </div>
+          </FormUser>
+        </DialogModal>
+      )}
+      {modalState === 'Delete' && (
+        <DialogModal
+          title='Hapus data User'
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+        >
+          <p>
+            Yakin ingin menghapus data <i>{formDelete.fullname}</i> ?
+          </p>
+          <div className='flex gap-2 justify-end'>
+            <InputButton
+              type='button'
+              className='btn btn-theme w-24'
+              isLoading={loadingMutation}
+              onClick={() => {
+                deleteMutation.mutate(formDelete.id);
+              }}
+            >
+              Hapus
+            </InputButton>
+          </div>
+        </DialogModal>
+      )}
     </>
   );
 };

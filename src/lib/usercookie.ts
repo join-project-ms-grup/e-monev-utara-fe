@@ -8,6 +8,9 @@ export interface UserCookie {
   username: string;
 }
 
+/**
+ * Ambil user dari cookie
+ */
 export function getUserFromCookie(): UserCookie | null {
   const rawCookie = Cookies.get('me');
   if (!rawCookie) return null;
@@ -22,6 +25,9 @@ export function getUserFromCookie(): UserCookie | null {
   }
 }
 
+/**
+ * Ambil role id dari cookie
+ */
 export function getRoleId(): number | null {
   const user = getUserFromCookie();
   return user?.roleId ?? null;

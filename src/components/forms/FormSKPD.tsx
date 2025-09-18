@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import InputButton from '../inputs/InputButton';
-import InputText from '../inputs/InputText';
 import InputSelectBox from '../inputs/InputSelectBox';
-import type { SKPDAddType, SKPDEditType } from '../../types/data';
+import type { SKPDForm, SKPDFormState } from '../../types/data';
+import { InputField } from '../inputs/InputField';
 
-interface FormAddProps {
-  type: 'Add';
+interface BaseFormProps {
   children?: React.ReactElement;
-  onSubmit: (data: SKPDAddType) => void;
-  formData: SKPDAddType;
-  setFormData: React.Dispatch<React.SetStateAction<SKPDAddType>>;
+  formData: SKPDFormState;
+  setFormData: React.Dispatch<React.SetStateAction<SKPDFormState>>;
 }
 
-interface FormEditProps {
+interface FormAddProps extends BaseFormProps {
+  type: 'Add';
+  onSubmit: (data: SKPDForm) => void;
+}
+
+interface FormEditProps extends BaseFormProps {
   type: 'Edit';
-  children?: React.ReactElement;
-  onSubmit: (data: SKPDEditType) => void;
-  formData: SKPDEditType;
-  setFormData: React.Dispatch<React.SetStateAction<SKPDEditType>>;
+  onSubmit: (data: { id: number; payload: SKPDForm & {status?: string | boolean} }) => void;
 }
 
 type FormProps = FormAddProps | FormEditProps;
@@ -39,17 +39,22 @@ const FormSKPD: React.FC<FormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // if (!formData.kode || !formData.name) {
-    //   setError('Kode dan Nama wajib diisi.');
-    //   return;
-    // }
+    if (!formData.kode || !formData.name) {
+      setError('Kode dan Nama wajib diisi.');
+      return;
+    }
 
     setError(null);
 
     if (type === 'Add') {
       onSubmit(formData);
     } else {
-      onSubmit({ ...formData, id: (formData as any).id });
+      if (formData.id == null) {
+        setError('ID tidak ditemukan untuk mode edit.');
+        return;
+      }
+      const { id, ...payload } = formData;
+      onSubmit({ id, payload });
     }
   };
 
@@ -58,13 +63,14 @@ const FormSKPD: React.FC<FormProps> = ({
       {error && <div className='text-red-600 text-sm mb-2'>{error}</div>}
       <div className='grid grid-cols-4 items-center gap-2'>
         <label htmlFor='kode'>Kode</label>
-        <InputText
-          type='number'
+        <InputField
+          type='text'
+          inputMode='numeric'
           id='kode'
           label='Kode'
           name='kode'
-          min={1}
-          value={formData.kode}
+          maxLength={10}
+          value={formData.kode!}
           onChange={handleChange}
           className='col-span-3'
           required
@@ -72,7 +78,7 @@ const FormSKPD: React.FC<FormProps> = ({
       </div>
       <div className='grid grid-cols-4 items-center gap-2'>
         <label htmlFor='shortname'>Singkatan</label>
-        <InputText
+        <InputField
           id='shortname'
           label='Singkatan'
           name='shortname'
@@ -84,7 +90,7 @@ const FormSKPD: React.FC<FormProps> = ({
       </div>
       <div className='grid grid-cols-4 items-center gap-2'>
         <label htmlFor='name'>Nama</label>
-        <InputText
+        <InputField
           id='name'
           label='Nama'
           name='name'
@@ -104,9 +110,9 @@ const FormSKPD: React.FC<FormProps> = ({
               { label: 'Ya', value: 'true' },
               { label: 'Tidak', value: 'false' },
             ]}
-            value={(formData as SKPDEditType).status.toString()}
+            value={(formData as SKPDFormState).status?.toString()}
             onChange={(val) =>
-              setFormData({ ...(formData as SKPDEditType), status: val })
+              setFormData({ ...(formData as SKPDFormState), status: val })
             }
             defaultOptionLabel='Pilih Status'
             className='col-span-3'

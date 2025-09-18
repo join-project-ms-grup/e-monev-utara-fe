@@ -2,9 +2,9 @@ import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import type {
-  SKPDAddType,
-  SKPDDeleteype,
-  SKPDEditType,
+  SKPDDeleteForm,
+  SKPDForm,
+  SKPDFormState,
   SKPDType,
 } from '../../types/data';
 import Spinner from '../inputs/Spinner';
@@ -16,7 +16,7 @@ import {
   deleteSKPD,
   updateSKPD,
 } from '../../services/SKPDService';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
 import FormSKPD from '../forms/FormSKPD';
@@ -24,32 +24,47 @@ import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
 
 const SKPDTable = () => {
+  const queryClient = useQueryClient();
   // Modal
-  const [openAdd, setOpenAdd] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
+  const [modalState, setModalState] = useState<'Add' | 'Edit' | 'Delete'>(
+    'Add',
+  );
+  const [openModal, setOpenModal] = useState(false);
+
   // Form Data
-  const initialFormData: SKPDAddType = {
-    kode: null,
+  const initialFormData: SKPDFormState = {
+    id: null,
     name: '',
-    shortname: '',
-  };
-  const initialFormEdit: SKPDEditType = {
-    id: 0,
     kode: null,
-    name: '',
     shortname: '',
     status: '',
   };
-  const initialFormDelete: SKPDDeleteype = {
+  const initialFormDelete: SKPDDeleteForm = {
     id: 0,
     name: '',
   };
 
-  const [formData, setFormData] = useState<SKPDAddType>(initialFormData);
-  const [formEdit, setFormEdit] = useState<SKPDEditType>(initialFormEdit);
+  const [formData, setFormData] = useState<
+    SKPDForm | (SKPDForm & { id: number | null, status: string | boolean })
+  >(initialFormData);
   const [formDelete, setFormDelete] =
-    useState<SKPDDeleteype>(initialFormDelete);
+    useState<SKPDDeleteForm>(initialFormDelete);
+
+  // Clear form
+  useEffect(() => {
+    if (!openModal) {
+      const timeout = setTimeout(() => {
+        if (modalState === 'Delete') {
+          setFormDelete(initialFormDelete);
+        } else {
+          setFormData(initialFormData);
+        }
+      }, 200);
+      return () => clearTimeout(timeout);
+    } else {
+      console.log(formData);
+    }
+  }, [openModal]);
 
   // Data fetching
   const [loadingMutation, setLoadingMutation] = useState(false);
@@ -58,24 +73,25 @@ const SKPDTable = () => {
     queryFn: getSKPD,
   });
 
-  const queryClient = useQueryClient();
   // Add
   const addMutation = useMutation({
-    mutationFn: async (payload: SKPDAddType) => {
+    mutationFn: async (payload: SKPDForm) => {
       setLoadingMutation(true);
       return addSKPD(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
+      setFormData(initialFormData);
+      setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+      if (error.status === 400) {
+        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+      }
     },
     onSettled: () => {
       setLoadingMutation(false);
-      setFormData(initialFormData);
-      setOpenAdd(false);
     },
   });
   // Update
@@ -85,22 +101,23 @@ const SKPDTable = () => {
       payload,
     }: {
       id: number;
-      payload: Omit<SKPDEditType, 'id'>;
+      payload: SKPDFormState;
     }) => {
       setLoadingMutation(true);
       return updateSKPD(id, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
+      setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      if (error.status === 400) {
+        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      }
     },
     onSettled: () => {
       setLoadingMutation(false);
-      setFormEdit(initialFormEdit);
-      setOpenEdit(false);
     },
   });
   // Delete
@@ -118,8 +135,7 @@ const SKPDTable = () => {
     },
     onSettled: () => {
       setLoadingMutation(false);
-      setFormDelete(initialFormDelete);
-      setOpenDelete(false);
+      setOpenModal(false);
     },
   });
 
@@ -164,14 +180,15 @@ const SKPDTable = () => {
             <button
               className='p-1 transition-all rounded-full hover:bg-blue-400 hover:text-[var(--text-3)] active:scale-90'
               onClick={() => {
-                setFormEdit({
+                setModalState('Edit');
+                setFormData({
                   id: row.original.id,
                   kode: row.original.kode,
                   name: row.original.name,
                   shortname: row.original.shortname,
                   status: row.original.status.toString(),
                 });
-                setOpenEdit(true);
+                setOpenModal(true);
               }}
             >
               <MdEdit className='text-xl' />
@@ -179,11 +196,12 @@ const SKPDTable = () => {
             <button
               className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
               onClick={() => {
+                setModalState('Delete');
                 setFormDelete({
-                  id: row.original.id,
+                  id: row.original.id!,
                   name: row.original.name,
                 });
-                setOpenDelete(true);
+                setOpenModal(true);
               }}
             >
               <MdDelete className='text-xl' />
@@ -192,6 +210,7 @@ const SKPDTable = () => {
         </>
       ),
       meta: {
+        thClassNames: 'w-[10%]',
         tdClassNames: 'text-center',
       },
     }),
@@ -204,7 +223,8 @@ const SKPDTable = () => {
           <button
             className='table-button w-9 h-9'
             onClick={() => {
-              setOpenAdd(true);
+              setModalState('Add');
+              setOpenModal(true);
             }}
           >
             <MdAdd />
@@ -229,90 +249,98 @@ const SKPDTable = () => {
         columns={columns}
         tabletop={<TableTopbar />}
       />
-      <DialogModal
-        title='Tambah data SKPD'
-        isOpen={openAdd}
-        onClose={() => setOpenAdd(false)}
-      >
-        <FormSKPD
-          type='Add'
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={(data: SKPDAddType) => {
-            console.log('Data dari form modal:', data);
-            // addMutation.mutate(data);
-            addMutation.mutate({
-              kode: Number(data.kode),
-              name: data.name,
-              shortname: data.shortname,
-            });
+      {modalState === 'Add' && (
+        <DialogModal
+          title='Tambah data SKPD'
+          isOpen={openModal}
+          onClose={() => {
+            setFormData(initialFormData);
+            setOpenModal(false);
           }}
         >
-          <div className='flex gap-2 justify-end'>
-            <InputButton
-              type='submit'
-              className='btn btn-theme w-24'
-              isLoading={loadingMutation}
-            >
-              Simpan
-            </InputButton>
-          </div>
-        </FormSKPD>
-      </DialogModal>
-      <DialogModal
-        title='Ubah data SKPD'
-        isOpen={openEdit}
-        onClose={() => setOpenEdit(false)}
-      >
-        <FormSKPD
-          type='Edit'
-          formData={formEdit}
-          setFormData={setFormEdit}
-          onSubmit={(data: SKPDEditType) => {
-            console.log('Data dari form modal:', data);
-            updateMutation.mutate({
-              id: data.id,
-              payload: {
+          <FormSKPD
+            type='Add'
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={(data: SKPDForm) => {
+              console.log('Data dari form modal:', data);
+              addMutation.mutate({
                 kode: Number(data.kode),
                 name: data.name,
                 shortname: data.shortname,
-                status: data.status === 'true',
-              },
-            });
-          }}
-        >
-          <div className='flex gap-2 justify-end'>
-            <InputButton
-              type='submit'
-              className='btn btn-theme w-24'
-              isLoading={loadingMutation}
-            >
-              Simpan
-            </InputButton>
-          </div>
-        </FormSKPD>
-      </DialogModal>
-      <DialogModal
-        title='Hapus data SKPD'
-        isOpen={openDelete}
-        onClose={() => setOpenDelete(false)}
-      >
-        <p>
-          Yakin ingin menghapus data <i>{formDelete.name}</i> ?
-        </p>
-        <div className='flex gap-2 justify-end'>
-          <InputButton
-            type='button'
-            className='btn btn-theme w-24'
-            isLoading={loadingMutation}
-            onClick={() => {
-              deleteMutation.mutate(formDelete.id);
+              });
             }}
           >
-            Hapus
-          </InputButton>
-        </div>
-      </DialogModal>
+            <div className='flex gap-2 justify-end'>
+              <InputButton
+                type='submit'
+                className='btn btn-theme w-24'
+                isLoading={loadingMutation}
+              >
+                Simpan
+              </InputButton>
+            </div>
+          </FormSKPD>
+        </DialogModal>
+      )}
+      {modalState === 'Edit' && (
+        <DialogModal
+          title='Ubah data SKPD'
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+        >
+          <FormSKPD
+            type='Edit'
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={({ id, payload }) => {
+              console.log('Data dari form modal:', data);
+              updateMutation.mutate({
+                id,
+                payload: {
+                  kode: Number(payload.kode),
+                  name: payload.name,
+                  shortname: payload.shortname,
+                  status: payload.status === 'true',
+                },
+              });
+            }}
+          >
+            <div className='flex gap-2 justify-end'>
+              <InputButton
+                type='submit'
+                className='btn btn-theme w-24'
+                isLoading={loadingMutation}
+              >
+                Simpan
+              </InputButton>
+            </div>
+          </FormSKPD>
+        </DialogModal>
+      )}
+      {modalState === 'Delete' && (
+        <DialogModal
+          title='Hapus data SKPD'
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+        >
+          <p>
+            Yakin ingin menghapus data <i>{formDelete.name}</i> ?
+          </p>
+          <div className='flex gap-2 justify-end'>
+            <InputButton
+              type='button'
+              className='btn btn-theme w-24'
+              isLoading={loadingMutation}
+              onClick={() => {
+                deleteMutation.mutate(formDelete.id);
+              }}
+            >
+              Hapus
+            </InputButton>
+          </div>
+        </DialogModal>
+      )}
     </>
   );
 };

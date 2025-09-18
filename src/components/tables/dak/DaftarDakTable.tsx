@@ -1,8 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import MainTable from '../MainTable';
 import { MdPrint, MdRefresh } from 'react-icons/md';
-import { Tooltip } from 'react-tooltip';
 import InputButton from '../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import InputSelectBox from '../../inputs/InputSelectBox';

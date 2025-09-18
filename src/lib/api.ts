@@ -1,11 +1,12 @@
 import axios from "axios"
 import Cookies from "js-cookie"
 import { SITE_URL } from "./config"
+import toast from "react-hot-toast";
 
 export type ApiResponse<T> = {
-    success: boolean;
-    message: string;
-    data: T;
+  success: boolean;
+  message: string;
+  data: T;
 };
 
 const api = axios.create({
@@ -29,6 +30,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       Cookies.remove("token");
       window.location.href = "/auth";
+    }
+    if (error.response.status === 500) {
+      toast.error('Terjadi kesalahan di server. Silakan coba lagi nanti.')
     }
     return Promise.reject(error);
   }

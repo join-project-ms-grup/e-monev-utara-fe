@@ -1,51 +1,63 @@
-export interface RoleUserType {
-  id: number;
-  kode: number;
-  name: string;
-  author_id: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface DataUserType {
+/**
+ * User type
+ */
+export interface UserType {
   id: number;
   name: string;
   fullname: string;
   avatar: string;
   email: string;
-  role_id: number;
-  skpd_id: number;
+  role_id: number | null;
+  skpd_id: number | null;
   password: string;
   token: string;
   session: string;
   status: boolean;
   created_at: string;
   updated_at: string;
-  userRole: RoleUserType;
+  userRole: RoleType;
   userSkpd: number;
 }
+/**
+ * User type untuk form
+ */
+export type UserForm = Pick<UserType, 'name' | 'fullname' | 'email' | 'role_id' | 'skpd_id' | 'password'>;
+/**
+ * User type untuk form dengan id
+ */
+export type UserFormState = UserForm & { id?: number | null };
+/**
+ * User type untuk delete
+ */
+export type UserDeleteForm = Pick<UserType, 'id' | 'fullname'>;
 
-// Type Role
-export interface RoleDevType {
+/**
+ * Role type
+ */
+export interface RoleType {
   id: number;
   kode: number | null;
   name: string;
-  author_id: number;
+  author_id: number | null;
   created_at: string;
   updated_at: string;
 }
+/**
+ * Role type untuk form
+ */
+export type RoleForm = Pick<RoleType, 'kode' | 'name'>;
+/**
+ * Role type untuk form dengan id
+ */
+export type RoleFormState = RoleForm & { id?: number | null };
+/**
+ * User type untuk delete
+ */
+export type RoleDeleteForm = Pick<RoleType, 'id' | 'name'>;
 
-export type RoleAdminType = Pick<
-  RoleDevType,
-  'kode' | 'name'
->;
-
-export type RoleEditType = Pick<
-  RoleDevType,
-  'id' | 'kode' | 'name'
->;
-
-// Type SKPD
+/**
+ * SKPD type
+ */
 export interface SKPDType {
   id: number;
   kode: number | null;
@@ -55,15 +67,15 @@ export interface SKPDType {
   created_at: string;
   updated_at: string;
 }
-export type SKPDAddType = Pick<
-  SKPDType,
-  'kode' | 'name' | 'shortname'
->;
-export type SKPDEditType = Omit<
-  SKPDType,
-  'created_at' | 'updated_at'
->;
-export type SKPDDeleteype = Pick<
-  SKPDType,
-  'id' | 'name'
->;
+/**
+ * SKPD type untuk form
+ */
+export type SKPDForm = Pick<SKPDType, 'kode' | 'name' | 'shortname'>;
+/**
+ * SKPD type untuk form dengan id dan status
+ */
+export type SKPDFormState = SKPDForm & { id?: number | null, status?: string | boolean };
+/**
+ * SKPD type untuk delete
+ */
+export type SKPDDeleteForm = Pick<SKPDType, 'id' | 'name'>;
