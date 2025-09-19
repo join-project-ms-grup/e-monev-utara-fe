@@ -1,36 +1,61 @@
-import { urusanDummy, type UrusanType } from '../../dummy/dummy_data';
 import { createColumnHelper } from '@tanstack/react-table';
 import MainTable from './MainTable';
+import type { MasterType } from '../../types/data';
+import { useQuery } from '@tanstack/react-query';
+import { getUrusan } from '../../services/MasterService';
+import Spinner from '../inputs/Spinner';
+import { MdRefresh } from 'react-icons/md';
 
 const UrusanTable = () => {
-  const columnHelper = createColumnHelper<UrusanType>();
-  //   const [data, _setData] = useState(() => [...jadwalDummy]);
+  // Data fetching
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ['tabel_urusan'],
+    queryFn: getUrusan,
+  });
+
+  // Kolom
+  const columnHelper = createColumnHelper<MasterType>();
   const columns = [
-    columnHelper.accessor('id', {
+    columnHelper.display({
       header: 'No',
-      cell: (info) => (
-        <span className='flex justify-center'>{info.getValue()}</span>
-      ),
-      footer: (info) => info.column.id,
+      cell: ({ row }) => `${row.index + 1}`,
+      meta: {
+        thClassNames: 'w-[5%]',
+        tdClassNames: 'text-center',
+      },
     }),
-    columnHelper.accessor('kode_urusan', {
+    columnHelper.accessor('kode', {
       header: 'Kode Urusan',
-      cell: (info) => (
-        <span className='flex justify-center'>{info.getValue()}</span>
-      ),
-      footer: (info) => info.column.id,
+      meta: {
+        thClassNames: 'w-[10%]',
+        tdClassNames: 'text-center',
+      },
     }),
-    columnHelper.accessor('urusan', {
+    columnHelper.accessor('name', {
       header: 'Urusan',
-      footer: (info) => info.column.id,
     }),
   ];
 
-  console.log(urusanDummy)
+  const TableTopbar = () => {
+    return (
+      <>
+        <div className='inline-flex flex-1 gap-2 justify-end'>
+
+          <button
+            className='table-button w-9 h-9'
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+          </button>
+        </div>
+      </>
+    );
+  };
 
   return (
     <>
-      <MainTable data={urusanDummy} columns={columns} />
+      <MainTable data={data || []} columns={columns} tabletop={<TableTopbar />} />
     </>
   );
 };

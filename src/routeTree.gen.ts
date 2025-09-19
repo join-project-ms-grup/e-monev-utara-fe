@@ -26,6 +26,7 @@ import { Route as DashboardRkpdRenjaRouteImport } from './routes/_dashboard/rkpd
 import { Route as DashboardRkpdRealisasiRouteImport } from './routes/_dashboard/rkpd/realisasi'
 import { Route as DashboardMasterSkpdRouteImport } from './routes/_dashboard/master/skpd'
 import { Route as DashboardMasterRoleRouteImport } from './routes/_dashboard/master/role'
+import { Route as DashboardMasterPeriodeRouteImport } from './routes/_dashboard/master/periode'
 import { Route as DashboardMasterOrganisasiRouteImport } from './routes/_dashboard/master/organisasi'
 import { Route as DashboardMasterJadwalRouteImport } from './routes/_dashboard/master/jadwal'
 import { Route as DashboardKonfigurasiUserRouteImport } from './routes/_dashboard/konfigurasi/user'
@@ -137,6 +138,11 @@ const DashboardMasterSkpdRoute = DashboardMasterSkpdRouteImport.update({
 const DashboardMasterRoleRoute = DashboardMasterRoleRouteImport.update({
   id: '/role',
   path: '/role',
+  getParentRoute: () => DashboardMasterRouteRoute,
+} as any)
+const DashboardMasterPeriodeRoute = DashboardMasterPeriodeRouteImport.update({
+  id: '/periode',
+  path: '/periode',
   getParentRoute: () => DashboardMasterRouteRoute,
 } as any)
 const DashboardMasterOrganisasiRoute =
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/master/jadwal': typeof DashboardMasterJadwalRoute
   '/master/organisasi': typeof DashboardMasterOrganisasiRoute
+  '/master/periode': typeof DashboardMasterPeriodeRoute
   '/master/role': typeof DashboardMasterRoleRoute
   '/master/skpd': typeof DashboardMasterSkpdRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
@@ -343,6 +350,7 @@ export interface FileRoutesByTo {
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/master/jadwal': typeof DashboardMasterJadwalRoute
   '/master/organisasi': typeof DashboardMasterOrganisasiRoute
+  '/master/periode': typeof DashboardMasterPeriodeRoute
   '/master/role': typeof DashboardMasterRoleRoute
   '/master/skpd': typeof DashboardMasterSkpdRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
@@ -389,6 +397,7 @@ export interface FileRoutesById {
   '/_dashboard/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/_dashboard/master/jadwal': typeof DashboardMasterJadwalRoute
   '/_dashboard/master/organisasi': typeof DashboardMasterOrganisasiRoute
+  '/_dashboard/master/periode': typeof DashboardMasterPeriodeRoute
   '/_dashboard/master/role': typeof DashboardMasterRoleRoute
   '/_dashboard/master/skpd': typeof DashboardMasterSkpdRoute
   '/_dashboard/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
@@ -435,6 +444,7 @@ export interface FileRouteTypes {
     | '/konfigurasi/user'
     | '/master/jadwal'
     | '/master/organisasi'
+    | '/master/periode'
     | '/master/role'
     | '/master/skpd'
     | '/rkpd/realisasi'
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/konfigurasi/user'
     | '/master/jadwal'
     | '/master/organisasi'
+    | '/master/periode'
     | '/master/role'
     | '/master/skpd'
     | '/rkpd/realisasi'
@@ -515,6 +526,7 @@ export interface FileRouteTypes {
     | '/_dashboard/konfigurasi/user'
     | '/_dashboard/master/jadwal'
     | '/_dashboard/master/organisasi'
+    | '/_dashboard/master/periode'
     | '/_dashboard/master/role'
     | '/_dashboard/master/skpd'
     | '/_dashboard/rkpd/realisasi'
@@ -666,6 +678,13 @@ declare module '@tanstack/react-router' {
       path: '/role'
       fullPath: '/master/role'
       preLoaderRoute: typeof DashboardMasterRoleRouteImport
+      parentRoute: typeof DashboardMasterRouteRoute
+    }
+    '/_dashboard/master/periode': {
+      id: '/_dashboard/master/periode'
+      path: '/periode'
+      fullPath: '/master/periode'
+      preLoaderRoute: typeof DashboardMasterPeriodeRouteImport
       parentRoute: typeof DashboardMasterRouteRoute
     }
     '/_dashboard/master/organisasi': {
@@ -935,6 +954,7 @@ interface DashboardMasterRouteRouteChildren {
   DashboardMasterRekeningRouteRoute: typeof DashboardMasterRekeningRouteRouteWithChildren
   DashboardMasterJadwalRoute: typeof DashboardMasterJadwalRoute
   DashboardMasterOrganisasiRoute: typeof DashboardMasterOrganisasiRoute
+  DashboardMasterPeriodeRoute: typeof DashboardMasterPeriodeRoute
   DashboardMasterRoleRoute: typeof DashboardMasterRoleRoute
   DashboardMasterSkpdRoute: typeof DashboardMasterSkpdRoute
   DashboardMasterIndexRoute: typeof DashboardMasterIndexRoute
@@ -945,6 +965,7 @@ const DashboardMasterRouteRouteChildren: DashboardMasterRouteRouteChildren = {
     DashboardMasterRekeningRouteRouteWithChildren,
   DashboardMasterJadwalRoute: DashboardMasterJadwalRoute,
   DashboardMasterOrganisasiRoute: DashboardMasterOrganisasiRoute,
+  DashboardMasterPeriodeRoute: DashboardMasterPeriodeRoute,
   DashboardMasterRoleRoute: DashboardMasterRoleRoute,
   DashboardMasterSkpdRoute: DashboardMasterSkpdRoute,
   DashboardMasterIndexRoute: DashboardMasterIndexRoute,

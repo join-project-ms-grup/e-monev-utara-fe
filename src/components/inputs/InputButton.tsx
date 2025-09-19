@@ -14,8 +14,6 @@ interface InputButtonType
   tooltipId?: string;
 }
 
-// #FF6B6B #FF5E5E
-
 const InputButton = ({
   children,
   className,
@@ -33,7 +31,7 @@ const InputButton = ({
       {...(tooltip ? { 'data-tooltip-id': tooltipId } : {})}
       {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
       className={`${className} flex flex-row items-center justify-center
-        gap-2 bg-[var(--color-1)] text-white py-2 rounded-md
+        gap-2 bg-[var(--color-2)] text-white py-2 rounded-md
         hover:opacity-80 active:scale-[95%] disabled:opacity-50 transition-all duration-100`}
       {...props}
     >

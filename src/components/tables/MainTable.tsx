@@ -18,7 +18,7 @@ import {
   MdKeyboardDoubleArrowRight,
 } from 'react-icons/md';
 import InputSelectBox from '../inputs/InputSelectBox';
-import { useState, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import InputButton from '../inputs/InputButton';
 
 interface MainTableProps<TData> {
@@ -26,6 +26,7 @@ interface MainTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData, any>[];
   tabletop?: ReactNode;
+  groupHeader?: string;
 }
 
 declare module '@tanstack/react-table' {
@@ -40,7 +41,8 @@ const MainTable = <TData,>({
   data,
   columns,
   tabletop,
-}: MainTableProps<TData>) => {
+  groupHeader
+}: MainTableProps<TData & {group?: string}>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -60,6 +62,8 @@ const MainTable = <TData,>({
       pagination,
     },
   });
+
+  const renderedGroups = new Set<string | undefined>();
 
   return (
     <div className='py-2'>
@@ -106,20 +110,45 @@ const MainTable = <TData,>({
         </thead>
         <tbody>
           {table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    {...(cell.column.columnDef.meta?.tdClassNames
-                      ? { className: cell.column.columnDef.meta.tdClassNames }
-                      : {})}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))
+            table.getRowModel().rows.map((row) => {
+              const group = row.original.group;
+              const needGroupHeader = !renderedGroups.has(group);
+              if (needGroupHeader) {
+                renderedGroups.add(group);
+              }
+
+              return (
+                <Fragment key={row.id}>
+                  {group && needGroupHeader && (
+                    <tr>
+                      <td
+                        colSpan={table.getAllLeafColumns().length}
+                      >
+                        <span className='font-semibold uppercase'>{groupHeader} : </span>{group}
+                      </td>
+                    </tr>
+                  )}
+                  <tr>
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        {...(cell.column.columnDef.meta?.tdClassNames
+                          ? {
+                              className:
+                                cell.column.columnDef.meta.tdClassNames,
+                            }
+                          : {})}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                </Fragment>
+              );
+            })
           ) : (
             <tr>
               <td

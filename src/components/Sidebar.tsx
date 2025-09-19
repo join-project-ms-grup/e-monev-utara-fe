@@ -47,9 +47,6 @@ const menuUtama: MenuItem[] = [
     label: 'Master',
     icon: <MdInventory />,
     submenu: [
-      { label: 'Role', to: '/master/role', akses: 1 && 2 },
-      { label: 'Periode', to: '/master/periode' },
-      { label: 'SKPD', to: '/master/skpd' },
       { label: 'Organisasi', to: '/master/organisasi' },
       {
         label: 'Rekening',
@@ -64,6 +61,9 @@ const menuUtama: MenuItem[] = [
         ],
       },
       { label: 'Jadwal', to: '/master/jadwal' },
+      { label: 'Role', to: '/master/role', akses: 1 && 2 },
+      { label: 'Periode', to: '/master/periode' },
+      { label: 'SKPD', to: '/master/skpd' },
     ],
   },
   {
@@ -128,7 +128,12 @@ const menuDAK: MenuItem[] = [
     ],
     akses: 4,
   },
-  { label: 'Daftar dan Jenis DAK', icon: <MdViewList />, to: '/dak/daftardak', akses: 4 },
+  {
+    label: 'Daftar dan Jenis DAK',
+    icon: <MdViewList />,
+    to: '/dak/daftardak',
+    akses: 4,
+  },
 ];
 const menus = [...menuUtama, ...menuRKPD, ...menuDAK];
 
@@ -232,7 +237,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <>
               <div
                 className={`ml-2 flex flex-col space-y-2 overflow-hidden transition-all duration-200 ease-in-out
-      ${openMenus[menu.label] ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+      ${openMenus[menu.label] ? 'max-h-max' : 'max-h-0'}`}
               >
                 <div className='mt-2 space-y-2'>
                   {menu.submenu.map((sub) =>

@@ -20,7 +20,6 @@ function RouteComponent() {
   return (
     <>
       <BidangTable />
-      {/* <GroupedTable /> */}
     </>
   );
 }

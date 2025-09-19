@@ -1,223 +1,82 @@
-import { useState } from 'react';
-import { bidangDummy } from '../../dummy/dummy_data';
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type PaginationState,
-} from '@tanstack/react-table';
-import InputSelectBox from '../inputs/InputSelectBox';
-import {
-  MdKeyboardDoubleArrowLeft,
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight,
-  MdKeyboardDoubleArrowRight,
-} from 'react-icons/md';
-import React from 'react';
+import { createColumnHelper } from '@tanstack/react-table';
+import MainTable from './MainTable';
+import type { MasterType } from '../../types/data';
+import { useQuery } from '@tanstack/react-query';
+import { getBidang, getUrusan } from '../../services/MasterService';
+import Spinner from '../inputs/Spinner';
+import { MdRefresh } from 'react-icons/md';
 
 const BidangTable = () => {
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
+  // Data fetching
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ['tabel_bidang'],
+    queryFn: async () => {
+      const urusanList = await getUrusan();
+      const urusanMap = urusanList.reduce((acc: Record<number, string>, u) => {
+        acc[u.id] = `[${u.kode}] ${u.name}`;
+        return acc;
+      }, {});
+
+      const ids = urusanList.map((u) => u.id);
+      const bidangList = await Promise.all(ids.map((id) => getBidang(id)));
+
+      const withUrusan = bidangList.flat().map((b) => ({
+        ...b,
+        group: urusanMap[b.parent_id] ?? null,
+      }));
+
+      return withUrusan;
+    },
   });
 
+  // Kolom
+  const columnHelper = createColumnHelper<MasterType>();
   const columns = [
-    {
-      accessorKey: 'kode_urusan',
-      header: 'Kode Urusan',
-      enableGrouping: true,
-      cell: () => null,
-    },
-    {
-      accessorKey: 'kode_bidang',
+    columnHelper.display({
+      header: 'No',
+      cell: ({ row }) => `${row.index + 1}`,
+      meta: {
+        thClassNames: 'w-[5%]',
+        tdClassNames: 'text-center',
+      },
+    }),
+    columnHelper.accessor('kode', {
       header: 'Kode Bidang',
-    },
-    {
-      accessorKey: 'bidang',
-      header: 'Bidang',
-    },
+      meta: {
+        thClassNames: 'w-[10%]',
+        tdClassNames: 'text-center',
+      },
+    }),
+    columnHelper.accessor('name', {
+      header: 'Urusan',
+    }),
   ];
 
-  const table = useReactTable({
-    data: bidangDummy,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getGroupedRowModel: getGroupedRowModel(),
-    onPaginationChange: setPagination,
-    // state: { pagination,grouping: ['kode_urusan'] },
-    // initialState: { pagination, grouping: ['kode_urusan'] },
-  });
-
-  let counter =
-    table.getState().pagination.pageIndex *
-      table.getState().pagination.pageSize +
-    1;
+  const TableTopbar = () => {
+    return (
+      <>
+        <div className='inline-flex flex-1 gap-2 justify-end'>
+          <button
+            className='table-button w-9 h-9'
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+          </button>
+        </div>
+      </>
+    );
+  };
 
   return (
-    <div className='table-responsive'>
-      <div className='inline-flex gap-2 mb-2 items-center'>
-        <span>Tahun Anggaran</span>
-        <InputSelectBox
-          options={[2025, 2024, 2023, 2022, 2021]}
-          onChange={(e) => console.log(e)}
-        />
-      </div>
-      <table className='table-auto'>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Kode Bidang</th>
-            <th>Bidang</th>
-          </tr>
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => {
-            if (row.getIsGrouped()) {
-              return (
-                <React.Fragment key={row.id}>
-                  <tr>
-                    <td colSpan={3} className='font-bold'>
-                      <p
-                        style={{
-                          margin: 0,
-                          marginLeft: 60,
-                          textIndent: -60,
-                          textAlign: 'left',
-                        }}
-                      >
-                        <big>
-                          <b>Urusan : </b>[{row.groupingValue}]
-                        </big>
-                      </p>
-                    </td>
-                  </tr>
-                  {row.subRows.map((subRow) => (
-                    <tr key={subRow.id}>
-                      <td
-                        style={{
-                          textAlign: 'center',
-                          verticalAlign: 'middle',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {counter++}
-                      </td>
-                      <td
-                        style={{
-                          textAlign: 'center',
-                          verticalAlign: 'middle',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {subRow.original.kode_bidang}
-                      </td>
-                      <td
-                        style={{ textAlign: 'left', verticalAlign: 'middle' }}
-                      >
-                        {subRow.original.bidang}
-                      </td>
-                    </tr>
-                  ))}
-                </React.Fragment>
-              );
-            }
-
-            // Row biasa jika tidak tergabung
-            return (
-              <tr key={row.id}>
-                <td
-                  style={{
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {counter++}
-                </td>
-                <td
-                  style={{
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {row.original.kode_bidang}
-                </td>
-                <td style={{ textAlign: 'left', verticalAlign: 'middle' }}>
-                  {row.original.bidang}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
-      <div className='flex flex-row items-center justify-between mt-2'>
-        <div className='flex items-center gap-2'>
-          <span className='opacity-85'>Menampilkan</span>
-          <InputSelectBox
-            value={table.getState().pagination.pageSize}
-            options={[10, 20, 30, 40, 50]}
-            onChange={(value) => table.setPageSize(value)}
-          />
-          <span className='opacity-85'>
-            dari {table.getRowCount().toLocaleString()} data
-          </span>
-        </div>
-
-        <div className='flex flex-row gap-2'>
-          <button
-            className='table-button'
-            onClick={() => table.firstPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <MdKeyboardDoubleArrowLeft />
-          </button>
-          <button
-            className='table-button'
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <MdKeyboardArrowLeft />
-          </button>
-          <div className='flex items-center gap-2'>
-            <input
-              type='number'
-              min='1'
-              max={table.getPageCount()}
-              value={table.getState().pagination.pageIndex + 1}
-              onChange={(e) => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                table.setPageIndex(page);
-              }}
-              className='pagination-input'
-            />
-            <span className='opacity-85'>
-              dari {table.getPageCount().toLocaleString()}
-            </span>
-          </div>
-          <button
-            className='table-button'
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <MdKeyboardArrowRight />
-          </button>
-          <button
-            className='table-button'
-            onClick={() => table.lastPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <MdKeyboardDoubleArrowRight />
-          </button>
-        </div>
-      </div>
-    </div>
+    <>
+      <MainTable
+        groupHeader='Urusan'
+        data={data || []}
+        columns={columns}
+        tabletop={<TableTopbar />}
+      />
+    </>
   );
 };
 

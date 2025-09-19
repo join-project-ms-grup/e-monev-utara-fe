@@ -20,7 +20,7 @@ const ToastComponent = () => {
     <Toaster
       position='top-right'
       toastOptions={{
-        duration: 5000000,
+        duration: 5000,
       }}
     >
       {(t) => (
