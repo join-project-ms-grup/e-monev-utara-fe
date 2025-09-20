@@ -1,104 +1,47 @@
-import React, { useState, type ChangeEvent } from 'react';
+import React from 'react';
 import type { IconType } from 'react-icons/lib';
+import { PiWarningCircle } from 'react-icons/pi';
 
-interface InputTextProps {
-  type?: 'text' | 'password' | 'email' | 'number';
-  id?: string;
-  label: string;
-  name: string;
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  invalid?: boolean;
   Icon?: IconType;
-  value: string | number | null;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  required?: boolean;
-  className?: string;
-  min?: number;
-  max?: number;
-  tooltip?: string; // tambahan
 }
 
 const InputText = ({
   type = 'text',
-  label,
-  name,
+  invalid,
   Icon,
-  value,
-  onChange,
-  required,
-  id = `input-${label.replace(/\s+/g, '-')}`,
-  className,
-  min,
-  max,
-  tooltip,
-}: InputTextProps) => {
-  const [focused, setFocused] = useState(false);
+  inputMode,
+  onBeforeInput,
+  ...props
+}: InputProps) => {
+  const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
+    if (inputMode === 'numeric') {
+      const inputEvent = e as unknown as InputEvent;
+      const nextValue = inputEvent.data;
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (type === 'number') {
-      const onlyNumbers = e.target.value.replace(/[^0-9]/g, '');
-      if (onlyNumbers !== '') {
-        const num = Number(onlyNumbers);
-        if (
-          (min !== undefined && num < min) ||
-          (max !== undefined && num > max)
-        ) {
-          return;
-        }
+      if (nextValue && !/^\d+$/.test(nextValue)) {
+        e.preventDefault();
       }
-      const modifiedEvent = {
-        ...e,
-        target: {
-          ...e.target,
-          value: onlyNumbers,
-        },
-      } as ChangeEvent<HTMLInputElement>;
-      onChange(modifiedEvent);
     }
 
-    onChange(e);
+    if (onBeforeInput) {
+      onBeforeInput(e as React.InputEvent<HTMLInputElement>);
+    }
   };
-
   return (
-    <div className={`relative w-full group ${className}`}>
+    <div className='input-wrapper h-10 inline-flex'>
+      {Icon && <Icon className='text-4xl h-full bg-gray-50 pl-2' />}
       <input
-        id={id}
         type={type}
-        value={value == null ? '' : value}
-        name={name}
-        required={required}
-        onChange={handleChange}
-        min={min}
-        max={max}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        className='w-full border border-[#ccc] rounded px-3 py-2 focus:border-[var(--color-2)] focus:outline-none'
-        style={{ lineHeight: '1.5rem' }}
+        {...props}
+        inputMode={inputMode}
+        onBeforeInput={handleBeforeInput}
+        className='h-full'
       />
-      <label
-        htmlFor={id}
-        className={`absolute left-3 flex items-center cursor-text transition-all duration-200 px-1
-          ${
-            focused || value
-              ? `text-sm -top-2.5 ${!focused && value ? 'text-gray-400' : 'text-[var(--color-2)]'} bg-white`
-              : 'text-gray-400 text-base top-1/2 -translate-y-1/2 bg-transparent'
-          }
-        `}
-      >
-        {Icon && (
-          <Icon
-            className='mr-1 transition-transform duration-200 text-base'
-            style={{
-              transform: focused || value ? 'scale(0.8)' : 'scale(1.1)',
-            }}
-          />
-        )}
-        {label}
-      </label>
-
-      {tooltip && (
-        <span className='absolute -top-8 right-0 px-2 py-1 text-sm text-[var(--text-3)] bg-[var(--color-2)] rounded opacity-0 group-hover:opacity-100 transition-opacity cursor-default'>
-          {tooltip}
-        </span>
-      )}
+      <PiWarningCircle
+        className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-2 ${invalid ? 'opacity-100' : 'opacity-0'}`}
+      />
     </div>
   );
 };

@@ -79,7 +79,7 @@ export default function InputSelectBox({
         </ListboxButton>
         <ListboxOptions
           anchor='bottom'
-          className='w-(--button-width) p-1 bg-white border border-[#ccc] rounded shadow-lg focus-visible:outline-0 z-[9999]'
+          className='[--anchor-max-height:12rem] w-(--button-width) p-1 bg-white border border-[#ccc] rounded shadow-lg focus-visible:outline-0 z-[9999]'
         >
           {allOptions.map((option) => (
             <ListboxOption
@@ -101,7 +101,7 @@ export default function InputSelectBox({
           required={required}
           disabled={disabled}
           tabIndex={-1}
-          aria-hidden='true'
+          // aria-hidden='true'
           value={currentValue}
           onChange={() => {}}
           className='absolute left-0 bottom-0 w-full h-px opacity-0 pointer-events-none'

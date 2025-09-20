@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../../lib/config';
-import BidangTable from '../../../../components/tables/BidangTable';
+import BidangTable from '../../../../components/tables/master/BidangTable';
 
 export const Route = createFileRoute('/_dashboard/master/rekening/bidang')({
   head: () => ({

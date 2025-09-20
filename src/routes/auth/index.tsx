@@ -2,11 +2,11 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useMutation } from '@tanstack/react-query';
 import { SITE_NAME } from '../../lib/config';
 import { useState } from 'react';
-import InputText from '../../components/inputs/InputText';
 import { MdKey, MdPerson } from 'react-icons/md';
 import InputButton from '../../components/inputs/InputButton';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../lib/api';
+import { InputField } from '../../components/inputs/InputField';
 
 export const Route = createFileRoute('/auth/')({
   beforeLoad: ({ context }) => {
@@ -87,7 +87,7 @@ function RouteComponent() {
             </h2>
             <form onSubmit={handleSubmit} className='space-y-4 w-full'>
               <div>
-                <InputText
+                <InputField
                   label='Username'
                   name='username'
                   Icon={MdPerson}
@@ -98,7 +98,7 @@ function RouteComponent() {
                 />
               </div>
               <div>
-                <InputText
+                <InputField
                   label='Password'
                   name='password'
                   Icon={MdKey}

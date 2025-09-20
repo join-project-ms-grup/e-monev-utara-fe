@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import InputButton from '../inputs/InputButton';
-import InputText from '../inputs/InputText';
 import type { RoleForm, RoleFormState } from '../../types/data';
 import { InputField } from '../inputs/InputField';
 

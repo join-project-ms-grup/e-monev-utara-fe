@@ -17,9 +17,9 @@ export const getUrusan = async (): Promise<MasterType[]> => {
   return response.data.data;
 };
 /**
- * Ambil semua bidang
+ * Ambil semua children
  */
-export const getBidang = async (id: number): Promise<MasterType[]> => {
+export const getChildren = async (id: number): Promise<MasterType[]> => {
   const response = await api.get<ApiResponse<MasterType[]>>(`/master/list/children/${id}`);
   return response.data.data;
 };

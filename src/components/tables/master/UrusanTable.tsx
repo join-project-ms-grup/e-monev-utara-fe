@@ -1,9 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table';
-import MainTable from './MainTable';
-import type { MasterType } from '../../types/data';
+import MainTable from '../MainTable';
+import type { MasterType } from '../../../types/data';
 import { useQuery } from '@tanstack/react-query';
-import { getUrusan } from '../../services/MasterService';
-import Spinner from '../inputs/Spinner';
+import { getUrusan } from '../../../services/MasterService';
+import Spinner from '../../inputs/Spinner';
 import { MdRefresh } from 'react-icons/md';
 
 const UrusanTable = () => {
@@ -17,7 +17,7 @@ const UrusanTable = () => {
   const columnHelper = createColumnHelper<MasterType>();
   const columns = [
     columnHelper.display({
-      header: 'No',
+      header: '#',
       cell: ({ row }) => `${row.index + 1}`,
       meta: {
         thClassNames: 'w-[5%]',
@@ -25,7 +25,7 @@ const UrusanTable = () => {
       },
     }),
     columnHelper.accessor('kode', {
-      header: 'Kode Urusan',
+      header: 'Kode',
       meta: {
         thClassNames: 'w-[10%]',
         tdClassNames: 'text-center',

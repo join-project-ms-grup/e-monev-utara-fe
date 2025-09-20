@@ -42,7 +42,7 @@ const DialogModal: FC<DialogModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`flex flex-col overflow-hidden bg-white rounded-2xl shadow-xl w-11/12 max-w-xl transform transition-all duration-300 ${
+        className={`flex flex-col overflow-hidden bg-white rounded shadow-xl w-11/12 max-w-xl transform transition-all duration-300 ${
           animateIn ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
         }`}
       >

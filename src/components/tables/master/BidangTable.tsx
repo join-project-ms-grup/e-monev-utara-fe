@@ -1,9 +1,9 @@
 import { createColumnHelper } from '@tanstack/react-table';
-import MainTable from './MainTable';
-import type { MasterType } from '../../types/data';
+import MainTable from '../MainTable';
+import type { MasterType } from '../../../types/data';
 import { useQuery } from '@tanstack/react-query';
-import { getBidang, getUrusan } from '../../services/MasterService';
-import Spinner from '../inputs/Spinner';
+import { getChildren, getUrusan } from '../../../services/MasterService';
+import Spinner from '../../inputs/Spinner';
 import { MdRefresh } from 'react-icons/md';
 
 const BidangTable = () => {
@@ -18,7 +18,7 @@ const BidangTable = () => {
       }, {});
 
       const ids = urusanList.map((u) => u.id);
-      const bidangList = await Promise.all(ids.map((id) => getBidang(id)));
+      const bidangList = await Promise.all(ids.map((id) => getChildren(id)));
 
       const withUrusan = bidangList.flat().map((b) => ({
         ...b,
@@ -33,7 +33,7 @@ const BidangTable = () => {
   const columnHelper = createColumnHelper<MasterType>();
   const columns = [
     columnHelper.display({
-      header: 'No',
+      header: '#',
       cell: ({ row }) => `${row.index + 1}`,
       meta: {
         thClassNames: 'w-[5%]',
@@ -41,14 +41,14 @@ const BidangTable = () => {
       },
     }),
     columnHelper.accessor('kode', {
-      header: 'Kode Bidang',
+      header: 'Kode',
       meta: {
         thClassNames: 'w-[10%]',
         tdClassNames: 'text-center',
       },
     }),
     columnHelper.accessor('name', {
-      header: 'Urusan',
+      header: 'Bidang',
     }),
   ];
 

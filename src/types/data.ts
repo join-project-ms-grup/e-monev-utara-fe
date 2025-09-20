@@ -81,36 +81,13 @@ export type SKPDFormState = SKPDForm & { id?: number | null, status?: string | b
 export type SKPDDeleteForm = Pick<SKPDType, 'id' | 'name'>;
 
 /**
- * Periode type
- */
-export interface PeriodeType {
-  id: number;
-  mulai: number | null;
-  akhir: number | null;
-  status: string | boolean;
-  created_at: string;
-  updated_at: string;
-}
-/**
- * Periode type untuk form
- */
-export type PeriodeForm = Pick<PeriodeType, 'mulai' | 'akhir' | 'status'>;
-/**
- * SKPD type untuk form dengan id dan status
- */
-export type PeriodeFormState = PeriodeForm & { id?: number | null };
-/**
- * Periode type untuk delete
- */
-export type PeriodeDeleteForm = Pick<PeriodeType, 'id'>;
-
-/**
  * Master type
  */
 export interface MasterType {
   id: number;
   kode: string;
   name: string;
+  type: string;
   parent_id: number;
 }
 export interface UrusanType extends MasterType {
