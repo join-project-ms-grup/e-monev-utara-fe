@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import InputButton from '../inputs/InputButton';
-import InputSelectBox from '../inputs/InputSelectBox';
-import type { SKPDForm, SKPDFormState } from '../../types/data';
-import { InputField } from '../inputs/InputField';
+import type { SKPDForm } from '../../services/SKPDService';
+import { useForm } from '@tanstack/react-form';
+import { skpdSchema, skpdSchemaSubmit } from './schemas/SchemaSKPD';
+import InputText from '../inputs/InputText';
+import ErrorField from './ErrorField';
+import InputToggle from '../inputs/InputToggle';
 
 interface BaseFormProps {
   children?: React.ReactElement;
-  formData: SKPDFormState;
-  setFormData: React.Dispatch<React.SetStateAction<SKPDFormState>>;
+  defaultValues: SKPDForm;
 }
 
 interface FormAddProps extends BaseFormProps {
@@ -17,7 +19,7 @@ interface FormAddProps extends BaseFormProps {
 
 interface FormEditProps extends BaseFormProps {
   type: 'Edit';
-  onSubmit: (data: { id: number; payload: SKPDForm & {status?: string | boolean} }) => void;
+  onSubmit: (data: { id: number; payload: SKPDForm }) => void;
 }
 
 type FormProps = FormAddProps | FormEditProps;
@@ -26,108 +28,168 @@ const FormSKPD: React.FC<FormProps> = ({
   type,
   children,
   onSubmit,
-  formData,
-  setFormData,
+  defaultValues,
 }) => {
-  const [error, setError] = useState<string | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.kode || !formData.name) {
-      setError('Kode dan Nama wajib diisi.');
-      return;
-    }
-
-    setError(null);
-
-    if (type === 'Add') {
-      onSubmit(formData);
-    } else {
-      if (formData.id == null) {
-        setError('ID tidak ditemukan untuk mode edit.');
-        return;
+  const form = useForm({
+    defaultValues,
+    onSubmit: async ({ value }) => {
+      if (type === 'Add') {
+        onSubmit(value);
+      } else {
+        if (value.id == null) {
+          return;
+        }
+        const { id, ...payload } = value;
+        onSubmit({ id, payload });
       }
-      const { id, ...payload } = formData;
-      onSubmit({ id, payload });
-    }
-  };
+    },
+    validators: {
+      onChange: ({ value }) => {
+        const input = {
+          kode: value.kode?.toString() ?? '',
+          name: value.name?.toString() ?? '',
+          shortname: value.shortname?.toString() ?? '',
+          status: value.status?.toString() ?? '',
+        };
+
+        const result = skpdSchema.safeParse(input);
+
+        if (result.success) {
+          return { fields: {} };
+        } else {
+          const errors = result.error.format();
+          return {
+            fields: {
+              kode: errors.kode?._errors[0],
+              name: errors.name?._errors[0],
+              shortname: errors.shortname?._errors[0],
+            },
+          };
+        }
+      },
+      onSubmit: ({ value }) => {
+        const input = {
+          kode: value.kode?.toString() ?? '',
+          name: value.name?.toString() ?? '',
+          shortname: value.shortname?.toString() ?? '',
+          status: value.status?.toString() ?? '',
+        };
+        const result = skpdSchemaSubmit.safeParse(input);
+        if (result.success) {
+          return { fields: {} };
+        } else {
+          const errors = result.error.format();
+          return {
+            fields: {
+              kode: errors.kode?._errors[0],
+              name: errors.name?._errors[0],
+              shortname: errors.shortname?._errors[0],
+            },
+          };
+        }
+      },
+    },
+  });
 
   return (
-    <form onSubmit={handleSubmit} className='max-w-md mx-auto p-4 space-y-4'>
-      {error && <div className='text-red-600 text-sm mb-2'>{error}</div>}
-      <div className='grid grid-cols-4 items-center gap-2'>
-        <label htmlFor='kode'>Kode</label>
-        <InputField
-          type='text'
-          inputMode='numeric'
-          id='kode'
-          label='Kode'
-          name='kode'
-          maxLength={10}
-          value={formData.kode!}
-          onChange={handleChange}
-          className='col-span-3'
-          required
-        />
-      </div>
-      <div className='grid grid-cols-4 items-center gap-2'>
-        <label htmlFor='shortname'>Singkatan</label>
-        <InputField
-          id='shortname'
-          label='Singkatan'
-          name='shortname'
-          value={formData.shortname}
-          onChange={handleChange}
-          className='col-span-3'
-          required
-        />
-      </div>
-      <div className='grid grid-cols-4 items-center gap-2'>
-        <label htmlFor='name'>Nama</label>
-        <InputField
-          id='name'
-          label='Nama'
-          name='name'
-          value={formData.name}
-          onChange={handleChange}
-          className='col-span-3'
-          required
-        />
-      </div>
-      {type == 'Edit' && (
-        <div className='grid grid-cols-4 items-center gap-2'>
-          <label htmlFor='status'>Status</label>
-          <InputSelectBox
-            id='status'
-            name='status'
-            options={[
-              { label: 'Ya', value: 'true' },
-              { label: 'Tidak', value: 'false' },
-            ]}
-            value={(formData as SKPDFormState).status?.toString()}
-            onChange={(val) =>
-              setFormData({ ...(formData as SKPDFormState), status: val })
-            }
-            defaultOptionLabel='Pilih Status'
-            className='col-span-3'
-            required
-          />
+    <>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+        className='max-w-md mx-auto space-y-4'
+      >
+        <div className='grid grid-rows-2 grid-cols-2 gap-2'>
+          {/* Field Kode */}
+          <div className={`${type === 'Add' ? 'col-span-2' : ''}`}>
+            <form.Field name='kode'>
+              {(field) => (
+                <div className='flex-1'>
+                  <label htmlFor='kode'>Kode</label>
+                  <InputText
+                    // Icon={MdKey}
+                    inputMode='numeric'
+                    type='text'
+                    maxLength={4}
+                    placeholder='Kode skpd...'
+                    id='kode'
+                    value={field.state.value!}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    invalid={!field.state.meta.isValid}
+                  />
+                  <ErrorField field={field} />
+                </div>
+              )}
+            </form.Field>
+          </div>
+          {/* Field Status */}
+          {type === 'Edit' && (
+            <form.Field name='status' validators={{}}>
+              {(field) => (
+                <div className='flex-1'>
+                  <div className='flex flex-col'>
+                    <label htmlFor='status'>Status</label>
+                    <InputToggle
+                      id='status'
+                      onLabel='Aktif'
+                      offLabel='Nonaktif'
+                      checked={field.state.value!}
+                      defaultChecked={true}
+                      onToggle={(val) => field.handleChange(val)}
+                    />
+                  </div>
+                </div>
+              )}
+            </form.Field>
+          )}
+          {/* Field Nama */}
+          <form.Field name='name'>
+            {(field) => (
+              <div className='flex-1'>
+                <label htmlFor='name'>Nama</label>
+                <InputText
+                  // Icon={MdCalendarMonth}
+                  type='text'
+                  placeholder='Nama skpd...'
+                  id='name'
+                  value={field.state.value!}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  invalid={!field.state.meta.isValid}
+                />
+                <ErrorField field={field} />
+              </div>
+            )}
+          </form.Field>
+          {/* Field Shortname */}
+          <form.Field name='shortname'>
+            {(field) => (
+              <div className='flex-1'>
+                <label htmlFor='shortname'>Singkatan</label>
+                <InputText
+                  // Icon={MdCalendarMonth}
+                  type='text'
+                  placeholder='Singkatan skpd...'
+                  id='shortname'
+                  value={field.state.value!}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  invalid={!field.state.meta.isValid}
+                />
+                <ErrorField field={field} />
+              </div>
+            )}
+          </form.Field>
         </div>
-      )}
-      {children ? (
-        children
-      ) : (
-        <InputButton type='submit'>
-          {type === 'Add' ? 'Tambah' : 'Simpan Perubahan'}
-        </InputButton>
-      )}
-    </form>
+
+        {children ? (
+          children
+        ) : (
+          <InputButton type='submit'>
+            {type === 'Add' ? 'Tambah' : 'Simpan'}
+          </InputButton>
+        )}
+      </form>
+    </>
   );
 };
 

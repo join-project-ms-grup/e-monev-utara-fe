@@ -1,12 +1,6 @@
 import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import type {
-  SKPDDeleteForm,
-  SKPDForm,
-  SKPDFormState,
-  SKPDType,
-} from '../../types/data';
 import Spinner from '../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
@@ -15,6 +9,7 @@ import {
   addSKPD,
   deleteSKPD,
   updateSKPD,
+  type SKPDForm,
 } from '../../services/SKPDService';
 import { useEffect, useState } from 'react';
 import DialogModal from '../inputs/DialogModal';
@@ -32,33 +27,21 @@ const SKPDTable = () => {
   const [openModal, setOpenModal] = useState(false);
 
   // Form Data
-  const initialFormData: SKPDFormState = {
-    id: null,
+  const initialFormData: SKPDForm = {
+    id: Number(''),
+    kode: '',
     name: '',
-    kode: null,
     shortname: '',
-    status: '',
-  };
-  const initialFormDelete: SKPDDeleteForm = {
-    id: 0,
-    name: '',
+    status: Boolean(''),
   };
 
-  const [formData, setFormData] = useState<
-    SKPDForm | (SKPDForm & { id: number | null, status: string | boolean })
-  >(initialFormData);
-  const [formDelete, setFormDelete] =
-    useState<SKPDDeleteForm>(initialFormDelete);
+  const [formData, setFormData] = useState<SKPDForm>(initialFormData);
 
   // Clear form
   useEffect(() => {
     if (!openModal) {
       const timeout = setTimeout(() => {
-        if (modalState === 'Delete') {
-          setFormDelete(initialFormDelete);
-        } else {
-          setFormData(initialFormData);
-        }
+        setFormData(initialFormData);
       }, 200);
       return () => clearTimeout(timeout);
     } else {
@@ -96,13 +79,7 @@ const SKPDTable = () => {
   });
   // Update
   const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: SKPDFormState;
-    }) => {
+    mutationFn: async ({ id, payload }: { id: number; payload: SKPDForm }) => {
       setLoadingMutation(true);
       return updateSKPD(id, payload);
     },
@@ -140,7 +117,7 @@ const SKPDTable = () => {
   });
 
   // Kolom
-  const columnHelper = createColumnHelper<SKPDType>();
+  const columnHelper = createColumnHelper<SKPDForm>();
   const columns = [
     columnHelper.display({
       header: 'No',
@@ -186,7 +163,7 @@ const SKPDTable = () => {
                   kode: row.original.kode,
                   name: row.original.name,
                   shortname: row.original.shortname,
-                  status: row.original.status.toString(),
+                  status: row.original.status,
                 });
                 setOpenModal(true);
               }}
@@ -197,7 +174,7 @@ const SKPDTable = () => {
               className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
               onClick={() => {
                 setModalState('Delete');
-                setFormDelete({
+                setFormData({
                   id: row.original.id!,
                   name: row.original.name,
                 });
@@ -260,8 +237,7 @@ const SKPDTable = () => {
         >
           <FormSKPD
             type='Add'
-            formData={formData}
-            setFormData={setFormData}
+            defaultValues={formData}
             onSubmit={(data: SKPDForm) => {
               console.log('Data dari form modal:', data);
               addMutation.mutate({
@@ -291,8 +267,7 @@ const SKPDTable = () => {
         >
           <FormSKPD
             type='Edit'
-            formData={formData}
-            setFormData={setFormData}
+            defaultValues={formData}
             onSubmit={({ id, payload }) => {
               console.log('Data dari form modal:', data);
               updateMutation.mutate({
@@ -301,7 +276,7 @@ const SKPDTable = () => {
                   kode: Number(payload.kode),
                   name: payload.name,
                   shortname: payload.shortname,
-                  status: payload.status === 'true',
+                  status: payload.status,
                 },
               });
             }}
@@ -325,7 +300,7 @@ const SKPDTable = () => {
           onClose={() => setOpenModal(false)}
         >
           <p>
-            Yakin ingin menghapus data <i>{formDelete.name}</i> ?
+            Yakin ingin menghapus data <i>{formData.name}</i> ?
           </p>
           <div className='flex gap-2 justify-end'>
             <InputButton
@@ -333,7 +308,7 @@ const SKPDTable = () => {
               className='btn btn-theme w-24'
               isLoading={loadingMutation}
               onClick={() => {
-                deleteMutation.mutate(formDelete.id);
+                deleteMutation.mutate(formData.id!);
               }}
             >
               Hapus

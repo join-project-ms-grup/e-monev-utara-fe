@@ -1,5 +1,15 @@
 import api, { type ApiResponse } from "../lib/api";
-import type { SKPDForm, SKPDFormState, SKPDType } from "../types/data";
+
+export interface SKPDType {
+  id?: number;
+  kode?: string | number;
+  name?: string;
+  shortname?: string;
+  status?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+export type SKPDForm = Pick<SKPDType, 'id' | 'kode' | 'name' | 'shortname' | 'status'>;
 
 /**
  * Ambil semua SKPD
@@ -20,8 +30,8 @@ export const addSKPD = async (payload: SKPDForm): Promise<SKPDForm> => {
 /**
  * Update data SKPD
  */
-export const updateSKPD = async (id: number, payload: SKPDFormState): Promise<SKPDFormState> => {
-  const response = await api.put<ApiResponse<SKPDFormState>>(`/skpd/update/${id}`, payload);
+export const updateSKPD = async (id: number, payload: SKPDForm): Promise<SKPDForm> => {
+  const response = await api.put<ApiResponse<SKPDForm>>(`/skpd/update/${id}`, payload);
   return response.data.data;
 };
 

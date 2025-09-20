@@ -60,27 +60,27 @@ export type UserDeleteForm = Pick<UserType, 'id' | 'fullname'>;
 /**
  * SKPD type
  */
-export interface SKPDType {
-  id: number;
-  kode: number | null;
-  name: string;
-  shortname: string;
-  status: string | boolean;
-  created_at: string;
-  updated_at: string;
-}
+// export interface SKPDType {
+//   id: number;
+//   kode: number | null;
+//   name: string;
+//   shortname: string;
+//   status: string | boolean;
+//   created_at: string;
+//   updated_at: string;
+// }
 /**
  * SKPD type untuk form
  */
-export type SKPDForm = Pick<SKPDType, 'kode' | 'name' | 'shortname'>;
+// export type SKPDForm = Pick<SKPDType, 'kode' | 'name' | 'shortname'>;
 /**
  * SKPD type untuk form dengan id dan status
  */
-export type SKPDFormState = SKPDForm & { id?: number | null, status?: string | boolean };
+// export type SKPDFormState = SKPDForm & { id?: number | null, status?: string | boolean };
 /**
  * SKPD type untuk delete
  */
-export type SKPDDeleteForm = Pick<SKPDType, 'id' | 'name'>;
+// export type SKPDDeleteForm = Pick<SKPDType, 'id' | 'name'>;
 
 /**
  * Master type
