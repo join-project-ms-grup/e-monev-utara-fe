@@ -1,3 +1,5 @@
+import type { RoleType } from "../services/RoleService";
+
 /**
  * User type
  */
@@ -34,26 +36,26 @@ export type UserDeleteForm = Pick<UserType, 'id' | 'fullname'>;
 /**
  * Role type
  */
-export interface RoleType {
-  id: number;
-  kode: number | null;
-  name: string;
-  author_id: number | null;
-  created_at: string;
-  updated_at: string;
-}
+// export interface RoleType {
+//   id: number;
+//   kode: number | null;
+//   name: string;
+//   author_id: number | null;
+//   created_at: string;
+//   updated_at: string;
+// }
 /**
  * Role type untuk form
  */
-export type RoleForm = Pick<RoleType, 'kode' | 'name'>;
+// export type RoleForm = Pick<RoleType, 'kode' | 'name'>;
 /**
  * Role type untuk form dengan id
  */
-export type RoleFormState = RoleForm & { id?: number | null };
+// export type RoleFormState = RoleForm & { id?: number | null };
 /**
  * User type untuk delete
  */
-export type RoleDeleteForm = Pick<RoleType, 'id' | 'name'>;
+// export type RoleDeleteForm = Pick<RoleType, 'id' | 'name'>;
 
 /**
  * SKPD type

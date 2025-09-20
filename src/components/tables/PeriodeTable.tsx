@@ -1,15 +1,12 @@
 import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useForm } from '@tanstack/react-form';
 import Spinner from '../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
-import { addRole } from '../../services/RoleService';
-import FormRole from '../forms/FormRole';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
 import { getRoleId } from '../../lib/usercookie';
@@ -297,28 +294,6 @@ const PeriodeTable = () => {
               </InputButton>
             </div>
           </FormPeriode>
-          {/* <FormRole
-            type='Edit'
-            formData={formData}
-            setFormData={setFormData}
-            onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', data);
-              updateMutation.mutate({
-                id,
-                payload: { kode: Number(payload.kode), name: payload.name },
-              });
-            }}
-          >
-            <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-                isLoading={loadingMutation}
-              >
-                Simpan
-              </InputButton>
-            </div>
-          </FormRole> */}
         </DialogModal>
       )}
       {modalState === 'Delete' && (

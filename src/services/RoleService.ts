@@ -1,5 +1,14 @@
 import api, { type ApiResponse } from "../lib/api";
-import type { RoleForm, RoleType } from "../types/data";
+
+export interface RoleType {
+    id?: number;
+    kode?: string | number;
+    name?: string;
+    author_id?: number;
+    created_at?: string;
+    updated_at?: string;
+}
+export type RoleForm = Pick<RoleType, 'id' | 'kode' | 'name'>;
 
 /**
  * Ambil semua role untuk Developer

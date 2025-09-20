@@ -40,6 +40,6 @@ export const periodeSchema = z
 
 export const periodeSchemaSubmit = z
   .object({
-    mulai: z.string().nonempty({ message: 'Tahun mulai wajib diisi' }),
-    akhir: z.string().nonempty({ message: 'Tahun akhir wajib diisi' }),
+    mulai: z.string().nonempty({ message: 'Field wajib diisi' }),
+    akhir: z.string().nonempty({ message: 'Field wajib diisi' }),
   });

@@ -1,12 +1,6 @@
 import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import type {
-  RoleDeleteForm,
-  RoleForm,
-  RoleFormState,
-  RoleType,
-} from '../../types/data';
 import Spinner from '../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
@@ -19,6 +13,7 @@ import {
   getRoleAdmin,
   getRoleDev,
   updateRole,
+  type RoleForm,
 } from '../../services/RoleService';
 import FormRole from '../forms/FormRole';
 import type { AxiosError } from 'axios';
@@ -34,31 +29,19 @@ const RoleTable = () => {
   const [openModal, setOpenModal] = useState(false);
 
   // Form Data
-  const initialFormData: RoleFormState = {
-    id: null,
-    name: '',
-    kode: null,
-  };
-  const initialFormDelete: RoleDeleteForm = {
-    id: 0,
+  const initialFormData: RoleForm = {
+    id: Number(''),
+    kode: '',
     name: '',
   };
 
-  const [formData, setFormData] = useState<
-    RoleForm | (RoleForm & { id: number | null })
-  >(initialFormData);
-  const [formDelete, setFormDelete] =
-    useState<RoleDeleteForm>(initialFormDelete);
+  const [formData, setFormData] = useState<RoleForm>(initialFormData);
 
   // Clear form
   useEffect(() => {
     if (!openModal) {
       const timeout = setTimeout(() => {
-        if (modalState === 'Delete') {
-          setFormDelete(initialFormDelete);
-        } else {
-          setFormData(initialFormData);
-        }
+        setFormData(initialFormData);
       }, 200);
       return () => clearTimeout(timeout);
     } else {
@@ -134,7 +117,7 @@ const RoleTable = () => {
   });
 
   // Kolom
-  const columnHelper = createColumnHelper<RoleFormState>();
+  const columnHelper = createColumnHelper<RoleForm>();
 
   const columns = [
     columnHelper.display({
@@ -178,7 +161,7 @@ const RoleTable = () => {
                     className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
                     onClick={() => {
                       setModalState('Delete');
-                      setFormDelete({
+                      setFormData({
                         id: row.original.id!,
                         name: row.original.name,
                       });
@@ -245,8 +228,7 @@ const RoleTable = () => {
         >
           <FormRole
             type='Add'
-            formData={formData}
-            setFormData={setFormData}
+            defaultValues={formData}
             onSubmit={(data: RoleForm) => {
               console.log('Data dari form modal:', data);
               addMutation.mutate({
@@ -275,8 +257,7 @@ const RoleTable = () => {
         >
           <FormRole
             type='Edit'
-            formData={formData}
-            setFormData={setFormData}
+            defaultValues={formData}
             onSubmit={({ id, payload }) => {
               console.log('Data dari form modal:', data);
               updateMutation.mutate({
@@ -304,7 +285,7 @@ const RoleTable = () => {
           onClose={() => setOpenModal(false)}
         >
           <p>
-            Yakin ingin menghapus data <i>{formDelete.name}</i> ?
+            Yakin ingin menghapus data <i>{formData.name}</i> ?
           </p>
           <div className='flex gap-2 justify-end'>
             <InputButton
@@ -312,7 +293,7 @@ const RoleTable = () => {
               className='btn btn-theme w-24'
               isLoading={loadingMutation}
               onClick={() => {
-                deleteMutation.mutate(formDelete.id);
+                deleteMutation.mutate(formData.id!);
               }}
             >
               Hapus

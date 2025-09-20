@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import InputButton from '../inputs/InputButton';
-import type { RoleForm, RoleFormState } from '../../types/data';
-import { InputField } from '../inputs/InputField';
+import type { RoleForm } from '../../services/RoleService';
+import { useForm } from '@tanstack/react-form';
+import { roleSchema, roleSchemaSubmit } from './schemas/SchemaRole';
+import InputText from '../inputs/InputText';
+import ErrorField from './ErrorField';
 
 interface BaseFormProps {
   children?: React.ReactElement;
-  formData: RoleFormState;
-  setFormData: React.Dispatch<React.SetStateAction<RoleFormState>>;
+  defaultValues: RoleForm;
 }
 
 interface FormAddProps extends BaseFormProps {
@@ -25,76 +27,160 @@ const FormRole: React.FC<FormProps> = ({
   type,
   children,
   onSubmit,
-  formData,
-  setFormData,
+  defaultValues,
 }) => {
-  const [error, setError] = useState<string | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.kode || !formData.name) {
-      setError('Kode dan Nama wajib diisi.');
-      return;
-    }
-
-    setError(null);
-
-    if (type === 'Add') {
-      onSubmit(formData);
-    } else {
-      if (formData.id == null) {
-        setError('ID tidak ditemukan untuk mode edit.');
-        return;
+  // Form
+  const form = useForm({
+    defaultValues,
+    onSubmit: async ({ value }) => {
+      if (type === 'Add') {
+        onSubmit(value);
+      } else {
+        if (value.id == null) {
+          return;
+        }
+        const { id, ...payload } = value;
+        onSubmit({ id, payload });
       }
-      const { id, ...payload } = formData;
-      onSubmit({ id, payload });
-    }
-  };
+    },
+    validators: {
+      onChange: ({ value }) => {
+        const input = {
+          kode: value.kode?.toString() ?? '',
+          name: value.name?.toString() ?? '',
+        };
+
+        const result = roleSchema.safeParse(input);
+
+        if (result.success) {
+          return { fields: {} };
+        } else {
+          const errors = result.error.format();
+          return {
+            fields: {
+              kode: errors.kode?._errors[0],
+              name: errors.name?._errors[0],
+            },
+          };
+        }
+      },
+      onSubmit: ({ value }) => {
+        const input = {
+          kode: value.kode?.toString() ?? '',
+          name: value.name?.toString() ?? '',
+        };
+        const result = roleSchemaSubmit.safeParse(input);
+        if (result.success) {
+          return { fields: {} };
+        } else {
+          const errors = result.error.format();
+          return {
+            fields: {
+              kode: errors.kode?._errors[0],
+              name: errors.name?._errors[0],
+            },
+          };
+        }
+      },
+    },
+  });
 
   return (
-    <form onSubmit={handleSubmit} className='max-w-md mx-auto p-4 space-y-4'>
-      {error && <div className='text-red-600 text-sm mb-2'>{error}</div>}
-      <div className='grid grid-cols-4 items-center gap-2'>
-        <label htmlFor='kode'>Kode</label>
-        <InputField
-          type='text'
-          inputMode='numeric'
-          id='kode'
-          label='Kode'
-          name='kode'
-          maxLength={10}
-          value={formData.kode!}
-          onChange={handleChange}
-          className='col-span-3'
-          required
-        />
-      </div>
-      <div className='grid grid-cols-4 items-center gap-2'>
-        <label htmlFor='name'>Nama</label>
-        <InputField
-          id='name'
-          label='Nama'
-          name='name'
-          value={formData.name}
-          onChange={handleChange}
-          className='col-span-3'
-          required
-        />
-      </div>
-      {children ? (
-        children
-      ) : (
-        <InputButton type='submit'>
-          {type === 'Add' ? 'Tambah' : 'Simpan'}
-        </InputButton>
-      )}
-    </form>
+    <>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+        className='max-w-md mx-auto space-y-4'
+      >
+        <div className='flex flex-row gap-4'>
+          {/* Field Kode */}
+          <form.Field name='kode'>
+            {(field) => (
+              <div className='flex-1'>
+                <label htmlFor='kode'>Kode</label>
+                <InputText
+                  // Icon={MdCalendarMonth}
+                  inputMode='numeric'
+                  type='text'
+                  maxLength={4}
+                  placeholder='Kode role...'
+                  id='kode'
+                  value={field.state.value!}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  invalid={!field.state.meta.isValid}
+                />
+                <ErrorField field={field} />
+              </div>
+            )}
+          </form.Field>
+          {/* Field Name */}
+          <form.Field name='name'>
+            {(field) => (
+              <div className='flex-1'>
+                <label htmlFor='name'>Role</label>
+                <InputText
+                  // Icon={MdCalendarMonth}
+                  type='text'
+                  placeholder='Nama role...'
+                  id='name'
+                  value={field.state.value!}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  invalid={!field.state.meta.isValid}
+                />
+                <ErrorField field={field} />
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        {children ? (
+          children
+        ) : (
+          <InputButton type='submit'>
+            {type === 'Add' ? 'Tambah' : 'Simpan'}
+          </InputButton>
+        )}
+      </form>
+      {/* <form onSubmit={handleSubmit} className='max-w-md mx-auto p-4 space-y-4'>
+        {error && <div className='text-red-600 text-sm mb-2'>{error}</div>}
+        <div className='grid grid-cols-4 items-center gap-2'>
+          <label htmlFor='kode'>Kode</label>
+          <InputField
+            type='text'
+            inputMode='numeric'
+            id='kode'
+            label='Kode'
+            name='kode'
+            maxLength={10}
+            value={formData.kode!}
+            onChange={handleChange}
+            className='col-span-3'
+            required
+          />
+        </div>
+        <div className='grid grid-cols-4 items-center gap-2'>
+          <label htmlFor='name'>Nama</label>
+          <InputField
+            id='name'
+            label='Nama'
+            name='name'
+            value={formData.name}
+            onChange={handleChange}
+            className='col-span-3'
+            required
+          />
+        </div>
+        {children ? (
+          children
+        ) : (
+          <InputButton type='submit'>
+            {type === 'Add' ? 'Tambah' : 'Simpan'}
+          </InputButton>
+        )}
+      </form> */}
+    </>
   );
 };
 

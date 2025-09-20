@@ -5,8 +5,11 @@ import { useState } from 'react';
 import { MdKey, MdPerson } from 'react-icons/md';
 import InputButton from '../../components/inputs/InputButton';
 import { useAuth } from '../../contexts/AuthContext';
-import api from '../../lib/api';
+import api, { type ApiResponse } from '../../lib/api';
 import { InputField } from '../../components/inputs/InputField';
+import type { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
+import InputText from '../../components/inputs/InputText';
 
 export const Route = createFileRoute('/auth/')({
   beforeLoad: ({ context }) => {
@@ -52,6 +55,11 @@ function RouteComponent() {
       });
       navigate({ to: '/' });
     },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Autentikasi gagal\n${error.response?.data.message}`);
+      }
+    },
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -86,7 +94,25 @@ function RouteComponent() {
               Masuk
             </h2>
             <form onSubmit={handleSubmit} className='space-y-4 w-full'>
-              <div>
+              <InputText
+                placeholder='Username'
+                name='username'
+                Icon={MdPerson}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                type='text'
+                required
+              />
+              <InputText
+                placeholder='Password'
+                name='password'
+                Icon={MdKey}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type='password'
+                required
+              />
+              {/* <div>
                 <InputField
                   label='Username'
                   name='username'
@@ -96,8 +122,8 @@ function RouteComponent() {
                   type='text'
                   required
                 />
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <InputField
                   label='Password'
                   name='password'
@@ -107,7 +133,7 @@ function RouteComponent() {
                   type='password'
                   required
                 />
-              </div>
+              </div> */}
               <InputButton
                 type='submit'
                 disabled={mutation.isPending}

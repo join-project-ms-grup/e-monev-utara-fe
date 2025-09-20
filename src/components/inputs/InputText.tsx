@@ -5,6 +5,7 @@ import { PiWarningCircle } from 'react-icons/pi';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
   Icon?: IconType;
+  wrapperHeight?: string;
 }
 
 const InputText = ({
@@ -13,6 +14,7 @@ const InputText = ({
   Icon,
   inputMode,
   onBeforeInput,
+  wrapperHeight = '10',
   ...props
 }: InputProps) => {
   const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -30,7 +32,7 @@ const InputText = ({
     }
   };
   return (
-    <div className='input-wrapper h-10 inline-flex'>
+    <div className={`input-wrapper h-10 inline-flex`}>
       {Icon && <Icon className='text-4xl h-full bg-gray-50 pl-2' />}
       <input
         type={type}
