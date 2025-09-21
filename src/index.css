@@ -363,19 +363,22 @@ input::-webkit-inner-spin-button {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 1px;
+  height: 2px;
   width: 100%;
+  background-color: var(--color-gray-200);
   transition: all 0.2s ease;
+  opacity: 1;
 }
 .input-wrapper:focus-within::after {
   background-color: var(--color-2);
+  opacity: 0.5;
 }
 
 .input-wrapper input {
   color: var(--text-1);
   width: 100%;
   background-color: var(--color-gray-50);
-  padding: 0.5rem;
+  padding: 0.5rem 0.85rem;
   outline: none;
 }
 /* Input Toggle */
@@ -424,3 +427,27 @@ input::-webkit-inner-spin-button {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Listbox */
+.listbox {
+  @apply relative flex;
+}
+
+.listbox .listbox-btn {
+  @apply w-full inline-flex justify-between items-center gap-1 bg-gray-50 rounded-b-none py-2 px-3 rounded;
+}
+.listbox .listbox-btn::after{
+  @apply content-[''] absolute bottom-0 left-0 h-[2px] w-full bg-gray-200 transition-all opacity-100;
+}
+.listbox .listbox-btn:focus::after{
+  @apply bg-[var(--color-2)] opacity-50;
+}
+.listbox .listbox-btn:focus{
+  @apply outline-none;
+}
+.listbox-menu{
+  @apply [--anchor-gap:0] [--anchor-max-height:12rem] w-(--button-width) p-1 bg-gray-50 rounded-b shadow-lg focus-visible:outline-0 z-[9999];
+}
+/* .listbox-menu::after{
+@apply content-[''] absolute top-0 left-0 h-[2px] w-full bg-[var(--color-2)] opacity-50;
+} */

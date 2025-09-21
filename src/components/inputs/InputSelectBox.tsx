@@ -6,6 +6,7 @@ import {
 } from '@headlessui/react';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import React, { useRef, useState } from 'react';
+import { PiWarningCircle } from 'react-icons/pi';
 
 export interface OptionItem {
   label: string;
@@ -27,6 +28,7 @@ export interface InputSelectBoxProps {
   btnclassName?: string;
   required?: boolean;
   disabled?: boolean;
+  invalid?: boolean;
 }
 
 export default function InputSelectBox({
@@ -41,6 +43,7 @@ export default function InputSelectBox({
   btnclassName,
   required = false,
   disabled = false,
+  invalid = false,
 }: InputSelectBoxProps) {
   const allOptions = defaultOptionLabel
     ? [{ label: defaultOptionLabel, value: '' }, ...options]
@@ -68,25 +71,29 @@ export default function InputSelectBox({
     allOptions.find((o) => o.value === currentValue)?.label ?? '';
 
   return (
-    <div className={`relative flex ${className}`}>
+    <div className={`listbox ${className}`}>
       <Listbox value={currentValue} onChange={handleChange} disabled={disabled}>
         <ListboxButton
           id={id}
           ref={buttonRef}
-          className={`w-full inline-flex justify-between items-center gap-1 bg-white border border-[#ccc] hover:border-[var(--color-2)] focus:border-[var(--color-2)] data-open:border-[var(--color-2)] focus:outline-none py-2 px-3 rounded transition-colors ${btnclassName}`}
+          className={`listbox-btn ${btnclassName ?? ''}`}
         >
-          {currentLabel} <MdKeyboardArrowDown />
+          {currentLabel}
+          <MdKeyboardArrowDown />
+          <PiWarningCircle
+            className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-8 ${invalid ? 'opacity-100' : 'opacity-0'}`}
+          />
         </ListboxButton>
         <ListboxOptions
           anchor='bottom'
-          className='[--anchor-max-height:12rem] w-(--button-width) p-1 bg-white border border-[#ccc] rounded shadow-lg focus-visible:outline-0 z-[9999]'
+          className='listbox-menu'
         >
           {allOptions.map((option) => (
             <ListboxOption
               disabled={option.value === ''}
               key={String(option.value)}
               value={option.value}
-              className={`data-focus:bg-[#ffcccc] cursor-pointer py-1 px-2 rounded ${
+              className={`data-focus:bg-[var(--color-2)] data-focus:text-[var(--text-3)] cursor-pointer py-1 px-2 rounded ${
                 option.value === '' ? 'text-gray-400' : ''
               }`}
             >

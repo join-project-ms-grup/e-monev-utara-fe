@@ -1,5 +1,25 @@
 import api, { type ApiResponse } from "../lib/api";
-import type { UserForm, UserType } from "../types/data";
+import type { RoleType } from "./RoleService";
+
+export interface UserType {
+  id?: number;
+  name?: string;
+  fullname?: string;
+  avatar?: string;
+  email?: string;
+  role_id?: number | string;
+  skpd_id?: number | string;
+  password?: string;
+  passwordConfirm?: string;
+  token?: string;
+  session?: string;
+  status?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  userRole?: RoleType;
+  userSkpd?: number;
+}
+export type UserForm = Pick<UserType, 'id' | 'name' | 'fullname' | 'email' | 'role_id' | 'skpd_id' | 'password' | 'passwordConfirm'>;
 
 /**
  * Ambil semua user
@@ -23,6 +43,14 @@ export const addUser = async (payload: UserForm): Promise<UserForm> => {
 export const updateUser = async (id: number, payload: UserForm): Promise<UserForm> => {
     const response = await api.put<ApiResponse<UserForm>>(`/user/update/${id}`, payload);
     return response.data.data;
+};
+
+/**
+ * Patch status user
+ */
+export const setStatusUser = async (id: number) => {
+  const response = await api.patch<ApiResponse<UserForm>>(`/user/status/${id}`);
+  return response.data.data;
 };
 
 /**

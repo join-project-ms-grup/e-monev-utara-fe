@@ -5,14 +5,11 @@ import {
   addUser,
   deleteUser,
   getUsers,
+  setStatusUser,
   updateUser,
+  type UserForm,
+  type UserType,
 } from '../../services/UserService';
-import type {
-  UserDeleteForm,
-  UserForm,
-  UserFormState,
-  UserType,
-} from '../../types/data';
 import Spinner from '../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
@@ -22,6 +19,7 @@ import { useEffect, useState } from 'react';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
 import { FormUser } from '../forms/FormUser';
+import InputToggle from '../inputs/InputToggle';
 
 const UserTable = () => {
   const queryClient = useQueryClient();
@@ -32,34 +30,23 @@ const UserTable = () => {
   const [openModal, setOpenModal] = useState(false);
 
   // Form Data
-  const initialFormData: UserFormState = {
-    id: null,
+  const initialFormData: UserForm = {
+    id: Number(''),
     email: '',
     fullname: '',
     name: '',
     password: '',
-    role_id: null,
-    skpd_id: null,
+    role_id: '',
+    skpd_id: '',
   };
-  const initialFormDelete: UserDeleteForm = {
-    id: 0,
-    fullname: '',
-  };
-  const [formData, setFormData] = useState<
-    UserForm | (UserForm & { id: number | null })
-  >(initialFormData);
-  const [formDelete, setFormDelete] =
-    useState<UserDeleteForm>(initialFormDelete);
+
+  const [formData, setFormData] = useState<UserForm>(initialFormData);
 
   // Clear form
   useEffect(() => {
     if (!openModal) {
       const timeout = setTimeout(() => {
-        if (modalState === 'Delete') {
-          setFormDelete(initialFormDelete);
-        } else {
-          setFormData(initialFormData);
-        }
+        setFormData(initialFormData);
       }, 200);
       return () => clearTimeout(timeout);
     } else {
@@ -99,6 +86,26 @@ const UserTable = () => {
     mutationFn: async ({ id, payload }: { id: number; payload: UserForm }) => {
       setLoadingMutation(true);
       return updateUser(id, payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_user'] });
+      setOpenModal(false);
+      toast.success('Data berhasil diperbarui');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+    },
+  });
+  // Update Status
+  const setStatusMutation = useMutation({
+    mutationFn: async (id: number) => {
+      setLoadingMutation(true);
+      return setStatusUser(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_user'] });
@@ -158,6 +165,27 @@ const UserTable = () => {
     columnHelper.accessor('userRole.name', {
       header: 'Role',
     }),
+    columnHelper.accessor('status', {
+      header: 'Status',
+      enableSorting: false,
+      meta: {
+        thClassNames: 'w-[15%]',
+        tdClassNames: 'text-center',
+      },
+      cell: ({ cell, row }) => (
+        <>
+          <InputToggle
+            checked={cell.getValue()!}
+            defaultChecked={cell.getValue()!}
+            onToggle={() => {
+              setStatusMutation.mutate(row.original.id!);
+            }}
+            onLabel={'Aktif'}
+            offLabel={'Nonaktif'}
+          />
+        </>
+      ),
+    }),
     columnHelper.display({
       header: 'Aksi',
       enableSorting: false,
@@ -185,7 +213,7 @@ const UserTable = () => {
             className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
             onClick={() => {
               setModalState('Delete');
-              setFormDelete({
+              setFormData({
                 id: row.original.id,
                 fullname: row.original.fullname,
               });
@@ -246,8 +274,7 @@ const UserTable = () => {
         >
           <FormUser
             type='Add'
-            formData={formData}
-            setFormData={setFormData}
+            defaultValues={formData}
             onSubmit={(data: UserForm) => {
               console.log('Data dari form modal:', data);
               addMutation.mutate({
@@ -280,8 +307,7 @@ const UserTable = () => {
         >
           <FormUser
             type='Edit'
-            formData={formData}
-            setFormData={setFormData}
+            defaultValues={formData}
             onSubmit={({ id, payload }) => {
               console.log('Data dari form modal:', data);
               updateMutation.mutate({
@@ -309,7 +335,7 @@ const UserTable = () => {
           onClose={() => setOpenModal(false)}
         >
           <p>
-            Yakin ingin menghapus data <i>{formDelete.fullname}</i> ?
+            Yakin ingin menghapus data <i>{formData.fullname}</i> ?
           </p>
           <div className='flex gap-2 justify-end'>
             <InputButton
@@ -317,7 +343,7 @@ const UserTable = () => {
               className='btn btn-theme w-24'
               isLoading={loadingMutation}
               onClick={() => {
-                deleteMutation.mutate(formDelete.id);
+                deleteMutation.mutate(formData.id!);
               }}
             >
               Hapus

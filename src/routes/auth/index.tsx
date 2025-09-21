@@ -81,10 +81,13 @@ function RouteComponent() {
               <img src='/bengkulu-utara-logo.webp' alt='' className='h-16' />
             </div>
             <div>
-              <h1 className='text-4xl font-bold mb-4 z-10'>E-MONEV</h1>
+              <h1 className='text-4xl font-bold mb-4 z-10 uppercase'>{SITE_NAME}</h1>
               <p className='uppercase font-semibold -mt-4'>
-                Kabupaten Bengkulu Utara
+                Monitoring, Analisis Hasil Pembangunan Daerah
               </p>
+              {/* <p className='uppercase font-semibold'>
+                Kabupaten Bengkulu Utara
+              </p> */}
             </div>
           </div>
         </div>

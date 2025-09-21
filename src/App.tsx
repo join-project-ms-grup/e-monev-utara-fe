@@ -6,8 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const queryClient = new QueryClient()
 
 function RouterWithAuth() {
-  const { token, user } = useAuth();
-  console.log({token},user)
+  const { token } = useAuth();
 
   return <RouterProvider router={router} context={{ token }} />;
 }
