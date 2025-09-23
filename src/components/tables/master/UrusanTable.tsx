@@ -55,7 +55,7 @@ const UrusanTable = () => {
 
   return (
     <>
-      <MainTable data={data || []} columns={columns} tabletop={<TableTopbar />} />
+      <MainTable data={data as any || []} columns={columns} tabletop={<TableTopbar />} />
     </>
   );
 };

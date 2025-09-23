@@ -1,5 +1,9 @@
-import React from 'react';
-import { MdKeyboardDoubleArrowLeft, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdKeyboardDoubleArrowRight } from 'react-icons/md';
+import {
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardArrowLeft,
+  MdKeyboardArrowRight,
+  MdKeyboardDoubleArrowRight,
+} from 'react-icons/md';
 import InputButton from '../inputs/InputButton';
 import InputSelectBox from '../inputs/InputSelectBox';
 import type { Table } from '@tanstack/react-table';
@@ -14,6 +18,7 @@ const Pagination = <TData,>({ table }: PaginationProps<TData>) => {
       <div className='flex items-center gap-1'>
         <span className='opacity-85'>Tampilkan</span>
         <InputSelectBox
+          btnclassName='bg-white'
           className='h-9'
           value={table.getState().pagination.pageSize.toString()}
           options={[
@@ -22,6 +27,8 @@ const Pagination = <TData,>({ table }: PaginationProps<TData>) => {
             { label: '30', value: '30' },
             { label: '40', value: '40' },
             { label: '50', value: '50' },
+            { label: '100', value: '100' },
+            { label: '200', value: '200' },
           ]}
           onChange={(value) => table.setPageSize(Number(value))}
         />

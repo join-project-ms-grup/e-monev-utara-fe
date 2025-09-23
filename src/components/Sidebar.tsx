@@ -10,7 +10,6 @@ import {
   MdInventory,
   MdAssignmentTurnedIn,
   MdFiberManualRecord,
-  MdSubdirectoryArrowRight,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
 
@@ -48,18 +47,7 @@ const menuUtama: MenuItem[] = [
     icon: <MdInventory />,
     submenu: [
       { label: 'Organisasi', to: '/master/organisasi' },
-      {
-        label: 'Rekening',
-        to: '/master/rekening',
-        icon: <MdSubdirectoryArrowRight />,
-        submenu: [
-          { label: 'Urusan', to: '/master/rekening/urusan' },
-          { label: 'Bidang', to: '/master/rekening/bidang' },
-          { label: 'Program', to: '/master/rekening/program' },
-          { label: 'Kegiatan', to: '/master/rekening/kegiatan' },
-          { label: 'Sub Kegiatan', to: '/master/rekening/subkegiatan' },
-        ],
-      },
+      { label: 'Rekening', to: '/master/rekening' },
       { label: 'Jadwal', to: '/master/jadwal' },
       { label: 'Role', to: '/master/role', akses: 1 && 2 },
       { label: 'Periode', to: '/master/periode' },

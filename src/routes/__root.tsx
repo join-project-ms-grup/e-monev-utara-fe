@@ -52,7 +52,7 @@ function RootComponent() {
     <>
       <HeadContent />
       <Outlet />
-      <Tooltip id='tooltip' />
+      <Tooltip id='tooltip' className='z-[99999]' />
       <ToastComponent />
     </>
   );

@@ -2,31 +2,15 @@ import { createColumnHelper } from '@tanstack/react-table';
 import MainTable from '../MainTable';
 import type { MasterType } from '../../../types/data';
 import { useQuery } from '@tanstack/react-query';
-import { getChildren, getUrusan } from '../../../services/MasterService';
+import { getMaster } from '../../../services/MasterService';
 import Spinner from '../../inputs/Spinner';
 import { MdRefresh } from 'react-icons/md';
 
-const BidangTable = () => {
+const SubKegiatanTable = () => {
   // Data fetching
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_bidang'],
-    queryFn: async () => {
-      const urusanList = await getUrusan();
-      const urusanMap = urusanList.reduce((acc: Record<number, string>, u) => {
-        acc[u.id] = `[${u.kode}] ${u.name}`;
-        return acc;
-      }, {});
-
-      const ids = urusanList.map((u) => u.id);
-      const bidangList = await Promise.all(ids.map((id) => getChildren(id)));
-
-      const withUrusan = bidangList.flat().map((b) => ({
-        ...b,
-        group: urusanMap[b.parent_id] ?? null,
-      }));
-
-      return withUrusan;
-    },
+    queryKey: ['tabel_subkegiatan'],
+    queryFn: getMaster,
   });
 
   // Kolom
@@ -48,7 +32,7 @@ const BidangTable = () => {
       },
     }),
     columnHelper.accessor('name', {
-      header: 'Bidang',
+      header: 'Sub Kegiatan',
     }),
   ];
 
@@ -56,6 +40,7 @@ const BidangTable = () => {
     return (
       <>
         <div className='inline-flex flex-1 gap-2 justify-end'>
+
           <button
             className='table-button w-9 h-9'
             onClick={() => refetch()}
@@ -70,14 +55,9 @@ const BidangTable = () => {
 
   return (
     <>
-      <MainTable
-        groupHeader='Urusan'
-        data={data as any || []}
-        columns={columns}
-        tabletop={<TableTopbar />}
-      />
+      <MainTable data={data as any || []} columns={columns} tabletop={<TableTopbar />} />
     </>
   );
 };
 
-export default BidangTable;
+export default SubKegiatanTable;
