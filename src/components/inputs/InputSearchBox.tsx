@@ -34,7 +34,7 @@ export interface InputSelectBoxProps {
   withClear?: boolean;
   placeholder?: string;
   tooltip?: boolean;
-  onChangeClear?: () => void;
+  onClear?: () => void;
 }
 
 export default function InputSearchBox({
@@ -53,8 +53,8 @@ export default function InputSearchBox({
   withSearch = false,
   withClear = false,
   placeholder,
-  tooltip,
-  onChangeClear,
+  tooltip = false,
+  onClear,
 }: InputSelectBoxProps) {
   const allOptions = defaultOptionLabel
     ? [{ label: defaultOptionLabel, value: '' }, ...options]
@@ -121,8 +121,11 @@ export default function InputSearchBox({
             className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-8 ${invalid ? 'opacity-100' : 'opacity-0'}`}
           />
         </ListboxButton>
-        {withClear && (
-          <button className='bg-white transition-all text-red-500 hover:text-red-400 px-1' onClick={onChangeClear}>
+        {withClear && currentValue !== '' && (
+          <button
+            className='bg-white transition-all text-red-500 hover:text-red-400 px-1'
+            onClick={onClear}
+          >
             <MdClear className='transition-all active:scale-80' />
           </button>
         )}
@@ -139,8 +142,10 @@ export default function InputSearchBox({
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => (
               <ListboxOption
-                data-tooltip-id='tooltip'
-                data-tooltip-content={option.label}
+                {...(tooltip && {
+                  'data-tooltip-id': 'tooltip',
+                  'data-tooltip-content': option.label,
+                })}
                 disabled={option.value === ''}
                 key={String(option.value)}
                 value={option.value}

@@ -7,6 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
+  type ColumnFiltersState,
   type ExpandedState,
   type PaginationState,
   type RowData,
@@ -16,16 +17,17 @@ import {
   MdArrowDropDown,
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
-import { Fragment, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import Pagination from './Pagination';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface MainTableProps<TData> {
   sorting?: boolean;
   data: TData[];
   subRows?: (row: TData) => TData[] | undefined;
+  subLabels?: string[];
   columns: ColumnDef<TData, any>[];
   tabletop?: ReactNode;
+  searchFilters?: { field: string; value: string }[];
 }
 
 declare module '@tanstack/react-table' {
@@ -41,15 +43,31 @@ const Tabel = <TData,>({
   columns,
   tabletop,
   subRows,
+  subLabels,
+  searchFilters,
 }: MainTableProps<TData & { group?: string }>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const [expanded, setExpanded] = useState<ExpandedState>({});
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  useEffect(() => {
+    if (searchFilters && searchFilters.length > 0) {
+      const filters = searchFilters
+        .filter((f) => f.value)
+        .map((f) => ({ id: f.field, value: f.value }));
+      setColumnFilters(filters);
+    } else {
+      setColumnFilters([]);
+    }
+    setExpanded({});
+  }, [searchFilters]);
+
   const table = useReactTable({
-    data: data,
-    columns: columns,
+    data,
+    columns,
     defaultColumn: {
       enableSorting: sorting,
     },
@@ -61,13 +79,13 @@ const Tabel = <TData,>({
     getExpandedRowModel: getExpandedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
+    onColumnFiltersChange: setColumnFilters,
     filterFromLeafRows: true,
-    maxLeafRowFilterDepth: 4,
-    // debugTable: true,
-    // debugRows: true,
+    maxLeafRowFilterDepth: subLabels?.length,
     state: {
       pagination,
       expanded,
+      columnFilters,
     },
   });
 
@@ -119,14 +137,15 @@ const Tabel = <TData,>({
         <tbody>
           {table.getRowModel().rows.length > 0 ? (
             table.getRowModel().rows.map((row) => {
-              const label =
-                row.depth === 0
-                  ? 'BIDANG :'
-                  : row.depth === 1
-                    ? 'PROGRAM :'
-                    : row.depth === 2
-                      ? 'KEGIATAN :'
-                      : 'SUB KEGIATAN :';
+              const label = subLabels?.[row.depth];
+              // const label =
+              //   row.depth === 0
+              //     ? 'BIDANG :'
+              //     : row.depth === 1
+              //       ? 'PROGRAM :'
+              //       : row.depth === 2
+              //         ? 'KEGIATAN :'
+              //         : 'SUB KEGIATAN :';
 
               return (
                 <Fragment key={row.id}>
@@ -152,7 +171,7 @@ const Tabel = <TData,>({
                   {row.getIsExpanded() && (
                     <>
                       <tr>
-                        <td colSpan={3}></td>
+                        <td colSpan={table.getAllColumns().length - 1}></td>
                         <td>
                           <strong
                             className='inline-flex'

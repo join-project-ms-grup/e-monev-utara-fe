@@ -6,6 +6,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
   Icon?: IconType;
   wrapperHeight?: string;
+  wrapperClassname?: string;
 }
 
 const InputText = ({
@@ -15,6 +16,7 @@ const InputText = ({
   inputMode,
   onBeforeInput,
   wrapperHeight = '10',
+  wrapperClassname,
   ...props
 }: InputProps) => {
   const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -32,8 +34,8 @@ const InputText = ({
     }
   };
   return (
-    <div className={`input-wrapper h-10 inline-flex`}>
-      {Icon && <Icon className='text-4xl h-full bg-gray-50 pl-2' />}
+    <div className={`${wrapperClassname} bg-gray-50 input-wrapper h-10 inline-flex`}>
+      {Icon && <Icon className='text-4xl h-full pl-2' />}
       <input
         type={type}
         {...props}

@@ -377,7 +377,7 @@ input::-webkit-inner-spin-button {
 .input-wrapper input {
   color: var(--text-1);
   width: 100%;
-  background-color: var(--color-gray-50);
+  /* background-color: var(--color-gray-50); */
   padding: 0.5rem 0.85rem;
   outline: none;
 }
