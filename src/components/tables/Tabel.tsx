@@ -25,6 +25,7 @@ interface MainTableProps<TData> {
   data: TData[];
   subRows?: (row: TData) => TData[] | undefined;
   subLabels?: string[];
+  subLabelPosition?: number;
   columns: ColumnDef<TData, any>[];
   tabletop?: ReactNode;
   searchFilters?: { field: string; value: string }[];
@@ -34,6 +35,8 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     tdClassNames?: string;
     thClassNames?: string;
+    rowSpan?: number;
+    hidden?: boolean;
   }
 }
 
@@ -44,6 +47,7 @@ const Tabel = <TData,>({
   tabletop,
   subRows,
   subLabels,
+  subLabelPosition,
   searchFilters,
 }: MainTableProps<TData & { group?: string }>) => {
   const [pagination, setPagination] = useState<PaginationState>({
@@ -98,55 +102,54 @@ const Tabel = <TData,>({
       )}
       <table className='table-auto table-responsive'>
         <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <th
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    {...(header.column.columnDef.meta?.thClassNames
-                      ? {
-                          className: header.column.columnDef.meta.thClassNames,
-                        }
-                      : {})}
-                  >
-                    <div
-                      {...{
-                        className: header.column.getCanSort()
-                          ? 'flex flex-row justify-center items-center'
-                          : '',
-                        onClick: header.column.getToggleSortingHandler(),
-                      }}
+          {table.getHeaderGroups().map((headerGroup) => {
+            return (
+              <tr key={headerGroup.id} id={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const meta = header.column.columnDef.meta || {};
+                  const rowSpan = meta.rowSpan ?? 1;
+                  if (meta.hidden) return null;
+                  return (
+                    <th
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      rowSpan={rowSpan}
+                      {...(meta.thClassNames
+                        ? {
+                            className: meta.thClassNames,
+                          }
+                        : {})}
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                      {{
-                        asc: <MdArrowDropUp />,
-                        desc: <MdArrowDropDown />,
-                      }[header.column.getIsSorted() as string] ?? null}
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
+                      <div
+                        {...{
+                          className: header.column.getCanSort()
+                            ? 'flex flex-row justify-center items-center'
+                            : '',
+                          onClick: header.column.getToggleSortingHandler(),
+                        }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                        {{
+                          asc: <MdArrowDropUp />,
+                          desc: <MdArrowDropDown />,
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </thead>
         <tbody>
           {table.getRowModel().rows.length > 0 ? (
             table.getRowModel().rows.map((row) => {
               const label = subLabels?.[row.depth];
-              // const label =
-              //   row.depth === 0
-              //     ? 'BIDANG :'
-              //     : row.depth === 1
-              //       ? 'PROGRAM :'
-              //       : row.depth === 2
-              //         ? 'KEGIATAN :'
-              //         : 'SUB KEGIATAN :';
-
               return (
                 <Fragment key={row.id}>
                   <tr>
@@ -171,8 +174,8 @@ const Tabel = <TData,>({
                   {row.getIsExpanded() && (
                     <>
                       <tr>
-                        <td colSpan={table.getAllColumns().length - 1}></td>
-                        <td>
+                        <td colSpan={table.getAllLeafColumns().length - (subLabelPosition ?? 1)}></td>
+                        <td colSpan={subLabelPosition}>
                           <strong
                             className='inline-flex'
                             style={{
@@ -192,7 +195,7 @@ const Tabel = <TData,>({
           ) : (
             <tr>
               <td
-                colSpan={table.getAllLeafColumns().length}
+                colSpan={table.getAllColumns().length}
                 className='text-center py-4'
               >
                 Tidak ada data

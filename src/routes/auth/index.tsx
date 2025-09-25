@@ -6,7 +6,6 @@ import { MdKey, MdPerson } from 'react-icons/md';
 import InputButton from '../../components/inputs/InputButton';
 import { useAuth } from '../../contexts/AuthContext';
 import api, { type ApiResponse } from '../../lib/api';
-import { InputField } from '../../components/inputs/InputField';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import InputText from '../../components/inputs/InputText';
@@ -115,28 +114,6 @@ function RouteComponent() {
                 type='password'
                 required
               />
-              {/* <div>
-                <InputField
-                  label='Username'
-                  name='username'
-                  Icon={MdPerson}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  type='text'
-                  required
-                />
-              </div> */}
-              {/* <div>
-                <InputField
-                  label='Password'
-                  name='password'
-                  Icon={MdKey}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  type='password'
-                  required
-                />
-              </div> */}
               <InputButton
                 type='submit'
                 disabled={mutation.isPending}

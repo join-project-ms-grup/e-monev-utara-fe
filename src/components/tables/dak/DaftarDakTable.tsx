@@ -4,9 +4,9 @@ import MainTable from '../MainTable';
 import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import toast from 'react-hot-toast';
-import InputSelectBox from '../../inputs/InputSelectBox';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import InputSearchBox from '../../inputs/InputSearchBox';
 
 interface DaftarDAKType {
   no: number;
@@ -194,7 +194,7 @@ export const DaftarDakTable = () => {
         <div className='inline-flex flex-1 gap-1 justify-between'>
           <div className='inline-flex items-center gap-1'>
             <label htmlFor='tahun'>Tahun</label>
-            <InputSelectBox
+            <InputSearchBox
               id='tahun'
               className='h-9'
               //   defaultValue='2025'

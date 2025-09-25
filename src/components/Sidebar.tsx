@@ -12,6 +12,7 @@ import {
   MdFiberManualRecord,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
+import { SITE_NAME } from '../lib/config';
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -281,7 +282,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <div
           className={`block text-nowrap text-center cursor-default ${sidebarOpen ? '' : 'hidden'}`}
         >
-          <h4>E-MONEV</h4>
+          <h4>{SITE_NAME}</h4>
           {/* <span>Kabupaten Bengkulu Utara</span> */}
         </div>
       </div>

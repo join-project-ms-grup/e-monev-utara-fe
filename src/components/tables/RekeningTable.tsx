@@ -5,13 +5,15 @@ import {
   type MasterUrusan,
 } from '../../services/MasterService';
 import { createColumnHelper } from '@tanstack/react-table';
-import { MdKeyboardArrowDown, MdRefresh, MdSearch } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import Tabel from './Tabel';
 import Spinner from '../inputs/Spinner';
 import InputButton from '../inputs/InputButton';
 import InputSearchBox from '../inputs/InputSearchBox';
 import { useEffect, useState } from 'react';
 import InputText from '../inputs/InputText';
+import RowExpand from './RowExpand';
+import RowExpandValue from './RowExpandValue';
 
 const RekeningTable = () => {
   const { data, refetch, isFetching } = useQuery({
@@ -36,26 +38,7 @@ const RekeningTable = () => {
         thClassNames: 'w-[5%]',
         tdClassNames: 'flex items-center justify-center',
       },
-      cell: ({ row, getValue }) => (
-        <div>
-          {row.getCanExpand() ? (
-            <button
-              className={`font-extrabold transition-all ease hover:opacity-80 active:scale-100 ${row.getIsExpanded() ? 'text-red-400' : 'text-blue-400'} scale-125`}
-              {...{
-                onClick: row.getToggleExpandedHandler(),
-                style: { cursor: 'pointer' },
-              }}
-            >
-              <MdKeyboardArrowDown
-                className={`transition-transform ${row.getIsExpanded() ? 'rotate-180' : ''}`}
-              />
-            </button>
-          ) : (
-            <span className='font-bold'>-</span>
-          )}
-          {getValue<boolean>()}
-        </div>
-      ),
+      cell: (ctx) => <RowExpand {...ctx} />,
     }),
     columnHelper.display({
       header: '#',
@@ -83,16 +66,7 @@ const RekeningTable = () => {
     }),
     columnHelper.accessor('name', {
       header: 'Nama',
-      cell: ({ row, getValue }) => (
-        <div
-          className='inline-flex items-start'
-          style={{
-            paddingLeft: `${row.depth * 1}rem`,
-          }}
-        >
-          {getValue<boolean>()}
-        </div>
-      ),
+      cell: (ctx) => <RowExpandValue {...ctx} />,
     }),
   ];
 

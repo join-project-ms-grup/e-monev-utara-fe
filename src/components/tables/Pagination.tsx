@@ -5,8 +5,8 @@ import {
   MdKeyboardDoubleArrowRight,
 } from 'react-icons/md';
 import InputButton from '../inputs/InputButton';
-import InputSelectBox from '../inputs/InputSelectBox';
 import type { Table } from '@tanstack/react-table';
+import InputSearchBox from '../inputs/InputSearchBox';
 
 type PaginationProps<TData> = {
   table: Table<TData>;
@@ -17,9 +17,8 @@ const Pagination = <TData,>({ table }: PaginationProps<TData>) => {
     <div className='flex flex-row items-center justify-between mt-2'>
       <div className='flex items-center gap-1'>
         <span className='opacity-85'>Tampilkan</span>
-        <InputSelectBox
-          btnclassName='bg-white'
-          className='h-9'
+        <InputSearchBox
+          btnclassName='bg-white h-9'
           value={table.getState().pagination.pageSize.toString()}
           options={[
             { label: '10', value: '10' },

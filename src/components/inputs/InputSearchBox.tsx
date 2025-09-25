@@ -5,9 +5,9 @@ import {
   ListboxOption,
 } from '@headlessui/react';
 import { MdClear, MdKeyboardArrowDown } from 'react-icons/md';
-import { FaTrash } from 'react-icons/fa';
 import React, { useRef, useState } from 'react';
 import { PiWarningCircle } from 'react-icons/pi';
+import clsx from 'clsx';
 
 export interface OptionItem {
   label: string;
@@ -90,27 +90,29 @@ export default function InputSearchBox({
           o.label.toLowerCase().includes(query.toLowerCase()),
         );
 
+  const wrapperClass = clsx('relative flex', className);
+  const btnClass = clsx(
+    btnclassName,
+    'w-full inline-flex justify-between items-center gap-1 bg-white shadow-sm rounded-b-none py-2 px-3 rounded whitespace-nowrap overflow-hidden focus:outline-none',
+    'focus:outline-none',
+    `after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-gray-200 after:transition-all after:opacity-100`,
+    'focus:after:bg-[var(--color-2)] focus:after:opacity-50',
+  );
+  const menuClass = clsx(
+    '[--anchor-gap:0] [--anchor-max-height:12rem] w-(--button-width) p-1 bg-gray-50 rounded-b shadow-lg focus-visible:outline-0 z-[9999]',
+  );
+
   return (
     <div
-      className={`listbox ${className}`}
+      className={wrapperClass}
       {...(tooltip && {
         'data-tooltip-id': 'tooltip',
         'data-tooltip-content': currentLabel,
       })}
     >
+      {/* <label htmlFor="">test</label> */}
       <Listbox value={currentValue} onChange={handleChange} disabled={disabled}>
-        <ListboxButton
-          id={id}
-          ref={buttonRef}
-          className={`${btnclassName ?? ''} bg-gray-50 listbox-btn`}
-        >
-          {/* {currentLabel ?? placeholder ?? '\u00A0'} */}
-          {/* {currentLabel ??
-            (placeholder ? (
-              <span className='text-gray-400'>{placeholder}</span>
-            ) : (
-              '\u00A0'
-            ))} */}
+        <ListboxButton id={id} ref={buttonRef} className={btnClass}>
           <span
             className={`truncate flex-1 text-left ${!currentValue && 'text-gray-400'}`}
           >
@@ -129,7 +131,7 @@ export default function InputSearchBox({
             <MdClear className='transition-all active:scale-80' />
           </button>
         )}
-        <ListboxOptions anchor='bottom' className='listbox-menu p-2'>
+        <ListboxOptions anchor='bottom' className={menuClass}>
           {withSearch && (
             <input
               type='text'

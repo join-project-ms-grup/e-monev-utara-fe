@@ -13,12 +13,9 @@ import {
 import {
   MdArrowDropDown,
   MdArrowDropUp,
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight,
-  MdKeyboardDoubleArrowLeft,
-  MdKeyboardDoubleArrowRight,
 } from 'react-icons/md';
-import InputSelectBox from '../inputs/InputSelectBox';
+import InputSearchBox from '../inputs/InputSearchBox';
+import Pagination from './Pagination';
 
 const OrganisasiTable = () => {
   const columnHelper = createColumnHelper<OrganisasiType>();
@@ -79,13 +76,28 @@ const OrganisasiTable = () => {
     },
   });
 
+  const [tahun, setTahun] = useState('2025');
+
   return (
-    <div className='table-responsive'>
+    <>
       <div className='inline-flex gap-2 mb-2 items-center'>
-        <span>Tahun Anggaran</span>
-        <InputSelectBox options={[2025, 2024, 2023, 2022, 2021]} onChange={(e) => console.log(e)} />
+        <label htmlFor='tahun'>Tahun</label>
+        <InputSearchBox
+          id='tahun'
+          className='w-24'
+          btnclassName='bg-white'
+          value={tahun}
+          onChange={(e) => setTahun(e)}
+          options={[
+            { label: '2026', value: '2026' },
+            { label: '2025', value: '2025' },
+            { label: '2024', value: '2024' },
+            { label: '2023', value: '2023' },
+            { label: '2022', value: '2022' },
+          ]}
+        />
       </div>
-      <table className='table-auto'>
+      <table className='table-auto table-responsive'>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -127,62 +139,8 @@ const OrganisasiTable = () => {
           ))}
         </tbody>
       </table>
-      <div className='flex flex-row items-center justify-between mt-2'>
-        <div className='flex items-center gap-2'>
-          <span className='opacity-85'>Menampilkan</span>
-          <InputSelectBox value={table.getState().pagination.pageSize} options={[10, 20, 30, 40, 50]} onChange={(value) => table.setPageSize(value)} />
-          <span className='opacity-85'>
-            dari {table.getRowCount().toLocaleString()} data
-          </span>
-        </div>
-        <div className='flex flex-row gap-2'>
-          <button
-            className='table-button'
-            onClick={() => table.firstPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <MdKeyboardDoubleArrowLeft />
-          </button>
-          <button
-            className='table-button'
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <MdKeyboardArrowLeft />
-          </button>
-          <div className='flex items-center gap-2'>
-            <input
-              type='number'
-              min='1'
-              max={table.getPageCount()}
-              value={table.getState().pagination.pageIndex + 1}
-              onChange={(e) => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                table.setPageIndex(page);
-              }}
-              className='pagination-input'
-            />
-            <span className='opacity-85'>
-              dari {table.getPageCount().toLocaleString()}
-            </span>
-          </div>
-          <button
-            className='table-button'
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <MdKeyboardArrowRight />
-          </button>
-          <button
-            className='table-button'
-            onClick={() => table.lastPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <MdKeyboardDoubleArrowRight />
-          </button>
-        </div>
-      </div>
-    </div>
+      <Pagination table={table} />
+    </>
   );
 };
 

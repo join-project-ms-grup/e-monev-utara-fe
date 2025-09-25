@@ -1,6 +1,5 @@
 import React from 'react';
 import InputButton from '../inputs/InputButton';
-import InputSelectBox, { type OptionItem } from '../inputs/InputSelectBox';
 import type { UserForm } from '../../services/UserService';
 import { useForm } from '@tanstack/react-form';
 import { userSchema, userSchemaSubmit } from './schemas/SchemaUser';
@@ -9,6 +8,7 @@ import ErrorField from './ErrorField';
 import { getRoleAdmin, getRoleDev } from '../../services/RoleService';
 import { useQuery } from '@tanstack/react-query';
 import { getRoleId } from '../../lib/usercookie';
+import InputSearchBox, { type OptionItem } from '../inputs/InputSearchBox';
 
 interface BaseFormProps {
   children?: React.ReactElement;
@@ -152,7 +152,7 @@ export const FormUser: React.FC<FormProps> = ({
               return (
                 <div className='flex-1'>
                   <label htmlFor='role_id'>Role</label>
-                  <InputSelectBox
+                  <InputSearchBox
                     id='role_id'
                     name='role_id'
                     options={roleList as OptionItem[]}
