@@ -94,7 +94,7 @@ const Tabel = <TData,>({
   });
 
   return (
-    <div className='py-2'>
+    <div>
       {tabletop && (
         <>
           <div className='flex mb-2'>{tabletop}</div>

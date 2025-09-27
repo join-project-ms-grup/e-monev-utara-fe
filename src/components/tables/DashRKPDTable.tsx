@@ -3,6 +3,12 @@ import Tabel from './Tabel';
 import { createColumnHelper } from '@tanstack/react-table';
 import RowExpand from './RowExpand';
 import RowExpandValue from './RowExpandValue';
+import toast from 'react-hot-toast';
+import { MdPrint } from 'react-icons/md';
+import InputButton from '../inputs/InputButton';
+import { exportRankingRKPD } from '../../services/ExcelService';
+import InputSearchBox from '../inputs/InputSearchBox';
+import { useState } from 'react';
 
 const dummy = fakeRKPDDashboardData;
 
@@ -52,13 +58,13 @@ const DashRKPDTable = () => {
       id: 'capaiankinerja',
       header: 'Rata - Rata Capaian Kinerja',
       columns: [
-        columnHelper.accessor('persentase_kinerja', {
-          id: 'persentase_kinerja',
+        columnHelper.accessor('persentaseKinerja', {
+          id: 'persentaseKinerja',
           header: '(%)',
           meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
         }),
-        columnHelper.accessor('predikat_kinerja', {
-          id: 'predikat_kinerja',
+        columnHelper.accessor('predikatKinerja', {
+          id: 'predikatKinerja',
           header: 'Predikat',
           meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
         }),
@@ -68,13 +74,13 @@ const DashRKPDTable = () => {
       id: 'capaiananggaran',
       header: 'Rata - Rata Capaian Anggaran',
       columns: [
-        columnHelper.accessor('persentase_anggaran', {
-          id: 'persentase_anggaran',
+        columnHelper.accessor('persentaseAnggaran', {
+          id: 'persentaseAnggaran',
           header: '(%)',
           meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
         }),
-        columnHelper.accessor('predikat_anggaran', {
-          id: 'predikat_anggaran',
+        columnHelper.accessor('predikatAnggaran', {
+          id: 'predikatAnggaran',
           header: 'Predikat',
           meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
         }),
@@ -92,7 +98,7 @@ const DashRKPDTable = () => {
             const formatter = new Intl.NumberFormat('id-ID');
             return `Rp. ${formatter.format(getValue())}`;
           },
-          meta: { hidden: true},
+          meta: { hidden: true },
         }),
       ],
     }),
@@ -101,8 +107,58 @@ const DashRKPDTable = () => {
   const subRows = (row: any) =>
     row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
 
+  const [tahun, setTahun] = useState('2025');
+  const [triwulan, setTriwulan] = useState('III');
+
   return (
     <>
+      <div className='flex items-end justify-between'>
+        <div className='inline-flex gap-2'>
+          <div>
+            <label htmlFor='tahun'>Tahun</label>
+            <InputSearchBox
+              id='tahun'
+              className='w-24'
+              btnclassName='bg-white'
+              value={tahun}
+              onChange={(e) => setTahun(e)}
+              options={[
+                { label: '2026', value: '2026' },
+                { label: '2025', value: '2025' },
+                { label: '2024', value: '2024' },
+                { label: '2023', value: '2023' },
+                { label: '2022', value: '2022' },
+              ]}
+            />
+          </div>
+          <div>
+            <label htmlFor='triwulan'>s.d Triwulan</label>
+            <InputSearchBox
+              id='triwulan'
+              className='w-24'
+              btnclassName='bg-white'
+              value={triwulan}
+              onChange={(e) => setTriwulan(e)}
+              options={[
+                { label: 'I', value: 'I' },
+                { label: 'II', value: 'II' },
+                { label: 'III', value: 'III' },
+                { label: 'IV', value: 'IV' },
+              ]}
+            />
+          </div>
+        </div>
+        <InputButton
+          tooltip='Print'
+          className='btn btn-theme w-9 h-9'
+          onClick={() => {
+            toast.success('Printing...');
+            exportRankingRKPD([], '2025');
+          }}
+        >
+          <MdPrint />
+        </InputButton>
+      </div>
       <Tabel
         subRows={subRows}
         subLabels={['Program', 'Kegiatan', 'Sub Kegiatan']}
@@ -110,6 +166,23 @@ const DashRKPDTable = () => {
         data={dummy}
         columns={columns}
       />
+      <div>
+        <span>Keterangan Predikat:</span>
+        <div className='grid grid-cols-[auto_1fr] space-x-2'>
+          <p>ST</p>
+          <p>SANGAT TINGGI {`(>90 dan <=100)`}</p>
+          <p>T</p>
+          <p>TINGGI {`(>75 dan <=90)`}</p>
+          <p>S</p>
+          <p>SEDANG {`(>65 dan <=75)`}</p>
+          <p>R</p>
+          <p>RENDAH {`(>50 dan <=65)`}</p>
+          <p>SR</p>
+          <p>SANGAT RENDAH {`(<=50)`}</p>
+          <p>UNK</p>
+          <p>UNKNOWN {`(<0 atau >100)`}</p>
+        </div>
+      </div>
     </>
   );
 };

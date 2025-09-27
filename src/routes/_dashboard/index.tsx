@@ -19,47 +19,12 @@ export const Route = createFileRoute('/_dashboard/')({
 });
 
 function RouteComponent() {
-  const [tahun, setTahun] = useState('2025');
-  const [triwulan, setTriwulan] = useState('III');
-
   return (
     <div className='space-y-2'>
       {/* <div>
         <h4>E-MAHABBAH</h4>
         <p>Monitoring, Analisis Hasil Pembangunan Daerah</p>
       </div> */}
-      <div className='grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-center max-w-md'>
-        <label htmlFor='tahun'>Tahun</label>
-        <InputSearchBox
-          id='tahun'
-          className='w-24'
-          btnclassName='bg-white'
-          value={tahun}
-          onChange={(e) => setTahun(e)}
-          options={[
-            { label: '2026', value: '2026' },
-            { label: '2025', value: '2025' },
-            { label: '2024', value: '2024' },
-            { label: '2023', value: '2023' },
-            { label: '2022', value: '2022' },
-          ]}
-        />
-
-        <label htmlFor='triwulan'>s.d Triwulan</label>
-        <InputSearchBox
-          id='triwulan'
-          className='w-24'
-          btnclassName='bg-white'
-          value={triwulan}
-          onChange={(e) => setTriwulan(e)}
-          options={[
-            { label: 'I', value: 'I' },
-            { label: 'II', value: 'II' },
-            { label: 'III', value: 'III' },
-            { label: 'IV', value: 'IV' },
-          ]}
-        />
-      </div>
       <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-2'>
         <div className='flex flex-col px-4 py-6 rounded-lg shadow bg-cyan-600 text-white'>
           <h1>57</h1>

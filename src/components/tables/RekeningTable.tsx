@@ -90,7 +90,7 @@ const RekeningTable = () => {
   }, [searchFields]);
 
   return (
-    <>
+    <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
           <div>
@@ -161,7 +161,7 @@ const RekeningTable = () => {
         subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
         searchFilters={filters}
       />
-    </>
+    </div>
   );
 };
 
