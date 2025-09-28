@@ -1,7 +1,6 @@
-import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import Spinner from '../inputs/Spinner';
+import Spinner from '../../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import {
@@ -10,13 +9,14 @@ import {
   deleteSKPD,
   updateSKPD,
   type SKPDForm,
-} from '../../services/SKPDService';
+} from '../../../services/SKPDService';
 import { useEffect, useState } from 'react';
-import DialogModal from '../inputs/DialogModal';
-import InputButton from '../inputs/InputButton';
-import FormSKPD from '../forms/FormSKPD';
+import DialogModal from '../../inputs/DialogModal';
+import InputButton from '../../inputs/InputButton';
+import FormSKPD from '../../forms/FormSKPD';
 import type { AxiosError } from 'axios';
-import type { ApiResponse } from '../../lib/api';
+import type { ApiResponse } from '../../../lib/api';
+import Tabel from '../Tabel';
 
 const SKPDTable = () => {
   const queryClient = useQueryClient();
@@ -193,39 +193,31 @@ const SKPDTable = () => {
     }),
   ];
 
-  const TableTopbar = () => {
-    return (
-      <>
+  return (
+    <div className='space-y-2'>
+      <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-end'>
-          <button
-            className='table-button w-9 h-9'
+          <InputButton
+            tooltip='Tambah data'
+            className='btn btn-theme w-9 h-9'
             onClick={() => {
               setModalState('Add');
               setOpenModal(true);
             }}
           >
             <MdAdd />
-          </button>
-
-          <button
-            className='table-button w-9 h-9'
+          </InputButton>
+          <InputButton
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
             onClick={() => refetch()}
             disabled={isFetching}
           >
             {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
-          </button>
+          </InputButton>
         </div>
-      </>
-    );
-  };
-
-  return (
-    <>
-      <MainTable
-        data={data || []}
-        columns={columns}
-        tabletop={<TableTopbar />}
-      />
+      </div>
+      <Tabel data={data || []} columns={columns} />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data SKPD'
@@ -316,7 +308,7 @@ const SKPDTable = () => {
           </div>
         </DialogModal>
       )}
-    </>
+    </div>
   );
 };
 

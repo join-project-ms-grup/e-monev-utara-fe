@@ -4,10 +4,9 @@ import MainTable from '../MainTable';
 import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import toast from 'react-hot-toast';
-import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import { exportDaftarDak } from '../../../services/ExcelService';
+import Tabel from '../Tabel';
 
 interface DaftarDAKType {
   no: number;
@@ -137,13 +136,31 @@ export const DaftarDakTable = () => {
   };
 
   return (
-    <>
-      <MainTable
-        data={data}
-        columns={columns}
-        sorting={false}
-        tabletop={<TableTopbar />}
-      />
-    </>
+    <div className='space-y-2'>
+      <div className='flex gap-2 justify-between'>
+        <div className='inline-flex flex-1 gap-2 justify-end'>
+          <InputButton
+            tooltip='Print'
+            className='btn btn-theme w-9 h-9'
+            onClick={() => {
+              toast.success('Printing...');
+              exportDaftarDak(data, tahunDAK);
+            }}
+          >
+            <MdPrint />
+          </InputButton>
+          <InputButton
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
+            // onClick={() => refetch()}
+            // disabled={isFetching}
+          >
+            {/* {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />} */}
+            <MdRefresh />
+          </InputButton>
+        </div>
+      </div>
+      <Tabel data={data} columns={columns} sorting={false} />
+    </div>
   );
 };

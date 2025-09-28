@@ -1,23 +1,23 @@
-import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import Spinner from '../inputs/Spinner';
+import Spinner from '../../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
-import DialogModal from '../inputs/DialogModal';
-import InputButton from '../inputs/InputButton';
+import DialogModal from '../../inputs/DialogModal';
+import InputButton from '../../inputs/InputButton';
 import type { AxiosError } from 'axios';
-import type { ApiResponse } from '../../lib/api';
-import { getRoleId } from '../../lib/usercookie';
+import type { ApiResponse } from '../../../lib/api';
+import { getRoleId } from '../../../lib/usercookie';
 import {
   addPeriode,
   deletePeriode,
   getPeriode,
   updatePeriode,
   type PeriodeForm,
-} from '../../services/PeriodeService';
-import FormPeriode from '../forms/FormPeriode';
+} from '../../../services/PeriodeService';
+import FormPeriode from '../../forms/FormPeriode';
+import Tabel from '../Tabel';
 
 const PeriodeTable = () => {
   const queryClient = useQueryClient();
@@ -195,41 +195,34 @@ const PeriodeTable = () => {
     }),
   ];
 
-  const TableTopbar = () => {
-    return (
-      <>
+  return (
+    <div className='space-y-2'>
+      <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-end'>
           {getRoleId() === 1 && (
-            <button
-              className='table-button w-9 h-9'
+            <InputButton
+              tooltip='Tambah data'
+              className='btn btn-theme w-9 h-9'
               onClick={() => {
                 setModalState('Add');
                 setOpenModal(true);
               }}
             >
               <MdAdd />
-            </button>
+            </InputButton>
           )}
 
-          <button
-            className='table-button w-9 h-9'
+          <InputButton
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
             onClick={() => refetch()}
             disabled={isFetching}
           >
             {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
-          </button>
+          </InputButton>
         </div>
-      </>
-    );
-  };
-
-  return (
-    <>
-      <MainTable
-        data={data || []}
-        columns={columns}
-        tabletop={<TableTopbar />}
-      />
+      </div>
+      <Tabel data={data || []} columns={columns} />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data Periode'
@@ -323,7 +316,7 @@ const PeriodeTable = () => {
           </div>
         </DialogModal>
       )}
-    </>
+    </div>
   );
 };
 

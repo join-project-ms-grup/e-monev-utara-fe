@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
-import RoleTable from '../../../components/tables/RoleTable';
+import RoleTable from '../../../components/tables/master/RoleTable';
 import { getRoleId } from '../../../lib/usercookie';
 import toast from 'react-hot-toast';
 

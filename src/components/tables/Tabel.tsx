@@ -19,6 +19,7 @@ import {
 } from 'react-icons/md';
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import Pagination from './Pagination';
+import clsx from 'clsx';
 
 interface MainTableProps<TData> {
   sorting?: boolean;
@@ -29,6 +30,7 @@ interface MainTableProps<TData> {
   columns: ColumnDef<TData, any>[];
   tabletop?: ReactNode;
   searchFilters?: { field: string; value: string }[];
+  tblClassName?: string;
 }
 
 declare module '@tanstack/react-table' {
@@ -49,6 +51,7 @@ const Tabel = <TData,>({
   subLabels,
   subLabelPosition,
   searchFilters,
+  tblClassName,
 }: MainTableProps<TData & { group?: string }>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -93,117 +96,126 @@ const Tabel = <TData,>({
     },
   });
 
+  const tableClass = clsx(tblClassName, 'w-full');
+
   return (
-    <div>
+    <div className=''>
       {tabletop && (
         <>
           <div className='flex mb-2'>{tabletop}</div>
         </>
       )}
-      <table className='table-auto table-responsive'>
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => {
-            return (
-              <tr key={headerGroup.id} id={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  const meta = header.column.columnDef.meta || {};
-                  const rowSpan = meta.rowSpan ?? 1;
-                  if (meta.hidden) return null;
-                  return (
-                    <th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      rowSpan={rowSpan}
-                      {...(meta.thClassNames
-                        ? {
-                            className: meta.thClassNames,
-                          }
-                        : {})}
-                    >
-                      <div
-                        {...{
-                          className: header.column.getCanSort()
-                            ? 'flex flex-row justify-center items-center'
-                            : '',
-                          onClick: header.column.getToggleSortingHandler(),
-                        }}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                        {{
-                          asc: <MdArrowDropUp />,
-                          desc: <MdArrowDropDown />,
-                        }[header.column.getIsSorted() as string] ?? null}
-                      </div>
-                    </th>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.length > 0 ? (
-            table.getRowModel().rows.map((row) => {
-              const label = subLabels?.[row.depth];
+      <div className='table-responsive'>
+        <table className={tableClass || undefined}>
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => {
               return (
-                <Fragment key={row.id}>
-                  <tr>
-                    {row.getVisibleCells().map((cell) => (
-                      <td
-                        key={cell.id}
-                        {...(cell.column.columnDef.meta?.tdClassNames
+                <tr key={headerGroup.id} id={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    const meta = header.column.columnDef.meta || {};
+                    const rowSpan = meta.rowSpan ?? 1;
+                    if (meta.hidden) return null;
+                    return (
+                      <th
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        rowSpan={rowSpan}
+                        {...(meta.thClassNames
                           ? {
-                              className:
-                                cell.column.columnDef.meta.tdClassNames,
+                              className: meta.thClassNames,
                             }
                           : {})}
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-
-                  {row.getIsExpanded() && (
-                    <>
-                      <tr>
-                        <td colSpan={table.getAllLeafColumns().length - (subLabelPosition ?? 1)}></td>
-                        <td colSpan={subLabelPosition}>
-                          <strong
-                            className='inline-flex'
-                            style={{
-                              paddingLeft: `${row.depth * 1}rem`,
-                            }}
-                          >
-                            <MdSubdirectoryArrowRight />
-                            {label}
-                          </strong>
-                        </td>
-                      </tr>
-                    </>
-                  )}
-                </Fragment>
+                        <div
+                          {...{
+                            className: header.column.getCanSort()
+                              ? 'flex flex-row justify-center items-center'
+                              : '',
+                            onClick: header.column.getToggleSortingHandler(),
+                          }}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                          {{
+                            asc: <MdArrowDropUp />,
+                            desc: <MdArrowDropDown />,
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
               );
-            })
-          ) : (
-            <tr>
-              <td
-                colSpan={table.getAllColumns().length}
-                className='text-center py-4'
-              >
-                Tidak ada data
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            })}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row) => {
+                const label = subLabels?.[row.depth];
+                return (
+                  <Fragment key={row.id}>
+                    <tr>
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          {...(cell.column.columnDef.meta?.tdClassNames
+                            ? {
+                                className:
+                                  cell.column.columnDef.meta.tdClassNames,
+                              }
+                            : {})}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+
+                    {row.getIsExpanded() && (
+                      <>
+                        <tr>
+                          <td
+                            colSpan={
+                              table.getAllLeafColumns().length -
+                              (subLabelPosition ?? 1)
+                            }
+                          ></td>
+                          <td colSpan={subLabelPosition}>
+                            <strong
+                              className='inline-flex'
+                              style={{
+                                paddingLeft: `${row.depth * 1}rem`,
+                              }}
+                            >
+                              <MdSubdirectoryArrowRight />
+                              {label}
+                            </strong>
+                          </td>
+                        </tr>
+                      </>
+                    )}
+                  </Fragment>
+                );
+              })
+            ) : (
+              <tr>
+                <td
+                  colSpan={table.getAllLeafColumns().length}
+                  className='text-center py-4'
+                >
+                  Tidak ada data
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       <Pagination table={table} />
     </div>
   );

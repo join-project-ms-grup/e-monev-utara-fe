@@ -28,7 +28,7 @@ const InputToggle = ({
   };
 
   return (
-    <label className={`h-10 toggle-switch ${disabled ? 'disabled' : ''}`}>
+    <label className={`h-9 toggle-switch ${disabled ? 'disabled' : ''}`}>
       <input
         type='checkbox'
         id={id}

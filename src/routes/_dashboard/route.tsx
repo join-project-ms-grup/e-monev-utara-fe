@@ -27,7 +27,7 @@ function RouteComponent() {
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Main Content */}
-        <div className='flex-1 flex flex-col'>
+        <div className='flex-1 flex flex-col min-w-0'>
           {/* Topbar */}
           <TopBar toggleSidebar={toggleSidebar} />
 

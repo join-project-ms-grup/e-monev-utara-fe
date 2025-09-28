@@ -34,7 +34,7 @@ const InputText = ({
     }
   };
   return (
-    <div className={`${wrapperClassname} bg-white shadow input-wrapper h-10 inline-flex`}>
+    <div className={`${wrapperClassname} bg-white shadow input-wrapper h-9 inline-flex`}>
       {Icon && <Icon className='text-4xl h-full pl-2' />}
       <input
         type={type}

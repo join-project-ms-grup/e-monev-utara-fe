@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import RowExpand from './RowExpand';
 import RowExpandValue from './RowExpandValue';
 import toast from 'react-hot-toast';
-import { MdPrint } from 'react-icons/md';
+import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../inputs/InputButton';
 import { exportRankingRKPD } from '../../services/ExcelService';
 import InputSearchBox from '../inputs/InputSearchBox';
@@ -118,7 +118,7 @@ const DashRKPDTable = () => {
             <label htmlFor='tahun'>Tahun</label>
             <InputSearchBox
               id='tahun'
-              className='w-24'
+              className='w-24 h-9'
               btnclassName='bg-white'
               value={tahun}
               onChange={(e) => setTahun(e)}
@@ -135,7 +135,7 @@ const DashRKPDTable = () => {
             <label htmlFor='triwulan'>s.d Triwulan</label>
             <InputSearchBox
               id='triwulan'
-              className='w-24'
+              className='w-24 h-9'
               btnclassName='bg-white'
               value={triwulan}
               onChange={(e) => setTriwulan(e)}
@@ -148,16 +148,27 @@ const DashRKPDTable = () => {
             />
           </div>
         </div>
-        <InputButton
-          tooltip='Print'
-          className='btn btn-theme w-9 h-9'
-          onClick={() => {
-            toast.success('Printing...');
-            exportRankingRKPD([], '2025');
-          }}
-        >
-          <MdPrint />
-        </InputButton>
+        <div className='inline-flex gap-2'>
+          <InputButton
+            tooltip='Print'
+            className='btn btn-theme w-9 h-9'
+            onClick={() => {
+              toast.success('Printing...');
+              exportRankingRKPD([], '2025');
+            }}
+          >
+            <MdPrint />
+          </InputButton>
+          <InputButton
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
+            // onClick={() => refetch()}
+            // disabled={isFetching}
+          >
+            {/* {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />} */}
+            <MdRefresh />
+          </InputButton>
+        </div>
       </div>
       <Tabel
         subRows={subRows}

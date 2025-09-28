@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
+import RealisasiTable from '../../../components/tables/rkpd/RealisasiTable';
 
 export const Route = createFileRoute('/_dashboard/rkpd/realisasi')({
   head: () => ({
@@ -18,8 +19,7 @@ export const Route = createFileRoute('/_dashboard/rkpd/realisasi')({
 function RouteComponent() {
   return (
     <>
-      <h4>Realisasi</h4>
-      <span>Ini halaman realisasi</span>
+      <RealisasiTable />
     </>
   );
 }

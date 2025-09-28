@@ -38,3 +38,62 @@ const fakeRKPDDashboard = faker.helpers
 export const fakeRKPDDashboardData = [...fakeRKPDDashboard].sort(
     (a, b) => a.ranking - b.ranking
 );
+
+export const fakeRealisasi = [
+    {
+        sasaran: 'Sasaran',
+        kode: '1.0.1',
+        name: faker.lorem.sentence(),
+        indikator: 'Indikator',
+        trFisik: '72%',
+        trRp: 'Rp.0',
+        rrFisik: '0 Unit',
+        rrRp: 'Rp. 0',
+        tkFisik: '96%',
+        tkRp: 'Rp. 0',
+        penanggung: 'Dinas Penanggung',
+    },
+]
+
+export const fakeTaggingIku = [
+    {
+        iku: faker.lorem.sentence(),
+        level: 'Sasaran',
+        satuan: 'Poin',
+        kondisiAwal: '52,5',
+        2022: '52,5',
+        2023: '52,5',
+        2024: '52,5',
+        2025: '52,5',
+        2026: '52,5',
+    },
+]
+
+export const fakeIku = [
+    {
+        sasaran: 'Sasaran',
+        iku: faker.lorem.sentence(),
+        deskform: '',
+        satuan: 'Poin',
+        kondisiAwal: '52,5',
+        2022: '52,5',
+        2023: '52,5',
+        2024: '52,5',
+        2025: '52,5',
+        2026: '52,5',
+    },
+]
+
+export const fakeCapaianIku = [
+    {
+        sasaran: 'Sasaran',
+        iku: faker.lorem.sentence(),
+        satuan: 'Poin',
+        targetTahunan: '52,5',
+        triwulan: 'Triwulan 1',
+        target: '',
+        realisasi: '',
+        capaian: '0',
+        keterangan: '',
+    },
+]

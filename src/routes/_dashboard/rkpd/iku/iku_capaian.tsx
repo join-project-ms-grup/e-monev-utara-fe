@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_NAME } from '../../../../lib/config'
+import CapaianIKUTable from '../../../../components/tables/rkpd/iku/CapaianIKUTable'
 
 export const Route = createFileRoute('/_dashboard/rkpd/iku/iku_capaian')({
     head: () => ({
@@ -18,8 +19,7 @@ export const Route = createFileRoute('/_dashboard/rkpd/iku/iku_capaian')({
 function RouteComponent() {
     return (
         <>
-            <h4>Indikator Kinerja Utama - Capaian Indikator IKU</h4>
-            <span>Ini halaman indikator kinerja utama capaian indikator iku</span>
+            <CapaianIKUTable />
         </>
     )
 }

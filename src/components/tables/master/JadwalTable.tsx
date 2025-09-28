@@ -1,7 +1,7 @@
-import { jadwalDummy, type JadwalType } from '../../dummy/dummy_data';
+import { jadwalDummy, type JadwalType } from '../../../dummy/dummy_data';
 import { createColumnHelper } from '@tanstack/react-table';
 import { MdNewspaper } from 'react-icons/md';
-import MainTable from './MainTable';
+import MainTable from '../MainTable';
 
 const JadwalTable = () => {
   const columnHelper = createColumnHelper<JadwalType>();

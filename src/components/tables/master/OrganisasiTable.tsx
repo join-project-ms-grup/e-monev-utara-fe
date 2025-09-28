@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { organisasiDummy, type OrganisasiType } from '../../dummy/dummy_data';
+import { organisasiDummy, type OrganisasiType } from '../../../dummy/dummy_data';
 import {
   createColumnHelper,
   flexRender,
@@ -14,8 +14,8 @@ import {
   MdArrowDropDown,
   MdArrowDropUp,
 } from 'react-icons/md';
-import InputSearchBox from '../inputs/InputSearchBox';
-import Pagination from './Pagination';
+import InputSearchBox from '../../inputs/InputSearchBox';
+import Pagination from '../Pagination';
 
 const OrganisasiTable = () => {
   const columnHelper = createColumnHelper<OrganisasiType>();

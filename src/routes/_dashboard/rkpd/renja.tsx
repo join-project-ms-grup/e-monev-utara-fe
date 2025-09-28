@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
+import RenjaTable from '../../../components/tables/rkpd/RenjaTable';
 
 export const Route = createFileRoute('/_dashboard/rkpd/renja')({
   head: () => ({
@@ -18,8 +19,7 @@ export const Route = createFileRoute('/_dashboard/rkpd/renja')({
 function RouteComponent() {
   return (
     <>
-      <h4>Renja</h4>
-      <span>Ini halaman renja</span>
+      <RenjaTable />
     </>
   );
 }

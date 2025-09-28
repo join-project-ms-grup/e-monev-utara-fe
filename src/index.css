@@ -167,9 +167,8 @@ a:hover {
   overflow-x: auto;
 }
 .table-responsive table {
-  width: 100%;
   border-collapse: collapse;
-  min-width: 600px;
+  table-layout: auto;
 }
 .table-responsive tbody {
   border-bottom: 2px solid var(--color-2);

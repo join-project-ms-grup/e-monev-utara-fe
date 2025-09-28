@@ -3,17 +3,17 @@ import {
   getRekening,
   type MasterTree,
   type MasterUrusan,
-} from '../../services/MasterService';
+} from '../../../services/MasterService';
 import { createColumnHelper } from '@tanstack/react-table';
 import { MdRefresh } from 'react-icons/md';
-import Tabel from './Tabel';
-import Spinner from '../inputs/Spinner';
-import InputButton from '../inputs/InputButton';
-import InputSearchBox from '../inputs/InputSearchBox';
+import Tabel from '../Tabel';
+import Spinner from '../../inputs/Spinner';
+import InputButton from '../../inputs/InputButton';
+import InputSearchBox from '../../inputs/InputSearchBox';
 import { useEffect, useState } from 'react';
-import InputText from '../inputs/InputText';
-import RowExpand from './RowExpand';
-import RowExpandValue from './RowExpandValue';
+import InputText from '../../inputs/InputText';
+import RowExpand from '../RowExpand';
+import RowExpandValue from '../RowExpandValue';
 
 const RekeningTable = () => {
   const { data, refetch, isFetching } = useQuery({
@@ -123,7 +123,7 @@ const RekeningTable = () => {
             <label htmlFor='rekening'>Rekening</label>
             <InputSearchBox
               id='rekening'
-              className='w-44'
+              className='w-44 h-9'
               btnclassName='bg-white'
               placeholder='Pilih rekening...'
               value={searchFields.rekening}
@@ -146,7 +146,8 @@ const RekeningTable = () => {
         </div>
         <div className='flex justify-end items-end'>
           <InputButton
-            className='h-9 w-9'
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
             onClick={() => refetch()}
             disabled={isFetching}
           >

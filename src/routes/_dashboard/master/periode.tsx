@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_NAME } from '../../../lib/config';
-import PeriodeTable from '../../../components/tables/PeriodeTable';
+import PeriodeTable from '../../../components/tables/master/PeriodeTable';
 
 export const Route = createFileRoute('/_dashboard/master/periode')({
   head: () => ({

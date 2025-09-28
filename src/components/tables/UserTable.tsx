@@ -1,4 +1,3 @@
-import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import {
@@ -20,6 +19,7 @@ import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
 import { FormUser } from '../forms/FormUser';
 import InputToggle from '../inputs/InputToggle';
+import Tabel from './Tabel';
 
 const UserTable = () => {
   const queryClient = useQueryClient();
@@ -230,39 +230,31 @@ const UserTable = () => {
     }),
   ];
 
-  const TableTopbar = () => {
-    return (
-      <>
+  return (
+    <div className='space-y-2'>
+      <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-end'>
-          <button
-            className='table-button w-9 h-9'
+          <InputButton
+            tooltip='Tambah data'
+            className='btn btn-theme w-9 h-9'
             onClick={() => {
               setModalState('Add');
               setOpenModal(true);
             }}
           >
             <MdAdd />
-          </button>
-
-          <button
-            className='table-button w-9 h-9'
+          </InputButton>
+          <InputButton
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
             onClick={() => refetch()}
             disabled={isFetching}
           >
             {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
-          </button>
+          </InputButton>
         </div>
-      </>
-    );
-  };
-
-  return (
-    <>
-      <MainTable
-        data={data || []}
-        columns={columns}
-        tabletop={<TableTopbar />}
-      />
+      </div>
+      <Tabel data={data || []} columns={columns} />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data User'
@@ -351,7 +343,7 @@ const UserTable = () => {
           </div>
         </DialogModal>
       )}
-    </>
+    </div>
   );
 };
 

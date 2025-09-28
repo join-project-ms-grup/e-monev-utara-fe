@@ -1,12 +1,11 @@
-import MainTable from './MainTable';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
-import Spinner from '../inputs/Spinner';
+import Spinner from '../../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
-import DialogModal from '../inputs/DialogModal';
-import InputButton from '../inputs/InputButton';
+import DialogModal from '../../inputs/DialogModal';
+import InputButton from '../../inputs/InputButton';
 import {
   addRole,
   deleteRole,
@@ -14,11 +13,12 @@ import {
   getRoleDev,
   updateRole,
   type RoleForm,
-} from '../../services/RoleService';
-import FormRole from '../forms/FormRole';
+} from '../../../services/RoleService';
+import FormRole from '../../forms/FormRole';
 import type { AxiosError } from 'axios';
-import type { ApiResponse } from '../../lib/api';
-import { getRoleId } from '../../lib/usercookie';
+import type { ApiResponse } from '../../../lib/api';
+import { getRoleId } from '../../../lib/usercookie';
+import Tabel from '../Tabel';
 
 const RoleTable = () => {
   const queryClient = useQueryClient();
@@ -211,12 +211,33 @@ const RoleTable = () => {
   };
 
   return (
-    <>
-      <MainTable
-        data={data || []}
-        columns={columns}
-        tabletop={<TableTopbar />}
-      />
+    <div className='space-y-2'>
+      <div className='flex gap-2 justify-between'>
+        <div className='inline-flex flex-1 gap-2 justify-end'>
+          {getRoleId() === 1 && (
+            <InputButton
+              tooltip='Tambah data'
+              className='btn btn-theme w-9 h-9'
+              onClick={() => {
+                setModalState('Add');
+                setOpenModal(true);
+              }}
+            >
+              <MdAdd />
+            </InputButton>
+          )}
+
+          <InputButton
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+          </InputButton>
+        </div>
+      </div>
+      <Tabel data={data || []} columns={columns} />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data Role'
@@ -301,7 +322,7 @@ const RoleTable = () => {
           </div>
         </DialogModal>
       )}
-    </>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import RekeningTable from '../../../components/tables/RekeningTable';
+import RekeningTable from '../../../components/tables/master/RekeningTable';
 import { SITE_NAME } from '../../../lib/config';
 
 export const Route = createFileRoute('/_dashboard/master/rekening')({
