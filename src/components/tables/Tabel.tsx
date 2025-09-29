@@ -28,6 +28,12 @@ interface MainTableProps<TData> {
   subLabels?: string[];
   subLabelPosition?: number;
   columns: ColumnDef<TData, any>[];
+  renderHeader?: (
+    table: ReturnType<typeof useReactTable<TData>>,
+  ) => React.ReactNode;
+  renderBody?: (
+    table: ReturnType<typeof useReactTable<TData>>,
+  ) => React.ReactNode;
   tabletop?: ReactNode;
   searchFilters?: { field: string; value: string }[];
   tblClassName?: string;
@@ -46,6 +52,8 @@ const Tabel = <TData,>({
   sorting = true,
   data,
   columns,
+  renderHeader,
+  renderBody,
   tabletop,
   subRows,
   subLabels,
@@ -108,52 +116,57 @@ const Tabel = <TData,>({
       <div className='table-responsive'>
         <table className={tableClass || undefined}>
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => {
-              return (
-                <tr key={headerGroup.id} id={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    const meta = header.column.columnDef.meta || {};
-                    const rowSpan = meta.rowSpan ?? 1;
-                    if (meta.hidden) return null;
-                    return (
-                      <th
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        rowSpan={rowSpan}
-                        {...(meta.thClassNames
-                          ? {
-                              className: meta.thClassNames,
-                            }
-                          : {})}
-                      >
-                        <div
-                          {...{
-                            className: header.column.getCanSort()
-                              ? 'flex flex-row justify-center items-center'
-                              : '',
-                            onClick: header.column.getToggleSortingHandler(),
-                          }}
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                          {{
-                            asc: <MdArrowDropUp />,
-                            desc: <MdArrowDropDown />,
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </div>
-                      </th>
-                    );
-                  })}
-                </tr>
-              );
-            })}
+            {renderHeader
+              ? renderHeader(table)
+              : table.getHeaderGroups().map((headerGroup) => {
+                  return (
+                    <tr key={headerGroup.id} id={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        const meta = header.column.columnDef.meta || {};
+                        const rowSpan = meta.rowSpan ?? 1;
+                        if (meta.hidden) return null;
+                        return (
+                          <th
+                            key={header.id}
+                            colSpan={header.colSpan}
+                            rowSpan={rowSpan}
+                            {...(meta.thClassNames
+                              ? {
+                                  className: meta.thClassNames,
+                                }
+                              : {})}
+                          >
+                            <div
+                              {...{
+                                className: header.column.getCanSort()
+                                  ? 'flex flex-row justify-center items-center'
+                                  : '',
+                                onClick:
+                                  header.column.getToggleSortingHandler(),
+                              }}
+                            >
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+                              {{
+                                asc: <MdArrowDropUp />,
+                                desc: <MdArrowDropDown />,
+                              }[header.column.getIsSorted() as string] ?? null}
+                            </div>
+                          </th>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
           </thead>
           <tbody>
-            {table.getRowModel().rows.length > 0 ? (
+            {renderBody ? (
+              renderBody(table)
+            ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => {
                 const label = subLabels?.[row.depth];
                 return (

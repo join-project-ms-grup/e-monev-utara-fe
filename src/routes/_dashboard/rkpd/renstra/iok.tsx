@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_NAME } from '../../../../lib/config'
+import IOKTable from '../../../../components/tables/rkpd/renstra/IOKTable'
 
 export const Route = createFileRoute('/_dashboard/rkpd/renstra/iok')({
     head: () => ({
@@ -18,8 +19,7 @@ export const Route = createFileRoute('/_dashboard/rkpd/renstra/iok')({
 function RouteComponent() {
     return (
         <>
-            <h4>Indikator Output Kegiatan</h4>
-            <span>Ini halaman indikator output kegiatan</span>
+            <IOKTable />
         </>
     )
 }
