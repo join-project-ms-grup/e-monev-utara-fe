@@ -1,7 +1,7 @@
 import type { ColumnDef, Table } from '@tanstack/react-table';
 import Tabel from '../../Tabel';
-import React, { useState } from 'react';
-import { MdEdit, MdRefresh } from 'react-icons/md';
+import { useState } from 'react';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox from '../../../inputs/InputSearchBox';
 

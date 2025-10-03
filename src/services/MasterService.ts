@@ -119,3 +119,19 @@ export const getMasterRaw = async (payload: MasterFilter): Promise<MasterUrusan[
   console.log(data)
   return data
 };
+
+/**
+ * Menambahkan data master
+ */
+export const addPeriode = async (payload: Master): Promise<Master> => {
+    const response = await api.post<ApiResponse<Master>>("/master/add", payload);
+    return response.data.data;
+};
+
+/**
+ * Update data master
+ */
+export const updatePeriode = async (id: number, payload: Master): Promise<Master> => {
+    const response = await api.put<ApiResponse<Master>>(`/master/update/${id}`, payload);
+    return response.data.data;
+};

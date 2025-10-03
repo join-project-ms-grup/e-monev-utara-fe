@@ -1,6 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { useState } from 'react';
-import MainTable from '../MainTable';
 import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import toast from 'react-hot-toast';
@@ -85,60 +84,29 @@ export const DaftarDakTable = () => {
     },
   ];
 
-  const TableTopbar = () => {
-    return (
-      <>
-        <div className='inline-flex flex-1 gap-1 justify-between'>
-          <div className='inline-flex items-center gap-1'>
-            <label htmlFor='tahun'>Tahun</label>
-            <InputSearchBox
-              id='tahun'
-              className='h-9'
-              //   defaultValue='2025'
-              value={tahunDAK}
-              onChange={(value) => {
-                setTahunDAK(value);
-              }}
-              options={[
-                { label: '2020', value: '2020' },
-                { label: '2021', value: '2021' },
-                { label: '2022', value: '2022' },
-                { label: '2023', value: '2023' },
-                { label: '2024', value: '2024' },
-                { label: '2025', value: '2025' },
-              ]}
-            />
-          </div>
-          <div className='inline-flex flex-1 gap-1 justify-end'>
-            <InputButton
-              tooltip='Print'
-              className='btn btn-theme w-9 h-9'
-              onClick={() => {
-                toast.success('Printing...');
-                exportDaftarDak(data, tahunDAK);
-              }}
-            >
-              <MdPrint />
-            </InputButton>
-            <InputButton
-              tooltip='Refresh'
-              className='btn btn-theme w-9 h-9'
-              onClick={() => toast.success('Refreshing...')}
-              // disabled={isFetching}
-            >
-              {/* {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />} */}
-              <MdRefresh />
-            </InputButton>
-          </div>
-        </div>
-      </>
-    );
-  };
-
   return (
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
-        <div className='inline-flex flex-1 gap-2 justify-end'>
+        <div className='inline-flex gap-2'>
+          <div>
+            <label htmlFor='tahun'>Tahun</label>
+            <InputSearchBox
+              id='tahun'
+              className='w-24 h-9'
+              btnclassName='bg-white'
+              value={tahunDAK}
+              onChange={(val) => setTahunDAK(val)}
+              options={[
+                { label: '2026', value: '2026' },
+                { label: '2025', value: '2025' },
+                { label: '2024', value: '2024' },
+                { label: '2023', value: '2023' },
+                { label: '2022', value: '2022' },
+              ]}
+            />
+          </div>
+        </div>
+        <div className='flex justify-end items-end gap-2'>
           <InputButton
             tooltip='Print'
             className='btn btn-theme w-9 h-9'
