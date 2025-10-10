@@ -97,22 +97,26 @@ export default function InputSearchBox({
     'focus:outline-none',
     `after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-gray-200 after:transition-all after:opacity-100`,
     'focus:after:bg-[var(--color-2)] focus:after:opacity-50',
+    `${disabled ? 'opacity-60' : ''}`,
   );
   const menuClass = clsx(
     '[--anchor-gap:0] [--anchor-max-height:12rem] w-(--button-width) p-1 bg-gray-50 rounded-b shadow-lg focus-visible:outline-0 z-[9999]',
   );
 
   return (
-    <div
-      className={wrapperClass}
-      {...(tooltip && {
-        'data-tooltip-id': 'tooltip',
-        'data-tooltip-content': currentLabel,
-      })}
-    >
+    <div className={wrapperClass}>
       {/* <label htmlFor="">test</label> */}
       <Listbox value={currentValue} onChange={handleChange} disabled={disabled}>
-        <ListboxButton id={id} ref={buttonRef} className={btnClass}>
+        <ListboxButton
+          id={id}
+          ref={buttonRef}
+          className={btnClass}
+          {...(tooltip &&
+            currentValue && {
+              'data-tooltip-id': 'tooltip',
+              'data-tooltip-content': currentLabel,
+            })}
+        >
           <span
             className={`truncate flex-1 text-left ${!currentValue && 'text-gray-400'}`}
           >
@@ -125,6 +129,7 @@ export default function InputSearchBox({
         </ListboxButton>
         {withClear && currentValue !== '' && (
           <button
+            type='button'
             className='bg-white transition-all text-red-500 hover:text-red-400 px-1'
             onClick={onClear}
           >
@@ -138,18 +143,20 @@ export default function InputSearchBox({
               placeholder='Cari...'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.stopPropagation()}
               className='w-full rounded border px-2 py-1 mb-2 text-sm'
             />
           )}
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option) => (
+          {filteredOptions.length > 1 ? (
+            filteredOptions.map((option, index) => (
               <ListboxOption
-                {...(tooltip && {
-                  'data-tooltip-id': 'tooltip',
-                  'data-tooltip-content': option.label,
-                })}
+                {...(tooltip &&
+                  option.value && {
+                    'data-tooltip-id': 'tooltip',
+                    'data-tooltip-content': option.label,
+                  })}
                 disabled={option.value === ''}
-                key={String(option.value)}
+                key={index}
                 value={option.value}
                 className={`truncate data-focus:bg-[var(--color-2)] data-focus:text-[var(--text-3)] cursor-pointer py-1 px-2 rounded ${
                   option.value === '' ? 'text-gray-400' : ''

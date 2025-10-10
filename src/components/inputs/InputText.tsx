@@ -39,6 +39,7 @@ const InputText = ({
       <input
         type={type}
         {...props}
+        value={props.value ?? ''}
         inputMode={inputMode}
         onBeforeInput={handleBeforeInput}
         className='h-full'

@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  addMaster,
   getRekening,
+  updateMaster,
   type Master,
   type MasterTree,
   type MasterUrusan,
 } from '../../../services/MasterService';
 import { type ColumnDef } from '@tanstack/react-table';
-import { MdAdd, MdRefresh } from 'react-icons/md';
+import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import Tabel from '../Tabel';
 import Spinner from '../../inputs/Spinner';
 import InputButton from '../../inputs/InputButton';
@@ -21,88 +23,7 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import FormRekening from '../../forms/FormRekening';
-
-// const columnHelper = createColumnHelper<MasterUrusan>();
-// const columns = [
-//   columnHelper.display({
-//     header: ' ',
-//     meta: {
-//       thClassNames: 'w-[5%]',
-//       tdClassNames: 'flex items-center justify-center',
-//     },
-//     cell: (ctx) => <RowExpand {...ctx} />,
-//   }),
-//   columnHelper.display({
-//     header: '#',
-//     cell: ({ row }) => `${row.index + 1}`,
-//     meta: {
-//       thClassNames: 'w-[5%]',
-//       tdClassNames: 'text-center',
-//     },
-//   }),
-//   columnHelper.accessor('kode', {
-//     header: 'Kode',
-//     meta: {
-//       thClassNames: 'w-[10%]',
-//       tdClassNames: 'text-center',
-//     },
-//   }),
-//   columnHelper.accessor('rekening', {
-//     header: 'Rekening',
-//     enableSorting: false,
-//     filterFn: 'equalsString',
-//     meta: {
-//       thClassNames: 'w-[10%]',
-//       tdClassNames: 'text-center capitalize',
-//     },
-//   }),
-//   columnHelper.accessor('name', {
-//     header: 'Nama',
-//     cell: (ctx) => <RowExpandValue {...ctx} />,
-//   }),
-// ];
-
-const columns: ColumnDef<MasterUrusan>[] = [
-  {
-    header: ' ',
-    cell: (ctx) => <RowExpand {...ctx} />,
-    meta: {
-      thClassNames: 'w-[60px]',
-      tdClassNames: 'text-center',
-    },
-  },
-  {
-    header: 'No',
-    cell: ({ row }) => `${row.index + 1}`,
-    meta: {
-      thClassNames: 'w-[60px]',
-      tdClassNames: 'text-center',
-    },
-  },
-  {
-    accessorKey: 'kode',
-    header: 'Kode',
-    meta: {
-      thClassNames: 'w-[150px]',
-      tdClassNames: 'text-center',
-    },
-  },
-  {
-    accessorKey: 'rekening',
-    header: 'Rekening',
-    enableSorting: false,
-    filterFn: 'equalsString',
-    meta: {
-      thClassNames: 'w-[200px]',
-      tdClassNames: 'text-center capitalize',
-    },
-  },
-  {
-    accessorKey: 'name',
-    header: 'Nama',
-    cell: (ctx) => <RowExpandValue {...ctx} />,
-  },
-];
+import AksiButton from '../../inputs/AksiButton';
 
 const RekeningTable = () => {
   const queryClient = useQueryClient();
@@ -113,14 +34,15 @@ const RekeningTable = () => {
   const [openModal, setOpenModal] = useState(false);
 
   // Form Data
-  const initialFormData: any = {
+  const initialFormData: Master = {
     id: Number(''),
-    mulai: '',
-    akhir: '',
-    status: false,
+    kode: '',
+    name: '',
+    parent: '',
+    rekening: '',
   };
 
-  const [formData, setFormData] = useState<any>(initialFormData);
+  const [formData, setFormData] = useState<Master>(initialFormData);
   // Clear form
   useEffect(() => {
     if (!openModal) {
@@ -151,13 +73,13 @@ const RekeningTable = () => {
 
   // Add
   const addMutation = useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: Master) => {
       setLoadingMutation(true);
       console.log(payload)
-      // return addPeriode(payload);
+      return addMaster(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_periode'] });
+      queryClient.invalidateQueries({ queryKey: ['tabel_rekening'] });
       setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
@@ -173,19 +95,12 @@ const RekeningTable = () => {
   });
   // Update
   const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: any;
-    }) => {
+    mutationFn: async ({ id, payload }: { id: number; payload: Master }) => {
       setLoadingMutation(true);
-      console.log(id, payload);
-      // return updatePeriode(id, payload);
+      return updateMaster(id, payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_periode'] });
+      queryClient.invalidateQueries({ queryKey: ['tabel_rekening'] });
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
@@ -202,7 +117,7 @@ const RekeningTable = () => {
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       setLoadingMutation(true);
-      console.log(id)
+      console.log(id);
       // return deletePeriode(id);
     },
     onSuccess: () => {
@@ -236,6 +151,67 @@ const RekeningTable = () => {
       .map(([field, value]) => ({ field, value }));
     setFilters(newFilters);
   }, [searchFields]);
+
+  const columns: ColumnDef<MasterUrusan>[] = [
+    {
+      header: ' ',
+      cell: (ctx) => <RowExpand {...ctx} />,
+      meta: {
+        thClassNames: 'w-[60px]',
+        tdClassNames: 'text-center',
+      },
+    },
+    {
+      header: 'No',
+      cell: ({ row }) => `${row.index + 1}`,
+      meta: {
+        thClassNames: 'w-[60px]',
+        tdClassNames: 'text-center',
+      },
+    },
+    {
+      accessorKey: 'kode',
+      header: 'Kode',
+      meta: {
+        thClassNames: 'w-[150px]',
+        tdClassNames: 'text-center',
+      },
+    },
+    {
+      accessorKey: 'rekening',
+      header: 'Rekening',
+      enableSorting: false,
+      filterFn: 'equalsString',
+      meta: {
+        thClassNames: 'w-[200px]',
+        tdClassNames: 'text-center capitalize',
+      },
+    },
+    {
+      accessorKey: 'name',
+      header: 'Nama',
+      cell: (ctx) => <RowExpandValue {...ctx} />,
+    },
+    {
+      header: 'Aksi',
+      cell: ({ row }) => (
+        <>
+          <AksiButton
+            Icon={MdEdit}
+            onClick={() => {
+              setModalState('Edit');
+              setFormData(row.original);
+              setOpenModal(true);
+            }}
+          />
+        </>
+      ),
+      meta: {
+        // thClassNames: 'w-[200px]',
+        tdClassNames: 'text-center',
+      },
+    },
+  ];
 
   return (
     <div className='space-y-2'>
@@ -321,6 +297,7 @@ const RekeningTable = () => {
         subRows={subRows}
         subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
         searchFilters={filters}
+        subLabelPosition={2}
       />
       {modalState === 'Add' && (
         <DialogModal
@@ -334,12 +311,13 @@ const RekeningTable = () => {
           <FormRekening
             type='Add'
             defaultValues={formData}
-            onSubmit={(data: Master) => {
+            onSubmit={(data) => {
               console.log('Data dari form modal:', data);
               addMutation.mutate({
                 kode: data.kode,
                 name: data.name,
                 type: data.rekening,
+                parent: data.parent ? Number(data.parent) : null
               });
             }}
           >
@@ -361,18 +339,18 @@ const RekeningTable = () => {
           isOpen={openModal}
           onClose={() => setOpenModal(false)}
         >
-          <></>
-          {/* <FormPeriode
+          <FormRekening
             type='Edit'
-            defaultValues={formData}
+            defaultValues={formData as any}
             onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', data);
+              console.log('Data dari form modal:', payload);
               updateMutation.mutate({
                 id,
                 payload: {
-                  mulai: Number(payload.mulai),
-                  akhir: Number(payload.akhir),
-                  status: payload.status,
+                  kode: payload.kode,
+                  name: payload.name,
+                  type: payload.rekening,
+                  parent: payload.parent! ?? null,
                 },
               });
             }}
@@ -386,7 +364,7 @@ const RekeningTable = () => {
                 Simpan
               </InputButton>
             </div>
-          </FormPeriode> */}
+          </FormRekening>
         </DialogModal>
       )}
       {modalState === 'Delete' && (
@@ -398,7 +376,7 @@ const RekeningTable = () => {
           <p>
             Yakin ingin menghapus data{' '}
             <i>
-              {formData.mulai} - {formData.akhir}
+              {formData.kode}
             </i>{' '}
             ?
           </p>

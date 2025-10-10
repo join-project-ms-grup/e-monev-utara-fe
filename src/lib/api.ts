@@ -27,6 +27,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.code === 'ECONNREFUSED') {
+      toast.error('Tidak bisa terhubung ke server. Pastikan server aktif.');
+    }
+    if (!error.response) {
+      toast.error('Koneksi gagal. Periksa jaringan atau server.');
+    }
     if (error.response?.status === 401) {
       Cookies.remove("token");
       window.location.href = "/auth";

@@ -41,7 +41,7 @@ export interface MasterType {
   kode: string;
   name: string;
   type: string;
-  parent_id: number;
+  parent: number;
 }
 export interface UrusanType extends MasterType {
   bidang: BidangType[];

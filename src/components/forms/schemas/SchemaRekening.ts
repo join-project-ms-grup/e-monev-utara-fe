@@ -8,7 +8,10 @@ export const rekeningSchema = z
         name: z
             .string()
             .optional(),
-        type: z
+        rekening: z
+            .string()
+            .optional(),
+        parent: z
             .string()
             .optional()
     });
@@ -17,5 +20,15 @@ export const rekeningSchemaSubmit = z
     .object({
         kode: z.string().nonempty({ message: 'Field wajib diisi' }),
         name: z.string().nonempty({ message: 'Field wajib diisi' }),
-        type: z.string().nonempty({ message: 'Field wajib diisi' }),
-    });
+        rekening: z.string().nonempty({ message: 'Field wajib diisi' }),
+        parent: z.string().optional(),
+    })
+    .refine(
+        (data) => {
+            return data.rekening === 'urusan' || !!data.parent;
+        },
+        {
+            message: 'Bagian harus di isi lengkap',
+            path: ['parent'],
+        }
+    );

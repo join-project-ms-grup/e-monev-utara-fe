@@ -5,7 +5,8 @@ export interface Master {
   kode?: string | number;
   name?: string;
   rekening?: string;
-  parent_id?: number;
+  parent?: string | number | null;
+  type?: string;
 }
 export interface MasterUrusan extends Master {
   bidang?: MasterBidang[];
@@ -35,19 +36,19 @@ export const getRekening = async (): Promise<MasterUrusan[]> => {
     ...urusan,
     bidang: urusan.bidang?.map((bid) => ({
       rekening: 'bidang',
-      parent_id: urusan.id,
+      parent: urusan.id,
       ...bid,
       program: bid.program?.map((prog) => ({
         rekening: 'program',
-        parent_id: bid.id,
+        parent: bid.id,
         ...prog,
         kegiatan: prog.kegiatan?.map((keg) => ({
           rekening: 'kegiatan',
-          parent_id: prog.id,
+          parent: prog.id,
           ...keg,
           subKegiatan: keg.subKegiatan?.map((subkeg) => ({
             rekening: 'sub kegiatan',
-            parent_id: keg.id,
+            parent: keg.id,
             ...subkeg,
           })),
         })),
@@ -91,19 +92,19 @@ export const getMasterFilter = async (payload: MasterFilter): Promise<MasterUrus
     ...urusan,
     bidang: urusan.bidang?.map((bid) => ({
       rekening: 'bidang',
-      parent_id: urusan.id,
+      parent: urusan.id,
       ...bid,
       program: bid.program?.map((prog) => ({
         rekening: 'program',
-        parent_id: bid.id,
+        parent: bid.id,
         ...prog,
         kegiatan: prog.kegiatan?.map((keg) => ({
           rekening: 'kegiatan',
-          parent_id: prog.id,
+          parent: prog.id,
           ...keg,
           subKegiatan: keg.subKegiatan?.map((subkeg) => ({
             rekening: 'sub kegiatan',
-            parent_id: keg.id,
+            parent: keg.id,
             ...subkeg,
           })),
         })),
@@ -123,7 +124,7 @@ export const getMasterRaw = async (payload: MasterFilter): Promise<MasterUrusan[
 /**
  * Menambahkan data master
  */
-export const addPeriode = async (payload: Master): Promise<Master> => {
+export const addMaster = async (payload: Master): Promise<Master> => {
     const response = await api.post<ApiResponse<Master>>("/master/add", payload);
     return response.data.data;
 };
@@ -131,7 +132,7 @@ export const addPeriode = async (payload: Master): Promise<Master> => {
 /**
  * Update data master
  */
-export const updatePeriode = async (id: number, payload: Master): Promise<Master> => {
+export const updateMaster = async (id: number, payload: Master): Promise<Master> => {
     const response = await api.put<ApiResponse<Master>>(`/master/update/${id}`, payload);
     return response.data.data;
 };

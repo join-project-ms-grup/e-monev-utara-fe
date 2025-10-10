@@ -3,7 +3,7 @@ import type { IconType } from 'react-icons/lib';
 
 interface AksiButton {
   onClick?: () => void;
-  Icon?: IconType;
+  Icon: IconType;
   iconClassName?: string;
   className?: string;
   hoverColor?: string;
