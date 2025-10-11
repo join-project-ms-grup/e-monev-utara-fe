@@ -105,7 +105,6 @@ export default function InputSearchBox({
 
   return (
     <div className={wrapperClass}>
-      {/* <label htmlFor="">test</label> */}
       <Listbox value={currentValue} onChange={handleChange} disabled={disabled}>
         <ListboxButton
           id={id}

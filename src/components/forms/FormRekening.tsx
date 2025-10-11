@@ -22,6 +22,7 @@ interface PilihanParent {
 interface BaseFormProps {
   children?: React.ReactElement;
   defaultValues: Master;
+  indukRekening?: any;
 }
 
 interface FormAddProps extends BaseFormProps {
@@ -41,6 +42,7 @@ const FormRekening: React.FC<FormProps> = ({
   children,
   onSubmit,
   defaultValues,
+  indukRekening,
 }) => {
   // Form
   const form = useForm({
@@ -107,15 +109,7 @@ const FormRekening: React.FC<FormProps> = ({
   });
 
   const values = useStore(form.store, (s) => s.values);
-  // const handleParentChange = ({
-  //   urusan,
-  //   bidang,
-  //   program,
-  //   kegiatan,
-  // }: PilihanParent) => {
-  //   const parentValue = kegiatan || program || bidang || urusan;
-  //   form.setFieldValue('parent', parentValue);
-  // };
+
   const handleParentChange = ({
     urusan,
     bidang,
@@ -141,7 +135,7 @@ const FormRekening: React.FC<FormProps> = ({
         if (urusan && bidang && program) parentValue = program;
         break;
 
-      case 'subKegiatan':
+      case 'sub kegiatan':
         if (urusan && bidang && program && kegiatan) parentValue = kegiatan;
         break;
 
@@ -181,6 +175,17 @@ const FormRekening: React.FC<FormProps> = ({
     handleParentChange(updatedPilihan);
   }, [pilihanParent]);
 
+  useEffect(() => {
+    if (type === 'Edit' && indukRekening) {
+      setPilihanParent({
+        urusan: indukRekening.idUrusan?.toString() || '',
+        bidang: indukRekening.idBidang?.toString() || '',
+        program: indukRekening.idProgram?.toString() || '',
+        kegiatan: indukRekening.idKegiatan?.toString() || '',
+      });
+    }
+  }, [type, indukRekening]);
+
   const { data: dataUrusan } = useQuery({
     queryKey: ['list_urusan'],
     queryFn: getUrusan,
@@ -206,27 +211,27 @@ const FormRekening: React.FC<FormProps> = ({
     { label: 'Bidang', value: 'bidang' },
     { label: 'Program', value: 'program' },
     { label: 'Kegiatan', value: 'kegiatan' },
-    { label: 'Sub Kegiatan', value: 'subKegiatan' },
+    { label: 'Sub Kegiatan', value: 'sub kegiatan' },
   ];
 
   const listUrusan =
     dataUrusan?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      label: `[${item.kode}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
   const listBidang =
     dataBidang?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      label: `[${item.kode}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
   const listProgram =
     dataProgram?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      label: `[${item.kode}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
   const listKegiatan =
     dataKegiatan?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      label: `[${item.kode}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
 
@@ -267,7 +272,7 @@ const FormRekening: React.FC<FormProps> = ({
                   <label htmlFor='name'>
                     Nama{' '}
                     <span className='capitalize'>
-                      {values.rekening == 'subKegiatan'
+                      {values.rekening == 'sub kegiatan'
                         ? 'sub kegiatan'
                         : values.rekening}
                     </span>
@@ -329,7 +334,7 @@ const FormRekening: React.FC<FormProps> = ({
                                 program: prev.program,
                                 kegiatan: '',
                               };
-                            case 'subKegiatan':
+                            case 'sub kegiatan':
                               return {
                                 urusan: prev.urusan,
                                 bidang: prev.bidang,
