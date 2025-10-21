@@ -4,11 +4,18 @@ export interface Periode {
     id?: number;
     mulai?: string | number;
     akhir?: string | number;
+    skpds?: string | number[];
     status: boolean;
     created_at?: string;
     updated_at?: string;
 }
-export type PeriodeForm = Pick<Periode, 'id' | 'mulai' | 'akhir' | 'status'>;
+export type PeriodeForm = Pick<Periode, 'id' | 'mulai' | 'akhir' | 'status' | 'skpds'>;
+
+export interface SKPDPeriode{
+    id?: number;
+    skpd_id?: number;
+    name?: string;
+}
 
 /**
  * Ambil semua data periode
@@ -40,4 +47,12 @@ export const updatePeriode = async (id: number, payload: PeriodeForm): Promise<P
 export const deletePeriode = async (id: number) => {
     const response = await api.delete<ApiResponse<null>>(`/periode/delete/${id}`);
     return response.data;
+};
+
+/**
+ * Ambil data SKPD by periode
+ */
+export const getSKPDPeriode = async (id: number) => {
+    const response = await api.get<ApiResponse<SKPDPeriode[]>>(`/periode/skpd/${id}`);
+    return response.data.data;
 };

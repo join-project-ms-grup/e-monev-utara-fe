@@ -10,6 +10,7 @@ import {
   MdInventory,
   MdAssignmentTurnedIn,
   MdFiberManualRecord,
+  MdDragIndicator,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
 import { SITE_NAME } from '../lib/config';
@@ -99,6 +100,7 @@ const menuRKPD: MenuItem[] = [
     to: '/rkpd/realisasi',
     akses: 3,
   },
+  { label: 'Pagu Indikatif', icon: <MdDragIndicator />, to: '/rkpd/pagu_indikatif', akses: 3 },
 ];
 
 // Menu DAK

@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import InputButton from '../inputs/InputButton';
-import type { PeriodeForm } from '../../services/PeriodeService';
-import { useForm } from '@tanstack/react-form';
+import {
+  getSKPDPeriode,
+  type PeriodeForm,
+  type SKPDPeriode,
+} from '../../services/PeriodeService';
+import { useForm, useStore } from '@tanstack/react-form';
 import { MdCalendarMonth } from 'react-icons/md';
 import InputText from '../inputs/InputText';
 import InputToggle from '../inputs/InputToggle';
 import { periodeSchema, periodeSchemaSubmit } from './schemas/SchemaPeriode';
 import ErrorField from './ErrorField';
+import { useQuery } from '@tanstack/react-query';
+import { getSKPD, type SKPDType } from '../../services/SKPDService';
+import InputSearchBox, { type OptionItem } from '../inputs/InputSearchBox';
 
+// #region Types
 interface BaseFormProps {
   children?: React.ReactElement;
   defaultValues: PeriodeForm;
@@ -24,6 +32,7 @@ interface FormEditProps extends BaseFormProps {
 }
 
 type FormProps = FormAddProps | FormEditProps;
+// #endregion
 
 const FormPeriode: React.FC<FormProps> = ({
   type,
@@ -31,7 +40,7 @@ const FormPeriode: React.FC<FormProps> = ({
   onSubmit,
   defaultValues,
 }) => {
-  // Form
+  // #region Form
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -86,6 +95,67 @@ const FormPeriode: React.FC<FormProps> = ({
       },
     },
   });
+  // #endregion
+
+  const values = useStore(form.store, (s) => s.values);
+
+  // #region Pilihan Input SKPD
+  const { data } = useQuery({
+    queryKey: ['list_SKPD'],
+    queryFn: () => getSKPD(),
+  });
+  const [selectedSKPD, setSelectedSKPD] = useState<SKPDType[]>([]);
+
+  const handleAddSKPD = (value: string) => {
+    const id = parseInt(value);
+    const selected = data?.find((item) => item.id === id);
+    if (selected && !selectedSKPD.some((x) => x.id === id)) {
+      setSelectedSKPD((prev) => [...prev, selected]);
+    }
+  };
+
+  const handleRemoveSKPD = (id: number) => {
+    setSelectedSKPD((prev) => prev.filter((x) => x.id !== id));
+  };
+
+  const { data: skpdbyperiode } = useQuery({
+    queryKey: ['list_skpdbyperiode', values.id],
+    queryFn: () => getSKPDPeriode(Number(values.id)),
+    enabled: type === 'Edit' && values.id !== 0,
+  });
+
+  const [firstOpen, setFirstOpen] = useState(true);
+  useEffect(() => {
+    setFirstOpen(false);
+    if (!firstOpen) {
+      const skpdterpilih = selectedSKPD.map((item) => item.id).join(', ');
+      form.setFieldValue('skpds', skpdterpilih);
+
+      if (!skpdterpilih) {
+        form.setFieldValue('skpds', 'all');
+      }
+    }
+  }, [selectedSKPD]);
+
+  useEffect(() => {
+    if (type === 'Edit' && values.id !== 0 && skpdbyperiode) {
+      const normalizedSKPD = skpdbyperiode.map(({ skpd_id, name }) => ({
+        id: skpd_id,
+        name: name
+      }));
+      setSelectedSKPD(normalizedSKPD);
+    }
+  }, [skpdbyperiode]);
+
+  const listSKPD =
+    data?.map((item) => ({
+      label: item.name,
+      value: item.id?.toString(),
+      disabled: selectedSKPD.some(
+        (skpd) => skpd.id?.toString() === item.id?.toString(),
+      ),
+    })) || [];
+  // #endregion
 
   return (
     <>
@@ -154,6 +224,59 @@ const FormPeriode: React.FC<FormProps> = ({
                 </div>
               </div>
             )}
+          </form.Field>
+        </div>
+        {/* Field SKPD */}
+        <div>
+          <label htmlFor='listskpd'>
+            SKPD{' '}
+            <span className='text-sm italic opacity-50'>
+              *kosongkan jika ingin semua SKPD
+            </span>
+          </label>
+          <InputSearchBox
+            id='listskpd'
+            options={listSKPD as OptionItem[]}
+            onChange={handleAddSKPD}
+            value=''
+            defaultValue=''
+            defaultOptionLabel='Pilih SKPD'
+            className='h-9'
+            withSearch
+          />
+          {/* Daftar SKPD terpilih */}
+          {selectedSKPD.length > 0 && (
+            <div className='mt-2 flex flex-wrap gap-2'>
+              {selectedSKPD.map((item) => (
+                <div
+                  key={item.id}
+                  className='flex items-center bg-white shadow px-2 py-1 rounded-full text-sm'
+                >
+                  <span>{item.name}</span>
+                  <button
+                    type='button'
+                    onClick={() => handleRemoveSKPD(item.id!)}
+                    className='ml-2 text-red-500 hover:text-red-700'
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <form.Field name='skpds'>
+            {(field) => {
+              return (
+                <input
+                  id='skpds'
+                  name='skpds'
+                  type='hidden'
+                  value={(field.state.value as []) ?? ''}
+                  readOnly
+                  className='py-1 px-2 mt-2 border rounded'
+                />
+              );
+            }}
           </form.Field>
         </div>
 

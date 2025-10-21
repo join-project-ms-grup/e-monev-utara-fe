@@ -22,7 +22,6 @@ interface PilihanParent {
 interface BaseFormProps {
   children?: React.ReactElement;
   defaultValues: Master;
-  indukRekening?: any;
 }
 
 interface FormAddProps extends BaseFormProps {
@@ -42,7 +41,6 @@ const FormRekening: React.FC<FormProps> = ({
   children,
   onSubmit,
   defaultValues,
-  indukRekening,
 }) => {
   // Form
   const form = useForm({
@@ -109,7 +107,6 @@ const FormRekening: React.FC<FormProps> = ({
   });
 
   const values = useStore(form.store, (s) => s.values);
-
   const handleParentChange = ({
     urusan,
     bidang,
@@ -120,22 +117,27 @@ const FormRekening: React.FC<FormProps> = ({
 
     switch (values.rekening) {
       case 'urusan':
+        // urusan tidak punya parent
         parentValue = '';
         break;
 
       case 'bidang':
+        // bidang harus punya urusan
         if (urusan) parentValue = urusan;
         break;
 
       case 'program':
+        // program harus punya urusan & bidang
         if (urusan && bidang) parentValue = bidang;
         break;
 
       case 'kegiatan':
+        // kegiatan harus punya urusan, bidang & program
         if (urusan && bidang && program) parentValue = program;
         break;
 
-      case 'sub kegiatan':
+      case 'subKegiatan':
+        // sub kegiatan harus punya semua di atas
         if (urusan && bidang && program && kegiatan) parentValue = kegiatan;
         break;
 
@@ -175,17 +177,6 @@ const FormRekening: React.FC<FormProps> = ({
     handleParentChange(updatedPilihan);
   }, [pilihanParent]);
 
-  useEffect(() => {
-    if (type === 'Edit' && indukRekening) {
-      setPilihanParent({
-        urusan: indukRekening.idUrusan?.toString() || '',
-        bidang: indukRekening.idBidang?.toString() || '',
-        program: indukRekening.idProgram?.toString() || '',
-        kegiatan: indukRekening.idKegiatan?.toString() || '',
-      });
-    }
-  }, [type, indukRekening]);
-
   const { data: dataUrusan } = useQuery({
     queryKey: ['list_urusan'],
     queryFn: getUrusan,
@@ -211,27 +202,27 @@ const FormRekening: React.FC<FormProps> = ({
     { label: 'Bidang', value: 'bidang' },
     { label: 'Program', value: 'program' },
     { label: 'Kegiatan', value: 'kegiatan' },
-    { label: 'Sub Kegiatan', value: 'sub kegiatan' },
+    { label: 'Sub Kegiatan', value: 'subKegiatan' },
   ];
 
   const listUrusan =
     dataUrusan?.map((item) => ({
-      label: `[${item.kode}] ${item.name}`,
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
   const listBidang =
     dataBidang?.map((item) => ({
-      label: `[${item.kode}] ${item.name}`,
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
   const listProgram =
     dataProgram?.map((item) => ({
-      label: `[${item.kode}] ${item.name}`,
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
   const listKegiatan =
     dataKegiatan?.map((item) => ({
-      label: `[${item.kode}] ${item.name}`,
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
 
@@ -272,7 +263,7 @@ const FormRekening: React.FC<FormProps> = ({
                   <label htmlFor='name'>
                     Nama{' '}
                     <span className='capitalize'>
-                      {values.rekening == 'sub kegiatan'
+                      {values.rekening == 'subKegiatan'
                         ? 'sub kegiatan'
                         : values.rekening}
                     </span>
@@ -334,7 +325,7 @@ const FormRekening: React.FC<FormProps> = ({
                                 program: prev.program,
                                 kegiatan: '',
                               };
-                            case 'sub kegiatan':
+                            case 'subKegiatan':
                               return {
                                 urusan: prev.urusan,
                                 bidang: prev.bidang,
@@ -357,28 +348,30 @@ const FormRekening: React.FC<FormProps> = ({
             </form.Field>
           </div>
           {/* Field Parent */}
-          {values.rekening && values.rekening !== 'urusan' && (
-            <div className='space-y-4 px-2 py-1 rounded shadow'>
-              <div>
-                <label htmlFor='listurusan'>Urusan</label>
-                <InputSearchBox
-                  id='listurusan'
-                  tooltip
-                  options={listUrusan as OptionItem[]}
-                  onChange={(e) =>
-                    setPilihanParent((prev) => ({ ...prev, urusan: e }))
-                  }
-                  value={pilihanParent.urusan}
-                  onClear={() =>
-                    setPilihanParent((prev) => ({ ...prev, urusan: '' }))
-                  }
-                  defaultOptionLabel='Pilih Urusan'
-                  className='h-9'
-                  withSearch
-                  withClear
-                />
-              </div>
-              {!['bidang'].includes(values.rekening!) && (
+          {values.rekening && (
+            <>
+              {values.rekening !== 'urusan' && (
+                <div>
+                  <label htmlFor='listurusan'>Urusan</label>
+                  <InputSearchBox
+                    id='listurusan'
+                    tooltip
+                    options={listUrusan as OptionItem[]}
+                    onChange={(e) =>
+                      setPilihanParent((prev) => ({ ...prev, urusan: e }))
+                    }
+                    value={pilihanParent.urusan}
+                    onClear={() =>
+                      setPilihanParent((prev) => ({ ...prev, urusan: '' }))
+                    }
+                    defaultOptionLabel='Pilih Urusan'
+                    className='h-9'
+                    withSearch
+                    withClear
+                  />
+                </div>
+              )}
+              {!['urusan', 'bidang'].includes(values.rekening!) && (
                 <div>
                   <label htmlFor='listbidang'>Bidang</label>
                   <InputSearchBox
@@ -400,7 +393,7 @@ const FormRekening: React.FC<FormProps> = ({
                   />
                 </div>
               )}
-              {!['bidang', 'program'].includes(values.rekening!) && (
+              {!['urusan', 'bidang', 'program'].includes(values.rekening!) && (
                 <div>
                   <label htmlFor='listprogram'>Program</label>
                   <InputSearchBox
@@ -422,7 +415,7 @@ const FormRekening: React.FC<FormProps> = ({
                   />
                 </div>
               )}
-              {!['bidang', 'program', 'kegiatan'].includes(
+              {!['urusan', 'bidang', 'program', 'kegiatan'].includes(
                 values.rekening!,
               ) && (
                 <div>
@@ -446,24 +439,24 @@ const FormRekening: React.FC<FormProps> = ({
                   />
                 </div>
               )}
-              {/* HIDDEN */}
-              <form.Field name='parent'>
-                {(field) => (
-                  <>
-                    <input
-                      id='parent'
-                      name='parent'
-                      type='hidden'
-                      value={field.state.value ?? ''}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      readOnly
-                    />
-                    <ErrorField field={field} />
-                  </>
-                )}
-              </form.Field>
-            </div>
+            </>
           )}
+          {/* HIDDEN */}
+          <form.Field name='parent'>
+            {(field) => (
+              <>
+                <input
+                  id='parent'
+                  name='parent'
+                  type='text'
+                  value={field.state.value ?? ''}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  readOnly
+                />
+                <ErrorField field={field} />
+              </>
+            )}
+          </form.Field>
         </div>
 
         {children ? (

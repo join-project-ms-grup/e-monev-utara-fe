@@ -5,7 +5,7 @@ export interface Master {
   kode?: string | number;
   name?: string;
   rekening?: string;
-  parent?: string | number | null;
+  parent?: string | number;
   type?: string;
 }
 export interface MasterUrusan extends Master {

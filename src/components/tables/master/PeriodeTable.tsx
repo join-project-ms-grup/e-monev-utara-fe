@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createColumnHelper } from '@tanstack/react-table';
+import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import Spinner from '../../inputs/Spinner';
 import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
@@ -33,6 +33,7 @@ const PeriodeTable = () => {
     mulai: '',
     akhir: '',
     status: false,
+    skpds: 'all'
   };
 
   const [formData, setFormData] = useState<PeriodeForm>(initialFormData);
@@ -44,7 +45,7 @@ const PeriodeTable = () => {
       }, 200);
       return () => clearTimeout(timeout);
     } else {
-      console.log(formData);
+      console.log('PeriodeTable.tsx',formData);
     }
   }, [openModal]);
 
@@ -59,6 +60,7 @@ const PeriodeTable = () => {
   const addMutation = useMutation({
     mutationFn: async (payload: PeriodeForm) => {
       setLoadingMutation(true);
+      // return console.log(payload)
       return addPeriode(payload);
     },
     onSuccess: () => {
@@ -86,6 +88,7 @@ const PeriodeTable = () => {
       payload: PeriodeForm;
     }) => {
       setLoadingMutation(true);
+      // return console.log(id, payload)
       return updatePeriode(id, payload);
     },
     onSuccess: () => {
@@ -122,10 +125,8 @@ const PeriodeTable = () => {
   });
 
   // Kolom
-  const columnHelper = createColumnHelper<PeriodeForm>();
-
-  const columns = [
-    columnHelper.display({
+  const columns: ColumnDef<PeriodeForm>[] = [
+    {
       header: 'No',
       enableSorting: true,
       cell: ({ row }) => `${row.index + 1}`,
@@ -133,20 +134,23 @@ const PeriodeTable = () => {
         thClassNames: 'w-[5%]',
         tdClassNames: 'text-center',
       },
-    }),
-    columnHelper.accessor('mulai', {
+    },
+    {
+      accessorKey: 'mulai',
       header: 'Mulai',
       meta: {
         tdClassNames: 'text-center',
       },
-    }),
-    columnHelper.accessor('akhir', {
+    },
+    {
+      accessorKey: 'akhir',
       header: 'Akhir',
       meta: {
         tdClassNames: 'text-center',
       },
-    }),
-    columnHelper.accessor('status', {
+    },
+    {
+      accessorKey: 'status',
       header: 'Status',
       meta: {
         tdClassNames: 'text-center',
@@ -158,8 +162,8 @@ const PeriodeTable = () => {
           {info.getValue() ? 'Aktif' : 'Nonaktif'}
         </span>
       ),
-    }),
-    columnHelper.display({
+    },
+    {
       header: 'Aksi',
       enableSorting: false,
       cell: ({ row }) => (
@@ -192,7 +196,7 @@ const PeriodeTable = () => {
         thClassNames: 'w-[10%]',
         tdClassNames: 'text-center',
       },
-    }),
+    },
   ];
 
   return (
@@ -241,6 +245,7 @@ const PeriodeTable = () => {
                 mulai: Number(data.mulai),
                 akhir: Number(data.akhir),
                 status: data.status,
+                skpds: (data.skpds === 'all' ? 'all' : data.skpds?.toString().split(',').map(item => Number(item.trim())))
               });
             }}
           >
@@ -273,6 +278,7 @@ const PeriodeTable = () => {
                   mulai: Number(payload.mulai),
                   akhir: Number(payload.akhir),
                   status: payload.status,
+                  skpds: (payload.skpds === 'all' ? 'all' : payload.skpds?.toString().split(',').map(item => Number(item.trim())))
                 },
               });
             }}

@@ -7,7 +7,7 @@ import {
   type MasterTree,
   type MasterUrusan,
 } from '../../../services/MasterService';
-import { type ColumnDef, type Row } from '@tanstack/react-table';
+import { type ColumnDef } from '@tanstack/react-table';
 import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import Tabel from '../Tabel';
 import Spinner from '../../inputs/Spinner';
@@ -42,18 +42,7 @@ const RekeningTable = () => {
     rekening: '',
   };
 
-  const [formData, setFormData] = useState<
-    Master | (Master & { induk: string | number })
-  >(initialFormData);
-
-  const initIndukRekening = {
-    idUrusan: 0,
-    idBidang: 0,
-    idProgram: 0,
-    idKegiatan: 0,
-  };
-  const [indukRekening, setIndukRekening] = useState(initIndukRekening);
-
+  const [formData, setFormData] = useState<Master>(initialFormData);
   // Clear form
   useEffect(() => {
     if (!openModal) {
@@ -86,7 +75,8 @@ const RekeningTable = () => {
   const addMutation = useMutation({
     mutationFn: async (payload: Master) => {
       setLoadingMutation(true);
-      return addMaster(payload);
+      console.log(payload)
+      // return addMaster(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_rekening'] });
@@ -123,6 +113,25 @@ const RekeningTable = () => {
       setLoadingMutation(false);
     },
   });
+  // Delete
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      setLoadingMutation(true);
+      console.log(id);
+      // return deletePeriode(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_periode'] });
+      toast.success('Data berhasil dihapus');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+      setOpenModal(false);
+    },
+  });
 
   const subRows = (row: MasterTree) =>
     row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
@@ -142,27 +151,6 @@ const RekeningTable = () => {
       .map(([field, value]) => ({ field, value }));
     setFilters(newFilters);
   }, [searchFields]);
-
-  function updateIndukFormFromRow(row: Row<MasterTree> | undefined) {
-    const originals = [];
-
-    let currentRow = row;
-
-    while (currentRow) {
-      if (currentRow.original) {
-        originals.unshift(currentRow.original);
-      }
-      currentRow = currentRow.getParentRow?.();
-    }
-
-    const induks = originals.map((r) => r.id);
-    setIndukRekening({
-      idUrusan: induks[0] || 0,
-      idBidang: induks[1] || 0,
-      idProgram: induks[2] || 0,
-      idKegiatan: induks[3] || 0,
-    });
-  }
 
   const columns: ColumnDef<MasterUrusan>[] = [
     {
@@ -202,11 +190,7 @@ const RekeningTable = () => {
     {
       accessorKey: 'name',
       header: 'Nama',
-      cell: (ctx) => (
-        <>
-          <RowExpandValue {...ctx} />
-        </>
-      ),
+      cell: (ctx) => <RowExpandValue {...ctx} />,
     },
     {
       header: 'Aksi',
@@ -218,14 +202,6 @@ const RekeningTable = () => {
               setModalState('Edit');
               setFormData(row.original);
               setOpenModal(true);
-              setIndukRekening(indukRekening);
-              updateIndukFormFromRow(row);
-              // const ids = getRowHierarchy(row).map((r) => ({
-              //   id: r.id,
-              //   rekening: r.rekening,
-              // }));
-              // console.log(ids);
-              // console.log(formData)
             }}
           />
         </>
@@ -319,7 +295,7 @@ const RekeningTable = () => {
         data={data || []}
         columns={columns}
         subRows={subRows}
-        subLabels={['Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan']}
+        subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
         searchFilters={filters}
         subLabelPosition={2}
       />
@@ -337,15 +313,12 @@ const RekeningTable = () => {
             defaultValues={formData}
             onSubmit={(data) => {
               console.log('Data dari form modal:', data);
-              addMutation.mutate({
-                kode: data.kode,
-                name: data.name,
-                type:
-                  data.rekening === 'sub kegiatan'
-                    ? 'subKegiatan'
-                    : data.rekening,
-                parent: data.parent ? Number(data.parent) : null,
-              });
+              // addMutation.mutate({
+              //   kode: data.kode,
+              //   name: data.name,
+              //   type: data.rekening,
+              //   parent: data.parent
+              // });
             }}
           >
             <div className='flex gap-2 justify-end'>
@@ -369,7 +342,6 @@ const RekeningTable = () => {
           <FormRekening
             type='Edit'
             defaultValues={formData as any}
-            indukRekening={indukRekening}
             onSubmit={({ id, payload }) => {
               console.log('Data dari form modal:', payload);
               updateMutation.mutate({
@@ -377,11 +349,8 @@ const RekeningTable = () => {
                 payload: {
                   kode: payload.kode,
                   name: payload.name,
-                  type:
-                    payload.rekening === 'sub kegiatan'
-                      ? 'subKegiatan'
-                      : payload.rekening,
-                  parent: payload.parent ? Number(payload.parent) : null,
+                  type: payload.rekening,
+                  parent: payload.parent! ?? null,
                 },
               });
             }}
@@ -396,6 +365,33 @@ const RekeningTable = () => {
               </InputButton>
             </div>
           </FormRekening>
+        </DialogModal>
+      )}
+      {modalState === 'Delete' && (
+        <DialogModal
+          title='Hapus data Rekening'
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+        >
+          <p>
+            Yakin ingin menghapus data{' '}
+            <i>
+              {formData.kode}
+            </i>{' '}
+            ?
+          </p>
+          <div className='flex gap-2 justify-end'>
+            <InputButton
+              type='button'
+              className='btn btn-theme w-24'
+              isLoading={loadingMutation}
+              onClick={() => {
+                deleteMutation.mutate(formData.id!);
+              }}
+            >
+              Hapus
+            </InputButton>
+          </div>
         </DialogModal>
       )}
     </div>

@@ -12,6 +12,7 @@ import clsx from 'clsx';
 export interface OptionItem {
   label: string;
   value: string;
+  disabled?: boolean;
 }
 
 export interface InputSelectBoxProps {
@@ -73,8 +74,9 @@ export default function InputSearchBox({
   const handleChange = (val: string) => {
     if (!isControlled) setInternalValue(val);
 
+    const selectedOption = allOptions.find((o) => o.value === val);
     const fakeEvent = {
-      target: { name, value: val },
+      target: { name: selectedOption?.label ?? '', value: val },
     } as unknown as React.ChangeEvent<HTMLInputElement>;
 
     onChange?.(val, fakeEvent);
@@ -105,6 +107,7 @@ export default function InputSearchBox({
 
   return (
     <div className={wrapperClass}>
+      {/* <label htmlFor="">test</label> */}
       <Listbox value={currentValue} onChange={handleChange} disabled={disabled}>
         <ListboxButton
           id={id}
@@ -154,12 +157,13 @@ export default function InputSearchBox({
                     'data-tooltip-id': 'tooltip',
                     'data-tooltip-content': option.label,
                   })}
-                disabled={option.value === ''}
+                // disabled={option.value === ''}
                 key={index}
                 value={option.value}
+                disabled={option.disabled || option.value === ''}
                 className={`truncate data-focus:bg-[var(--color-2)] data-focus:text-[var(--text-3)] cursor-pointer py-1 px-2 rounded ${
                   option.value === '' ? 'text-gray-400' : ''
-                }`}
+                } ${option.disabled ? 'text-gray-400' : ''}`}
               >
                 {option.label}
               </ListboxOption>
