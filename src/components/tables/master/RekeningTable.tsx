@@ -264,7 +264,6 @@ const RekeningTable = () => {
               onClear={() =>
                 setSearchFields((prev) => ({ ...prev, rekening: '' }))
               }
-              withClear
             />
           </div>
         </div>

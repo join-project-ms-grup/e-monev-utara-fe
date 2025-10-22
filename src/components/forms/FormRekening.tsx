@@ -367,7 +367,6 @@ const FormRekening: React.FC<FormProps> = ({
                     defaultOptionLabel='Pilih Urusan'
                     className='h-9'
                     withSearch
-                    withClear
                   />
                 </div>
               )}
@@ -388,7 +387,6 @@ const FormRekening: React.FC<FormProps> = ({
                     defaultOptionLabel='Pilih Bidang'
                     className='h-9'
                     withSearch
-                    withClear
                     disabled={!pilihanParent.urusan}
                   />
                 </div>
@@ -410,7 +408,6 @@ const FormRekening: React.FC<FormProps> = ({
                     defaultOptionLabel='Pilih Program'
                     className='h-9'
                     withSearch
-                    withClear
                     disabled={!pilihanParent.bidang}
                   />
                 </div>
@@ -434,7 +431,6 @@ const FormRekening: React.FC<FormProps> = ({
                     defaultOptionLabel='Pilih Kegiatan'
                     className='h-9'
                     withSearch
-                    withClear
                     disabled={!pilihanParent.program}
                   />
                 </div>

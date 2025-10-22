@@ -32,3 +32,11 @@ export function getRoleId(): number | null {
   const user = getUserFromCookie();
   return user?.roleId ?? null;
 }
+
+/**
+ * Ambil periode dari cookie
+ */
+export function getPeriodeFromCookie() {
+  const cookie = Cookies.get('periode');
+  return cookie ?? null;
+}

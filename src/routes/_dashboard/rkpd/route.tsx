@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import toast from 'react-hot-toast';
-import { getRoleId } from '../../../lib/usercookie';
+import { getPeriodeFromCookie, getRoleId } from '../../../lib/usercookie';
 
 export const Route = createFileRoute('/_dashboard/rkpd')({
   beforeLoad: () => {
@@ -10,6 +10,9 @@ export const Route = createFileRoute('/_dashboard/rkpd')({
         toast.error('Tidak memiliki izin akses.');
         throw redirect({ to: '/', replace: true });
       }
+    }
+    if(!getPeriodeFromCookie()){
+      throw redirect({ to: '/', replace: true });
     }
   },
   staticData: {

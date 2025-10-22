@@ -1,0 +1,447 @@
+import React, { useEffect, useState } from 'react';
+import InputButton from '../inputs/InputButton';
+import { useForm, useStore } from '@tanstack/react-form';
+import { periodeSchema, periodeSchemaSubmit } from './schemas/SchemaPeriode';
+import type { PaguForm } from '../../services/PaguService';
+import ErrorField from './ErrorField';
+import InputSearchBox, { type OptionItem } from '../inputs/InputSearchBox';
+import { getChildren, getUrusan } from '../../services/MasterService';
+import { useQuery } from '@tanstack/react-query';
+import { getPeriodeFromCookie } from '../../lib/usercookie';
+import InputText from '../inputs/InputText';
+import { paguSchema, paguSchemaSubmit } from './schemas/SchemaPagu';
+
+// #region Types
+interface PilihanParent {
+  urusan?: string;
+  bidang?: string;
+  program?: string;
+  kegiatan?: string;
+  subkegiatan?: string;
+}
+
+interface BaseFormProps {
+  children?: React.ReactElement;
+  defaultValues: PaguForm;
+  onSubmit: (data: PaguForm) => void;
+}
+
+interface FormAddProps extends BaseFormProps {
+  type: 'Add';
+}
+
+interface FormEditProps extends BaseFormProps {
+  type: 'Edit';
+}
+
+type FormProps = FormAddProps | FormEditProps;
+// #endregion
+
+const FormPagu: React.FC<FormProps> = ({
+  type,
+  children,
+  onSubmit,
+  defaultValues,
+}) => {
+  // #region Form
+  function mapToInput(value: any) {
+    return {
+      skpd_periode_id: value.skpd_periode_id?.toString() ?? '',
+      master_id: value.master_id?.toString() ?? '',
+      target: {
+        pagu: value.target?.pagu?.toString() ?? '',
+        tahun_ke: value.target?.tahun_ke?.toString() ?? '',
+      },
+    };
+  }
+
+  function mapErrors(errors: any) {
+    return {
+      skpd_periode_id: errors.skpd_periode_id?._errors[0],
+      master_id: errors.master_id?._errors[0],
+      'target.pagu': errors.target?.pagu?._errors[0],
+      'target.tahun_ke': errors.target?.tahun_ke?._errors[0],
+    };
+  }
+
+  const form = useForm({
+    defaultValues,
+    onSubmit: async ({ value }) => {
+      onSubmit(value);
+    },
+    validators: {
+      onChange: ({ value }) => {
+        const input = mapToInput(value);
+        const result = paguSchema.safeParse(input);
+
+        if (result.success) return { fields: {} };
+        return { fields: mapErrors(result.error.format()) };
+      },
+      onSubmit: ({ value }) => {
+        const input = mapToInput(value);
+        const result = paguSchemaSubmit.safeParse(input);
+
+        if (result.success) return { fields: {} };
+        return { fields: mapErrors(result.error.format()) };
+      },
+    },
+  });
+  // #endregion
+
+  // #region Master ID
+  const [selectedRek, setSelectedRek] = useState('');
+  const listRekening = [
+    { label: 'Urusan', value: 'urusan' },
+    { label: 'Bidang', value: 'bidang' },
+    { label: 'Program', value: 'program' },
+    { label: 'Kegiatan', value: 'kegiatan' },
+    { label: 'Sub Kegiatan', value: 'subKegiatan' },
+  ];
+  const initPilihanParent: PilihanParent = {
+    urusan: '',
+    bidang: '',
+    program: '',
+    kegiatan: '',
+    subkegiatan: '',
+  };
+
+  const [pilihanParent, setPilihanParent] =
+    useState<PilihanParent>(initPilihanParent);
+  const levelKeys = [
+    'urusan',
+    'bidang',
+    'program',
+    'kegiatan',
+    'subkegiatan',
+  ] as const;
+  useEffect(() => {
+    const updatedPilihan: PilihanParent = { ...pilihanParent };
+    let foundEmpty = false;
+
+    for (const key of levelKeys) {
+      if (foundEmpty) {
+        updatedPilihan[key] = '';
+      } else if (updatedPilihan[key] === '') {
+        foundEmpty = true;
+      }
+    }
+
+    if (JSON.stringify(updatedPilihan) !== JSON.stringify(pilihanParent)) {
+      setPilihanParent(updatedPilihan);
+    }
+
+    handleParentChange(updatedPilihan);
+    console.log(selectedRek);
+  }, [pilihanParent, selectedRek]);
+  const handleParentChange = ({
+    urusan,
+    bidang,
+    program,
+    kegiatan,
+    subkegiatan,
+  }: PilihanParent) => {
+    let parentValue = '';
+
+    switch (selectedRek) {
+      case 'urusan':
+        if (urusan) parentValue = urusan;
+        break;
+
+      case 'bidang':
+        if (urusan && bidang) parentValue = bidang;
+        break;
+
+      case 'program':
+        if (urusan && bidang && program) parentValue = program;
+        break;
+
+      case 'kegiatan':
+        if (urusan && bidang && program && kegiatan) parentValue = kegiatan;
+        break;
+
+      case 'subKegiatan':
+        if (urusan && bidang && program && kegiatan && subkegiatan)
+          parentValue = subkegiatan;
+        break;
+
+      default:
+        parentValue = '';
+    }
+    if (type === 'Add') {
+      form.setFieldValue('master_id', parentValue);
+    }
+  };
+  const { data: dataUrusan } = useQuery({
+    queryKey: ['list_urusan'],
+    queryFn: getUrusan,
+  });
+  const { data: dataBidang } = useQuery({
+    queryKey: ['listBidang', pilihanParent.urusan],
+    queryFn: () => getChildren(Number(pilihanParent.urusan)),
+    enabled: !!pilihanParent.urusan,
+  });
+  const { data: dataProgram } = useQuery({
+    queryKey: ['listProgram', pilihanParent.bidang],
+    queryFn: () => getChildren(Number(pilihanParent.bidang)),
+    enabled: !!pilihanParent.bidang,
+  });
+  const { data: dataKegiatan } = useQuery({
+    queryKey: ['listKegiatan', pilihanParent.program],
+    queryFn: () => getChildren(Number(pilihanParent.program)),
+    enabled: !!pilihanParent.program,
+  });
+  const { data: dataSubKegiatan } = useQuery({
+    queryKey: ['listSubKegiatan', pilihanParent.kegiatan],
+    queryFn: () => getChildren(Number(pilihanParent.kegiatan)),
+    enabled: !!pilihanParent.kegiatan,
+  });
+
+  const listUrusan =
+    dataUrusan?.map((item) => ({
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  const listBidang =
+    dataBidang?.map((item) => ({
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  const listProgram =
+    dataProgram?.map((item) => ({
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  const listKegiatan =
+    dataKegiatan?.map((item) => ({
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  const listSubKegiatan =
+    dataSubKegiatan?.map((item) => ({
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  // #endregion
+
+  return (
+    <>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+        className='max-w-md mx-auto space-y-4'
+      >
+        <div className='flex flex-col space-y-4'>
+          {type === 'Add' && (
+            <div>
+              <InputSearchBox
+                defaultOptionLabel='Pilih Rekening'
+                options={listRekening}
+                value={selectedRek}
+                onChange={(val) => setSelectedRek(val)}
+                onClear={() => setSelectedRek('')}
+              />
+            </div>
+          )}
+          {type === 'Add' && selectedRek && (
+            <>
+              {
+                <div>
+                  <label htmlFor='listurusan'>Urusan</label>
+                  <InputSearchBox
+                    id='listurusan'
+                    tooltip
+                    options={listUrusan as OptionItem[]}
+                    onChange={(e) =>
+                      setPilihanParent((prev) => ({ ...prev, urusan: e }))
+                    }
+                    value={pilihanParent.urusan}
+                    onClear={() =>
+                      setPilihanParent((prev) => ({ ...prev, urusan: '' }))
+                    }
+                    defaultOptionLabel='Pilih Urusan'
+                    className='h-9'
+                    withSearch
+                  />
+                </div>
+              }
+              {!['urusan'].includes(selectedRek!) && (
+                <div>
+                  <label htmlFor='listbidang'>Bidang</label>
+                  <InputSearchBox
+                    id='listbidang'
+                    tooltip
+                    options={listBidang as OptionItem[]}
+                    onChange={(e) =>
+                      setPilihanParent((prev) => ({ ...prev, bidang: e }))
+                    }
+                    value={pilihanParent.bidang}
+                    onClear={() =>
+                      setPilihanParent((prev) => ({ ...prev, bidang: '' }))
+                    }
+                    defaultOptionLabel='Pilih Bidang'
+                    className='h-9'
+                    withSearch
+                    disabled={!pilihanParent.urusan}
+                  />
+                </div>
+              )}
+              {!['urusan', 'bidang'].includes(selectedRek!) && (
+                <div>
+                  <label htmlFor='listprogram'>Program</label>
+                  <InputSearchBox
+                    id='listprogram'
+                    tooltip
+                    options={listProgram as OptionItem[]}
+                    onChange={(e) =>
+                      setPilihanParent((prev) => ({ ...prev, program: e }))
+                    }
+                    value={pilihanParent.program}
+                    onClear={() =>
+                      setPilihanParent((prev) => ({ ...prev, program: '' }))
+                    }
+                    defaultOptionLabel='Pilih Program'
+                    className='h-9'
+                    withSearch
+                    disabled={!pilihanParent.bidang}
+                  />
+                </div>
+              )}
+              {!['urusan', 'bidang', 'program'].includes(selectedRek!) && (
+                <div>
+                  <label htmlFor='listkegiatan'>Kegiatan</label>
+                  <InputSearchBox
+                    id='listkegiatan'
+                    tooltip
+                    options={listKegiatan as OptionItem[]}
+                    onChange={(e) =>
+                      setPilihanParent((prev) => ({ ...prev, kegiatan: e }))
+                    }
+                    value={pilihanParent.kegiatan}
+                    onClear={() =>
+                      setPilihanParent((prev) => ({ ...prev, kegiatan: '' }))
+                    }
+                    defaultOptionLabel='Pilih Kegiatan'
+                    className='h-9'
+                    withSearch
+                    disabled={!pilihanParent.program}
+                  />
+                </div>
+              )}
+              {!['urusan', 'bidang', 'program', 'kegiatan'].includes(
+                selectedRek!,
+              ) && (
+                <div>
+                  <label htmlFor='listsubkegiatan'>Sub Kegiatan</label>
+                  <InputSearchBox
+                    id='listsubkegiatan'
+                    tooltip
+                    options={listSubKegiatan as OptionItem[]}
+                    onChange={(e) =>
+                      setPilihanParent((prev) => ({ ...prev, subkegiatan: e }))
+                    }
+                    value={pilihanParent.subkegiatan}
+                    onClear={() =>
+                      setPilihanParent((prev) => ({ ...prev, subkegiatan: '' }))
+                    }
+                    defaultOptionLabel='Pilih Sub Kegiatan'
+                    className='h-9'
+                    withSearch
+                    disabled={!pilihanParent.kegiatan}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Field Master Id */}
+          <form.Field name='master_id'>
+            {(field) => (
+              <>
+                <input
+                  id='master_id'
+                  name='master_id'
+                  type='hidden'
+                  value={field.state.value ?? ''}
+                  readOnly
+                />
+                <ErrorField field={field} />
+              </>
+            )}
+          </form.Field>
+
+          <div className='inline-flex gap-2'>
+            {/* Field Target Pagu */}
+            <form.Field name='target[0].pagu'>
+              {(field) => (
+                <div className='flex-1'>
+                  <label htmlFor='target.pagu'>Target Pagu</label>
+                  <InputText
+                    inputMode='numeric'
+                    type='text'
+                    placeholder='Target Pagu...'
+                    id='target.pagu'
+                    value={field.state.value ?? ''}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    invalid={!field.state.meta.isValid}
+                  />
+                  <ErrorField field={field} />
+                </div>
+              )}
+            </form.Field>
+            {/* Field Target Tahun Ke */}
+            <form.Field name='target[0].tahun_ke'>
+              {(field) => (
+                <div className='flex-1'>
+                  <label htmlFor='target.tahun_ke'>Target Tahun Ke</label>
+                  <InputSearchBox
+                    className='h-9'
+                    id='target.tahun_ke'
+                    defaultOptionLabel='Pilih Target Tahun Ke'
+                    options={[
+                      { label: '1', value: '1' },
+                      { label: '2', value: '2' },
+                      { label: '3', value: '3' },
+                      { label: '4', value: '4' },
+                      { label: '5', value: '5' },
+                    ]}
+                    onChange={(val) => field.handleChange(val)}
+                    value={field.state.value?.toString() ?? ''}
+                    onClear={() => field.handleChange('')}
+                  />
+                  <ErrorField field={field} />
+                </div>
+              )}
+            </form.Field>
+          </div>
+          {/* Field SKPD Periode Id */}
+          <form.Field name='skpd_periode_id'>
+            {(field) => (
+              <>
+                <input
+                  id='skpd_periode_id'
+                  name='skpd_periode_id'
+                  type='hidden'
+                  value={field.state.value ?? Number(getPeriodeFromCookie())}
+                  readOnly
+                />
+                <ErrorField field={field} />
+              </>
+            )}
+          </form.Field>
+        </div>
+
+        {children ? (
+          children
+        ) : (
+          <InputButton type='submit'>
+            {type === 'Add' ? 'Tambah' : 'Simpan'}
+          </InputButton>
+        )}
+      </form>
+    </>
+  );
+};
+
+export default FormPagu;

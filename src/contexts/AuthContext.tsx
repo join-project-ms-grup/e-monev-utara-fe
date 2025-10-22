@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    Cookies.remove('periode');
     Cookies.remove('token');
     Cookies.remove('me');
     setToken(null);

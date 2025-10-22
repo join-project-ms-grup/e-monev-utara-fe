@@ -1,8 +1,14 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { getPeriodeFromCookie } from '../../../lib/usercookie';
 
 export const Route = createFileRoute('/_dashboard/master')({
-    staticData: {
-        title: 'Master',
-    },
-    component: Outlet,
-})
+  beforeLoad: () => {
+    if (!getPeriodeFromCookie()) {
+      throw redirect({ to: '/', replace: true });
+    }
+  },
+  staticData: {
+    title: 'Master',
+  },
+  component: Outlet,
+});

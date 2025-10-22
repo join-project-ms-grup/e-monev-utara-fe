@@ -141,7 +141,7 @@ const FormPeriode: React.FC<FormProps> = ({
     if (type === 'Edit' && values.id !== 0 && skpdbyperiode) {
       const normalizedSKPD = skpdbyperiode.map(({ skpd_id, name }) => ({
         id: skpd_id,
-        name: name
+        name: name,
       }));
       setSelectedSKPD(normalizedSKPD);
     }
@@ -265,18 +265,16 @@ const FormPeriode: React.FC<FormProps> = ({
             </div>
           )}
           <form.Field name='skpds'>
-            {(field) => {
-              return (
-                <input
-                  id='skpds'
-                  name='skpds'
-                  type='hidden'
-                  value={(field.state.value as []) ?? ''}
-                  readOnly
-                  className='py-1 px-2 mt-2 border rounded'
-                />
-              );
-            }}
+            {(field) => (
+              <input
+                id='skpds'
+                name='skpds'
+                type='hidden'
+                value={(field.state.value as []) ?? ''}
+                readOnly
+                className='py-1 px-2 mt-2 border rounded'
+              />
+            )}
           </form.Field>
         </div>
 

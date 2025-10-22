@@ -32,7 +32,6 @@ export interface InputSelectBoxProps {
   disabled?: boolean;
   invalid?: boolean;
   withSearch?: boolean;
-  withClear?: boolean;
   placeholder?: string;
   tooltip?: boolean;
   onClear?: () => void;
@@ -52,7 +51,6 @@ export default function InputSearchBox({
   disabled = false,
   invalid = false,
   withSearch = false,
-  withClear = false,
   placeholder,
   tooltip = false,
   onClear,
@@ -129,7 +127,7 @@ export default function InputSearchBox({
             className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-8 ${invalid ? 'opacity-100' : 'opacity-0'}`}
           />
         </ListboxButton>
-        {withClear && currentValue !== '' && (
+        {onClear && currentValue !== '' && (
           <button
             type='button'
             className='bg-white transition-all text-red-500 hover:text-red-400 px-1'
