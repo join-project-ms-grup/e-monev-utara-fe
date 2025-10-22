@@ -1,16 +1,9 @@
-import { type ColumnDef, type RowData } from '@tanstack/react-table';
+import { type ColumnDef } from '@tanstack/react-table';
 import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
 import RowExpand from '../RowExpand';
-import {
-  addPagu,
-  getPagu,
-  updatePagu,
-  type PaguForm,
-  type PaguMaster,
-  type PaguMasterTree,
-} from '../../../services/PaguService';
+import { type PaguForm } from '../../../services/PaguService';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
@@ -33,6 +26,8 @@ import {
   type IndikatorMaster,
   type IndikatorMasterTree,
 } from '../../../services/IndikatorService';
+import { getSKPDPeriode } from '../../../services/PeriodeService';
+import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -70,9 +65,20 @@ const tableHead = () => {
 const IndikatorTable = () => {
   const queryClient = useQueryClient();
   // #region Modal & FormData & Tabel Data
+  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const { data: dataSKPDPeriode } = useQuery({
+    queryKey: ['list_skpd_periode'],
+    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+  });
+  const listSKPDPeriode =
+    dataSKPDPeriode?.map((item) => ({
+      label: `[${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_indikator'],
-    queryFn: () => getIndikator(8),
+    queryKey: ['tabel_indikator', selectedSKPD],
+    queryFn: () => getIndikator(Number(selectedSKPD)),
   });
   // Modal
   const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
@@ -198,17 +204,23 @@ const IndikatorTable = () => {
       },
       cell: ({ getValue }) => {
         const indikatorList = getValue() as Indikator[];
-        if (!indikatorList || indikatorList.length === 0) return <span>-</span>;
+        if (!indikatorList || indikatorList.length === 0) return null;
 
         return (
           <>
-            {indikatorList.map((item, index) => (
-              <tr>
-                <td key={item.id}>
-                  {item.name}
-                </td>
-              </tr>
-            ))}
+            <div>
+              <table className='w-full'>
+                <tbody className='border-0!'>
+                  {indikatorList.map((item, index) => (
+                    <tr key={item.id}>
+                      <td className='block overflow-y-auto h-[70px]'>
+                        {item.name}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         );
       },
@@ -217,21 +229,27 @@ const IndikatorTable = () => {
       accessorFn: (row) => row.indikator,
       header: 'Satuan',
       meta: {
-        tdClassNames: 'p-0!',
+        tdClassNames: 'p-0! flex flex-col',
       },
       cell: ({ getValue }) => {
         const indikatorList = getValue() as Indikator[];
-        if (!indikatorList || indikatorList.length === 0) return <span>-</span>;
+        if (!indikatorList || indikatorList.length === 0) return null;
 
         return (
           <>
-            {indikatorList.map((item, index) => (
-              <tr>
-                <td key={item.id}>
-                  {item.satuan}
-                </td>
-              </tr>
-            ))}
+            <div>
+              <table className='w-full'>
+                <tbody className='border-0!'>
+                  {indikatorList.map((item, index) => (
+                    <tr key={item.id}>
+                      <td className='block overflow-y-auto h-[70px]'>
+                        {item.satuan}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         );
       },
@@ -249,16 +267,24 @@ const IndikatorTable = () => {
 
           return (
             <>
-              {indikatorList.map((indikator: any, idx: number) => {
-                const targetValue = indikator.target?.find(
-                  (t: any) => t.tahun_ke === tahun,
-                )?.target;
-                return (
-                  <tr key={indikator.id}>
-                    <td className='align-top'>{targetValue ?? '-'}</td>
-                  </tr>
-                );
-              })}
+              <div>
+                <table className='w-full'>
+                  <tbody className='border-0!'>
+                    {indikatorList.map((indikator: any, idx: number) => {
+                      const targetValue = indikator.target?.find(
+                        (t: any) => t.tahun_ke === tahun,
+                      )?.target;
+                      return (
+                        <tr key={indikator.id}>
+                          <td className='block overflow-y-auto h-[70px]'>
+                            {targetValue ?? '-'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </>
           );
         },
@@ -302,8 +328,24 @@ const IndikatorTable = () => {
 
   return (
     <div className='space-y-2'>
-      <div className='flex items-end justify-end'>
-        <div className='flex justify-between gap-2 items-end'>
+      <div className='flex gap-2 justify-between'>
+        <div className='inline-flex gap-2'>
+          <div>
+            <label htmlFor='skpd'>SKPD</label>
+            <InputSearchBox
+              id='skpd'
+              className='w-64 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih SKPD...'
+              value={selectedSKPD.toString()}
+              options={listSKPDPeriode as OptionItem[]}
+              onChange={(val) => setSelectedSKPD(val)}
+              onClear={() => setSelectedSKPD('')}
+              withSearch
+            />
+          </div>
+        </div>
+        <div className='flex justify-end items-end gap-2'>
           <InputButton
             tooltip='Tambah data'
             className='btn btn-theme w-9 h-9'
@@ -329,19 +371,20 @@ const IndikatorTable = () => {
         columns={columns}
         subRows={subRows}
         subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
-        subLabelPosition={8}
+        subLabelPosition={9}
         renderHeader={tableHead}
       />
       {modalState === 'Add' && (
         <DialogModal
-          title='Tambah data Pagu'
+          title='Tambah data Indikator'
           isOpen={openModal}
           onClose={() => {
             setFormData(initialFormData);
             setOpenModal(false);
           }}
         >
-          <FormPagu
+          <></>
+          {/* <FormPagu
             type='Add'
             defaultValues={formData}
             onSubmit={(data: PaguForm) => {
@@ -362,16 +405,17 @@ const IndikatorTable = () => {
                 Simpan
               </InputButton>
             </div>
-          </FormPagu>
+          </FormPagu> */}
         </DialogModal>
       )}
       {modalState === 'Edit' && (
         <DialogModal
-          title='Ubah data Pagu'
+          title='Ubah data Indikator'
           isOpen={openModal}
           onClose={() => setOpenModal(false)}
         >
-          <FormPagu
+          <></>
+          {/* <FormPagu
             type='Edit'
             defaultValues={formData}
             onSubmit={(data: PaguForm) => {
@@ -392,7 +436,7 @@ const IndikatorTable = () => {
                 Simpan
               </InputButton>
             </div>
-          </FormPagu>
+          </FormPagu> */}
         </DialogModal>
       )}
     </div>

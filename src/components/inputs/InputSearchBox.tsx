@@ -147,7 +147,7 @@ export default function InputSearchBox({
               className='w-full rounded border px-2 py-1 mb-2 text-sm'
             />
           )}
-          {filteredOptions.length > 1 ? (
+          {filteredOptions.length > 0 ? (
             filteredOptions.map((option, index) => (
               <ListboxOption
                 {...(tooltip &&
