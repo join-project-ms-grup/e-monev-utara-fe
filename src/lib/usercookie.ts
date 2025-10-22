@@ -8,6 +8,12 @@ export interface UserCookie {
   username: string;
 }
 
+export interface PeriodeCookie{
+  id: number;
+  mulai: number;
+  akhir: number;
+}
+
 /**
  * Ambil user dari cookie
  */
@@ -36,7 +42,28 @@ export function getRoleId(): number | null {
 /**
  * Ambil periode dari cookie
  */
-export function getPeriodeFromCookie() {
-  const cookie = Cookies.get('periode');
-  return cookie ?? null;
+export function getPeriodeFromCookie(): PeriodeCookie | null {
+  const rawCookie = Cookies.get('periode');
+  if (!rawCookie) return null;
+
+  try {
+    const decoded = decodeURIComponent(rawCookie);
+    const parsed: PeriodeCookie = JSON.parse(decoded);
+    return parsed;
+  } catch (error) {
+    console.error('Failed to parse cookie:', error);
+    return null;
+  }
+}
+export function getPeriodeIDFromCookie() {
+  const periode = getPeriodeFromCookie();
+  return periode?.id ?? null;
+}
+export function getPeriodeMulaiFromCookie() {
+  const periode = getPeriodeFromCookie();
+  return periode?.mulai ?? null;
+}
+export function getPeriodeAkhirFromCookie() {
+  const periode = getPeriodeFromCookie();
+  return periode?.akhir ?? null;
 }

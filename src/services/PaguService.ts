@@ -57,11 +57,3 @@ export const updatePagu = async (payload: PaguForm): Promise<PaguForm> => {
     const response = await api.put<ApiResponse<PaguForm>>("/pagu/update", payload);
     return response.data.data;
 };
-
-/**
- * Update data pagu
- */
-// export const updatePagu = async (id: number, payload: PeriodeForm): Promise<PeriodeForm> => {
-//     const response = await api.put<ApiResponse<PeriodeForm>>(`/periode/update/${id}`, payload);
-//     return response.data.data;
-// };

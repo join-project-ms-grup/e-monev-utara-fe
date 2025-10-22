@@ -161,6 +161,7 @@ a:hover {
   z-index: -1;
   pointer-events: none;
 }
+
 /* Tabel */
 .table-responsive {
   width: 100%;
@@ -202,7 +203,7 @@ a:hover {
   background-color: var(--bg-color);
 }
 .table-responsive tbody tr:hover {
-  background-color: var(--color-4);
+  /* background-color: var(--color-4); */
 }
 @media (max-width: 768px) {
   .table-responsive table,

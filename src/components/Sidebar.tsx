@@ -73,26 +73,27 @@ const menuRKPD: MenuItem[] = [
     label: 'MENU RKPD',
     akses: 3,
   },
-  {
-    label: 'Renstra',
-    icon: <MdLibraryBooks />,
-    submenu: [
-      { label: 'Indikator Outcome\nProgram', to: '/rkpd/renstra/iop' },
-      { label: 'Indikator Output Kegiatan', to: '/rkpd/renstra/iok' },
-      { label: 'Indikator Output Sub\nKegiatan', to: '/rkpd/renstra/iosk' },
-    ],
-    akses: 3,
-  },
-  {
-    label: 'Indikator Kinerja Utama',
-    icon: <MdInsights />,
-    submenu: [
-      { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
-      { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
-      { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
-    ],
-    akses: 3,
-  },
+  // {
+  //   label: 'Renstra',
+  //   icon: <MdLibraryBooks />,
+  //   submenu: [
+  //     { label: 'Indikator Outcome\nProgram', to: '/rkpd/renstra/iop' },
+  //     { label: 'Indikator Output Kegiatan', to: '/rkpd/renstra/iok' },
+  //     { label: 'Indikator Output Sub\nKegiatan', to: '/rkpd/renstra/iosk' },
+  //   ],
+  //   akses: 3,
+  // },
+  // {
+  //   label: 'Indikator Kinerja Utama',
+  //   icon: <MdInsights />,
+  //   submenu: [
+  //     { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
+  //     { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
+  //     { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
+  //   ],
+  //   akses: 3,
+  // },
+  { label: 'Indikator', icon: <MdInsights />, to: '/rkpd/indikator', akses: 3 },
   { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
   {
     label: 'Realisasi',

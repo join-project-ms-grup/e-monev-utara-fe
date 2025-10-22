@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import InputButton from '../inputs/InputButton';
-import { useForm, useStore } from '@tanstack/react-form';
-import { periodeSchema, periodeSchemaSubmit } from './schemas/SchemaPeriode';
+import { useForm } from '@tanstack/react-form';
 import type { PaguForm } from '../../services/PaguService';
 import ErrorField from './ErrorField';
 import InputSearchBox, { type OptionItem } from '../inputs/InputSearchBox';
 import { getChildren, getUrusan } from '../../services/MasterService';
 import { useQuery } from '@tanstack/react-query';
-import { getPeriodeFromCookie } from '../../lib/usercookie';
+import { getPeriodeIDFromCookie } from '../../lib/usercookie';
 import InputText from '../inputs/InputText';
 import { paguSchema, paguSchemaSubmit } from './schemas/SchemaPagu';
 
@@ -423,7 +422,7 @@ const FormPagu: React.FC<FormProps> = ({
                   id='skpd_periode_id'
                   name='skpd_periode_id'
                   type='hidden'
-                  value={field.state.value ?? Number(getPeriodeFromCookie())}
+                  value={field.state.value ?? Number(getPeriodeIDFromCookie())}
                   readOnly
                 />
                 <ErrorField field={field} />

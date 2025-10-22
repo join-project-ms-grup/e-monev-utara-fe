@@ -43,6 +43,7 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     tdClassNames?: string;
     thClassNames?: string;
+    tdColSpan?: number;
     rowSpan?: number;
     hidden?: boolean;
   }
@@ -174,6 +175,7 @@ const Tabel = <TData,>({
                     <tr>
                       {row.getVisibleCells().map((cell) => (
                         <td
+                          colSpan={cell.column.columnDef.meta?.tdColSpan}
                           key={cell.id}
                           {...(cell.column.columnDef.meta?.tdClassNames
                             ? {

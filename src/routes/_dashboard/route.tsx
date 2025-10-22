@@ -67,6 +67,7 @@ function RouteComponent() {
 
 function PilihPeriodeComponent() {
   const [periode, setPeriode] = useState('');
+  const [tahun, setTahun] = useState('');
   const { data: listPeriode } = useQuery({
     queryKey: ['list_periode_pilih_periode'],
     queryFn: async () => {
@@ -78,7 +79,7 @@ function PilihPeriodeComponent() {
         })) || []
       );
     },
-    enabled: !getPeriodeFromCookie()
+    enabled: !getPeriodeFromCookie(),
   });
 
   return (
@@ -95,17 +96,35 @@ function PilihPeriodeComponent() {
                 className='w-52 h-9'
                 btnclassName='bg-white'
                 value={periode}
-                onChange={(val) => setPeriode(val)}
+                onChange={(val, e) => {
+                  setPeriode(val);
+                  setTahun(e?.target.name!);
+                }}
                 options={(listPeriode as OptionItem[]) || []}
                 defaultOptionLabel='Pilih Periode'
                 withSearch
-                onClear={() => setPeriode('')}
+                onClear={() => {
+                  setPeriode('');
+                  setTahun('');
+                }}
               />
               <InputButton
                 className='px-2 w-full h-9'
                 onClick={() => {
                   if (periode) {
-                    Cookies.set('periode', periode, { sameSite: 'strict' });
+                    // Cookies.set('periode', periode, { sameSite: 'strict' });
+                    const [mulai, akhir] = tahun.split(' - ');
+                    Cookies.set(
+                      'periode',
+                      JSON.stringify({
+                        id: periode,
+                        mulai: mulai,
+                        akhir: akhir,
+                      }),
+                      {
+                        sameSite: 'strict',
+                      },
+                    );
                   }
                   if (getPeriodeFromCookie() && periode) {
                     window.location.reload();

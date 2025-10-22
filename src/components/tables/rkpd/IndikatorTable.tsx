@@ -1,4 +1,4 @@
-import { type ColumnDef } from '@tanstack/react-table';
+import { type ColumnDef, type RowData } from '@tanstack/react-table';
 import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
@@ -11,7 +11,11 @@ import {
   type PaguMaster,
   type PaguMasterTree,
 } from '../../../services/PaguService';
-import { getPeriodeIDFromCookie } from '../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
 import RowExpandValue from '../RowExpandValue';
@@ -22,8 +26,22 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import AksiButton from '../../inputs/AksiButton';
+import {
+  getIndikator,
+  type Indikator,
+  type IndikatorForm,
+  type IndikatorMaster,
+  type IndikatorMasterTree,
+} from '../../../services/IndikatorService';
 
 const tableHead = () => {
+  const mulai = Number(getPeriodeMulaiFromCookie()!);
+  const akhir = Number(getPeriodeAkhirFromCookie()!);
+
+  const periode = Array.from(
+    { length: akhir - mulai + 1 },
+    (_, i) => mulai + i,
+  );
   return (
     <>
       <tr>
@@ -31,31 +49,43 @@ const tableHead = () => {
         <th rowSpan={2}>No</th>
         <th rowSpan={2}>Kode</th>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={1} colSpan={2}>
-          Pagu
+        <th rowSpan={2}>Indikator</th>
+        <th rowSpan={2}>Satuan</th>
+        <th rowSpan={1} colSpan={5}>
+          Target
         </th>
         <th rowSpan={2}>Aksi</th>
       </tr>
       <tr>
-        <th rowSpan={1}>Tahun Ke</th>
-        <th rowSpan={1}>Pagu</th>
+        {periode.map((thn) => (
+          <th key={thn} rowSpan={1}>
+            {thn}
+          </th>
+        ))}
       </tr>
     </>
   );
 };
 
-const PaguIndikatifTable = () => {
+const IndikatorTable = () => {
   const queryClient = useQueryClient();
+  // #region Modal & FormData & Tabel Data
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ['tabel_indikator'],
+    queryFn: () => getIndikator(8),
+  });
   // Modal
   const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
   const [openModal, setOpenModal] = useState(false);
   // Form Data
-  const initialFormData: PaguForm = {
-    skpd_periode_id: Number(getPeriodeIDFromCookie()),
+  const initialFormData: IndikatorForm = {
+    skpd_periode_id: '',
     master_id: '',
-    target: [{ pagu: '', tahun_ke: '' }],
+    name: '',
+    satuan: '',
+    target: [{ target: '', tahun_ke: '' }],
   };
-  const [formData, setFormData] = useState<PaguForm>(initialFormData);
+  const [formData, setFormData] = useState<IndikatorForm>(initialFormData);
   // Clear form
   useEffect(() => {
     if (!openModal) {
@@ -64,27 +94,31 @@ const PaguIndikatifTable = () => {
       }, 200);
       return () => clearTimeout(timeout);
     } else {
-      console.log('PaguIndikatifTable.tsx', formData);
+      console.log('IndikatorTable.tsx', formData);
     }
   }, [openModal]);
+  // #endregion
 
+  // #region Mutasi
+  const [loadingMutation, setLoadingMutation] = useState(false);
   // Add
   const addMutation = useMutation({
     mutationFn: async (payload: PaguForm) => {
       setLoadingMutation(true);
-      return addPagu({
-        master_id: Number(payload.master_id),
-        skpd_periode_id: Number(payload.skpd_periode_id),
-        target: [
-          {
-            pagu: Number(payload.target?.[0].pagu),
-            tahun_ke: Number(payload.target?.[0].tahun_ke),
-          },
-        ],
-      });
+      return console.log(payload);
+      // return addPagu({
+      //   master_id: Number(payload.master_id),
+      //   skpd_periode_id: Number(payload.skpd_periode_id),
+      //   target: [
+      //     {
+      //       pagu: Number(payload.target?.[0].pagu),
+      //       tahun_ke: Number(payload.target?.[0].tahun_ke),
+      //     },
+      //   ],
+      // });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_pagu'] });
+      queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
       setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
@@ -102,10 +136,11 @@ const PaguIndikatifTable = () => {
   const updateMutation = useMutation({
     mutationFn: async (payload: PaguForm) => {
       setLoadingMutation(true);
-      return updatePagu(payload);
+      return console.log(payload);
+      // return updatePagu(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_pagu'] });
+      queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
@@ -118,17 +153,13 @@ const PaguIndikatifTable = () => {
       setLoadingMutation(false);
     },
   });
+  // #endregion
 
-  const [loadingMutation, setLoadingMutation] = useState(false);
-  const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_pagu'],
-    queryFn: () => getPagu(Number(getPeriodeIDFromCookie())),
-  });
-
-  const subRows = (row: PaguMasterTree) =>
+  // #region Kolom Tabel
+  const subRows = (row: IndikatorMasterTree) =>
     row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
 
-  const columns: ColumnDef<PaguMaster>[] = [
+  const columns: ColumnDef<IndikatorMaster>[] = [
     {
       header: ' ',
       cell: (ctx) => <RowExpand {...ctx} />,
@@ -153,46 +184,90 @@ const PaguIndikatifTable = () => {
     {
       accessorKey: 'name',
       header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      enableSorting: false,
-      filterFn: 'equalsString',
-      meta: {
-        tdClassNames: 'capitalize',
-      },
       cell: (ctx) => (
         <>
-          <span>{`[id:${ctx.row.original.id}] `}</span>
           <RowExpandValue {...ctx} />
         </>
       ),
     },
     {
-      header: 'Pagu',
+      accessorFn: (row) => row.indikator,
+      header: 'Indikator',
       meta: {
-        tdClassNames: 'text-center',
+        tdClassNames: 'p-0!',
       },
-      columns: [
-        {
-          id: 'tahun_ke',
-          accessorFn: (row) => row.pagu?.[0].tahun_ke,
-          header: 'Tahun Ke',
-          meta: {
-            tdClassNames: 'text-center',
-          },
+      cell: ({ getValue }) => {
+        const indikatorList = getValue() as Indikator[];
+        if (!indikatorList || indikatorList.length === 0) return <span>-</span>;
+
+        return (
+          <>
+            {indikatorList.map((item, index) => (
+              <tr>
+                <td key={item.id}>
+                  {item.name}
+                </td>
+              </tr>
+            ))}
+          </>
+        );
+      },
+    },
+    {
+      accessorFn: (row) => row.indikator,
+      header: 'Satuan',
+      meta: {
+        tdClassNames: 'p-0!',
+      },
+      cell: ({ getValue }) => {
+        const indikatorList = getValue() as Indikator[];
+        if (!indikatorList || indikatorList.length === 0) return <span>-</span>;
+
+        return (
+          <>
+            {indikatorList.map((item, index) => (
+              <tr>
+                <td key={item.id}>
+                  {item.satuan}
+                </td>
+              </tr>
+            ))}
+          </>
+        );
+      },
+    },
+    {
+      header: 'Target',
+      meta: { tdClassNames: 'text-center' },
+      columns: [1, 2, 3, 4, 5].map((tahun) => ({
+        id: `tahun_ke_${tahun}`,
+        header: `Target ${tahun}`,
+        meta: { tdClassNames: 'text-center p-0!' },
+        cell: ({ row }: any) => {
+          const indikatorList = row.original.indikator ?? [];
+          if (!indikatorList.length) return '\u00A0';
+
+          return (
+            <>
+              {indikatorList.map((indikator: any, idx: number) => {
+                const targetValue = indikator.target?.find(
+                  (t: any) => t.tahun_ke === tahun,
+                )?.target;
+                return (
+                  <tr key={indikator.id}>
+                    <td className='align-top'>{targetValue ?? '-'}</td>
+                  </tr>
+                );
+              })}
+            </>
+          );
         },
-        {
-          id: 'pagu',
-          accessorFn: (row) => row.pagu?.[0].pagu,
-          header: 'Pagu',
-          meta: {
-            tdClassNames: 'text-center',
-          },
-        },
-      ],
+      })),
     },
     {
       header: 'Aksi',
       cell: (ctx) => {
-        if (ctx.row.original.pagu) {
+        if (ctx.row.original.indikator) {
           const data = ctx.row.original;
           return (
             <>
@@ -205,8 +280,8 @@ const PaguIndikatifTable = () => {
                     skpd_periode_id: Number(getPeriodeIDFromCookie()),
                     target: [
                       {
-                        pagu: data.pagu?.[0].pagu,
-                        tahun_ke: data.pagu?.[0].tahun_ke,
+                        target: data.indikator?.[0].target?.[0].target,
+                        tahun_ke: data.indikator?.[0].target?.[0].tahun_ke,
                       },
                     ],
                   });
@@ -223,6 +298,7 @@ const PaguIndikatifTable = () => {
       },
     },
   ];
+  // #endregion
 
   return (
     <div className='space-y-2'>
@@ -253,7 +329,7 @@ const PaguIndikatifTable = () => {
         columns={columns}
         subRows={subRows}
         subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
-        subLabelPosition={4}
+        subLabelPosition={8}
         renderHeader={tableHead}
       />
       {modalState === 'Add' && (
@@ -323,4 +399,4 @@ const PaguIndikatifTable = () => {
   );
 };
 
-export default PaguIndikatifTable;
+export default IndikatorTable;
