@@ -36,6 +36,7 @@ export interface IndikatorMasterSubKegiatan extends IndikatorMaster {
 export type IndikatorMasterTree = IndikatorMasterUrusan & IndikatorMasterBidang & IndikatorMasterProgram & IndikatorMasterKegiatan & IndikatorMasterSubKegiatan;
 
 export interface IndikatorForm {
+  id?: number;
   skpd_periode_id?: string | number;
   master_id?: string | number;
   name?: string;
@@ -62,7 +63,7 @@ export const addIndikator = async (payload: IndikatorForm): Promise<IndikatorFor
 /**
  * Update data indikator
  */
-export const updateIndikator = async (payload: IndikatorForm): Promise<IndikatorForm> => {
-  const response = await api.put<ApiResponse<IndikatorForm>>("/indikator/update", payload);
+export const updateIndikator = async (id: number, payload: IndikatorForm): Promise<IndikatorForm> => {
+  const response = await api.put<ApiResponse<IndikatorForm>>(`/indikator/update/${id}`, payload);
   return response.data.data;
 };

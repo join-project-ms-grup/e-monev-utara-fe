@@ -37,6 +37,7 @@ interface MainTableProps<TData> {
   tabletop?: ReactNode;
   searchFilters?: { field: string; value: string }[];
   tblClassName?: string;
+  initialExpanded?: boolean;
 }
 
 declare module '@tanstack/react-table' {
@@ -61,6 +62,7 @@ const Tabel = <TData,>({
   subLabelPosition,
   searchFilters,
   tblClassName,
+  initialExpanded = false,
 }: MainTableProps<TData & { group?: string }>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -104,6 +106,24 @@ const Tabel = <TData,>({
       columnFilters,
     },
   });
+
+  const expandAllRows = (rows: any[]): ExpandedState => {
+    const expanded: ExpandedState = {};
+    const traverse = (rows: any[]) => {
+      rows.forEach((row) => {
+        expanded[row.id] = true;
+        if (row.subRows?.length) traverse(row.subRows);
+      });
+    };
+    traverse(rows);
+    return expanded;
+  };
+
+  useEffect(() => {
+    if (initialExpanded) {
+      setExpanded(expandAllRows(table.getRowModel().rows));
+    }
+  }, [data, initialExpanded, table]);
 
   const tableClass = clsx(tblClassName, 'w-full');
 
@@ -192,7 +212,7 @@ const Tabel = <TData,>({
                       ))}
                     </tr>
 
-                    {row.getIsExpanded() && (
+                    {row.getIsExpanded() && subLabels && (
                       <>
                         <tr>
                           <td

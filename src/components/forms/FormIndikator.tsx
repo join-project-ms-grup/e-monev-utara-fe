@@ -7,7 +7,6 @@ import { getChildren, getUrusan } from '../../services/MasterService';
 import { useQuery } from '@tanstack/react-query';
 import { getPeriodeIDFromCookie } from '../../lib/usercookie';
 import InputText from '../inputs/InputText';
-import { paguSchema, paguSchemaSubmit } from './schemas/SchemaPagu';
 import type { IndikatorForm } from '../../services/IndikatorService';
 import {
   indikatorSchema,
@@ -29,15 +28,16 @@ interface PilihanParent {
 interface BaseFormProps {
   children?: React.ReactElement;
   defaultValues: IndikatorForm;
-  onSubmit: (data: IndikatorForm) => void;
 }
 
 interface FormAddProps extends BaseFormProps {
   type: 'Add';
+  onSubmit: (data: IndikatorForm) => void;
 }
 
 interface FormEditProps extends BaseFormProps {
   type: 'Edit';
+  onSubmit: (data: { id: number; payload: IndikatorForm }) => void;
 }
 
 type FormProps = FormAddProps | FormEditProps;
@@ -61,7 +61,16 @@ const FormIndikator: React.FC<FormProps> = ({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      onSubmit(value);
+      console.log(value);
+      if (type === 'Add') {
+        onSubmit(value);
+      } else {
+        if (value.id == null) {
+          return;
+        }
+        const { id, ...payload } = value;
+        onSubmit({ id, payload });
+      }
     },
     validators: {
       onChange: ({ value }) => validateWith(indikatorSchema, value),
@@ -205,7 +214,6 @@ const FormIndikator: React.FC<FormProps> = ({
   // #endregion
 
   // #region SKPD ID
-  const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
     queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
@@ -226,6 +234,9 @@ const FormIndikator: React.FC<FormProps> = ({
         }}
         className='mx-auto space-y-4'
       >
+        <form.Field name='id'>
+          {(field) => <input type='hidden' value={field.state.value ?? ''} />}
+        </form.Field>
         <div className='flex flex-col space-y-4'>
           {/* Field Master Id */}
           <form.Field name='master_id'>
@@ -385,24 +396,6 @@ const FormIndikator: React.FC<FormProps> = ({
             )}
           </form.Field>
 
-          {/* Field Master Id */}
-          {/* <form.Field name='master_id'>
-            {(field) => {
-              return (
-                <>
-                  <input
-                    id='master_id'
-                    name='master_id'
-                    type='hidden'
-                    value={field.state.value ?? ''}
-                    readOnly
-                  />
-                  <ErrorField field={field} />
-                </>
-              );
-            }}
-          </form.Field> */}
-
           <div className='grid grid-cols-[2fr_1fr] gap-2'>
             <div>
               <form.Field name='name'>
@@ -436,8 +429,13 @@ const FormIndikator: React.FC<FormProps> = ({
                       value={field.state.value?.toString() ?? ''}
                       options={listSKPDPeriode as OptionItem[]}
                       onChange={(val) => field.handleChange(val)}
-                      onClear={() => field.handleChange('')}
+                      onClear={
+                        type !== 'Edit'
+                          ? () => field.handleChange('')
+                          : undefined
+                      }
                       invalid={!field.state.meta.isValid}
+                      disabled={type === 'Edit'}
                       withSearch
                     />
                     <ErrorField field={field} />

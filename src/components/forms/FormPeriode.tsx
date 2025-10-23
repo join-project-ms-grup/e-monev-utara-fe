@@ -3,7 +3,6 @@ import InputButton from '../inputs/InputButton';
 import {
   getSKPDPeriode,
   type PeriodeForm,
-  type SKPDPeriode,
 } from '../../services/PeriodeService';
 import { useForm, useStore } from '@tanstack/react-form';
 import { MdCalendarMonth } from 'react-icons/md';

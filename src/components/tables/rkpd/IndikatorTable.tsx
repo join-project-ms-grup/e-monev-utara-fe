@@ -3,7 +3,6 @@ import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
 import RowExpand from '../RowExpand';
-import { type PaguForm } from '../../../services/PaguService';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
@@ -11,10 +10,8 @@ import {
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
-import RowExpandValue from '../RowExpandValue';
 import { useEffect, useState } from 'react';
 import DialogModal from '../../inputs/DialogModal';
-import FormPagu from '../../forms/FormPagu';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
@@ -22,6 +19,7 @@ import AksiButton from '../../inputs/AksiButton';
 import {
   addIndikator,
   getIndikator,
+  updateIndikator,
   type Indikator,
   type IndikatorForm,
   type IndikatorMaster,
@@ -44,7 +42,6 @@ const tableHead = () => {
       <tr>
         <th rowSpan={2}></th>
         <th rowSpan={2}>No</th>
-        <th rowSpan={2}>Kode</th>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={2}>Indikator</th>
         <th rowSpan={2}>Satuan</th>
@@ -87,6 +84,7 @@ const IndikatorTable = () => {
   const [openModal, setOpenModal] = useState(false);
   // Form Data
   const initialFormData: IndikatorForm = {
+    id: 0,
     skpd_periode_id: '',
     master_id: '',
     name: '',
@@ -146,10 +144,23 @@ const IndikatorTable = () => {
   });
   // Update
   const updateMutation = useMutation({
-    mutationFn: async (payload: IndikatorForm) => {
+    mutationFn: async ({
+      id,
+      payload,
+    }: {
+      id: number;
+      payload: IndikatorForm;
+    }) => {
       setLoadingMutation(true);
-      return console.log(payload);
-      // return updatePagu(payload);
+      return updateIndikator(id, {
+        ...payload,
+        skpd_periode_id: Number(payload.skpd_periode_id),
+        master_id: Number(payload.master_id),
+        target: payload.target?.slice(0, 5).map((t) => ({
+          target: Number(t.target),
+          tahun_ke: Number(t.tahun_ke),
+        })),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
@@ -181,14 +192,16 @@ const IndikatorTable = () => {
     },
     {
       header: 'No',
-      cell: ({ row }) => `${row.index + 1}`,
-      meta: {
-        tdClassNames: 'text-center',
-      },
-    },
-    {
-      accessorKey: 'kode',
-      header: 'Kode',
+      cell: ({ row }) => (
+        <div
+          className='inline-flex items-start'
+          style={{
+            paddingLeft: `${row.depth * 1}rem`,
+          }}
+        >
+          {row.index + 1}
+        </div>
+      ),
       meta: {
         tdClassNames: 'text-center',
       },
@@ -196,11 +209,21 @@ const IndikatorTable = () => {
     {
       accessorKey: 'name',
       header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      cell: (ctx) => (
-        <>
-          <RowExpandValue {...ctx} />
-        </>
-      ),
+      cell: ({ row, getValue }) => {
+        let currentRow: any = row;
+        const kodeArray: string[] = [];
+        while (currentRow) {
+          kodeArray.unshift(currentRow.original.kode); // unshift supaya root duluan
+          currentRow = currentRow.getParentRow?.();
+        }
+
+        return (
+          <div className='' style={{ paddingLeft: `${row.depth * 1}rem` }}>
+            <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
+            {getValue<string>()}
+          </div>
+        );
+      },
     },
     {
       accessorFn: (row) => row.indikator,
@@ -217,7 +240,7 @@ const IndikatorTable = () => {
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((item, index) => (
+                  {indikatorList.map((item) => (
                     <tr key={item.id}>
                       <td className='block overflow-y-auto h-[70px]'>
                         {item.name}
@@ -246,7 +269,7 @@ const IndikatorTable = () => {
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((item, index) => (
+                  {indikatorList.map((item) => (
                     <tr key={item.id}>
                       <td className='block overflow-y-auto h-[70px]'>
                         {item.satuan}
@@ -276,7 +299,7 @@ const IndikatorTable = () => {
               <div>
                 <table className='w-full'>
                   <tbody className='border-0!'>
-                    {indikatorList.map((indikator: any, idx: number) => {
+                    {indikatorList.map((indikator: any) => {
                       const targetValue = indikator.target?.find(
                         (t: any) => t.tahun_ke === tahun,
                       )?.target;
@@ -298,35 +321,54 @@ const IndikatorTable = () => {
     },
     {
       header: 'Aksi',
-      cell: (ctx) => {
-        if (ctx.row.original.indikator) {
-          const data = ctx.row.original;
-          return (
-            <>
-              <AksiButton
-                Icon={MdEdit}
-                tooltip='Ubah'
-                onClick={() => {
-                  setFormData({
-                    master_id: data.id,
-                    skpd_periode_id: Number(getPeriodeIDFromCookie()),
-                    target: [
-                      {
-                        target: data.indikator?.[0].target?.[0].target,
-                        tahun_ke: data.indikator?.[0].target?.[0].tahun_ke,
-                      },
-                    ],
-                  });
-                  setModalState('Edit');
-                  setOpenModal(true);
-                }}
-              />
-            </>
-          );
-        }
-      },
       meta: {
-        tdClassNames: 'text-center',
+        tdClassNames: 'p-0!',
+      },
+      cell: ({ row }) => {
+        const data = row.original;
+        const indikatorList = data.indikator as Indikator[];
+        if (!indikatorList || indikatorList.length === 0) return null;
+        return (
+          <div>
+            <table className='w-full'>
+              <tbody className='border-0!'>
+                {indikatorList.map((item, index) => (
+                  <tr key={item.id}>
+                    <td className='block overflow-y-auto h-[70px]'>
+                      <AksiButton
+                        Icon={MdEdit}
+                        tooltip='Ubah'
+                        onClick={() => {
+                          console.log('Edit klik', data, index);
+                          const mappedTarget = formData.target?.map(
+                            ({ tahun_ke }) => {
+                              const found = data.indikator?.[
+                                index
+                              ].target?.find(
+                                (t) => Number(t.tahun_ke) === Number(tahun_ke),
+                              );
+                              return { tahun_ke, target: found?.target || 0 };
+                            },
+                          );
+                          setFormData({
+                            id: data.indikator?.[index].id,
+                            master_id: data.id,
+                            skpd_periode_id: selectedSKPD,
+                            name: data.indikator?.[index].name,
+                            satuan: data.indikator?.[index].satuan,
+                            target: mappedTarget,
+                          });
+                          setModalState('Edit');
+                          setOpenModal(true);
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
       },
     },
   ];
@@ -376,10 +418,10 @@ const IndikatorTable = () => {
         data={data || []}
         columns={columns}
         subRows={subRows}
-        subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
         subLabelPosition={9}
         renderHeader={tableHead}
-        tblClassName='md:min-w-[1600px]'
+        tblClassName='lg:min-w-[1500px]'
+        initialExpanded={true}
       />
       {modalState === 'Add' && (
         <DialogModal
@@ -423,16 +465,27 @@ const IndikatorTable = () => {
           isOpen={openModal}
           onClose={() => setOpenModal(false)}
         >
-          <></>
-          {/* <FormPagu
+          <FormIndikator
             type='Edit'
             defaultValues={formData}
-            onSubmit={(data: PaguForm) => {
+            onSubmit={({ id, payload }) => {
               console.log('Data dari form modal:', data);
+              // updateMutation.mutate({
+              //   skpd_periode_id: data.skpd_periode_id,
+              //   master_id: data.master_id,
+              //   name: data.name,
+              //   satuan: data.satuan,
+              //   target: data.target,
+              // });
               updateMutation.mutate({
-                skpd_periode_id: data.skpd_periode_id,
-                master_id: data.master_id,
-                target: data.target,
+                id,
+                payload: {
+                  skpd_periode_id: payload.skpd_periode_id,
+                  master_id: payload.master_id,
+                  name: payload.name,
+                  satuan: payload.satuan,
+                  target: payload.target,
+                },
               });
             }}
           >
@@ -445,7 +498,7 @@ const IndikatorTable = () => {
                 Simpan
               </InputButton>
             </div>
-          </FormPagu> */}
+          </FormIndikator>
         </DialogModal>
       )}
     </div>
