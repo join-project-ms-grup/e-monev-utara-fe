@@ -1,8 +1,8 @@
 import api, { type ApiResponse } from "../lib/api";
 
 export interface IndikatorTarget {
-  tahun_ke?: string;
-  target?: string;
+  tahun_ke?: string | number;
+  target?: string | number;
 }
 
 export interface Indikator {

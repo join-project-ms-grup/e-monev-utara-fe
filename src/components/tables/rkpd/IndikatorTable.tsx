@@ -20,6 +20,7 @@ import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import AksiButton from '../../inputs/AksiButton';
 import {
+  addIndikator,
   getIndikator,
   type Indikator,
   type IndikatorForm,
@@ -28,6 +29,7 @@ import {
 } from '../../../services/IndikatorService';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
+import FormIndikator from '../../forms/FormIndikator';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -89,7 +91,13 @@ const IndikatorTable = () => {
     master_id: '',
     name: '',
     satuan: '',
-    target: [{ target: '', tahun_ke: '' }],
+    target: [
+      { tahun_ke: '1', target: '' },
+      { tahun_ke: '2', target: '' },
+      { tahun_ke: '3', target: '' },
+      { tahun_ke: '4', target: '' },
+      { tahun_ke: '5', target: '' },
+    ],
   };
   const [formData, setFormData] = useState<IndikatorForm>(initialFormData);
   // Clear form
@@ -109,19 +117,17 @@ const IndikatorTable = () => {
   const [loadingMutation, setLoadingMutation] = useState(false);
   // Add
   const addMutation = useMutation({
-    mutationFn: async (payload: PaguForm) => {
+    mutationFn: async (payload: IndikatorForm) => {
       setLoadingMutation(true);
-      return console.log(payload);
-      // return addPagu({
-      //   master_id: Number(payload.master_id),
-      //   skpd_periode_id: Number(payload.skpd_periode_id),
-      //   target: [
-      //     {
-      //       pagu: Number(payload.target?.[0].pagu),
-      //       tahun_ke: Number(payload.target?.[0].tahun_ke),
-      //     },
-      //   ],
-      // });
+      return addIndikator({
+        ...payload,
+        skpd_periode_id: Number(payload.skpd_periode_id),
+        master_id: Number(payload.master_id),
+        target: payload.target?.slice(0, 5).map((t) => ({
+          target: Number(t.target),
+          tahun_ke: Number(t.tahun_ke),
+        })),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
@@ -140,7 +146,7 @@ const IndikatorTable = () => {
   });
   // Update
   const updateMutation = useMutation({
-    mutationFn: async (payload: PaguForm) => {
+    mutationFn: async (payload: IndikatorForm) => {
       setLoadingMutation(true);
       return console.log(payload);
       // return updatePagu(payload);
@@ -373,25 +379,28 @@ const IndikatorTable = () => {
         subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
         subLabelPosition={9}
         renderHeader={tableHead}
+        tblClassName='md:min-w-[1600px]'
       />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data Indikator'
           isOpen={openModal}
+          widthLevel={6}
           onClose={() => {
             setFormData(initialFormData);
             setOpenModal(false);
           }}
         >
-          <></>
-          {/* <FormPagu
+          <FormIndikator
             type='Add'
             defaultValues={formData}
-            onSubmit={(data: PaguForm) => {
+            onSubmit={(data: IndikatorForm) => {
               console.log('Data dari form modal:', data);
               addMutation.mutate({
                 skpd_periode_id: data.skpd_periode_id,
                 master_id: data.master_id,
+                name: data.name,
+                satuan: data.satuan,
                 target: data.target,
               });
             }}
@@ -405,7 +414,7 @@ const IndikatorTable = () => {
                 Simpan
               </InputButton>
             </div>
-          </FormPagu> */}
+          </FormIndikator>
         </DialogModal>
       )}
       {modalState === 'Edit' && (
