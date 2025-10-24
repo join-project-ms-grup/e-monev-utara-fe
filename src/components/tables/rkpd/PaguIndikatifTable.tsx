@@ -128,7 +128,6 @@ const PaguIndikatifTable = () => {
   const updateMutation = useMutation({
     mutationFn: async (payload: PaguForm) => {
       setLoadingMutation(true);
-      // return updatePagu(payload);
       return updatePagu({
         master_id: Number(payload.master_id),
         skpd_periode_id: Number(payload.skpd_periode_id),

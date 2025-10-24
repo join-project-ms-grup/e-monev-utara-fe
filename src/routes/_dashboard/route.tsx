@@ -3,13 +3,14 @@ import {
   Link,
   Outlet,
   redirect,
+  useNavigate,
+  useRouter,
 } from '@tanstack/react-router';
 import { useState } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Breadcrumb from '../../components/Breadcrumb';
 import Footer from '../../components/Footer';
 import TopBar from '../../components/Topbar';
-import { getPeriodeFromCookie } from '../../lib/usercookie';
 import InputButton from '../../components/inputs/InputButton';
 import { MdLogout } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
@@ -18,6 +19,8 @@ import InputSearchBox, {
   type OptionItem,
 } from '../../components/inputs/InputSearchBox';
 import Cookies from 'js-cookie';
+import { useAuth } from '../../contexts/AuthContext';
+import AksiButton from '../../components/inputs/AksiButton';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {
@@ -26,16 +29,16 @@ export const Route = createFileRoute('/_dashboard')({
       throw redirect({ to: '/auth' });
     }
   },
-  component: () => {
-    if (getPeriodeFromCookie()) {
-      return RouteComponent();
-    } else {
-      return PilihPeriodeComponent();
-    }
-  },
+  component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { periodeCookie } = useAuth();
+  if (!periodeCookie) return <PeriodeComponent />;
+  return <MainComponent />;
+}
+
+function MainComponent() {
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
@@ -65,7 +68,9 @@ function RouteComponent() {
   );
 }
 
-function PilihPeriodeComponent() {
+function PeriodeComponent() {
+  const navigate = useNavigate();
+  const { periodeCookie, refreshPeriodeCookie } = useAuth();
   const [periode, setPeriode] = useState('');
   const [tahun, setTahun] = useState('');
   const { data: listPeriode } = useQuery({
@@ -79,17 +84,34 @@ function PilihPeriodeComponent() {
         })) || []
       );
     },
-    enabled: !getPeriodeFromCookie(),
+    enabled: !periodeCookie,
   });
 
   return (
     <>
       <div className='h-screen flex items-center justify-center flex-col space-y-2'>
         <div className='shadow rounded min-w-md'>
-          <div className='w-full bg-red-50 flex items-center justify-center p-2'>
-            <h4>Pilih Periode</h4>
+          <div className='w-full bg-red-50 flex items-center justify-center'>
+            <div className='grid grid-cols-3'>
+              <div></div>
+              <h4 className='p-2'>Pilih Periode</h4>
+              <div className='flex justify-end items-center'>
+                <AksiButton
+                  tooltip='Keluar'
+                  Icon={MdLogout}
+                  className='mr-2 p-1'
+                  hoverColor='bg-[var(--color-2)]'
+                  onClick={() =>
+                    navigate({ to: '/auth/logout', replace: true })
+                  }
+                />
+              </div>
+            </div>
           </div>
-          <div className='bg-white flex items-center justify-center'>
+          <div className='bg-white flex flex-col items-center justify-center'>
+            <div className='mt-4'>
+              <img src='/periode/schedule.png' width={128} />
+            </div>
             <div className='py-4 space-y-2'>
               <InputSearchBox
                 id='periode'
@@ -110,9 +132,9 @@ function PilihPeriodeComponent() {
               />
               <InputButton
                 className='px-2 w-full h-9'
+                type='button'
                 onClick={() => {
                   if (periode) {
-                    // Cookies.set('periode', periode, { sameSite: 'strict' });
                     const [mulai, akhir] = tahun.split(' - ');
                     Cookies.set(
                       'periode',
@@ -125,9 +147,7 @@ function PilihPeriodeComponent() {
                         sameSite: 'strict',
                       },
                     );
-                  }
-                  if (getPeriodeFromCookie() && periode) {
-                    window.location.reload();
+                    refreshPeriodeCookie();
                   }
                 }}
               >
@@ -135,17 +155,6 @@ function PilihPeriodeComponent() {
               </InputButton>
             </div>
           </div>
-        </div>
-        <div>
-          <InputButton className='px-2 h-9'>
-            <Link
-              to={'/auth/logout'}
-              className='inline-flex gap-2 items-center text-sm'
-            >
-              <MdLogout />
-              Keluar
-            </Link>
-          </InputButton>
         </div>
       </div>
     </>

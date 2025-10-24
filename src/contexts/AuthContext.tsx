@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
+import { getPeriodeFromCookie, type PeriodeCookie } from '../lib/usercookie';
 
 export interface LoggedUserType {
   nama: string;
@@ -11,10 +12,12 @@ export interface LoggedUserType {
 }
 
 export interface AuthContextType {
-  token: string | null
-  user: LoggedUserType | null
-  login: (data: { token: string; user: LoggedUserType }) => void
-  logout: () => void
+  token: string | null;
+  user: LoggedUserType | null;
+  login: (data: { token: string; user: LoggedUserType }) => void;
+  logout: () => void;
+  periodeCookie: PeriodeCookie | null;
+  refreshPeriodeCookie: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,15 +50,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     toast.success('Logout berhasil');
   };
 
+  const [periodeCookie, setPeriodeCookie] = useState(
+    getPeriodeFromCookie() || null,
+  );
+  const refreshPeriodeCookie = () => {
+    setPeriodeCookie(getPeriodeFromCookie());
+  };
+
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        login,
+        logout,
+        periodeCookie,
+        refreshPeriodeCookie,
+      }}
+    >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider")
-  return ctx
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  return ctx;
 }

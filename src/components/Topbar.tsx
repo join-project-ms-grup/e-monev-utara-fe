@@ -2,13 +2,14 @@ import { Link, useMatches } from '@tanstack/react-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { MdKeyboardArrowDown, MdMenu } from 'react-icons/md';
 import { useAuth } from '../contexts/AuthContext';
+import Cookies from 'js-cookie';
 
 type TopbarProps = {
   toggleSidebar: () => void;
 };
 
 const Topbar = ({ toggleSidebar }: TopbarProps) => {
-  const { user } = useAuth();
+  const { user, refreshPeriodeCookie } = useAuth();
   const matches = useMatches();
   // Judul Route
   const pageTitle = matches[matches.length - 1].staticData?.title;
@@ -42,7 +43,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
         <MenuItems
           anchor='bottom'
           className={
-            'right-0 bg-white text-black p-2 w-32 rounded shadow-lg focus-visible:outline-0 z-20'
+            'right-0 bg-white text-black p-2 w-36 rounded shadow-lg focus-visible:outline-0 z-20'
           }
         >
           <MenuItem>
@@ -51,6 +52,17 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
               href='/#profil'
             >
               Profil
+            </a>
+          </MenuItem>
+          <MenuItem>
+            <a
+              className='block py-1 px-2 hover:bg-gray-200 rounded cursor-pointer'
+              onClick={() => {
+                Cookies.remove('periode');
+                refreshPeriodeCookie();
+              }}
+            >
+              Ubah Periode
             </a>
           </MenuItem>
           <MenuItem>

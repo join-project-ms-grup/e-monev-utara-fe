@@ -1,7 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../lib/config';
-import InputSearchBox from '../../components/inputs/InputSearchBox';
-import { useState } from 'react';
 import DashRKPDTable from '../../components/tables/DashRKPDTable';
 
 export const Route = createFileRoute('/_dashboard/')({
