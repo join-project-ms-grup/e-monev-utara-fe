@@ -11,10 +11,13 @@ import {
   type PaguMaster,
   type PaguMasterTree,
 } from '../../../services/PaguService';
-import { getPeriodeIDFromCookie } from '../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
-import RowExpandValue from '../RowExpandValue';
 import { useEffect, useState } from 'react';
 import DialogModal from '../../inputs/DialogModal';
 import FormPagu from '../../forms/FormPagu';
@@ -24,21 +27,31 @@ import type { ApiResponse } from '../../../lib/api';
 import AksiButton from '../../inputs/AksiButton';
 
 const tableHead = () => {
+  const mulai = Number(getPeriodeMulaiFromCookie()!);
+  const akhir = Number(getPeriodeAkhirFromCookie()!);
+
+  const periode = Array.from(
+    { length: akhir - mulai + 1 },
+    (_, i) => mulai + i,
+  );
+
   return (
     <>
       <tr>
         <th rowSpan={2}></th>
         <th rowSpan={2}>No</th>
-        <th rowSpan={2}>Kode</th>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={1} colSpan={2}>
-          Pagu
+        <th rowSpan={1} colSpan={5}>
+          Target
         </th>
         <th rowSpan={2}>Aksi</th>
       </tr>
       <tr>
-        <th rowSpan={1}>Tahun Ke</th>
-        <th rowSpan={1}>Pagu</th>
+        {periode.map((thn) => (
+          <th key={thn} rowSpan={1}>
+            {thn}
+          </th>
+        ))}
       </tr>
     </>
   );
@@ -46,6 +59,11 @@ const tableHead = () => {
 
 const PaguIndikatifTable = () => {
   const queryClient = useQueryClient();
+  //#region Modal, FormData & Tabel Data
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ['tabel_pagu'],
+    queryFn: () => getPagu(Number(getPeriodeIDFromCookie())),
+  });
   // Modal
   const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
   const [openModal, setOpenModal] = useState(false);
@@ -53,7 +71,14 @@ const PaguIndikatifTable = () => {
   const initialFormData: PaguForm = {
     skpd_periode_id: Number(getPeriodeIDFromCookie()),
     master_id: '',
-    target: [{ pagu: '', tahun_ke: '' }],
+    master_name: '',
+    target: [
+      { tahun_ke: '1', pagu: '' },
+      { tahun_ke: '2', pagu: '' },
+      { tahun_ke: '3', pagu: '' },
+      { tahun_ke: '4', pagu: '' },
+      { tahun_ke: '5', pagu: '' },
+    ],
   };
   const [formData, setFormData] = useState<PaguForm>(initialFormData);
   // Clear form
@@ -67,7 +92,10 @@ const PaguIndikatifTable = () => {
       console.log('PaguIndikatifTable.tsx', formData);
     }
   }, [openModal]);
+  //#endregion
 
+  //#region Mutasi
+  const [loadingMutation, setLoadingMutation] = useState(false);
   // Add
   const addMutation = useMutation({
     mutationFn: async (payload: PaguForm) => {
@@ -75,12 +103,10 @@ const PaguIndikatifTable = () => {
       return addPagu({
         master_id: Number(payload.master_id),
         skpd_periode_id: Number(payload.skpd_periode_id),
-        target: [
-          {
-            pagu: Number(payload.target?.[0].pagu),
-            tahun_ke: Number(payload.target?.[0].tahun_ke),
-          },
-        ],
+        target: payload.target?.slice(0, 5).map((t) => ({
+          pagu: Number(t.pagu),
+          tahun_ke: Number(t.tahun_ke),
+        })),
       });
     },
     onSuccess: () => {
@@ -102,7 +128,15 @@ const PaguIndikatifTable = () => {
   const updateMutation = useMutation({
     mutationFn: async (payload: PaguForm) => {
       setLoadingMutation(true);
-      return updatePagu(payload);
+      // return updatePagu(payload);
+      return updatePagu({
+        master_id: Number(payload.master_id),
+        skpd_periode_id: Number(payload.skpd_periode_id),
+        target: payload.target?.slice(0, 5).map((t) => ({
+          pagu: Number(t.pagu),
+          tahun_ke: Number(t.tahun_ke),
+        })),
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_pagu'] });
@@ -118,13 +152,9 @@ const PaguIndikatifTable = () => {
       setLoadingMutation(false);
     },
   });
+  //#endregion
 
-  const [loadingMutation, setLoadingMutation] = useState(false);
-  const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_pagu'],
-    queryFn: () => getPagu(Number(getPeriodeIDFromCookie())),
-  });
-
+  // #region Kolom Tabel
   const subRows = (row: PaguMasterTree) =>
     row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
 
@@ -138,14 +168,16 @@ const PaguIndikatifTable = () => {
     },
     {
       header: 'No',
-      cell: ({ row }) => `${row.index + 1}`,
-      meta: {
-        tdClassNames: 'text-center',
-      },
-    },
-    {
-      accessorKey: 'kode',
-      header: 'Kode',
+      cell: ({ row }) => (
+        <div
+          className='inline-flex items-start'
+          style={{
+            paddingLeft: `${row.depth * 1}rem`,
+          }}
+        >
+          {row.index + 1}
+        </div>
+      ),
       meta: {
         tdClassNames: 'text-center',
       },
@@ -153,41 +185,36 @@ const PaguIndikatifTable = () => {
     {
       accessorKey: 'name',
       header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      enableSorting: false,
-      filterFn: 'equalsString',
-      meta: {
-        tdClassNames: 'capitalize',
+      cell: ({ row, getValue }) => {
+        let currentRow: any = row;
+        const kodeArray: string[] = [];
+        while (currentRow) {
+          kodeArray.unshift(currentRow.original.kode); // unshift supaya root duluan
+          currentRow = currentRow.getParentRow?.();
+        }
+
+        return (
+          <div className='' style={{ paddingLeft: `${row.depth * 1}rem` }}>
+            <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
+            {getValue<string>()}
+          </div>
+        );
       },
-      cell: (ctx) => (
-        <>
-          <span>{`[id:${ctx.row.original.id}] `}</span>
-          <RowExpandValue {...ctx} />
-        </>
-      ),
     },
     {
-      header: 'Pagu',
+      header: 'Target',
       meta: {
         tdClassNames: 'text-center',
       },
-      columns: [
-        {
-          id: 'tahun_ke',
-          accessorFn: (row) => row.pagu?.[0].tahun_ke,
-          header: 'Tahun Ke',
-          meta: {
-            tdClassNames: 'text-center',
-          },
+      columns: [1, 2, 3, 4, 5].map((tahun) => ({
+        id: `pagu${tahun}`,
+        header: `Pagu ${tahun}`,
+        meta: { tdClassNames: 'text-center p-0!' },
+        accessorFn: (row) => {
+          const item = row.pagu?.find((p) => p.tahun_ke === tahun);
+          return item ? item.pagu : null;
         },
-        {
-          id: 'pagu',
-          accessorFn: (row) => row.pagu?.[0].pagu,
-          header: 'Pagu',
-          meta: {
-            tdClassNames: 'text-center',
-          },
-        },
-      ],
+      })),
     },
     {
       header: 'Aksi',
@@ -200,15 +227,20 @@ const PaguIndikatifTable = () => {
                 Icon={MdEdit}
                 tooltip='Ubah'
                 onClick={() => {
+                  const mappedPagu = formData.target?.map(({ tahun_ke }) => {
+                    const found = data.pagu?.find(
+                      (p) => Number(p.tahun_ke) === Number(tahun_ke),
+                    );
+                    return {
+                      tahun_ke,
+                      pagu: found?.pagu || 0,
+                    };
+                  });
                   setFormData({
                     master_id: data.id,
+                    master_name: data.name,
                     skpd_periode_id: Number(getPeriodeIDFromCookie()),
-                    target: [
-                      {
-                        pagu: data.pagu?.[0].pagu,
-                        tahun_ke: data.pagu?.[0].tahun_ke,
-                      },
-                    ],
+                    target: mappedPagu,
                   });
                   setModalState('Edit');
                   setOpenModal(true);
@@ -223,6 +255,7 @@ const PaguIndikatifTable = () => {
       },
     },
   ];
+  // #endregion
 
   return (
     <div className='space-y-2'>
@@ -252,9 +285,11 @@ const PaguIndikatifTable = () => {
         data={data || []}
         columns={columns}
         subRows={subRows}
-        subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
-        subLabelPosition={4}
+        // subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
+        // subLabelPosition={4}
         renderHeader={tableHead}
+        tblClassName='lg:min-w-[1500px]'
+        initialExpanded
       />
       {modalState === 'Add' && (
         <DialogModal

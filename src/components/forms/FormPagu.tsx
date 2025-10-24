@@ -8,7 +8,12 @@ import { getChildren, getUrusan } from '../../services/MasterService';
 import { useQuery } from '@tanstack/react-query';
 import { getPeriodeIDFromCookie } from '../../lib/usercookie';
 import InputText from '../inputs/InputText';
-import { paguSchema, paguSchemaSubmit } from './schemas/SchemaPagu';
+import {
+  mapErrors,
+  mapToInput,
+  paguSchema,
+  paguSchemaSubmit,
+} from './schemas/SchemaPagu';
 
 // #region Types
 interface PilihanParent {
@@ -43,25 +48,13 @@ const FormPagu: React.FC<FormProps> = ({
   defaultValues,
 }) => {
   // #region Form
-  function mapToInput(value: any) {
-    return {
-      skpd_periode_id: value.skpd_periode_id?.toString() ?? '',
-      master_id: value.master_id?.toString() ?? '',
-      target: {
-        pagu: value.target?.pagu?.toString() ?? '',
-        tahun_ke: value.target?.tahun_ke?.toString() ?? '',
-      },
-    };
-  }
-
-  function mapErrors(errors: any) {
-    return {
-      skpd_periode_id: errors.skpd_periode_id?._errors[0],
-      master_id: errors.master_id?._errors[0],
-      'target.pagu': errors.target?.pagu?._errors[0],
-      'target.tahun_ke': errors.target?.tahun_ke?._errors[0],
-    };
-  }
+  const validateWith = (schema: any, value: any) => {
+    const input = mapToInput(value);
+    const result = schema.safeParse(input);
+    return result.success
+      ? { fields: {} }
+      : { fields: mapErrors(result.error.format()) };
+  };
 
   const form = useForm({
     defaultValues,
@@ -69,20 +62,8 @@ const FormPagu: React.FC<FormProps> = ({
       onSubmit(value);
     },
     validators: {
-      onChange: ({ value }) => {
-        const input = mapToInput(value);
-        const result = paguSchema.safeParse(input);
-
-        if (result.success) return { fields: {} };
-        return { fields: mapErrors(result.error.format()) };
-      },
-      onSubmit: ({ value }) => {
-        const input = mapToInput(value);
-        const result = paguSchemaSubmit.safeParse(input);
-
-        if (result.success) return { fields: {} };
-        return { fields: mapErrors(result.error.format()) };
-      },
+      onChange: ({ value }) => validateWith(paguSchema, value),
+      onSubmit: ({ value }) => validateWith(paguSchemaSubmit, value),
     },
   });
   // #endregion
@@ -90,8 +71,6 @@ const FormPagu: React.FC<FormProps> = ({
   // #region Master ID
   const [selectedRek, setSelectedRek] = useState('');
   const listRekening = [
-    { label: 'Urusan', value: 'urusan' },
-    { label: 'Bidang', value: 'bidang' },
     { label: 'Program', value: 'program' },
     { label: 'Kegiatan', value: 'kegiatan' },
     { label: 'Sub Kegiatan', value: 'subKegiatan' },
@@ -142,14 +121,6 @@ const FormPagu: React.FC<FormProps> = ({
     let parentValue = '';
 
     switch (selectedRek) {
-      case 'urusan':
-        if (urusan) parentValue = urusan;
-        break;
-
-      case 'bidang':
-        if (urusan && bidang) parentValue = bidang;
-        break;
-
       case 'program':
         if (urusan && bidang && program) parentValue = program;
         break;
@@ -235,7 +206,7 @@ const FormPagu: React.FC<FormProps> = ({
           {type === 'Add' && (
             <div>
               <InputSearchBox
-                defaultOptionLabel='Pilih Rekening'
+                defaultOptionLabel='Pilih Tujuan'
                 options={listRekening}
                 value={selectedRek}
                 onChange={(val) => setSelectedRek(val)}
@@ -370,50 +341,46 @@ const FormPagu: React.FC<FormProps> = ({
             )}
           </form.Field>
 
-          <div className='inline-flex gap-2'>
-            {/* Field Target Pagu */}
-            <form.Field name='target[0].pagu'>
-              {(field) => (
-                <div className='flex-1'>
-                  <label htmlFor='target.pagu'>Target Pagu</label>
-                  <InputText
-                    inputMode='numeric'
-                    type='text'
-                    placeholder='Target Pagu...'
-                    id='target.pagu'
-                    value={field.state.value ?? ''}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    invalid={!field.state.meta.isValid}
-                  />
-                  <ErrorField field={field} />
-                </div>
-              )}
-            </form.Field>
-            {/* Field Target Tahun Ke */}
-            <form.Field name='target[0].tahun_ke'>
-              {(field) => (
-                <div className='flex-1'>
-                  <label htmlFor='target.tahun_ke'>Target Tahun Ke</label>
-                  <InputSearchBox
-                    className='h-9'
-                    id='target.tahun_ke'
-                    defaultOptionLabel='Pilih Target Tahun Ke'
-                    options={[
-                      { label: '1', value: '1' },
-                      { label: '2', value: '2' },
-                      { label: '3', value: '3' },
-                      { label: '4', value: '4' },
-                      { label: '5', value: '5' },
-                    ]}
-                    onChange={(val) => field.handleChange(val)}
-                    value={field.state.value?.toString() ?? ''}
-                    onClear={() => field.handleChange('')}
-                  />
-                  <ErrorField field={field} />
-                </div>
-              )}
-            </form.Field>
+          {type === 'Edit' && <InputText value={form.getFieldValue('master_name')} onChange={() => {}} disabled readOnly />}
+          {/* Target */}
+          <div className='grid grid-cols-3 grid-rows-2 gap-2'>
+            {[0, 1, 2, 3, 4].map((n) => (
+              <div key={n}>
+                <form.Field name={`target[${n}].pagu`}>
+                  {(field) => (
+                    <>
+                      <label htmlFor={`target[${n}].pagu`}>
+                        Tahun ke {n + 1}
+                      </label>
+                      <InputText
+                        inputMode='numeric'
+                        type='text'
+                        placeholder='Target...'
+                        id={`target[${n}].pagu`}
+                        value={field.state.value ?? ''}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        invalid={!field.state.meta.isValid}
+                      />
+                      <ErrorField field={field} />
+                    </>
+                  )}
+                </form.Field>
+                <form.Field name={`target[${n}].tahun_ke`}>
+                  {(field) => (
+                    <>
+                      <input
+                        type='hidden'
+                        value={field.state.value ?? ''}
+                        readOnly
+                      />
+                      {/* <ErrorField field={field} /> */}
+                    </>
+                  )}
+                </form.Field>
+              </div>
+            ))}
           </div>
+
           {/* Field SKPD Periode Id */}
           <form.Field name='skpd_periode_id'>
             {(field) => (

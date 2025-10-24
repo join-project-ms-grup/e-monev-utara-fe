@@ -7,6 +7,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   Icon?: IconType;
   wrapperHeight?: string;
   wrapperClassname?: string;
+  disabled?: boolean;
 }
 
 const InputText = ({
@@ -17,6 +18,7 @@ const InputText = ({
   onBeforeInput,
   wrapperHeight = '10',
   wrapperClassname,
+  disabled = false,
   ...props
 }: InputProps) => {
   const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -34,7 +36,7 @@ const InputText = ({
     }
   };
   return (
-    <div className={`${wrapperClassname} bg-white shadow input-wrapper h-9 inline-flex`}>
+    <div className={`${wrapperClassname} bg-white shadow input-wrapper h-9 inline-flex ${disabled ? 'opacity-60' : ''}`}>
       {Icon && <Icon className='text-4xl h-full pl-2' />}
       <input
         type={type}
@@ -45,7 +47,7 @@ const InputText = ({
         className='h-full'
       />
       <PiWarningCircle
-        className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-2 ${invalid ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-2 ${invalid ? 'block opacity-100' : 'hidden opacity-0'}`}
       />
     </div>
   );

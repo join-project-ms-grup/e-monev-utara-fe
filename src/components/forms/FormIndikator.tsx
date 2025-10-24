@@ -82,8 +82,6 @@ const FormIndikator: React.FC<FormProps> = ({
   // #region Master ID
   const [selectedRek, setSelectedRek] = useState('');
   const listRekening = [
-    { label: 'Urusan', value: 'urusan' },
-    { label: 'Bidang', value: 'bidang' },
     { label: 'Program', value: 'program' },
     { label: 'Kegiatan', value: 'kegiatan' },
     { label: 'Sub Kegiatan', value: 'subKegiatan' },
@@ -245,7 +243,7 @@ const FormIndikator: React.FC<FormProps> = ({
                 {type === 'Add' && (
                   <div>
                     <InputSearchBox
-                      defaultOptionLabel='Pilih Rekening'
+                      defaultOptionLabel='Pilih Tujuan'
                       options={listRekening}
                       value={selectedRek}
                       onChange={(val) => setSelectedRek(val)}
@@ -476,7 +474,7 @@ const FormIndikator: React.FC<FormProps> = ({
                         value={field.state.value ?? ''}
                         readOnly
                       />
-                      <ErrorField field={field} />
+                      {/* <ErrorField field={field} /> */}
                     </>
                   )}
                 </form.Field>

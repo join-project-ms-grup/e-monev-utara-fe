@@ -63,7 +63,7 @@ const tableHead = () => {
 
 const IndikatorTable = () => {
   const queryClient = useQueryClient();
-  // #region Modal & FormData & Tabel Data
+  //#region SKPD
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
@@ -74,7 +74,8 @@ const IndikatorTable = () => {
       label: `[${item.id}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
-
+  //#endregion
+  // #region Modal, FormData & Tabel Data
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_indikator', selectedSKPD],
     queryFn: () => getIndikator(Number(selectedSKPD)),
@@ -418,10 +419,9 @@ const IndikatorTable = () => {
         data={data || []}
         columns={columns}
         subRows={subRows}
-        subLabelPosition={9}
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
-        initialExpanded={true}
+        initialExpanded
       />
       {modalState === 'Add' && (
         <DialogModal
@@ -470,13 +470,6 @@ const IndikatorTable = () => {
             defaultValues={formData}
             onSubmit={({ id, payload }) => {
               console.log('Data dari form modal:', data);
-              // updateMutation.mutate({
-              //   skpd_periode_id: data.skpd_periode_id,
-              //   master_id: data.master_id,
-              //   name: data.name,
-              //   satuan: data.satuan,
-              //   target: data.target,
-              // });
               updateMutation.mutate({
                 id,
                 payload: {

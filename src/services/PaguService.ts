@@ -31,6 +31,7 @@ export type PaguMasterTree = PaguMasterUrusan & PaguMasterBidang & PaguMasterPro
 export interface PaguForm{
   skpd_periode_id?: number | string;
   master_id?:number | string;
+  master_name?: string;
   target?: Pagu[];
 }
 
