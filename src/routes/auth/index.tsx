@@ -32,7 +32,7 @@ export const Route = createFileRoute('/auth/')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, refreshPeriodeCookie } = useAuth();
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin123');
 
@@ -52,7 +52,7 @@ function RouteComponent() {
           username: data.username,
         },
       });
-      navigate({ to: '/' });
+      navigate({ to: '/', replace: true });
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
       if (error.status === 400) {

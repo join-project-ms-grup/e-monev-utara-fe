@@ -11,6 +11,8 @@ import {
   MdAssignmentTurnedIn,
   MdFiberManualRecord,
   MdDragIndicator,
+  MdSpeed,
+  MdPayments,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
 import { SITE_NAME } from '../lib/config';
@@ -93,7 +95,8 @@ const menuRKPD: MenuItem[] = [
   //   ],
   //   akses: 3,
   // },
-  { label: 'Indikator', icon: <MdInsights />, to: '/rkpd/indikator', akses: 3 },
+  { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
+  { label: 'Capaian', icon: <MdInsights />, to: '/rkpd/capaian', akses: 3 },
   { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
   {
     label: 'Realisasi',
@@ -113,7 +116,7 @@ const menuDAK: MenuItem[] = [
   },
   {
     label: 'DAK Kabupaten',
-    icon: <MdInsights />,
+    icon: <MdPayments />,
     submenu: [
       { label: 'Identifikasi DAK', to: '/dak/kabupaten/identifikasi' },
       { label: 'Monitoring DAK', to: '/dak/kabupaten/monitoring' },

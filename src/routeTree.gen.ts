@@ -26,6 +26,7 @@ import { Route as DashboardRkpdRenjaRouteImport } from './routes/_dashboard/rkpd
 import { Route as DashboardRkpdRealisasiRouteImport } from './routes/_dashboard/rkpd/realisasi'
 import { Route as DashboardRkpdPagu_indikatifRouteImport } from './routes/_dashboard/rkpd/pagu_indikatif'
 import { Route as DashboardRkpdIndikatorRouteImport } from './routes/_dashboard/rkpd/indikator'
+import { Route as DashboardRkpdCapaianRouteImport } from './routes/_dashboard/rkpd/capaian'
 import { Route as DashboardMasterSkpdRouteImport } from './routes/_dashboard/master/skpd'
 import { Route as DashboardMasterRoleRouteImport } from './routes/_dashboard/master/role'
 import { Route as DashboardMasterRekeningRouteImport } from './routes/_dashboard/master/rekening'
@@ -135,6 +136,11 @@ const DashboardRkpdPagu_indikatifRoute =
 const DashboardRkpdIndikatorRoute = DashboardRkpdIndikatorRouteImport.update({
   id: '/indikator',
   path: '/indikator',
+  getParentRoute: () => DashboardRkpdRouteRoute,
+} as any)
+const DashboardRkpdCapaianRoute = DashboardRkpdCapaianRouteImport.update({
+  id: '/capaian',
+  path: '/capaian',
   getParentRoute: () => DashboardRkpdRouteRoute,
 } as any)
 const DashboardMasterSkpdRoute = DashboardMasterSkpdRouteImport.update({
@@ -287,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/master/rekening': typeof DashboardMasterRekeningRoute
   '/master/role': typeof DashboardMasterRoleRoute
   '/master/skpd': typeof DashboardMasterSkpdRoute
+  '/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
   '/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/master/rekening': typeof DashboardMasterRekeningRoute
   '/master/role': typeof DashboardMasterRoleRoute
   '/master/skpd': typeof DashboardMasterSkpdRoute
+  '/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
   '/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
@@ -363,6 +371,7 @@ export interface FileRoutesById {
   '/_dashboard/master/rekening': typeof DashboardMasterRekeningRoute
   '/_dashboard/master/role': typeof DashboardMasterRoleRoute
   '/_dashboard/master/skpd': typeof DashboardMasterSkpdRoute
+  '/_dashboard/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/_dashboard/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
   '/_dashboard/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/_dashboard/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
@@ -406,6 +415,7 @@ export interface FileRouteTypes {
     | '/master/rekening'
     | '/master/role'
     | '/master/skpd'
+    | '/rkpd/capaian'
     | '/rkpd/indikator'
     | '/rkpd/pagu_indikatif'
     | '/rkpd/realisasi'
@@ -439,6 +449,7 @@ export interface FileRouteTypes {
     | '/master/rekening'
     | '/master/role'
     | '/master/skpd'
+    | '/rkpd/capaian'
     | '/rkpd/indikator'
     | '/rkpd/pagu_indikatif'
     | '/rkpd/realisasi'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/_dashboard/master/rekening'
     | '/_dashboard/master/role'
     | '/_dashboard/master/skpd'
+    | '/_dashboard/rkpd/capaian'
     | '/_dashboard/rkpd/indikator'
     | '/_dashboard/rkpd/pagu_indikatif'
     | '/_dashboard/rkpd/realisasi'
@@ -626,6 +638,13 @@ declare module '@tanstack/react-router' {
       path: '/indikator'
       fullPath: '/rkpd/indikator'
       preLoaderRoute: typeof DashboardRkpdIndikatorRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
+    }
+    '/_dashboard/rkpd/capaian': {
+      id: '/_dashboard/rkpd/capaian'
+      path: '/capaian'
+      fullPath: '/rkpd/capaian'
+      preLoaderRoute: typeof DashboardRkpdCapaianRouteImport
       parentRoute: typeof DashboardRkpdRouteRoute
     }
     '/_dashboard/master/skpd': {
@@ -910,6 +929,7 @@ const DashboardRkpdRenstraRouteRouteWithChildren =
 interface DashboardRkpdRouteRouteChildren {
   DashboardRkpdIkuRouteRoute: typeof DashboardRkpdIkuRouteRouteWithChildren
   DashboardRkpdRenstraRouteRoute: typeof DashboardRkpdRenstraRouteRouteWithChildren
+  DashboardRkpdCapaianRoute: typeof DashboardRkpdCapaianRoute
   DashboardRkpdIndikatorRoute: typeof DashboardRkpdIndikatorRoute
   DashboardRkpdPagu_indikatifRoute: typeof DashboardRkpdPagu_indikatifRoute
   DashboardRkpdRealisasiRoute: typeof DashboardRkpdRealisasiRoute
@@ -920,6 +940,7 @@ interface DashboardRkpdRouteRouteChildren {
 const DashboardRkpdRouteRouteChildren: DashboardRkpdRouteRouteChildren = {
   DashboardRkpdIkuRouteRoute: DashboardRkpdIkuRouteRouteWithChildren,
   DashboardRkpdRenstraRouteRoute: DashboardRkpdRenstraRouteRouteWithChildren,
+  DashboardRkpdCapaianRoute: DashboardRkpdCapaianRoute,
   DashboardRkpdIndikatorRoute: DashboardRkpdIndikatorRoute,
   DashboardRkpdPagu_indikatifRoute: DashboardRkpdPagu_indikatifRoute,
   DashboardRkpdRealisasiRoute: DashboardRkpdRealisasiRoute,

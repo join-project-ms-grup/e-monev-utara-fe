@@ -40,8 +40,8 @@ const tableHead = () => {
   return (
     <>
       <tr>
-        <th rowSpan={2}></th>
-        <th rowSpan={2}>No</th>
+        {/* <th rowSpan={2}></th>
+        <th rowSpan={2}>No</th> */}
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={2}>Indikator</th>
         <th rowSpan={2}>Satuan</th>
@@ -185,44 +185,27 @@ const IndikatorTable = () => {
 
   const columns: ColumnDef<IndikatorMaster>[] = [
     {
-      header: ' ',
-      cell: (ctx) => <RowExpand {...ctx} />,
-      meta: {
-        tdClassNames: 'text-center',
-      },
-    },
-    {
-      header: 'No',
-      cell: ({ row }) => (
-        <div
-          className='inline-flex items-start'
-          style={{
-            paddingLeft: `${row.depth * 1}rem`,
-          }}
-        >
-          {row.index + 1}
-        </div>
-      ),
-      meta: {
-        tdClassNames: 'text-center',
-      },
-    },
-    {
       accessorKey: 'name',
       header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      cell: ({ row, getValue }) => {
-        let currentRow: any = row;
+      cell: (ctx) => {
+        let currentRow: any = ctx.row;
         const kodeArray: string[] = [];
         while (currentRow) {
-          kodeArray.unshift(currentRow.original.kode); // unshift supaya root duluan
+          kodeArray.unshift(currentRow.original.kode);
           currentRow = currentRow.getParentRow?.();
         }
 
         return (
-          <div className='' style={{ paddingLeft: `${row.depth * 1}rem` }}>
-            <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
-            {getValue<string>()}
-          </div>
+          <>
+            <div
+              className='inline-flex gap-2'
+              style={{ paddingLeft: `${ctx.row.depth * 1}rem` }}
+            >
+              <RowExpand showValue={false} {...ctx} />
+              <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
+              {ctx.getValue<string>()}
+            </div>
+          </>
         );
       },
     },

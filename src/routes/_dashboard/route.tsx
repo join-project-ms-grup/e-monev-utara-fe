@@ -99,7 +99,7 @@ function PeriodeComponent() {
                 <AksiButton
                   tooltip='Keluar'
                   Icon={MdLogout}
-                  className='mr-2 p-1'
+                  className='mr-2 p-1 hover:text-gray-800 hover:opacity-60'
                   hoverColor='bg-[var(--color-2)]'
                   onClick={() =>
                     navigate({ to: '/auth/logout', replace: true })

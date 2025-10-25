@@ -1,10 +1,18 @@
-import React from 'react'
-import { MdKeyboardArrowDown } from 'react-icons/md'
-import type { CellContext } from '@tanstack/react-table'
+import React from 'react';
+import { MdHorizontalRule, MdKeyboardArrowDown } from 'react-icons/md';
+import type { CellContext } from '@tanstack/react-table';
 
-function RowExpand<TData, TValue>({ row, getValue }: CellContext<TData, TValue>) {
+interface RowExpandProps<TData, TValue> extends CellContext<TData, TValue> {
+  showValue?: boolean;
+}
+
+function RowExpand<TData, TValue>({
+  row,
+  getValue,
+  showValue = true,
+}: RowExpandProps<TData, TValue>) {
   return (
-    <div>
+    <div className='inline-flex items-center'>
       {row.getCanExpand() ? (
         <button
           className={`font-extrabold transition-all ease hover:opacity-80 active:scale-100 ${
@@ -20,11 +28,11 @@ function RowExpand<TData, TValue>({ row, getValue }: CellContext<TData, TValue>)
           />
         </button>
       ) : (
-        <span className="font-bold">-</span>
+        <MdHorizontalRule className='scale-x-75'></MdHorizontalRule>
       )}
-      {getValue() as React.ReactNode}
+      {showValue && (getValue() as React.ReactNode)}
     </div>
-  )
+  );
 }
 
-export default RowExpand
+export default RowExpand;

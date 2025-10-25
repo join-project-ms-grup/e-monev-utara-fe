@@ -36,25 +36,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     Cookies.set('me', JSON.stringify(data.user), {
       sameSite: 'strict',
     });
+    refreshPeriodeCookie();
     setToken(data.token);
     setUser(data.user);
     toast.success('Autentikasi berhasil');
   };
+  const [periodeCookie, setPeriodeCookie] = useState(
+    getPeriodeFromCookie() || null,
+  );
+  const refreshPeriodeCookie = () => {
+    const localPCookie = getPeriodeFromCookie();
+    setPeriodeCookie(localPCookie);
+    if (localPCookie) {
+      toast.success(`Periode: ${localPCookie.mulai} - ${localPCookie.akhir}`);
+    }
+  };
 
   const logout = () => {
     Cookies.remove('periode');
+    refreshPeriodeCookie();
     Cookies.remove('token');
     Cookies.remove('me');
     setToken(null);
     setUser(null);
     toast.success('Logout berhasil');
-  };
-
-  const [periodeCookie, setPeriodeCookie] = useState(
-    getPeriodeFromCookie() || null,
-  );
-  const refreshPeriodeCookie = () => {
-    setPeriodeCookie(getPeriodeFromCookie());
   };
 
   return (
