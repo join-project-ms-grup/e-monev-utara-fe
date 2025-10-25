@@ -235,21 +235,25 @@ const CapaianTable = () => {
         if (!indikatorList || indikatorList.length === 0) return null;
 
         return (
-          <>
-            <div>
-              <table className='w-full'>
-                <tbody className='border-0!'>
-                  {indikatorList.map((item) => (
+          <div>
+            <table className='w-full'>
+              <tbody className='border-0!'>
+                {indikatorList.map((item) => {
+                  const targetValue = Array.isArray(item.target)
+                    ? (item.target[0]?.target ?? '-')
+                    : '-';
+
+                  return (
                     <tr key={item.id}>
                       <td className='block overflow-y-auto h-[70px]'>
-                        {item.target?.[0].target}
+                        {targetValue}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         );
       },
     },
@@ -342,64 +346,67 @@ const CapaianTable = () => {
         );
       },
     },
-{
-  header: 'Aksi',
-  meta: { tdClassNames: 'p-0!' },
-  cell: ({ row }) => {
-    const data = row.original;
-    const indikatorList = data.indikator as CapaianIndikator[];
-    if (!indikatorList || indikatorList.length === 0) return null;
+    {
+      header: 'Aksi',
+      meta: { tdClassNames: 'p-0!' },
+      cell: ({ row }) => {
+        const data = row.original;
+        const indikatorList = data.indikator as CapaianIndikator[];
+        if (!indikatorList || indikatorList.length === 0) return null;
 
-    return (
-      <div>
-        <table className='w-full'>
-          <tbody className='border-0!'>
-            {indikatorList.map((item) => (
-              <tr key={item.id}>
-                <td className='block overflow-y-auto h-[70px]'>
-                  <AksiButton
-                    Icon={MdEdit}
-                    tooltip='Ubah'
-                    onClick={() => {
-                      const matchedTarget = item.target?.find(
-                        (t) => Number(t.tahun_ke) === Number(tahunKe)
-                      );
+        return (
+          <div>
+            <table className='w-full'>
+              <tbody className='border-0!'>
+                {indikatorList.map((item) => (
+                  <tr key={item.id}>
+                    <td className='block overflow-y-auto h-[70px]'>
+                      <AksiButton
+                        Icon={MdEdit}
+                        tooltip='Ubah'
+                        onClick={() => {
+                          const matchedTarget = item.target?.find(
+                            (t) => Number(t.tahun_ke) === Number(tahunKe),
+                          );
 
-                      const id_rincian =
-                        matchedTarget?.id_rincian ??
-                        item.target?.[0]?.id_rincian ??
-                        item.id ??
-                        undefined;
+                          const id_rincian =
+                            matchedTarget?.id_rincian ??
+                            item.target?.[0]?.id_rincian ??
+                            item.id ??
+                            undefined;
 
-                      const capaianObj =
-                        (Array.isArray(item.capaian)
-                          ? item.capaian[0]
-                          : item.capaian) ?? ({} as CapaianIndikatorCapaian);
+                          const capaianObj =
+                            (Array.isArray(item.capaian)
+                              ? item.capaian[0]
+                              : item.capaian) ??
+                            ({} as CapaianIndikatorCapaian);
 
-                      const capaian = capaianObj.capaianTriwulan?.map((tw: CapaianTriwulan) => ({
-                        triwulan: tw.triwulan,
-                        capaian: tw.capaian ?? 0,
-                      })) ?? [];
+                          const capaian =
+                            capaianObj.capaianTriwulan?.map(
+                              (tw: CapaianTriwulan) => ({
+                                triwulan: tw.triwulan,
+                                capaian: tw.capaian ?? 0,
+                              }),
+                            ) ?? [];
 
-                      setFormData({
-                        indikator_name: item.name ?? '',
-                        id_rincian,
-                        capaian,
-                      });
+                          setFormData({
+                            indikator_name: item.name ?? '',
+                            id_rincian,
+                            capaian,
+                          });
 
-                      setOpenModal(true);
-                    }}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  },
-}
-
+                          setOpenModal(true);
+                        }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      },
+    },
   ];
   // #endregion
 
@@ -490,7 +497,7 @@ const CapaianTable = () => {
             <InputButton
               type='submit'
               className='btn btn-theme w-24'
-                isLoading={loadingMutation}
+              isLoading={loadingMutation}
             >
               Simpan
             </InputButton>
