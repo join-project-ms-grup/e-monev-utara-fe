@@ -50,9 +50,9 @@ const menuUtama: MenuItem[] = [
     label: 'Master',
     icon: <MdInventory />,
     submenu: [
-      { label: 'Organisasi', to: '/master/organisasi' },
+      // { label: 'Organisasi', to: '/master/organisasi' },
       { label: 'Rekening', to: '/master/rekening' },
-      { label: 'Jadwal', to: '/master/jadwal' },
+      // { label: 'Jadwal', to: '/master/jadwal' },
       { label: 'Role', to: '/master/role', akses: 1 && 2 },
       { label: 'Periode', to: '/master/periode' },
       { label: 'SKPD', to: '/master/skpd' },
@@ -63,7 +63,7 @@ const menuUtama: MenuItem[] = [
     icon: <MdSettings />,
     submenu: [
       { label: 'User', to: '/konfigurasi/user' },
-      { label: 'Transfer Data', to: '/konfigurasi/transferdata' },
+      // { label: 'Transfer Data', to: '/konfigurasi/transferdata' },
     ],
   },
 ];
@@ -97,7 +97,7 @@ const menuRKPD: MenuItem[] = [
   // },
   { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
   { label: 'Capaian', icon: <MdInsights />, to: '/rkpd/capaian', akses: 3 },
-  { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
+  // { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
   {
     label: 'Realisasi',
     icon: <MdAssignmentTurnedIn />,
