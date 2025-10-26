@@ -10,7 +10,11 @@ import {
   type RealisasiForm,
   type RealisasiMasterTree,
 } from '../../../services/RealisasiService';
-import { getPeriodeIDFromCookie } from '../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import RowExpand from '../RowExpand';
 import AksiButton from '../../inputs/AksiButton';
@@ -19,6 +23,8 @@ import DialogModal from '../../inputs/DialogModal';
 import FormRealisasi from '../../forms/FormRealisasi';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
+import InputSearchBox from '../../inputs/InputSearchBox';
+import { formatUang } from '../../../lib/Helper';
 
 const tableHead = () => {
   return (
@@ -45,9 +51,12 @@ const tableHead = () => {
 const RealisasiTable = () => {
   const queryClient = useQueryClient();
   //#region Modal, FormData & Tabel Data
+  const [tahunKe, setTahunKe] = useState('');
+  const skpdPeriodeId = Number(getPeriodeIDFromCookie());
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_realisasi'],
-    queryFn: () => getRealisasi(Number(getPeriodeIDFromCookie())),
+    queryKey: ['tabel_realisasi', skpdPeriodeId, tahunKe],
+    queryFn: () => getRealisasi(skpdPeriodeId, Number(tahunKe)),
+    enabled: !!(skpdPeriodeId && tahunKe),
   });
   // Modal
   const [openModal, setOpenModal] = useState(false);
@@ -141,6 +150,8 @@ const RealisasiTable = () => {
       meta: {
         tdClassNames: 'text-center',
       },
+      cell: ({ getValue }) =>
+        `${getValue() ? formatUang(Number(getValue())) : ''}`,
     },
     {
       header: 'Triwulan',
@@ -155,7 +166,7 @@ const RealisasiTable = () => {
           const item = row.realisasi_per_triwulan?.find(
             (p) => p.triwulan === triwulan,
           );
-          return item ? item.realisasi : null;
+          return item ? formatUang(Number(item.realisasi)) : null;
         },
       })),
     },
@@ -165,11 +176,16 @@ const RealisasiTable = () => {
       meta: {
         tdClassNames: 'text-center font-bold',
       },
+      cell: ({ getValue }) =>
+        `${getValue() ? formatUang(Number(getValue())) : ''}`,
     },
     {
       header: 'Aksi',
       cell: (ctx) => {
-        if (ctx.row.original.pagu && ctx.row.original.type?.includes('subKegiatan')) {
+        if (
+          ctx.row.original.pagu &&
+          ctx.row.original.type?.includes('subKegiatan')
+        ) {
           const data = ctx.row.original;
           return (
             <>
@@ -207,10 +223,36 @@ const RealisasiTable = () => {
   ];
   // #endregion
 
+  //#region List data periode
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+  //#endregion
+
   return (
     <div className='space-y-2'>
       <div className='flex items-end justify-between'>
-        <div className='inline-flex gap-2'></div>
+        <div className='inline-flex gap-2'>
+          <div>
+            <label htmlFor='tahun_ke'>Tahun ke</label>
+            <InputSearchBox
+              id='tahun_ke'
+              className='w-42 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Tahun ke...'
+              value={tahunKe}
+              options={listTahunKe}
+              onChange={(val) => setTahunKe(val)}
+              onClear={() => setTahunKe('')}
+            />
+          </div>
+        </div>
         <div className='inline-flex gap-2'>
           {/* <InputButton
             tooltip='Cetak Laporan 5 Tahunan'
@@ -250,7 +292,7 @@ const RealisasiTable = () => {
         initialExpanded
       />
       <DialogModal
-        title='Tambah data Realisasi'
+        title='Ubah data Realisasi'
         isOpen={openModal}
         onClose={() => {
           setFormData(initialFormData);

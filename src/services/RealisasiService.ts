@@ -43,9 +43,9 @@ export interface RealisasiForm {
 /**
  * Ambil semua data realisasi
  */
-export const getRealisasi = async (id: number): Promise<RealisasiMasterTree[]> => {
+export const getRealisasi = async (skpd_periode_id: number, tahun_ke: number): Promise<RealisasiMasterTree[]> => {
   try {
-    const response = await api.get<ApiResponse<RealisasiMasterTree[]>>(`/realisasi-anggaran/list/${id}`);
+    const response = await api.get<ApiResponse<RealisasiMasterTree[]>>(`/realisasi-anggaran/list/${skpd_periode_id}/${tahun_ke}`);
     return response.data.data;
   } catch (error: any) {
     if (error.response?.status === 404) {

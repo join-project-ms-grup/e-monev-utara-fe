@@ -32,12 +32,6 @@ import type { ApiResponse } from '../../../lib/api';
 const tableHead = () => {
   return (
     <>
-      {/* <tr>
-        <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={2}>Indikator</th>
-        <th rowSpan={2}>Satuan</th>
-        <th rowSpan={2}>Aksi</th>
-      </tr> */}
       <tr>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={2}>Indikator</th>
@@ -410,6 +404,7 @@ const CapaianTable = () => {
   ];
   // #endregion
 
+  //#region List data periode
   const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
   const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
   const listTahunKe = Array.from(
@@ -419,6 +414,7 @@ const CapaianTable = () => {
       value: `${i + 1}`,
     }),
   );
+  //#endregion
 
   return (
     <div className='space-y-2'>

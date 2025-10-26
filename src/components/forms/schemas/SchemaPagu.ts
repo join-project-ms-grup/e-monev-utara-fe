@@ -18,15 +18,15 @@ export const paguSchema = z.object({
 
 export const paguSchemaSubmit = z.object({
   skpd_periode_id: z.string().nonempty({ message: 'Field wajib diisi' }),
-  master_id: z.string().nonempty({ message: 'Field wajib diisi lengkap' }),
+  master_id: z.string().nonempty({ message: 'Field wajib diisi' }),
   target: z
     .array(
       z.object({
-        tahun_ke: z.string().nonempty({ message: 'Field wajib diisi lengkap' }),
-        pagu: z.string().nonempty({ message: 'Field wajib diisi lengkap' }),
+        tahun_ke: z.string().nonempty({ message: 'Field wajib diisi' }),
+        pagu: z.string().nonempty({ message: 'Field wajib diisi' }),
       })
     )
-    .min(1, { message: 'Minimal satu target harus diisi' }),
+    .min(5, { message: 'Minimal 5 target harus diisi' }),
 });
 
 // =============================

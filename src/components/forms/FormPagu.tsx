@@ -14,6 +14,7 @@ import {
   paguSchema,
   paguSchemaSubmit,
 } from './schemas/SchemaPagu';
+import { getSKPDPeriode } from '../../services/PeriodeService';
 
 // #region Types
 interface PilihanParent {
@@ -67,6 +68,20 @@ const FormPagu: React.FC<FormProps> = ({
     },
   });
   // #endregion
+
+  //#region SKPD
+  const idPeriodeCookie = Number(getPeriodeIDFromCookie());
+  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const { data: dataSKPDPeriode } = useQuery({
+    queryKey: ['list_skpd_periode'],
+    queryFn: async () => getSKPDPeriode(idPeriodeCookie),
+  });
+  const listSKPDPeriode =
+    dataSKPDPeriode?.map((item) => ({
+      label: `[${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  //#endregion
 
   // #region Master ID
   const [selectedRek, setSelectedRek] = useState('');
@@ -203,132 +218,184 @@ const FormPagu: React.FC<FormProps> = ({
         className='max-w-md mx-auto space-y-4'
       >
         <div className='flex flex-col space-y-4'>
-          {type === 'Add' && (
-            <div>
-              <InputSearchBox
-                defaultOptionLabel='Pilih Tujuan'
-                options={listRekening}
-                value={selectedRek}
-                onChange={(val) => setSelectedRek(val)}
-                onClear={() => setSelectedRek('')}
-              />
-            </div>
-          )}
-          {type === 'Add' && selectedRek && (
-            <>
-              {
-                <div>
-                  <label htmlFor='listurusan'>Urusan</label>
-                  <InputSearchBox
-                    id='listurusan'
-                    tooltip
-                    options={listUrusan as OptionItem[]}
-                    onChange={(e) =>
-                      setPilihanParent((prev) => ({ ...prev, urusan: e }))
-                    }
-                    value={pilihanParent.urusan}
-                    onClear={() =>
-                      setPilihanParent((prev) => ({ ...prev, urusan: '' }))
-                    }
-                    defaultOptionLabel='Pilih Urusan'
-                    className='h-9'
-                    withSearch
-                  />
-                </div>
-              }
-              {!['urusan'].includes(selectedRek!) && (
-                <div>
-                  <label htmlFor='listbidang'>Bidang</label>
-                  <InputSearchBox
-                    id='listbidang'
-                    tooltip
-                    options={listBidang as OptionItem[]}
-                    onChange={(e) =>
-                      setPilihanParent((prev) => ({ ...prev, bidang: e }))
-                    }
-                    value={pilihanParent.bidang}
-                    onClear={() =>
-                      setPilihanParent((prev) => ({ ...prev, bidang: '' }))
-                    }
-                    defaultOptionLabel='Pilih Bidang'
-                    className='h-9'
-                    withSearch
-                    disabled={!pilihanParent.urusan}
-                  />
-                </div>
-              )}
-              {!['urusan', 'bidang'].includes(selectedRek!) && (
-                <div>
-                  <label htmlFor='listprogram'>Program</label>
-                  <InputSearchBox
-                    id='listprogram'
-                    tooltip
-                    options={listProgram as OptionItem[]}
-                    onChange={(e) =>
-                      setPilihanParent((prev) => ({ ...prev, program: e }))
-                    }
-                    value={pilihanParent.program}
-                    onClear={() =>
-                      setPilihanParent((prev) => ({ ...prev, program: '' }))
-                    }
-                    defaultOptionLabel='Pilih Program'
-                    className='h-9'
-                    withSearch
-                    disabled={!pilihanParent.bidang}
-                  />
-                </div>
-              )}
-              {!['urusan', 'bidang', 'program'].includes(selectedRek!) && (
-                <div>
-                  <label htmlFor='listkegiatan'>Kegiatan</label>
-                  <InputSearchBox
-                    id='listkegiatan'
-                    tooltip
-                    options={listKegiatan as OptionItem[]}
-                    onChange={(e) =>
-                      setPilihanParent((prev) => ({ ...prev, kegiatan: e }))
-                    }
-                    value={pilihanParent.kegiatan}
-                    onClear={() =>
-                      setPilihanParent((prev) => ({ ...prev, kegiatan: '' }))
-                    }
-                    defaultOptionLabel='Pilih Kegiatan'
-                    className='h-9'
-                    withSearch
-                    disabled={!pilihanParent.program}
-                  />
-                </div>
-              )}
-              {!['urusan', 'bidang', 'program', 'kegiatan'].includes(
-                selectedRek!,
-              ) && (
-                <div>
-                  <label htmlFor='listsubkegiatan'>Sub Kegiatan</label>
-                  <InputSearchBox
-                    id='listsubkegiatan'
-                    tooltip
-                    options={listSubKegiatan as OptionItem[]}
-                    onChange={(e) =>
-                      setPilihanParent((prev) => ({ ...prev, subkegiatan: e }))
-                    }
-                    value={pilihanParent.subkegiatan}
-                    onClear={() =>
-                      setPilihanParent((prev) => ({ ...prev, subkegiatan: '' }))
-                    }
-                    defaultOptionLabel='Pilih Sub Kegiatan'
-                    className='h-9'
-                    withSearch
-                    disabled={!pilihanParent.kegiatan}
-                  />
-                </div>
-              )}
-            </>
-          )}
-
           {/* Field Master Id */}
           <form.Field name='master_id'>
             {(field) => (
               <>
+                {type === 'Add' && (
+                  <div>
+                    <InputSearchBox
+                      defaultOptionLabel='Pilih Tujuan'
+                      options={listRekening}
+                      value={selectedRek}
+                      onChange={(val) => setSelectedRek(val)}
+                      onClear={() => setSelectedRek('')}
+                      invalid={!field.state.meta.isValid && !selectedRek}
+                    />
+                    {!selectedRek && <ErrorField field={field} />}
+                  </div>
+                )}
+                {type === 'Add' && selectedRek && (
+                  <>
+                    {
+                      <div>
+                        <label htmlFor='listurusan'>Urusan</label>
+                        <InputSearchBox
+                          id='listurusan'
+                          tooltip
+                          options={listUrusan as OptionItem[]}
+                          onChange={(e) =>
+                            setPilihanParent((prev) => ({ ...prev, urusan: e }))
+                          }
+                          value={pilihanParent.urusan}
+                          onClear={() =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              urusan: '',
+                            }))
+                          }
+                          defaultOptionLabel='Pilih Urusan'
+                          className='h-9'
+                          withSearch
+                          invalid={
+                            !field.state.meta.isValid && !pilihanParent.urusan
+                          }
+                        />
+                        {!pilihanParent.urusan && <ErrorField field={field} />}
+                      </div>
+                    }
+                    {!['urusan'].includes(selectedRek!) && (
+                      <div>
+                        <label htmlFor='listbidang'>Bidang</label>
+                        <InputSearchBox
+                          id='listbidang'
+                          tooltip
+                          options={listBidang as OptionItem[]}
+                          onChange={(e) =>
+                            setPilihanParent((prev) => ({ ...prev, bidang: e }))
+                          }
+                          value={pilihanParent.bidang}
+                          onClear={() =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              bidang: '',
+                            }))
+                          }
+                          defaultOptionLabel='Pilih Bidang'
+                          className='h-9'
+                          withSearch
+                          disabled={!pilihanParent.urusan}
+                          invalid={
+                            !field.state.meta.isValid && !pilihanParent.bidang
+                          }
+                        />
+                        {!pilihanParent.bidang && <ErrorField field={field} />}
+                      </div>
+                    )}
+                    {!['urusan', 'bidang'].includes(selectedRek!) && (
+                      <div>
+                        <label htmlFor='listprogram'>Program</label>
+                        <InputSearchBox
+                          id='listprogram'
+                          tooltip
+                          options={listProgram as OptionItem[]}
+                          onChange={(e) =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              program: e,
+                            }))
+                          }
+                          value={pilihanParent.program}
+                          onClear={() =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              program: '',
+                            }))
+                          }
+                          defaultOptionLabel='Pilih Program'
+                          className='h-9'
+                          withSearch
+                          disabled={!pilihanParent.bidang}
+                          invalid={
+                            !field.state.meta.isValid && !pilihanParent.program
+                          }
+                        />
+                        {!pilihanParent.program && <ErrorField field={field} />}
+                      </div>
+                    )}
+                    {!['urusan', 'bidang', 'program'].includes(
+                      selectedRek!,
+                    ) && (
+                      <div>
+                        <label htmlFor='listkegiatan'>Kegiatan</label>
+                        <InputSearchBox
+                          id='listkegiatan'
+                          tooltip
+                          options={listKegiatan as OptionItem[]}
+                          onChange={(e) =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              kegiatan: e,
+                            }))
+                          }
+                          value={pilihanParent.kegiatan}
+                          onClear={() =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              kegiatan: '',
+                            }))
+                          }
+                          defaultOptionLabel='Pilih Kegiatan'
+                          className='h-9'
+                          withSearch
+                          disabled={!pilihanParent.program}
+                          invalid={
+                            !field.state.meta.isValid && !pilihanParent.kegiatan
+                          }
+                        />
+                        {!pilihanParent.kegiatan && (
+                          <ErrorField field={field} />
+                        )}
+                      </div>
+                    )}
+                    {!['urusan', 'bidang', 'program', 'kegiatan'].includes(
+                      selectedRek!,
+                    ) && (
+                      <div>
+                        <label htmlFor='listsubkegiatan'>Sub Kegiatan</label>
+                        <InputSearchBox
+                          id='listsubkegiatan'
+                          tooltip
+                          options={listSubKegiatan as OptionItem[]}
+                          onChange={(e) =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              subkegiatan: e,
+                            }))
+                          }
+                          value={pilihanParent.subkegiatan}
+                          onClear={() =>
+                            setPilihanParent((prev) => ({
+                              ...prev,
+                              subkegiatan: '',
+                            }))
+                          }
+                          defaultOptionLabel='Pilih Sub Kegiatan'
+                          className='h-9'
+                          withSearch
+                          disabled={!pilihanParent.kegiatan}
+                          invalid={
+                            !field.state.meta.isValid &&
+                            !pilihanParent.subkegiatan
+                          }
+                        />
+                        {!pilihanParent.subkegiatan && (
+                          <ErrorField field={field} />
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
                 <input
                   id='master_id'
                   name='master_id'
@@ -336,12 +403,50 @@ const FormPagu: React.FC<FormProps> = ({
                   value={field.state.value ?? ''}
                   readOnly
                 />
-                <ErrorField field={field} />
               </>
             )}
           </form.Field>
 
-          {type === 'Edit' && <InputText value={form.getFieldValue('master_name')} onChange={() => {}} disabled readOnly />}
+          <div>
+            {/* Field SKPD Periode Id */}
+            <form.Field name='skpd_periode_id'>
+              {(field) => (
+                <>
+                  <label htmlFor='skpd_periode_id'>SKPD</label>
+                  <InputSearchBox
+                    id='skpd_periode_id'
+                    className='h-9'
+                    btnclassName='bg-white'
+                    placeholder='Pilih SKPD...'
+                    value={field.state.value?.toString()}
+                    options={listSKPDPeriode as OptionItem[]}
+                    onChange={(val) => field.handleChange(val)}
+                    onClear={() => field.handleChange('')}
+                    withSearch
+                    disabled={type === 'Edit'}
+                    invalid={!field.state.meta.isValid}
+                  />
+                  {/* <input
+                  id='skpd_periode_id'
+                  name='skpd_periode_id'
+                  type='hidden'
+                  value={field.state.value ?? ''}
+                  readOnly
+                /> */}
+                  <ErrorField field={field} />
+                </>
+              )}
+            </form.Field>
+          </div>
+
+          {type === 'Edit' && (
+            <InputText
+              value={form.getFieldValue('master_name')}
+              onChange={() => {}}
+              disabled
+              readOnly
+            />
+          )}
           {/* Target */}
           <div className='grid grid-cols-3 grid-rows-2 gap-2'>
             {[0, 1, 2, 3, 4].map((n) => (
@@ -380,22 +485,6 @@ const FormPagu: React.FC<FormProps> = ({
               </div>
             ))}
           </div>
-
-          {/* Field SKPD Periode Id */}
-          <form.Field name='skpd_periode_id'>
-            {(field) => (
-              <>
-                <input
-                  id='skpd_periode_id'
-                  name='skpd_periode_id'
-                  type='hidden'
-                  value={field.state.value ?? Number(getPeriodeIDFromCookie())}
-                  readOnly
-                />
-                <ErrorField field={field} />
-              </>
-            )}
-          </form.Field>
         </div>
 
         {children ? (

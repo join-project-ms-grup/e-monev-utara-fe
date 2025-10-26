@@ -25,6 +25,9 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import AksiButton from '../../inputs/AksiButton';
+import { formatUang } from '../../../lib/Helper';
+import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
+import { getSKPDPeriode } from '../../../services/PeriodeService';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -38,8 +41,6 @@ const tableHead = () => {
   return (
     <>
       <tr>
-        {/* <th rowSpan={2}></th>
-        <th rowSpan={2}>No</th> */}
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={1} colSpan={5}>
           Target
@@ -59,17 +60,31 @@ const tableHead = () => {
 
 const PaguIndikatifTable = () => {
   const queryClient = useQueryClient();
+  const idPeriodeCookie = Number(getPeriodeIDFromCookie());
+  //#region SKPD
+  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const { data: dataSKPDPeriode } = useQuery({
+    queryKey: ['list_skpd_periode'],
+    queryFn: async () => getSKPDPeriode(idPeriodeCookie),
+  });
+  const listSKPDPeriode =
+    dataSKPDPeriode?.map((item) => ({
+      label: `[${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  //#endregion
+
   //#region Modal, FormData & Tabel Data
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_pagu'],
-    queryFn: () => getPagu(Number(getPeriodeIDFromCookie())),
+    queryKey: ['tabel_pagu', selectedSKPD],
+    queryFn: () => getPagu(Number(selectedSKPD)),
   });
   // Modal
   const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
   const [openModal, setOpenModal] = useState(false);
   // Form Data
   const initialFormData: PaguForm = {
-    skpd_periode_id: Number(getPeriodeIDFromCookie()),
+    skpd_periode_id: '',
     master_id: '',
     master_name: '',
     target: [
@@ -170,7 +185,10 @@ const PaguIndikatifTable = () => {
         }
 
         return (
-          <div className='inline-flex gap-2' style={{ paddingLeft: `${ctx.row.depth * 1}rem` }}>
+          <div
+            className='inline-flex gap-2'
+            style={{ paddingLeft: `${ctx.row.depth * 1}rem` }}
+          >
             <RowExpand showValue={false} {...ctx} />
             <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
             {ctx.getValue<string>()}
@@ -189,7 +207,7 @@ const PaguIndikatifTable = () => {
         meta: { tdClassNames: 'text-center' },
         accessorFn: (row) => {
           const item = row.pagu?.find((p) => p.tahun_ke === tahun);
-          return item ? item.pagu : null;
+          return item ? formatUang(Number(item.pagu)) : null;
         },
       })),
     },
@@ -236,7 +254,25 @@ const PaguIndikatifTable = () => {
 
   return (
     <div className='space-y-2'>
-      <div className='flex items-end justify-end'>
+      <div className='flex items-end justify-between'>
+        <div className='inline-flex gap-2'>
+          <div>
+            <label htmlFor='skpd'>SKPD</label>
+            <InputSearchBox
+              id='skpd'
+              className='w-72 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih SKPD...'
+              value={selectedSKPD.toString()}
+              options={listSKPDPeriode as OptionItem[]}
+              onChange={(val) => setSelectedSKPD(val)}
+              onClear={() => {
+                setSelectedSKPD('');
+              }}
+              withSearch
+            />
+          </div>
+        </div>
         <div className='flex justify-between gap-2 items-end'>
           <InputButton
             tooltip='Tambah data'

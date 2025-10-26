@@ -40,8 +40,6 @@ const tableHead = () => {
   return (
     <>
       <tr>
-        {/* <th rowSpan={2}></th>
-        <th rowSpan={2}>No</th> */}
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={2}>Indikator</th>
         <th rowSpan={2}>Satuan</th>
