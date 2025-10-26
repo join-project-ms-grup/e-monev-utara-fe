@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Tabel from '../Tabel';
-import { MdAdd, MdEdit, MdPrint, MdRefresh } from 'react-icons/md';
+import { MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import { type ColumnDef } from '@tanstack/react-table';
 import toast from 'react-hot-toast';
@@ -23,8 +23,9 @@ import DialogModal from '../../inputs/DialogModal';
 import FormRealisasi from '../../forms/FormRealisasi';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
-import InputSearchBox from '../../inputs/InputSearchBox';
-import { formatUang } from '../../../lib/Helper';
+import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
+import { formatUang } from '../../../lib/helper';
+import { getSKPDPeriode } from '../../../services/PeriodeService';
 
 const tableHead = () => {
   return (
@@ -50,13 +51,25 @@ const tableHead = () => {
 
 const RealisasiTable = () => {
   const queryClient = useQueryClient();
-  //#region Modal, FormData & Tabel Data
+  //#region SKPD dan Tahun ke
   const [tahunKe, setTahunKe] = useState('');
-  const skpdPeriodeId = Number(getPeriodeIDFromCookie());
+  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const { data: dataSKPDPeriode } = useQuery({
+    queryKey: ['list_skpd_periode'],
+    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+  });
+  const listSKPDPeriode =
+    dataSKPDPeriode?.map((item) => ({
+      label: `[${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  //#endregion
+
+  //#region Modal, FormData & Tabel Data
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_realisasi', skpdPeriodeId, tahunKe],
-    queryFn: () => getRealisasi(skpdPeriodeId, Number(tahunKe)),
-    enabled: !!(skpdPeriodeId && tahunKe),
+    queryKey: ['tabel_realisasi', selectedSKPD, tahunKe],
+    queryFn: () => getRealisasi(Number(selectedSKPD), Number(tahunKe)),
+    enabled: !!(selectedSKPD && tahunKe),
   });
   // Modal
   const [openModal, setOpenModal] = useState(false);
@@ -240,6 +253,23 @@ const RealisasiTable = () => {
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
           <div>
+            <label htmlFor='skpd'>SKPD</label>
+            <InputSearchBox
+              id='skpd'
+              className='w-72 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih SKPD...'
+              value={selectedSKPD.toString()}
+              options={listSKPDPeriode as OptionItem[]}
+              onChange={(val) => setSelectedSKPD(val)}
+              onClear={() => {
+                setSelectedSKPD('');
+                setTahunKe('');
+              }}
+              withSearch
+            />
+          </div>
+          <div>
             <label htmlFor='tahun_ke'>Tahun ke</label>
             <InputSearchBox
               id='tahun_ke'
@@ -250,29 +280,11 @@ const RealisasiTable = () => {
               options={listTahunKe}
               onChange={(val) => setTahunKe(val)}
               onClear={() => setTahunKe('')}
+              disabled={!selectedSKPD}
             />
           </div>
         </div>
         <div className='inline-flex gap-2'>
-          {/* <InputButton
-            tooltip='Cetak Laporan 5 Tahunan'
-            className='btn btn-theme w-14 h-9'
-            onClick={() => {
-              toast.success('Printing...');
-            }}
-          >
-            <MdPrint />
-            {`5`}
-          </InputButton>
-          <InputButton
-            tooltip='Cetak Laporan Tahunan'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              toast.success('Printing...');
-            }}
-          >
-            <MdPrint />
-          </InputButton> */}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'

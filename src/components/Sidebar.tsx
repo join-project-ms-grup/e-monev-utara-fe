@@ -6,13 +6,13 @@ import {
   MdSettings,
   MdKeyboardArrowDown,
   MdInsights,
-  MdLibraryBooks,
   MdInventory,
   MdAssignmentTurnedIn,
   MdFiberManualRecord,
   MdDragIndicator,
   MdSpeed,
   MdPayments,
+  MdAssignment,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
 import { SITE_NAME } from '../lib/config';
@@ -95,6 +95,12 @@ const menuRKPD: MenuItem[] = [
   //   ],
   //   akses: 3,
   // },
+  {
+    label: 'Pagu Indikatif',
+    icon: <MdDragIndicator />,
+    to: '/rkpd/pagu_indikatif',
+    akses: 3,
+  },
   { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
   { label: 'Capaian', icon: <MdInsights />, to: '/rkpd/capaian', akses: 3 },
   // { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
@@ -104,7 +110,17 @@ const menuRKPD: MenuItem[] = [
     to: '/rkpd/realisasi',
     akses: 3,
   },
-  { label: 'Pagu Indikatif', icon: <MdDragIndicator />, to: '/rkpd/pagu_indikatif', akses: 3 },
+  {
+    label: 'Hasil Evaluasi',
+    icon: <MdAssignment />,
+    submenu: [
+      { label: 'RKPD Tahunan', to: '/rkpd/hasil_evaluasi/rkpd_tahunan' },
+      { label: 'RKPD 5 Tahunan', to: '/rkpd/hasil_evaluasi/rkpd_5_tahunan' },
+      { label: 'RESTRA', to: '/#' },
+      { label: 'RPJMD', to: '/#' },
+    ],
+    akses: 3,
+  },
 ];
 
 // Menu DAK
@@ -277,20 +293,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     <aside
       className={`flex flex-col bg-white text-[#333] sticky top-0 whitespace-break-spaces h-screen transition-all duration-200 ${sidebarOpen ? 'w-72' : 'w-20'}`}
     >
-      <div className='flex flex-row items-center justify-center p-4'>
-        <div className={`aspect-auto ${sidebarOpen ? 'mr-2' : 'mr-0'}`}>
+      <div className='flex flex-row items-center justify-center'>
+        <div className='px-6 py-4'>
+          <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
+        </div>
+        {/* <div className={`aspect-auto ${sidebarOpen ? 'mr-2' : 'mr-0'}`}>
           <img
             src='/bengkulu-utara-logo.webp'
             alt=''
             className='max-w-[32px]'
           />
-        </div>
-        <div
+        </div> */}
+        {/* <div
           className={`block text-nowrap text-center cursor-default ${sidebarOpen ? '' : 'hidden'}`}
         >
           <h4>{SITE_NAME}</h4>
-          {/* <span>Kabupaten Bengkulu Utara</span> */}
-        </div>
+        </div> */}
       </div>
       <nav className='overflow-y-auto overflow-x-hidden sidebar-scroll space-y-2 p-4'>
         {/* {menus.map(renderMenu)} */}
