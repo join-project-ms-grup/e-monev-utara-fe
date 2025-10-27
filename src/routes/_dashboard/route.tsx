@@ -12,7 +12,7 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Footer from '../../components/Footer';
 import TopBar from '../../components/Topbar';
 import InputButton from '../../components/inputs/InputButton';
-import { MdLogout } from 'react-icons/md';
+import { MdChevronLeft, MdLogout } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import { getPeriode } from '../../services/PeriodeService';
 import InputSearchBox, {
@@ -21,6 +21,7 @@ import InputSearchBox, {
 import Cookies from 'js-cookie';
 import { useAuth } from '../../contexts/AuthContext';
 import AksiButton from '../../components/inputs/AksiButton';
+import { getRoleId, skipPeriode } from '../../lib/usercookie';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {
@@ -32,10 +33,27 @@ export const Route = createFileRoute('/_dashboard')({
   component: RouteComponent,
 });
 
+// function RouteComponent() {
+//   const { periodeCookie } = useAuth();
+//   if (!periodeCookie) return <PeriodeComponent />;
+//   return <MainComponent />;
+// }
+
 function RouteComponent() {
-  const { periodeCookie } = useAuth();
-  if (!periodeCookie) return <PeriodeComponent />;
-  return <MainComponent />;
+  const roleId = getRoleId();
+  const { periodeCookie, skipPeriodeCookie } = useAuth();
+
+  if (roleId === 1) {
+    if (!periodeCookie && !skipPeriodeCookie) {
+      return <PeriodeComponent />;
+    }
+    return <MainComponent />;
+  } else {
+    if (!periodeCookie) {
+      return <PeriodeComponent />;
+    }
+    return <MainComponent />;
+  }
 }
 
 function MainComponent() {
@@ -93,7 +111,18 @@ function PeriodeComponent() {
         <div className='shadow rounded min-w-md'>
           <div className='w-full bg-red-50 flex items-center justify-center'>
             <div className='grid grid-cols-3'>
-              <div></div>
+              <div className='flex justify-start items-center'>
+                <AksiButton
+                  tooltip='Lewati'
+                  Icon={MdChevronLeft}
+                  className='ms-2 p-1 hover:text-gray-800 hover:opacity-60'
+                  hoverColor='bg-[var(--color-2)]'
+                  onClick={() => {
+                    Cookies.set('skip_periode', '1');
+                    refreshPeriodeCookie();
+                  }}
+                />
+              </div>
               <h4 className='p-2'>Pilih Periode</h4>
               <div className='flex justify-end items-center'>
                 <AksiButton

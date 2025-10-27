@@ -288,7 +288,7 @@ const RKPDTahunanTable = () => {
     },
     {
       header: 'Perangkat Daerah Penanggung Jawab',
-      cell: () => `${listSKPDPeriode[Number(selectedSKPD) - 1].label}`,
+      cell: () => `${dataSKPDPeriode?.find(item => item.skpd_id === Number(selectedSKPD))?.name}`,
     },
   ];
 

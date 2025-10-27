@@ -1,7 +1,11 @@
 import { createContext, useContext, useState } from 'react';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
-import { getPeriodeFromCookie, type PeriodeCookie } from '../lib/usercookie';
+import {
+  getPeriodeFromCookie,
+  skipPeriode,
+  type PeriodeCookie,
+} from '../lib/usercookie';
 
 export interface LoggedUserType {
   nama: string;
@@ -17,6 +21,7 @@ export interface AuthContextType {
   login: (data: { token: string; user: LoggedUserType }) => void;
   logout: () => void;
   periodeCookie: PeriodeCookie | null;
+  skipPeriodeCookie: boolean;
   refreshPeriodeCookie: () => void;
 }
 
@@ -44,15 +49,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [periodeCookie, setPeriodeCookie] = useState(
     getPeriodeFromCookie() || null,
   );
+  const [skipPeriodeCookie, setSkipPeriodeCookie] = useState(
+    skipPeriode(),
+  );
   const refreshPeriodeCookie = () => {
     const localPCookie = getPeriodeFromCookie();
     setPeriodeCookie(localPCookie);
     if (localPCookie) {
       toast.success(`Periode: ${localPCookie.mulai} - ${localPCookie.akhir}`);
     }
+
+    const localSkipPCookie = skipPeriode();
+    setSkipPeriodeCookie(localSkipPCookie);
   };
 
   const logout = () => {
+    Cookies.remove('skip_periode');
     Cookies.remove('periode');
     refreshPeriodeCookie();
     Cookies.remove('token');
@@ -70,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         periodeCookie,
+        skipPeriodeCookie,
         refreshPeriodeCookie,
       }}
     >

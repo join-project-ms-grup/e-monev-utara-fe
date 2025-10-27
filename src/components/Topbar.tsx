@@ -58,6 +58,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
             <a
               className='block py-1 px-2 hover:bg-gray-200 rounded cursor-pointer'
               onClick={() => {
+                Cookies.remove('skip_periode');
                 Cookies.remove('periode');
                 refreshPeriodeCookie();
               }}

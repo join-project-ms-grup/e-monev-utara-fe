@@ -192,50 +192,6 @@ export const exportRKPD = async (
         cell.font = style.font;
       });
     }
-    // if (item.level.toLowerCase() === 'urusan') {
-    //   cols.forEach(col => {
-    //     const cell = row.getCell(col);
-    //     cell.fill = {
-    //       type: 'pattern',
-    //       pattern: 'solid',
-    //       fgColor: { argb: 'ffcc00' },
-    //     };
-    //     cell.font = { bold: true };
-    //   });
-    // }
-    // if (item.level.toLowerCase() === 'bidang') {
-    //   cols.forEach(col => {
-    //     const cell = row.getCell(col);
-    //     cell.fill = {
-    //       type: 'pattern',
-    //       pattern: 'solid',
-    //       fgColor: { argb: '1e1e1e' }
-    //     };
-    //     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    //   });
-    // }
-    // if (item.level.toLowerCase() === 'program') {
-    //   cols.forEach(col => {
-    //     const cell = row.getCell(col);
-    //     cell.fill = {
-    //       type: 'pattern',
-    //       pattern: 'solid',
-    //       fgColor: { argb: '666666' }
-    //     };
-    //     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    //   });
-    // }
-    // if (item.level.toLowerCase() === 'kegiatan') {
-    //   cols.forEach(col => {
-    //     const cell = row.getCell(col);
-    //     cell.fill = {
-    //       type: 'pattern',
-    //       pattern: 'solid',
-    //       fgColor: { argb: 'a6a6a6' }
-    //     };
-    //     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    //   });
-    // }
 
     // tulis baris indikator
     if (indikatorCount > 0) {
@@ -331,7 +287,99 @@ export const exportRKPD = async (
       const row = worksheet.getRow(rowIndex++);
       row.getCell('H').value = item.name;
     }
+    cols.forEach(col => {
+      const cell = row.getCell(col);
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
   });
+
+  const rowsConfig = [
+    { offset: 1, merge: 'A:O', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
+    { offset: 2, merge: 'A:O', text: 'Predikat kinerja', align: 'right' },
+    { offset: 3, merge: 'A:AG', text: 'Faktor pendorong keberhasilan kinerja:Predikat kinerja:' },
+    { offset: 4, merge: 'A:AG', text: 'Faktor penghambat pencapaian kinerja:' },
+    { offset: 5, merge: 'A:AG', text: 'Tindak lanjut yang diperlukan dalam triwulan berikutnya:' },
+    { offset: 6, merge: 'A:AG', text: 'Tindak lanjut yang diperlukan dalam Renja Perangkat Daerah berikutnya:' }
+  ];
+
+  rowsConfig.forEach(({ offset, merge, text, align = 'left' }) => {
+    const r = rowIndex + offset;
+    worksheet.mergeCells(`${merge.replace(':', r + ':')}${r}`);
+    const row = worksheet.getRow(r);
+    const cell = row.getCell('A');
+    cell.value = text;
+    cell.alignment = { horizontal: align as any };
+    cell.font = { bold: true };
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    };
+  });
+
+  worksheet.mergeCells(`AE${rowIndex + 8}:AG${rowIndex + 8}`);
+  worksheet.getRow(rowIndex + 8).getCell('AE').value =
+    'Kabupaten Bengkulu Utara, .........................................';
+
+  worksheet.getRow(rowIndex + 15).getCell('AE').value = 'NIP.';
+
+
+  // const rerataCapKinerjaRowIndex = rowIndex + 1;
+  // worksheet.mergeCells(`A${rerataCapKinerjaRowIndex}:O${rerataCapKinerjaRowIndex}`);
+  // const rerataCapKinerjaRow = worksheet.getRow(rerataCapKinerjaRowIndex);
+  // rerataCapKinerjaRow.getCell('A').value = 'Rata-rata capaian kinerja (%)';
+  // rerataCapKinerjaRow.getCell('A').alignment = { horizontal: 'right' };
+  // rerataCapKinerjaRow.getCell('A').font = { bold: true };
+
+  // const predikatKinerjaRowIndex = rowIndex + 2;
+  // worksheet.mergeCells(`A${predikatKinerjaRowIndex}:O${predikatKinerjaRowIndex}`);
+  // const predikatKinerjaRow = worksheet.getRow(predikatKinerjaRowIndex);
+  // predikatKinerjaRow.getCell('A').value = 'Predikat kinerja';
+  // predikatKinerjaRow.getCell('A').alignment = { horizontal: 'right' };
+  // predikatKinerjaRow.getCell('A').font = { bold: true };
+
+  // const faktorPendorongRowIndex = rowIndex + 3;
+  // worksheet.mergeCells(`A${faktorPendorongRowIndex}:AG${faktorPendorongRowIndex}`);
+  // const faktorPendorongRow = worksheet.getRow(faktorPendorongRowIndex);
+  // faktorPendorongRow.getCell('A').value = 'Faktor pendorong keberhasilan kinerja:Predikat kinerja:';
+  // faktorPendorongRow.getCell('A').alignment = { horizontal: 'left' };
+  // faktorPendorongRow.getCell('A').font = { bold: true };
+
+  // const faktorPenghambatRowIndex = rowIndex + 4;
+  // worksheet.mergeCells(`A${faktorPenghambatRowIndex}:AG${faktorPenghambatRowIndex}`);
+  // const faktorPenghambatRow = worksheet.getRow(faktorPenghambatRowIndex);
+  // faktorPenghambatRow.getCell('A').value = 'Faktor penghambat pencapaian kinerja:';
+  // faktorPenghambatRow.getCell('A').alignment = { horizontal: 'left' };
+  // faktorPenghambatRow.getCell('A').font = { bold: true };
+
+  // const tlTriRowIndex = rowIndex + 5;
+  // worksheet.mergeCells(`A${tlTriRowIndex}:AG${tlTriRowIndex}`);
+  // const tlTriRow = worksheet.getRow(tlTriRowIndex);
+  // tlTriRow.getCell('A').value = 'Tindak lanjut yang diperlukan dalam triwulan berikutnya:';
+  // tlTriRow.getCell('A').alignment = { horizontal: 'left' };
+  // tlTriRow.getCell('A').font = { bold: true };
+
+  // const tlRenjaRowIndex = rowIndex + 6;
+  // worksheet.mergeCells(`A${tlRenjaRowIndex}:AG${tlRenjaRowIndex}`);
+  // const tlRenjaRow = worksheet.getRow(tlRenjaRowIndex);
+  // tlRenjaRow.getCell('A').value = 'Tindak lanjut yang diperlukan dalam Renja Perangkat Daerah berikutnya:';
+  // tlRenjaRow.getCell('A').alignment = { horizontal: 'left' };
+  // tlRenjaRow.getCell('A').font = { bold: true };
+
+  // const targetRowKab = rowIndex + 7;
+  // worksheet.mergeCells(`AE${targetRowKab}:AG${targetRowKab}`);
+  // const rowKab = worksheet.getRow(targetRowKab);
+  // rowKab.getCell('AE').value = 'Kabupaten Bengkulu Utara, .........................................';
+
+  // const targetRowNIP = rowIndex + 14;
+  // const rowNIP = worksheet.getRow(targetRowNIP);
+  // rowNIP.getCell('AE').value = 'NIP.';
   //#endregion
 
   const buffer = await workbook.xlsx.writeBuffer();

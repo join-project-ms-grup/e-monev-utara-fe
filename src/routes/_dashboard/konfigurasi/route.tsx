@@ -1,9 +1,9 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { getPeriodeFromCookie } from '../../../lib/usercookie';
+import { getPeriodeFromCookie, isDev } from '../../../lib/usercookie';
 
 export const Route = createFileRoute('/_dashboard/konfigurasi')({
   beforeLoad: () => {
-    if (!getPeriodeFromCookie()) {
+    if (!getPeriodeFromCookie() && !isDev()) {
       throw redirect({ to: '/', replace: true });
     }
   },

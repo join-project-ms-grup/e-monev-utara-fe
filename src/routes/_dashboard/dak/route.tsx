@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
-import { getPeriodeFromCookie, getRoleId } from '../../../lib/usercookie';
+import { getPeriodeFromCookie, getRoleId, isDev } from '../../../lib/usercookie';
 import toast from 'react-hot-toast';
 
 export const Route = createFileRoute('/_dashboard/dak')({
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_dashboard/dak')({
         throw redirect({ to: '/', replace: true });
       }
     }
-    if (!getPeriodeFromCookie()) {
+    if (!getPeriodeFromCookie() && !isDev()) {
       throw redirect({ to: '/', replace: true });
     }
   },

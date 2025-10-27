@@ -40,6 +40,22 @@ export function getRoleId(): number | null {
 }
 
 /**
+ * Cek apakah user developer
+ */
+export function isDev(): boolean {
+  const roleId = getRoleId();
+  return roleId === 1;
+}
+/**
+ * Logic untuk pemilihan periode developer
+ */
+export function skipPeriode(): boolean {
+  const skipPeriode = Cookies.get('skip_periode');
+  return skipPeriode === '1';
+}
+
+
+/**
  * Ambil periode dari cookie
  */
 export function getPeriodeFromCookie(): PeriodeCookie | null {
