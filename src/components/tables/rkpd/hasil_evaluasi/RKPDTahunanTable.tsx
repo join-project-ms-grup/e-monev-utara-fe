@@ -58,8 +58,8 @@ const tableHead = () => {
 
 const RKPDTahunanTable = () => {
   //#region SKPD dan Tahun ke
-  const [tahunKe, setTahunKe] = useState('1');
-  const [selectedSKPD, setSelectedSKPD] = useState('1');
+  const [tahunKe, setTahunKe] = useState('');
+  const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
     queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
@@ -84,11 +84,10 @@ const RKPDTahunanTable = () => {
 
   //#region RKPD Data Flatten
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['tabel_rkpd_tahunan'],
+    queryKey: ['tabel_rkpd_tahunan', selectedSKPD, tahunKe],
     queryFn: async () => {
-      const rawData = await getRKPDTahunan(1, 1);
+      const rawData = await getRKPDTahunan(Number(selectedSKPD), Number(tahunKe));
       const flatten = flattenRKPD(rawData);
-      console.log('Flatten', flatten);
       return flatten;
     },
     enabled: !!(selectedSKPD && tahunKe),
@@ -291,7 +290,6 @@ const RKPDTahunanTable = () => {
       cell: () => `${dataSKPDPeriode?.find(item => item.skpd_id === Number(selectedSKPD))?.name}`,
     },
   ];
-
   // #endregion
 
   return (
