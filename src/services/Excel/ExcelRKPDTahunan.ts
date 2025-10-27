@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import type { RKPDMasterTree } from '../RKPDTahunanService';
+import type { FlatRKPDRow } from '../RKPDTahunanService';
+import { waktuNowGabung } from '../../lib/helper';
 
 /**
  * Export RKPD mimic dari file sumber.
@@ -14,7 +15,7 @@ import type { RKPDMasterTree } from '../RKPDTahunanService';
  * @param opts.startRow (optional) baris mulai data (default 18)
  */
 export const exportRKPD = async (
-  data: RKPDMasterTree[],
+  data: FlatRKPDRow[],
   tahun: string,
   skpd: string,
   opts?: { startRow?: number },
@@ -106,13 +107,13 @@ export const exportRKPD = async (
     { addr: 'X15', value: '13 = (9 + 10 + 11 + 12)' }, { addr: 'X16', value: 'K' }, { addr: 'Y16', value: 'Rp' },
 
     { addr: 'Z13', value: 'Tingkat Capaian Kinerja & Realisasi Anggaran Tahun yang dievaluasi (%)' },
-    { addr: 'Z15', value: '14 = (13 / 8 * 100) %' }, { addr: 'Z16', value: 'K' }, { addr: 'AA16', value: 'Rp' },
+    { addr: 'Z15', value: '14 = (13 / 8 * 100) %' }, { addr: 'Z16', value: 'K (%)' }, { addr: 'AA16', value: 'Rp (%)' },
 
     { addr: 'AB13', value: 'Realisasi Kinerja & Anggaran RPJM/Renstra s/d Tahun yang dievaluasi (2025)' },
     { addr: 'AB15', value: '15 = (7 + 13)' }, { addr: 'AB16', value: 'K' }, { addr: 'AC16', value: 'Rp' },
 
     { addr: 'AD13', value: 'Tingkat Capaian Kinerja & Realisasi Anggaran RPJM/Renstra s/d Tahun yang dievaluasi (%)' },
-    { addr: 'AD15', value: '16 = (15 / 6 * 100) %' }, { addr: 'AD16', value: 'K' }, { addr: 'AE16', value: 'Rp' },
+    { addr: 'AD15', value: '16 = (15 / 6 * 100) %' }, { addr: 'AD16', value: 'K (%)' }, { addr: 'AE16', value: 'Rp (%)' },
 
     { addr: 'AF13', value: 'Perangkat Daerah Penanggung Jawab' }, { addr: 'AF15', value: '17' },
     { addr: 'AG13', value: 'Keterangan' }, { addr: 'AG15', value: '18' },
@@ -140,7 +141,7 @@ export const exportRKPD = async (
       const c = worksheet.getCell(addr);
       c.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
       c.fill = {
-        type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F81BD' }
+        type: 'pattern', pattern: 'solid', fgColor: { argb: '082187' }
       };
       c.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       c.border = {
@@ -148,125 +149,194 @@ export const exportRKPD = async (
       };
     });
 
+
+  //#region Mapping Data
   let rowIndex = startRow;
-  data.forEach((urusan) => {
-    // Baris untuk URUSAN
-    const rowU = worksheet.getRow(rowIndex++);
-    rowU.getCell('H').value = urusan.name;
-    rowU.getCell('C').value = urusan.kode;
-    rowU.getCell('A').value = rowIndex - startRow + 1;
-    rowU.font = { bold: true };
+  let subKegiatanIndex = 1;
 
-    urusan.bidang?.forEach((bidang) => {
-      // Baris untuk BIDANG
-      const rowB = worksheet.getRow(rowIndex++);
-      rowB.getCell('H').value = `${bidang.name}`;
-      rowB.getCell('C').value = urusan.kode;
-      rowB.getCell('D').value = bidang.kode;
-      rowB.getCell('A').value = rowIndex - startRow + 1;
-      rowB.font = { bold: true };
+  data.forEach((item) => {
+    const startItemRow = rowIndex;
+    const row = worksheet.getRow(startItemRow);
+    if (item.level === 'sub_kegiatan') {
+      row.getCell('A').value = subKegiatanIndex++;
+    }
+    row.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+    ['A', 'C', 'D', 'E', 'F', 'G'].forEach((col) => {
+      row.getCell(col).alignment = { horizontal: 'center', vertical: 'top' };
+    });
+    const indikatorCount = item.indikator?.length || 0;
+    const persenFormat = '0.00 "%"';
 
-      bidang.program?.forEach((program) => {
-        // Baris untuk PROGRAM
-        const rowP = worksheet.getRow(rowIndex++);
-        rowP.getCell('H').value = `${program.name}`;
-        rowP.getCell('C').value = urusan.kode;
-        rowP.getCell('D').value = bidang.kode;
-        rowP.getCell('E').value = program.kode;
-        rowP.getCell('A').value = rowIndex - startRow + 1;
-        rowP.font = { bold: true };
-        program.indikator?.forEach((indikator) => {
-          rowP.getCell('I').value = indikator.name;
-        })
+    const cols = [
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+      'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG'
+    ];
+    const levelStyles = {
+      urusan: { fill: 'FFCC00', font: { bold: true } },
+      bidang: { fill: 'FF1E1E1E', font: { bold: true, color: { argb: 'FFFFFFFF' } } },
+      program: { fill: 'FF666666', font: { bold: true, color: { argb: 'FFFFFFFF' } } },
+      kegiatan: { fill: 'FFA6A6A6', font: { bold: true, color: { argb: 'FFFFFFFF' } } },
+    };
 
-        program.kegiatan?.forEach((kegiatan) => {
-          // Baris untuk KEGIATAN
-          const rowK = worksheet.getRow(rowIndex++);
-          rowK.getCell('H').value = `${kegiatan.name}`;
-          rowK.getCell('C').value = urusan.kode;
-          rowK.getCell('D').value = bidang.kode;
-          rowK.getCell('E').value = program.kode;
-          rowK.getCell('F').value = kegiatan.kode;
-          rowK.getCell('A').value = rowIndex - startRow + 1;
-          rowK.font = { bold: true };
-          kegiatan.indikator?.forEach((indikator) => {
-            rowK.getCell('I').value = indikator.name;
-          })
+    // const style = levelStyles[item.level.toLowerCase()];
+    const levelKey = item.level.toLowerCase() as keyof typeof levelStyles;
+    const style = levelStyles[levelKey];
+    if (style) {
+      cols.forEach(col => {
+        const cell = row.getCell(col);
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: style.fill },
+        };
+        cell.font = style.font;
+      });
+    }
+    // if (item.level.toLowerCase() === 'urusan') {
+    //   cols.forEach(col => {
+    //     const cell = row.getCell(col);
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: 'ffcc00' },
+    //     };
+    //     cell.font = { bold: true };
+    //   });
+    // }
+    // if (item.level.toLowerCase() === 'bidang') {
+    //   cols.forEach(col => {
+    //     const cell = row.getCell(col);
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: '1e1e1e' }
+    //     };
+    //     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    //   });
+    // }
+    // if (item.level.toLowerCase() === 'program') {
+    //   cols.forEach(col => {
+    //     const cell = row.getCell(col);
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: '666666' }
+    //     };
+    //     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    //   });
+    // }
+    // if (item.level.toLowerCase() === 'kegiatan') {
+    //   cols.forEach(col => {
+    //     const cell = row.getCell(col);
+    //     cell.fill = {
+    //       type: 'pattern',
+    //       pattern: 'solid',
+    //       fgColor: { argb: 'a6a6a6' }
+    //     };
+    //     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    //   });
+    // }
 
-          kegiatan.subKegiatan?.forEach((sub) => {
-            // Baris untuk SUB KEGIATAN
-            const rowS = worksheet.getRow(rowIndex);
-            rowS.getCell('H').value = `${sub.name}`;
-            rowS.getCell('C').value = urusan.kode;
-            rowS.getCell('D').value = bidang.kode;
-            rowS.getCell('E').value = program.kode;
-            rowS.getCell('F').value = kegiatan.kode;
-            rowS.getCell('G').value = sub.kode;
-            rowS.getCell('A').value = rowIndex - startRow + 1;
-            rowS.font = { bold: true };
+    // tulis baris indikator
+    if (indikatorCount > 0) {
+      item.indikator?.forEach((ind) => {
+        const row = worksheet.getRow(rowIndex++);
 
-            // Baris indikator (data detail)
-            const pagu = sub.pagu;
-            sub.indikator?.forEach((indikator) => {
-              const row = worksheet.getRow(rowIndex++);
-              row.getCell('I').value = indikator.name;
-              row.getCell('J').value = indikator.target_akhir_periode;
-              row.getCell('K').value = pagu?.paguPeriode;
-              row.getCell('L').value = indikator.total_capaian_periode;
-              row.getCell('M').value = pagu?.paguTahunEval;
-              row.getCell('N').value = indikator.target_tahun_dievaluasi;
-              row.getCell('O').value = pagu?.paguTahunEval;
+        // tulis indikator
+        row.getCell('I').value = ind.name;
+        row.getCell('J').value = ind.target_akhir_periode;
+        row.getCell('L').value = 0;
+        row.getCell('M').value = 0;
+        row.getCell('N').value = ind.target_tahun_dievaluasi;
+        ['P', 'R', 'T', 'V'].forEach((col, i) => {
+          row.getCell(col).value = ind.triwulan?.[i]?.capaian ?? '';
+        });
+        row.getCell('X').value = ind.total_capaian ?? '';
+        row.getCell('Z').value = Number(ind.persen_capaian);
+        row.getCell('Z').numFmt = persenFormat;
+        row.getCell('AB').value = ind.total_capaian_periode;
+        row.getCell('AD').value = Number(ind.persen_capaian_periode);
+        row.getCell('AD').numFmt = persenFormat;
+        row.getCell('AF').value = skpd;
 
-              const tri1 = pagu?.triwulan?.[0];
-              const tri2 = pagu?.triwulan?.[1];
-              const tri3 = pagu?.triwulan?.[2];
-              const tri4 = pagu?.triwulan?.[3];
+        const satuan = ind.satuan ? ind.satuan.replace(/"/g, '') : '';
+        let numFmt = 'General';
+        if (satuan) {
+          if (satuan.trim() === '%' || satuan.toLowerCase().includes('persen')) numFmt = '0.00 "%"';
+          else numFmt = `General "${satuan}"`;
+        }
+        ['J', 'L', 'N', 'P', 'R', 'T', 'V', 'X', 'AA', 'AB'].forEach(col => {
+          row.getCell(col).numFmt = numFmt;
+        });
 
-              row.getCell('P').value = indikator.triwulan?.[0]?.capaian ?? '';
-              row.getCell('Q').value = Number(tri1?.realisasi) ?? '';
-              row.getCell('R').value = indikator.triwulan?.[1]?.capaian ?? '';
-              row.getCell('S').value = Number(tri2?.realisasi) ?? '';
-              row.getCell('T').value = indikator.triwulan?.[2]?.capaian ?? '';
-              row.getCell('U').value = Number(tri3?.realisasi) ?? '';
-              row.getCell('V').value = indikator.triwulan?.[3]?.capaian ?? '';
-              row.getCell('W').value = Number(tri4?.realisasi) ?? '';
-              row.getCell('X').value = indikator.total_capaian ?? '';
-              row.getCell('Y').value = pagu?.totalRealisasi ?? '';
-              row.getCell('Z').value = indikator.persen_capaian ?? '';
-              row.getCell('AA').value = Number(pagu?.persenRealisasi) ?? '';
-              row.getCell('AF').value = skpd;
-
-              const satuan = indikator.satuan ? indikator.satuan.replace(/"/g, '') : '';
-              let numFmt = 'General';
-              if (satuan) {
-                if (satuan.trim() === '%' || satuan.toLowerCase().includes('persen')) {
-                  numFmt = '0.00 "%"';
-                } else {
-                  numFmt = `General "${satuan}"`;
-                }
-              }
-
-              ['J', 'L', 'N', 'P', 'R', 'T', 'V', 'X', 'Z'].forEach(col => {
-                row.getCell(col).numFmt = numFmt;
-              });
-
-              const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-              ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA'].forEach(col => {
-                row.getCell(col).numFmt = fmtRupiah;
-              });
-
-            });
-          });
+        const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+        ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA'].forEach(col => {
+          row.getCell(col).numFmt = fmtRupiah;
         });
       });
-    });
-  });
 
-  worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: startRow - 1, topLeftCell: `A${startRow}` }];
+      const endItemRow = rowIndex - 1;
+
+      // Merge cell untuk kode & nama item
+      const row = worksheet.getRow(startItemRow);
+      row.getCell('H').value = item.name;
+
+      // Merge kolom kode jika ada lebih dari 1 indikator
+      if (indikatorCount > 1) {
+        const colsToMerge = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'Q', 'S', 'U', 'W', 'O', 'Y', 'AA', 'AC', 'AE'];
+        colsToMerge.forEach(col => {
+          worksheet.mergeCells(`${col}${startItemRow}:${col}${endItemRow}`);
+        });
+      }
+
+      // tulis kode & pagu di baris pertama saja
+      const kodeStr = (item.kode ?? '').toString();
+      if (item.level === 'urusan') row.getCell('C').value = kodeStr;
+      else if (item.level === 'bidang') {
+        const [urusanKode, bidangKode] = kodeStr.split(' ');
+        row.getCell('C').value = urusanKode;
+        row.getCell('D').value = bidangKode;
+      } else if (item.level === 'program') {
+        const [urusanKode, bidangKode, programKode] = kodeStr.split(' ');
+        row.getCell('C').value = urusanKode;
+        row.getCell('D').value = bidangKode;
+        row.getCell('E').value = programKode;
+      } else if (item.level === 'kegiatan') {
+        const [urusanKode, bidangKode, programKode, kegiatanKode] = kodeStr.split(' ');
+        row.getCell('C').value = urusanKode;
+        row.getCell('D').value = bidangKode;
+        row.getCell('E').value = programKode;
+        row.getCell('F').value = kegiatanKode;
+      } else if (item.level === 'sub_kegiatan') {
+        const [urusanKode, bidangKode, programKode, kegiatanKode, subKode] = kodeStr.split(' ');
+        row.getCell('C').value = urusanKode;
+        row.getCell('D').value = bidangKode;
+        row.getCell('E').value = programKode;
+        row.getCell('F').value = kegiatanKode;
+        row.getCell('G').value = subKode;
+      }
+
+      row.getCell('K').value = item.pagu?.paguPeriode;
+      row.getCell('O').value = item.pagu?.paguTahunEval;
+      row.getCell('Y').value = item.pagu?.totalRealisasi;
+      ['Q', 'S', 'U', 'W'].forEach((col, i) => {
+        row.getCell(col).value = Number(item.pagu?.triwulan?.[i]?.realisasi) ?? 0;
+      });
+      row.getCell('AA').value = Number(item.pagu?.persenRealisasi);
+      row.getCell('AA').numFmt = persenFormat;
+      row.getCell('AC').value = item.pagu?.totalRealisasiPeriode;
+      row.getCell('AE').value = Number(item.pagu?.persenRealisasiPeriode);
+      row.getCell('AE').numFmt = persenFormat;
+    } else {
+      const row = worksheet.getRow(rowIndex++);
+      row.getCell('H').value = item.name;
+    }
+  });
+  //#endregion
 
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
-  saveAs(blob, `[473 - 1.01.2.22.0.00.01.0000] Laporan Evaluasi Terhadap RKPD Kabupaten Bengkulu Utara Tahun ${tahun} (20251026141917).xlsx`);
+  saveAs(blob, `Laporan Evaluasi Terhadap RKPD Kabupaten Bengkulu Utara Tahun ${tahun} ${waktuNowGabung}.xlsx`);
 };
