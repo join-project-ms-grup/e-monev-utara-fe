@@ -56,23 +56,12 @@ export type RKPDMasterTree = RKPDMasterUrusan & RKPDMasterBidang & RKPDMasterPro
 
 /**
  * Ambil semua data rkpd tahunan
- * @param id number
  */
 export const getRKPDTahunan = async (skpd_periode_id: number, tahun_ke: number): Promise<RKPDMasterTree[]> => {
     const response = await api.get<ApiResponse<RKPDMasterTree[]>>(`/rkpd/laporan-tahunan/${skpd_periode_id}/${tahun_ke}`);
     return response.data.data;
 };
 
-/**
- * Ambil semua data rkpd 5 tahunan
- * @param id number
- */
-export const getRKPD5Tahunan = async (skpd_periode_id: number): Promise<RKPDMasterTree[]> => {
-    const response = await api.get<ApiResponse<RKPDMasterTree[]>>(`/rkpd/laporan/${skpd_periode_id}`);
-    return response.data.data;
-};
-
-// 
 
 export interface FlatRKPDRow {
     level: 'urusan' | 'bidang' | 'program' | 'kegiatan' | 'sub_kegiatan';
@@ -226,108 +215,310 @@ export const flattenRKPD = (data: RKPDMasterUrusan[]): FlatRKPDRow[] => {
     return rows;
 };
 
-// export const flattenRKPD = (data: RKPDMasterUrusan[]): FlatRKPDRow[] => {
-//     const rows: FlatRKPDRow[] = [];
+// 
 
-//     data.forEach((urusan) => {
-//         // Urusan
-//         rows.push({
-//             level: 'urusan',
-//             kode: urusan.kode,
-//             name: urusan.name,
-//         });
+export interface IndikatorTarget5T {
+    tahun_ke?: number | string;
+    target?: number;
+}
 
-//         urusan.bidang?.forEach((bidang) => {
-//             // Bidang
-//             rows.push({
-//                 level: 'bidang',
-//                 kode: `${urusan.kode} ${bidang.kode}`,
-//                 name: bidang.name,
-//             });
+export interface IndikatorCapaian5T {
+    tahun_ke?: number | string;
+    capaian?: number;
+}
 
-//             bidang.program?.forEach((program) => {
-//                 // Kalau program punya indikator → tambahkan satu baris per indikator
-//                 if (program.indikator && program.indikator.length > 0) {
-//                     program.indikator.forEach((indikator) => {
-//                         rows.push({
-//                             level: 'program',
-//                             kode: `${urusan.kode} ${bidang.kode} ${program.kode}`,
-//                             name: program.name,
-//                             indikator_name: indikator.name,
-//                             indikator_satuan: indikator.satuan,
-//                             indikator_target_tahun_dievaluasi: indikator.target_tahun_dievaluasi,
-//                             indikator_target_akhir_periode: indikator.target_akhir_periode,
-//                             pagu_tahun_eval: program.pagu?.paguTahunEval,
-//                             pagu_periode: program.pagu?.paguPeriode,
-//                             total_realisasi: program.pagu?.totalRealisasi,
-//                             persen_realisasi: program.pagu?.persenRealisasi,
-//                         });
-//                     });
-//                 } else {
-//                     // Kalau tidak punya indikator
-//                     rows.push({
-//                         level: 'program',
-//                         kode: `${urusan.kode} ${bidang.kode} ${program.kode}`,
-//                         name: program.name,
-//                     });
-//                 }
+export interface IndikatorRasio5T {
+    tahun_ke?: number | string;
+    rasio?: number | string;
+}
 
-//                 program.kegiatan?.forEach((kegiatan) => {
-//                     // Kalau kegiatan punya indikator
-//                     if (kegiatan.indikator && kegiatan.indikator.length > 0) {
-//                         kegiatan.indikator.forEach((indikator) => {
-//                             rows.push({
-//                                 level: 'kegiatan',
-//                                 kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode}`,
-//                                 name: kegiatan.name,
-//                                 indikator_name: indikator.name,
-//                                 indikator_satuan: indikator.satuan,
-//                                 indikator_target_tahun_dievaluasi: indikator.target_tahun_dievaluasi,
-//                                 indikator_target_akhir_periode: indikator.target_akhir_periode,
-//                                 pagu_tahun_eval: kegiatan.pagu?.paguTahunEval,
-//                                 pagu_periode: kegiatan.pagu?.paguPeriode,
-//                                 total_realisasi: kegiatan.pagu?.totalRealisasi,
-//                                 persen_realisasi: kegiatan.pagu?.persenRealisasi,
-//                             });
-//                         });
-//                     } else {
-//                         rows.push({
-//                             level: 'kegiatan',
-//                             kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode}`,
-//                             name: kegiatan.name,
-//                         });
-//                     }
+export interface Indikator5T {
+    id?: number;
+    name?: string;
+    satuan?: string;
+    totalTarget?: number;
+    target_per_tahun?: IndikatorTarget5T[];
+    capaian_per_tahun?: IndikatorCapaian5T[];
+    rasio_per_tahun?: IndikatorRasio5T[];
+}
 
-//                     kegiatan.subKegiatan?.forEach((sub) => {
-//                         // Kalau sub_kegiatan punya indikator
-//                         if (sub.indikator && sub.indikator.length > 0) {
-//                             sub.indikator.forEach((indikator) => {
-//                                 rows.push({
-//                                     level: 'sub_kegiatan',
-//                                     kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode} ${sub.kode}`,
-//                                     name: sub.name,
-//                                     indikator_name: indikator.name,
-//                                     indikator_satuan: indikator.satuan,
-//                                     indikator_target_tahun_dievaluasi: indikator.target_tahun_dievaluasi,
-//                                     indikator_target_akhir_periode: indikator.target_akhir_periode,
-//                                     pagu_tahun_eval: sub.pagu?.paguTahunEval,
-//                                     pagu_periode: sub.pagu?.paguPeriode,
-//                                     total_realisasi: sub.pagu?.totalRealisasi,
-//                                     persen_realisasi: sub.pagu?.persenRealisasi,
-//                                 });
-//                             });
-//                         } else {
-//                             rows.push({
-//                                 level: 'sub_kegiatan',
-//                                 kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode} ${sub.kode}`,
-//                                 name: sub.name,
-//                             });
-//                         }
-//                     });
-//                 });
-//             });
-//         });
-//     });
+export interface RKPDPaguTahun5T {
+    tahun_ke?: number | string;
+    pagu?: number;
+}
 
-//     return rows;
-// };
+export interface RKPDRealisasiTahun5T {
+    tahun_ke?: number | string;
+    realisasi?: number;
+}
+
+export interface RKPDRasioTahun5T {
+    tahun_ke?: number | string;
+    rasio?: number | string;
+}
+
+export interface RKPDPagu5T {
+    totalPagu?: number;
+    pagu_per_tahun?: RKPDPaguTahun5T[];
+    realisasi_per_tahun?: RKPDRealisasiTahun5T[];
+    rasio_per_tahun?: RKPDRasioTahun5T[];
+}
+
+export interface RKPDMaster5T {
+    id?: number;
+    kode?: string | number;
+    name?: string;
+    type?: string;
+    indikator?: Indikator5T[];
+    pagu?: RKPDPagu5T;
+}
+
+export interface RKPDMasterUrusan5T extends RKPDMaster5T {
+    bidang?: RKPDMasterBidang5T[];
+}
+
+export interface RKPDMasterBidang5T extends RKPDMaster5T {
+    program?: RKPDMasterProgram5T[];
+}
+
+export interface RKPDMasterProgram5T extends RKPDMaster5T {
+    kegiatan?: RKPDMasterKegiatan5T[];
+}
+
+export interface RKPDMasterKegiatan5T extends RKPDMaster5T {
+    subKegiatan?: RKPDMasterSubKegiatan5T[];
+}
+
+export interface RKPDMasterSubKegiatan5T extends RKPDMaster5T { }
+
+export type RKPDMasterTree5T =
+    RKPDMasterUrusan5T &
+    RKPDMasterBidang5T &
+    RKPDMasterProgram5T &
+    RKPDMasterKegiatan5T &
+    RKPDMasterSubKegiatan5T;
+
+/**
+ * Ambil semua data rkpd 5 tahunan
+ */
+export const getRKPD5Tahunan = async (skpd_periode_id: number): Promise<RKPDMasterTree5T[]> => {
+    const response = await api.get<ApiResponse<RKPDMasterTree5T[]>>(`/rkpd/laporan/${skpd_periode_id}`);
+    return response.data.data;
+};
+
+export interface FlatRKPD5TRow {
+    level: 'urusan' | 'bidang' | 'program' | 'kegiatan' | 'sub_kegiatan';
+    kode?: string | number;
+    name?: string;
+    indikator?: {
+        id: number;
+        name: string;
+        satuan: string;
+        totalTarget: number;
+        target_per_tahun: {
+            tahun_ke: number;
+            target: number;
+        }[];
+        capaian_per_tahun: {
+            tahun_ke: number;
+            capaian: number;
+        }[];
+        rasio_per_tahun: {
+            tahun_ke: number;
+            rasio: number | string;
+        }[];
+    }[];
+    pagu: {
+        totalPagu: number;
+        pagu_per_tahun: {
+            tahun_ke: number;
+            pagu: number;
+        }[];
+        realisasi_per_tahun: {
+            tahun_ke: number;
+            realisasi: number;
+        }[];
+        rasio_per_tahun: {
+            tahun_ke: number;
+            rasio: number | string;
+        }[];
+    };
+}
+
+export const flattenRKPD5T = (data: RKPDMasterUrusan5T[]): FlatRKPD5TRow[] => {
+    const rows: FlatRKPD5TRow[] = [];
+
+    data.forEach((urusan) => {
+        rows.push({
+            level: 'urusan',
+            kode: urusan.kode,
+            name: urusan.name,
+            pagu: {
+                totalPagu: 0,
+                pagu_per_tahun: [],
+                realisasi_per_tahun: [],
+                rasio_per_tahun: [],
+            },
+        });
+
+        urusan.bidang?.forEach((bidang) => {
+            rows.push({
+                level: 'bidang',
+                kode: `${urusan.kode} ${bidang.kode}`,
+                name: bidang.name,
+                pagu: {
+                    totalPagu: 0,
+                    pagu_per_tahun: [],
+                    realisasi_per_tahun: [],
+                    rasio_per_tahun: [],
+                },
+            });
+
+            bidang.program?.forEach((program) => {
+                rows.push({
+                    level: 'program',
+                    kode: `${urusan.kode} ${bidang.kode} ${program.kode}`,
+                    name: program.name,
+                    indikator: program.indikator?.map(i => ({
+                        id: i.id ?? 0,
+                        name: i.name ?? '',
+                        satuan: i.satuan ?? '',
+                        totalTarget: i.totalTarget ?? 0,
+                        target_per_tahun: i.target_per_tahun?.map(t => ({
+                            tahun_ke: Number(t.tahun_ke ?? 0),
+                            target: t.target ?? 0,
+                        })) ?? [],
+                        capaian_per_tahun: i.capaian_per_tahun?.map(c => ({
+                            tahun_ke: Number(c.tahun_ke ?? 0),
+                            capaian: c.capaian ?? 0,
+                        })) ?? [],
+                        rasio_per_tahun: i.rasio_per_tahun?.map(r => ({
+                            tahun_ke: Number(r.tahun_ke ?? 0),
+                            rasio: r.rasio ?? '0',
+                        })) ?? [],
+                    })),
+                    pagu: program.pagu
+                        ? {
+                            totalPagu: program.pagu.totalPagu ?? 0,
+                            pagu_per_tahun: program.pagu.pagu_per_tahun?.map(p => ({
+                                tahun_ke: Number(p.tahun_ke ?? 0),
+                                pagu: p.pagu ?? 0,
+                            })) ?? [],
+                            realisasi_per_tahun: program.pagu.realisasi_per_tahun?.map(r => ({
+                                tahun_ke: Number(r.tahun_ke ?? 0),
+                                realisasi: r.realisasi ?? 0,
+                            })) ?? [],
+                            rasio_per_tahun: program.pagu.rasio_per_tahun?.map(r => ({
+                                tahun_ke: Number(r.tahun_ke ?? 0),
+                                rasio: r.rasio ?? '0',
+                            })) ?? [],
+                        }
+                        : {
+                            totalPagu: 0,
+                            pagu_per_tahun: [],
+                            realisasi_per_tahun: [],
+                            rasio_per_tahun: [],
+                        },
+                });
+
+                program.kegiatan?.forEach((kegiatan) => {
+                    rows.push({
+                        level: 'kegiatan',
+                        kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode}`,
+                        name: kegiatan.name,
+                        indikator: kegiatan.indikator?.map(i => ({
+                            id: i.id ?? 0,
+                            name: i.name ?? '',
+                            satuan: i.satuan ?? '',
+                            totalTarget: i.totalTarget ?? 0,
+                            target_per_tahun: i.target_per_tahun?.map(t => ({
+                                tahun_ke: Number(t.tahun_ke ?? 0),
+                                target: t.target ?? 0,
+                            })) ?? [],
+                            capaian_per_tahun: i.capaian_per_tahun?.map(c => ({
+                                tahun_ke: Number(c.tahun_ke ?? 0),
+                                capaian: c.capaian ?? 0,
+                            })) ?? [],
+                            rasio_per_tahun: i.rasio_per_tahun?.map(r => ({
+                                tahun_ke: Number(r.tahun_ke ?? 0),
+                                rasio: r.rasio ?? '0',
+                            })) ?? [],
+                        })),
+                        pagu: kegiatan.pagu
+                            ? {
+                                totalPagu: kegiatan.pagu.totalPagu ?? 0,
+                                pagu_per_tahun: kegiatan.pagu.pagu_per_tahun?.map(p => ({
+                                    tahun_ke: Number(p.tahun_ke ?? 0),
+                                    pagu: p.pagu ?? 0,
+                                })) ?? [],
+                                realisasi_per_tahun: kegiatan.pagu.realisasi_per_tahun?.map(r => ({
+                                    tahun_ke: Number(r.tahun_ke ?? 0),
+                                    realisasi: r.realisasi ?? 0,
+                                })) ?? [],
+                                rasio_per_tahun: kegiatan.pagu.rasio_per_tahun?.map(r => ({
+                                    tahun_ke: Number(r.tahun_ke ?? 0),
+                                    rasio: r.rasio ?? '0',
+                                })) ?? [],
+                            }
+                            : {
+                                totalPagu: 0,
+                                pagu_per_tahun: [],
+                                realisasi_per_tahun: [],
+                                rasio_per_tahun: [],
+                            },
+                    });
+
+                    kegiatan.subKegiatan?.forEach((sub) => {
+                        rows.push({
+                            level: 'sub_kegiatan',
+                            kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode} ${sub.kode}`,
+                            name: sub.name,
+                            indikator: sub.indikator?.map(i => ({
+                                id: i.id ?? 0,
+                                name: i.name ?? '',
+                                satuan: i.satuan ?? '',
+                                totalTarget: i.totalTarget ?? 0,
+                                target_per_tahun: i.target_per_tahun?.map(t => ({
+                                    tahun_ke: Number(t.tahun_ke ?? 0),
+                                    target: t.target ?? 0,
+                                })) ?? [],
+                                capaian_per_tahun: i.capaian_per_tahun?.map(c => ({
+                                    tahun_ke: Number(c.tahun_ke ?? 0),
+                                    capaian: c.capaian ?? 0,
+                                })) ?? [],
+                                rasio_per_tahun: i.rasio_per_tahun?.map(r => ({
+                                    tahun_ke: Number(r.tahun_ke ?? 0),
+                                    rasio: r.rasio ?? '0',
+                                })) ?? [],
+                            })),
+                            pagu: sub.pagu
+                                ? {
+                                    totalPagu: sub.pagu.totalPagu ?? 0,
+                                    pagu_per_tahun: sub.pagu.pagu_per_tahun?.map(p => ({
+                                        tahun_ke: Number(p.tahun_ke ?? 0),
+                                        pagu: p.pagu ?? 0,
+                                    })) ?? [],
+                                    realisasi_per_tahun: sub.pagu.realisasi_per_tahun?.map(r => ({
+                                        tahun_ke: Number(r.tahun_ke ?? 0),
+                                        realisasi: r.realisasi ?? 0,
+                                    })) ?? [],
+                                    rasio_per_tahun: sub.pagu.rasio_per_tahun?.map(r => ({
+                                        tahun_ke: Number(r.tahun_ke ?? 0),
+                                        rasio: r.rasio ?? '0',
+                                    })) ?? [],
+                                }
+                                : {
+                                    totalPagu: 0,
+                                    pagu_per_tahun: [],
+                                    realisasi_per_tahun: [],
+                                    rasio_per_tahun: [],
+                                },
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    return rows;
+};

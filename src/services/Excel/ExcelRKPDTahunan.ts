@@ -328,58 +328,6 @@ export const exportRKPD = async (
     'Kabupaten Bengkulu Utara, .........................................';
 
   worksheet.getRow(rowIndex + 15).getCell('AE').value = 'NIP.';
-
-
-  // const rerataCapKinerjaRowIndex = rowIndex + 1;
-  // worksheet.mergeCells(`A${rerataCapKinerjaRowIndex}:O${rerataCapKinerjaRowIndex}`);
-  // const rerataCapKinerjaRow = worksheet.getRow(rerataCapKinerjaRowIndex);
-  // rerataCapKinerjaRow.getCell('A').value = 'Rata-rata capaian kinerja (%)';
-  // rerataCapKinerjaRow.getCell('A').alignment = { horizontal: 'right' };
-  // rerataCapKinerjaRow.getCell('A').font = { bold: true };
-
-  // const predikatKinerjaRowIndex = rowIndex + 2;
-  // worksheet.mergeCells(`A${predikatKinerjaRowIndex}:O${predikatKinerjaRowIndex}`);
-  // const predikatKinerjaRow = worksheet.getRow(predikatKinerjaRowIndex);
-  // predikatKinerjaRow.getCell('A').value = 'Predikat kinerja';
-  // predikatKinerjaRow.getCell('A').alignment = { horizontal: 'right' };
-  // predikatKinerjaRow.getCell('A').font = { bold: true };
-
-  // const faktorPendorongRowIndex = rowIndex + 3;
-  // worksheet.mergeCells(`A${faktorPendorongRowIndex}:AG${faktorPendorongRowIndex}`);
-  // const faktorPendorongRow = worksheet.getRow(faktorPendorongRowIndex);
-  // faktorPendorongRow.getCell('A').value = 'Faktor pendorong keberhasilan kinerja:Predikat kinerja:';
-  // faktorPendorongRow.getCell('A').alignment = { horizontal: 'left' };
-  // faktorPendorongRow.getCell('A').font = { bold: true };
-
-  // const faktorPenghambatRowIndex = rowIndex + 4;
-  // worksheet.mergeCells(`A${faktorPenghambatRowIndex}:AG${faktorPenghambatRowIndex}`);
-  // const faktorPenghambatRow = worksheet.getRow(faktorPenghambatRowIndex);
-  // faktorPenghambatRow.getCell('A').value = 'Faktor penghambat pencapaian kinerja:';
-  // faktorPenghambatRow.getCell('A').alignment = { horizontal: 'left' };
-  // faktorPenghambatRow.getCell('A').font = { bold: true };
-
-  // const tlTriRowIndex = rowIndex + 5;
-  // worksheet.mergeCells(`A${tlTriRowIndex}:AG${tlTriRowIndex}`);
-  // const tlTriRow = worksheet.getRow(tlTriRowIndex);
-  // tlTriRow.getCell('A').value = 'Tindak lanjut yang diperlukan dalam triwulan berikutnya:';
-  // tlTriRow.getCell('A').alignment = { horizontal: 'left' };
-  // tlTriRow.getCell('A').font = { bold: true };
-
-  // const tlRenjaRowIndex = rowIndex + 6;
-  // worksheet.mergeCells(`A${tlRenjaRowIndex}:AG${tlRenjaRowIndex}`);
-  // const tlRenjaRow = worksheet.getRow(tlRenjaRowIndex);
-  // tlRenjaRow.getCell('A').value = 'Tindak lanjut yang diperlukan dalam Renja Perangkat Daerah berikutnya:';
-  // tlRenjaRow.getCell('A').alignment = { horizontal: 'left' };
-  // tlRenjaRow.getCell('A').font = { bold: true };
-
-  // const targetRowKab = rowIndex + 7;
-  // worksheet.mergeCells(`AE${targetRowKab}:AG${targetRowKab}`);
-  // const rowKab = worksheet.getRow(targetRowKab);
-  // rowKab.getCell('AE').value = 'Kabupaten Bengkulu Utara, .........................................';
-
-  // const targetRowNIP = rowIndex + 14;
-  // const rowNIP = worksheet.getRow(targetRowNIP);
-  // rowNIP.getCell('AE').value = 'NIP.';
   //#endregion
 
   const buffer = await workbook.xlsx.writeBuffer();
