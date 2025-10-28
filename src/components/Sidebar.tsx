@@ -55,12 +55,13 @@ const menuUtama: MenuItem[] = [
       // { label: 'Jadwal', to: '/master/jadwal' },
       { label: 'Role', to: '/master/role', akses: 1 && 2 },
       { label: 'Periode', to: '/master/periode' },
-      { label: 'SKPD', to: '/master/skpd' },
+      { label: 'SKPD', to: '/master/skpd', akses: 1 && 2 },
     ],
   },
   {
     label: 'Konfigurasi',
     icon: <MdSettings />,
+    akses: 1 && 2,
     submenu: [
       { label: 'User', to: '/konfigurasi/user' },
       // { label: 'Transfer Data', to: '/konfigurasi/transferdata' },
@@ -102,13 +103,13 @@ const menuRKPD: MenuItem[] = [
     akses: 3,
   },
   { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
-  { label: 'Capaian', icon: <MdInsights />, to: '/rkpd/capaian', akses: 3 },
+  { label: 'Capaian', icon: <MdInsights />, to: '/rkpd/capaian', akses: 2 },
   // { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
   {
     label: 'Realisasi',
     icon: <MdAssignmentTurnedIn />,
     to: '/rkpd/realisasi',
-    akses: 3,
+    akses: 2,
   },
   {
     label: 'Hasil Evaluasi',
@@ -116,8 +117,8 @@ const menuRKPD: MenuItem[] = [
     submenu: [
       { label: 'RKPD Tahunan', to: '/rkpd/hasil_evaluasi/rkpd_tahunan' },
       { label: 'RKPD 5 Tahunan', to: '/rkpd/hasil_evaluasi/rkpd_5_tahunan' },
-      { label: 'RESTRA', to: '/#' },
-      { label: 'RPJMD', to: '/#' },
+      // { label: 'RESTRA', to: '/#' },
+      // { label: 'RPJMD', to: '/#' },
     ],
     akses: 3,
   },

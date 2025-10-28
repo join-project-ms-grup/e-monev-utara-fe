@@ -7,6 +7,7 @@ import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
+  getRoleId,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
@@ -317,33 +318,36 @@ const IndikatorTable = () => {
                 {indikatorList.map((item, index) => (
                   <tr key={item.id}>
                     <td className='block overflow-y-auto h-[70px]'>
-                      <AksiButton
-                        Icon={MdEdit}
-                        tooltip='Ubah'
-                        onClick={() => {
-                          console.log('Edit klik', data, index);
-                          const mappedTarget = formData.target?.map(
-                            ({ tahun_ke }) => {
-                              const found = data.indikator?.[
-                                index
-                              ].target?.find(
-                                (t) => Number(t.tahun_ke) === Number(tahun_ke),
-                              );
-                              return { tahun_ke, target: found?.target || 0 };
-                            },
-                          );
-                          setFormData({
-                            id: data.indikator?.[index].id,
-                            master_id: data.id,
-                            skpd_periode_id: selectedSKPD,
-                            name: data.indikator?.[index].name,
-                            satuan: data.indikator?.[index].satuan,
-                            target: mappedTarget,
-                          });
-                          setModalState('Edit');
-                          setOpenModal(true);
-                        }}
-                      />
+                      {getRoleId() !== 3 && (
+                        <AksiButton
+                          Icon={MdEdit}
+                          tooltip='Ubah'
+                          onClick={() => {
+                            console.log('Edit klik', data, index);
+                            const mappedTarget = formData.target?.map(
+                              ({ tahun_ke }) => {
+                                const found = data.indikator?.[
+                                  index
+                                ].target?.find(
+                                  (t) =>
+                                    Number(t.tahun_ke) === Number(tahun_ke),
+                                );
+                                return { tahun_ke, target: found?.target || 0 };
+                              },
+                            );
+                            setFormData({
+                              id: data.indikator?.[index].id,
+                              master_id: data.id,
+                              skpd_periode_id: selectedSKPD,
+                              name: data.indikator?.[index].name,
+                              satuan: data.indikator?.[index].satuan,
+                              target: mappedTarget,
+                            });
+                            setModalState('Edit');
+                            setOpenModal(true);
+                          }}
+                        />
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -376,16 +380,18 @@ const IndikatorTable = () => {
           </div>
         </div>
         <div className='flex justify-end items-end gap-2'>
-          <InputButton
-            tooltip='Tambah data'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              setModalState('Add');
-              setOpenModal(true);
-            }}
-          >
-            <MdAdd />
-          </InputButton>
+          {getRoleId() !== 3 && (
+            <InputButton
+              tooltip='Tambah data'
+              className='btn btn-theme w-9 h-9'
+              onClick={() => {
+                setModalState('Add');
+                setOpenModal(true);
+              }}
+            >
+              <MdAdd />
+            </InputButton>
+          )}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'

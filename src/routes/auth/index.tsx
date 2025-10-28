@@ -33,8 +33,8 @@ export const Route = createFileRoute('/auth/')({
 function RouteComponent() {
   const navigate = useNavigate();
   const { login, refreshPeriodeCookie } = useAuth();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -132,7 +132,7 @@ function RouteComponent() {
               </a>
             </p>
           </div>
-          <div className='inline-flex gap-2'>
+          {/* <div className='inline-flex gap-2'>
             <button
               className='text-red-200 hover:text-red-100 transition-all'
               onClick={() => {
@@ -169,7 +169,7 @@ function RouteComponent() {
             >
               DAK
             </button>
-          </div>
+          </div> */}
           <div className='h-1/5 text-center w-full flex flex-col items-center justify-center opacity-50 text-[0.9rem]'>
             <p>BAPPELITBANGDA</p>
             <p>&copy; 2025 Kabupaten Bengkulu Utara</p>

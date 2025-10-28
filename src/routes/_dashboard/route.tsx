@@ -21,7 +21,7 @@ import InputSearchBox, {
 import Cookies from 'js-cookie';
 import { useAuth } from '../../contexts/AuthContext';
 import AksiButton from '../../components/inputs/AksiButton';
-import { getRoleId, skipPeriode } from '../../lib/usercookie';
+import { getRoleId, isDev, skipPeriode } from '../../lib/usercookie';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {
@@ -112,16 +112,18 @@ function PeriodeComponent() {
           <div className='w-full bg-red-50 flex items-center justify-center'>
             <div className='grid grid-cols-3'>
               <div className='flex justify-start items-center'>
-                <AksiButton
-                  tooltip='Lewati'
-                  Icon={MdChevronLeft}
-                  className='ms-2 p-1 hover:text-gray-800 hover:opacity-60'
-                  hoverColor='bg-[var(--color-2)]'
-                  onClick={() => {
-                    Cookies.set('skip_periode', '1');
-                    refreshPeriodeCookie();
-                  }}
-                />
+                {isDev() && (
+                  <AksiButton
+                    tooltip='Lewati'
+                    Icon={MdChevronLeft}
+                    className='ms-2 p-1 hover:text-gray-800 hover:opacity-60'
+                    hoverColor='bg-[var(--color-2)]'
+                    onClick={() => {
+                      Cookies.set('skip_periode', '1');
+                      refreshPeriodeCookie();
+                    }}
+                  />
+                )}
               </div>
               <h4 className='p-2'>Pilih Periode</h4>
               <div className='flex justify-end items-center'>

@@ -15,6 +15,7 @@ import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
+  getRoleId,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
@@ -25,7 +26,7 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import AksiButton from '../../inputs/AksiButton';
-import { formatUang } from '../../../lib/Helper';
+import { formatUang } from '../../../lib/helper';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 
@@ -218,29 +219,31 @@ const PaguIndikatifTable = () => {
           const data = ctx.row.original;
           return (
             <>
-              <AksiButton
-                Icon={MdEdit}
-                tooltip='Ubah'
-                onClick={() => {
-                  const mappedPagu = formData.target?.map(({ tahun_ke }) => {
-                    const found = data.pagu?.find(
-                      (p) => Number(p.tahun_ke) === Number(tahun_ke),
-                    );
-                    return {
-                      tahun_ke,
-                      pagu: found?.pagu || 0,
-                    };
-                  });
-                  setFormData({
-                    master_id: data.id,
-                    master_name: data.name,
-                    skpd_periode_id: Number(getPeriodeIDFromCookie()),
-                    target: mappedPagu,
-                  });
-                  setModalState('Edit');
-                  setOpenModal(true);
-                }}
-              />
+              {getRoleId() !== 3 && (
+                <AksiButton
+                  Icon={MdEdit}
+                  tooltip='Ubah'
+                  onClick={() => {
+                    const mappedPagu = formData.target?.map(({ tahun_ke }) => {
+                      const found = data.pagu?.find(
+                        (p) => Number(p.tahun_ke) === Number(tahun_ke),
+                      );
+                      return {
+                        tahun_ke,
+                        pagu: found?.pagu || 0,
+                      };
+                    });
+                    setFormData({
+                      master_id: data.id,
+                      master_name: data.name,
+                      skpd_periode_id: Number(getPeriodeIDFromCookie()),
+                      target: mappedPagu,
+                    });
+                    setModalState('Edit');
+                    setOpenModal(true);
+                  }}
+                />
+              )}
             </>
           );
         }
@@ -274,16 +277,18 @@ const PaguIndikatifTable = () => {
           </div>
         </div>
         <div className='flex justify-between gap-2 items-end'>
-          <InputButton
-            tooltip='Tambah data'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              setModalState('Add');
-              setOpenModal(true);
-            }}
-          >
-            <MdAdd />
-          </InputButton>
+          {getRoleId() !== 3 && (
+            <InputButton
+              tooltip='Tambah data'
+              className='btn btn-theme w-9 h-9'
+              onClick={() => {
+                setModalState('Add');
+                setOpenModal(true);
+              }}
+            >
+              <MdAdd />
+            </InputButton>
+          )}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
