@@ -274,8 +274,8 @@ const UserTable = () => {
                 fullname: data.fullname,
                 name: data.name,
                 password: data.password,
-                role_id: data.role_id,
-                skpd_id: data.skpd_id,
+                role_id: Number(data.role_id),
+                skpd_id: Number(data.skpd_id),
               });
             }}
           >
@@ -301,10 +301,18 @@ const UserTable = () => {
             type='Edit'
             defaultValues={formData}
             onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', data);
+              console.log('Data dari form modal:', payload);
+              const newPayload = {
+                email: payload?.email,
+                fullname: payload?.fullname,
+                name: payload?.name,
+                role_id: Number(payload?.role_id),
+                skpd_id: Number(payload?.skpd_id),
+              };
+
               updateMutation.mutate({
                 id,
-                payload,
+                payload: newPayload,
               });
             }}
           >
