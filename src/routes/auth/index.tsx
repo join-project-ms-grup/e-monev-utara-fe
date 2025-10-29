@@ -33,8 +33,8 @@ export const Route = createFileRoute('/auth/')({
 function RouteComponent() {
   const navigate = useNavigate();
   const { login, refreshPeriodeCookie } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('admin_dev');
+  const [password, setPassword] = useState('admin123');
 
   const mutation = useMutation({
     mutationFn: async () => {

@@ -6,6 +6,7 @@ import RowExpand from '../RowExpand';
 import {
   addPagu,
   getPagu,
+  getPaguFlat,
   updatePagu,
   type PaguForm,
   type PaguMaster,
@@ -19,7 +20,7 @@ import {
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import DialogModal from '../../inputs/DialogModal';
 import FormPagu from '../../forms/FormPagu';
 import type { AxiosError } from 'axios';
@@ -42,6 +43,9 @@ const tableHead = () => {
   return (
     <>
       <tr>
+        <th rowSpan={2} colSpan={5}>
+          Kode
+        </th>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={1} colSpan={5}>
           Target
@@ -78,7 +82,9 @@ const PaguIndikatifTable = () => {
   //#region Modal, FormData & Tabel Data
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_pagu', selectedSKPD],
-    queryFn: () => getPagu(Number(selectedSKPD)),
+    // queryFn: () => getPagu(Number(selectedSKPD)),
+    queryFn: () => getPaguFlat(Number(selectedSKPD)),
+    enabled: !!selectedSKPD,
   });
   // Modal
   const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
@@ -175,27 +181,31 @@ const PaguIndikatifTable = () => {
 
   const columns: ColumnDef<PaguMaster>[] = [
     {
+      id: 'kode',
+      columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
+        (label, index) => ({
+          id: `kode_${label}`,
+          meta: {
+            tdClassNames: 'w-[30px]',
+          },
+          accessorFn: (row) => row.kodeFull?.[index],
+          cell: ({ getValue }) => {
+            const value = getValue();
+            return value ?? '';
+          },
+        }),
+      ),
+    },
+    {
       accessorKey: 'name',
-      header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      cell: (ctx) => {
-        let currentRow: any = ctx.row;
-        const kodeArray: string[] = [];
-        while (currentRow) {
-          kodeArray.unshift(currentRow.original.kode);
-          currentRow = currentRow.getParentRow?.();
-        }
-
+      cell: ({getValue, row}) => {
+        const isBold = !!row.original.type;
         return (
-          <div
-            className='inline-flex gap-2'
-            style={{ paddingLeft: `${ctx.row.depth * 1}rem` }}
-          >
-            <RowExpand showValue={false} {...ctx} />
-            <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
-            {ctx.getValue<string>()}
-          </div>
-        );
-      },
+          <>
+          <span className={isBold ? 'font-bold' : undefined}>{getValue() as ReactNode}</span>
+          </>
+        )
+      }
     },
     {
       header: 'Target',
