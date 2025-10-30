@@ -2,7 +2,6 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
-import RowExpand from '../RowExpand';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
@@ -19,13 +18,11 @@ import type { ApiResponse } from '../../../lib/api';
 import AksiButton from '../../inputs/AksiButton';
 import {
   addIndikator,
-  getIndikator,
   getIndikatorFlat,
   updateIndikator,
   type Indikator,
   type IndikatorForm,
   type IndikatorMaster,
-  type IndikatorMasterTree,
 } from '../../../services/IndikatorService';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
@@ -79,11 +76,6 @@ const IndikatorTable = () => {
     })) || [];
   //#endregion
   // #region Modal, FormData & Tabel Data
-  // const { data, refetch, isFetching } = useQuery({
-  //   queryKey: ['tabel_indikator', selectedSKPD],
-  //   queryFn: () => getIndikator(Number(selectedSKPD)),
-  //   enabled: !!selectedSKPD,
-  // });
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_indikator', selectedSKPD],
     queryFn: async () => getIndikatorFlat(Number(selectedSKPD)),
@@ -266,7 +258,7 @@ const IndikatorTable = () => {
       accessorFn: (row) => row.indikator,
       header: 'Satuan',
       meta: {
-        tdClassNames: 'p-0! flex flex-col',
+        tdClassNames: 'p-0!',
       },
       cell: ({ row, getValue }) => {
         const indikatorList = getValue() as Indikator[];

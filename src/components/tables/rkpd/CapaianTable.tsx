@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState, type ReactNode } from 'react';
 import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
@@ -13,9 +13,11 @@ import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import {
   addCapaian,
   getCapaian,
+  getCapaianFlat,
   type CapaianForm,
   type CapaianIndikator,
   type CapaianIndikatorCapaian,
+  type CapaianMaster,
   type CapaianMasterTree,
   type CapaianTriwulan,
 } from '../../../services/CapaianService';
@@ -33,6 +35,9 @@ const tableHead = () => {
   return (
     <>
       <tr>
+        <th rowSpan={2} colSpan={5}>
+          Kode
+        </th>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={2}>Indikator</th>
         <th rowSpan={2}>Satuan</th>
@@ -69,9 +74,14 @@ const CapaianTable = () => {
   //#endregion
 
   //#region Modal, FormData & Tabel Data
-  const { data, isFetching, refetch } = useQuery({
+  // const { data, isFetching, refetch } = useQuery({
+  //   queryKey: ['tabel_capaian', selectedSKPD, tahunKe],
+  //   queryFn: async () => getCapaian(Number(selectedSKPD), Number(tahunKe)),
+  //   enabled: !!(selectedSKPD && tahunKe),
+  // });
+  const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_capaian', selectedSKPD, tahunKe],
-    queryFn: async () => getCapaian(Number(selectedSKPD), Number(tahunKe)),
+    queryFn: async () => getCapaianFlat(Number(selectedSKPD), Number(tahunKe)),
     enabled: !!(selectedSKPD && tahunKe),
   });
   // Modal
@@ -133,30 +143,34 @@ const CapaianTable = () => {
   //#endregion
 
   // #region Kolom Tabel
-  const subRows = (row: CapaianMasterTree) =>
-    row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
-
-  const columns: ColumnDef<CapaianMasterTree>[] = [
+  const rowHeights = useRef<{ [key: string]: number[] }>({});
+  const columns: ColumnDef<CapaianMaster>[] = [
+    {
+      id: 'kode',
+      columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
+        (label, index) => ({
+          id: `kode_${label}`,
+          meta: {
+            tdClassNames: 'w-[30px]',
+          },
+          accessorFn: (row) => row.kodeFull?.[index],
+          cell: ({ getValue }) => {
+            const value = getValue();
+            return value ?? '';
+          },
+        }),
+      ),
+    },
     {
       accessorKey: 'name',
-      header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      cell: (ctx) => {
-        let currentRow: any = ctx.row;
-        const kodeArray: string[] = [];
-        while (currentRow) {
-          kodeArray.unshift(currentRow.original.kode);
-          currentRow = currentRow.getParentRow?.();
-        }
-
+      cell: ({ getValue, row }) => {
+        const isBold = !!row.original.type;
         return (
-          <div
-            className='inline-flex gap-2'
-            style={{ paddingLeft: `${ctx.row.depth * 1}rem` }}
-          >
-            <RowExpand showValue={false} {...ctx} />
-            <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
-            {ctx.getValue<string>()}
-          </div>
+          <>
+            <span className={isBold ? 'font-bold' : undefined}>
+              {getValue() as ReactNode}
+            </span>
+          </>
         );
       },
     },
@@ -166,18 +180,29 @@ const CapaianTable = () => {
       meta: {
         tdClassNames: 'p-0!',
       },
-      cell: ({ getValue }) => {
+      cell: ({ row, getValue }) => {
         const indikatorList = getValue() as CapaianIndikator[];
         if (!indikatorList || indikatorList.length === 0) return null;
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <>
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((item) => (
-                    <tr key={item.id}>
-                      <td className='block overflow-y-auto h-[70px]'>
+                  {indikatorList.map((item, index) => (
+                    <tr key={item.id} className={bgClass}>
+                      <td
+                        className='block overflow-y-auto'
+                        ref={(el) => {
+                          if (el) {
+                            const h = el.offsetHeight;
+                            if (!rowHeights.current[row.id])
+                              rowHeights.current[row.id] = [];
+                            rowHeights.current[row.id][index] = h;
+                          }
+                        }}
+                      >
                         {item.name}
                       </td>
                     </tr>
@@ -193,20 +218,25 @@ const CapaianTable = () => {
       accessorFn: (row) => row.indikator,
       header: 'Satuan',
       meta: {
-        tdClassNames: 'p-0! flex flex-col',
+        tdClassNames: 'p-0!',
       },
-      cell: ({ getValue }) => {
+      cell: ({ row, getValue }) => {
         const indikatorList = getValue() as CapaianIndikator[];
         if (!indikatorList || indikatorList.length === 0) return null;
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <>
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((item) => (
-                    <tr key={item.id}>
-                      <td className='block overflow-y-auto h-[70px]'>
+                  {indikatorList.map((item, index) => (
+                    <tr key={item.id} className={bgClass}>
+                      <td
+                        style={{
+                          height: rowHeights.current[row.id]?.[index] || 'auto',
+                        }}
+                      >
                         {item.satuan}
                       </td>
                     </tr>
@@ -224,22 +254,27 @@ const CapaianTable = () => {
       meta: {
         tdClassNames: 'p-0!',
       },
-      cell: ({ getValue }) => {
+      cell: ({ row, getValue }) => {
         const indikatorList = getValue() as CapaianIndikator[];
         if (!indikatorList || indikatorList.length === 0) return null;
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <div>
             <table className='w-full'>
               <tbody className='border-0!'>
-                {indikatorList.map((item) => {
+                {indikatorList.map((item, index) => {
                   const targetValue = Array.isArray(item.target)
                     ? (item.target[0]?.target ?? '-')
                     : '-';
 
                   return (
-                    <tr key={item.id}>
-                      <td className='block overflow-y-auto h-[70px]'>
+                    <tr key={item.id} className={bgClass}>
+                      <td
+                        style={{
+                          height: rowHeights.current[row.id]?.[index] || 'auto',
+                        }}
+                      >
                         {targetValue}
                       </td>
                     </tr>
@@ -261,19 +296,24 @@ const CapaianTable = () => {
         cell: ({ row }) => {
           const indikatorList = row.original.indikator ?? [];
           if (!indikatorList.length) return '\u00A0';
-
+          const isEven = row.index % 2 === 1;
+          const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
           return (
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((indikator: CapaianIndikator) => {
-                    const capaianValue =
-                      indikator.capaian?.capaianTriwulan?.find(
-                        (t) => t.triwulan === triwulan,
-                      )?.capaian;
+                  {indikatorList.map((item, index) => {
+                    const capaianValue = item.capaian?.capaianTriwulan?.find(
+                      (t) => t.triwulan === triwulan,
+                    )?.capaian;
                     return (
-                      <tr key={indikator.id}>
-                        <td className='block overflow-y-auto h-[70px] text-center'>
+                      <tr key={item.id} className={bgClass}>
+                        <td
+                          style={{
+                            height:
+                              rowHeights.current[row.id]?.[index] || 'auto',
+                          }}
+                        >
                           {capaianValue ?? '-'}
                         </td>
                       </tr>
@@ -293,15 +333,20 @@ const CapaianTable = () => {
       cell: ({ row }) => {
         const indikatorList = row.original.indikator ?? [];
         if (!indikatorList.length) return '\u00A0';
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <div>
             <table className='w-full'>
               <tbody className='border-0!'>
-                {indikatorList.map((indikator: CapaianIndikator) => (
-                  <tr key={indikator.id}>
-                    <td className='block overflow-y-auto h-[70px] text-center font-bold'>
-                      {indikator.capaian?.capaianTotal ?? '-'}
+                {indikatorList.map((item, index) => (
+                  <tr key={item.id} className={bgClass}>
+                    <td
+                      style={{
+                        height: rowHeights.current[row.id]?.[index] || 'auto',
+                      }}
+                    >
+                      {item.capaian?.capaianTotal ?? '-'}
                     </td>
                   </tr>
                 ))}
@@ -318,18 +363,22 @@ const CapaianTable = () => {
       cell: ({ row }) => {
         const indikatorList = row.original.indikator ?? [];
         if (!indikatorList.length) return '\u00A0';
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <div>
             <table className='w-full'>
               <tbody className='border-0!'>
-                {indikatorList.map((indikator: CapaianIndikator) => (
-                  <tr key={indikator.id}>
-                    <td className='block overflow-y-auto h-[70px] text-center font-bold'>
-                      {indikator.capaian?.perseCapaian != null
-                        ? Math.floor(
-                            Number(indikator.capaian.perseCapaian) * 100,
-                          ) / 100
+                {indikatorList.map((item, index) => (
+                  <tr key={item.id} className={bgClass}>
+                    <td
+                      style={{
+                        height: rowHeights.current[row.id]?.[index] || 'auto',
+                      }}
+                    >
+                      {item.capaian?.perseCapaian != null
+                        ? Math.floor(Number(item.capaian.perseCapaian) * 100) /
+                          100
                         : '-'}
                     </td>
                   </tr>
@@ -347,14 +396,19 @@ const CapaianTable = () => {
         const data = row.original;
         const indikatorList = data.indikator as CapaianIndikator[];
         if (!indikatorList || indikatorList.length === 0) return null;
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <div>
             <table className='w-full'>
               <tbody className='border-0!'>
-                {indikatorList.map((item) => (
-                  <tr key={item.id}>
-                    <td className='block overflow-y-auto h-[70px]'>
+                {indikatorList.map((item, index) => (
+                  <tr key={item.id} className={bgClass}>
+                    <td
+                      style={{
+                        height: rowHeights.current[row.id]?.[index] || 'auto',
+                      }}
+                    >
                       <AksiButton
                         Icon={MdEdit}
                         tooltip='Ubah'
@@ -466,10 +520,10 @@ const CapaianTable = () => {
       <Tabel
         data={data || []}
         columns={columns}
-        subRows={subRows}
+        // subRows={subRows}
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
-        initialExpanded
+        // initialExpanded
       />
       <DialogModal
         title='Tambah data Realisasi'
