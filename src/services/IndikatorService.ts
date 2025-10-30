@@ -14,6 +14,7 @@ export interface Indikator {
 
 export interface IndikatorMaster {
   id?: number;
+  kodeFull?: (string | number)[];
   kode?: string | number;
   name?: string;
   type?: string;
@@ -50,6 +51,46 @@ export interface IndikatorForm {
 export const getIndikator = async (id: number): Promise<IndikatorMasterTree[]> => {
   const response = await api.get<ApiResponse<IndikatorMasterTree[]>>(`/indikator/list/${id}`);
   return response.data.data;
+};
+
+type ChildKey = 'bidang' | 'program' | 'kegiatan' | 'subKegiatan';
+/**
+ * Ambil semua flat data indikator
+ */
+export const getIndikatorFlat = async (
+  id: number
+): Promise<(IndikatorMaster & { parentId?: number | string; depth: number; })[]> => {
+  const treeData = await getIndikator(id);
+  const flatData: (IndikatorMaster & { parentId?: number | string; depth: number; })[] = [];
+
+  const childKeys: ChildKey[] = ['bidang', 'program', 'kegiatan', 'subKegiatan'];
+
+  function flattenNode(
+    node: IndikatorMaster,
+    parentId?: number | string,
+    parentKodeFull: (string | number)[] = [],
+    depth = 0
+  ): void {
+    const kodeFull = [...parentKodeFull, node.kode ?? ''];
+    const flatNode = {
+      ...node,
+      parentId,
+      depth,
+      kodeFull,
+    };
+    childKeys.forEach((key) => delete (flatNode as any)[key]);
+    flatData.push(flatNode);
+    childKeys.forEach((key) => {
+      const children = (node as any)[key];
+      if (Array.isArray(children)) {
+        children.forEach((child: IndikatorMaster) =>
+          flattenNode(child, node.id, kodeFull, depth + 1)
+        );
+      }
+    });
+  }
+  treeData.forEach((item) => flattenNode(item));
+  return flatData;
 };
 
 /**

@@ -32,7 +32,7 @@ export const Route = createFileRoute('/auth/')({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const { login, refreshPeriodeCookie } = useAuth();
+  const { login } = useAuth();
   const [username, setUsername] = useState('admin_dev');
   const [password, setPassword] = useState('admin123');
 
@@ -75,20 +75,24 @@ function RouteComponent() {
             alt=''
             className='w-full h-full object-cover object-[60%_center] absolute z-0'
           />
-          <div className='flex flex-row items-center gap-2 absolute left-4 top-4 cursor-default bg-[#0000001e] rounded-xl px-4 py-2'>
+          {/* bg-[#0000001e] */}
+          <div className='flex flex-row items-center gap-4 absolute left-4 top-4 cursor-default rounded-xl px-4 py-2'>
             <div>
-              <img src='/bengkulu-utara-logo.webp' alt='' className='h-16' />
+              <img src='/bengkulu-utara-logo.webp' alt='' className='h-16 mt-4' />
             </div>
             <div>
-              <h1 className='text-4xl font-bold mb-4 z-10 uppercase'>
+              {/* <h1 className='text-4xl font-bold mb-4 z-10 uppercase'>
                 {SITE_NAME}
-              </h1>
-              <p className='uppercase font-semibold -mt-4'>
-                Monitoring, Analisis Hasil Pembangunan Daerah
+              </h1> */}
+              <div className='w-72'>
+                <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
+              </div>
+              <p className='uppercase font-bold'>
+                <span className='text-[var(--color-1)]'>M</span>onitoring,{' '}
+                <span className='text-[var(--color-1)]'>A</span>nalisis{' '}
+                <span className='text-[var(--color-1)]'>Ha</span>sil Pem
+                <span className='text-[var(--color-1)]'>b</span>angunan Daer<span className='text-[var(--color-1)]'>ah</span>
               </p>
-              {/* <p className='uppercase font-semibold'>
-                Kabupaten Bengkulu Utara
-              </p> */}
             </div>
           </div>
         </div>

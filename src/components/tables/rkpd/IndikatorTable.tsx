@@ -11,7 +11,7 @@ import {
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import DialogModal from '../../inputs/DialogModal';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
@@ -20,6 +20,7 @@ import AksiButton from '../../inputs/AksiButton';
 import {
   addIndikator,
   getIndikator,
+  getIndikatorFlat,
   updateIndikator,
   type Indikator,
   type IndikatorForm,
@@ -41,6 +42,9 @@ const tableHead = () => {
   return (
     <>
       <tr>
+        <th rowSpan={2} colSpan={5}>
+          Kode
+        </th>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={2}>Indikator</th>
         <th rowSpan={2}>Satuan</th>
@@ -75,9 +79,15 @@ const IndikatorTable = () => {
     })) || [];
   //#endregion
   // #region Modal, FormData & Tabel Data
+  // const { data, refetch, isFetching } = useQuery({
+  //   queryKey: ['tabel_indikator', selectedSKPD],
+  //   queryFn: () => getIndikator(Number(selectedSKPD)),
+  //   enabled: !!selectedSKPD,
+  // });
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_indikator', selectedSKPD],
-    queryFn: () => getIndikator(Number(selectedSKPD)),
+    queryFn: async () => getIndikatorFlat(Number(selectedSKPD)),
+    enabled: !!selectedSKPD,
   });
   // Modal
   const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
@@ -179,31 +189,35 @@ const IndikatorTable = () => {
   // #endregion
 
   // #region Kolom Tabel
-  const subRows = (row: IndikatorMasterTree) =>
-    row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
-
+  // const subRows = (row: IndikatorMasterTree) =>
+  //   row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
+  const rowHeights = useRef<{ [key: string]: number[] }>({});
   const columns: ColumnDef<IndikatorMaster>[] = [
     {
+      id: 'kode',
+      columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
+        (label, index) => ({
+          id: `kode_${label}`,
+          meta: {
+            tdClassNames: 'w-[30px]',
+          },
+          accessorFn: (row) => row.kodeFull?.[index],
+          cell: ({ getValue }) => {
+            const value = getValue();
+            return value ?? '';
+          },
+        }),
+      ),
+    },
+    {
       accessorKey: 'name',
-      header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      cell: (ctx) => {
-        let currentRow: any = ctx.row;
-        const kodeArray: string[] = [];
-        while (currentRow) {
-          kodeArray.unshift(currentRow.original.kode);
-          currentRow = currentRow.getParentRow?.();
-        }
-
+      cell: ({ getValue, row }) => {
+        const isBold = !!row.original.type;
         return (
           <>
-            <div
-              className='inline-flex gap-2'
-              style={{ paddingLeft: `${ctx.row.depth * 1}rem` }}
-            >
-              <RowExpand showValue={false} {...ctx} />
-              <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
-              {ctx.getValue<string>()}
-            </div>
+            <span className={isBold ? 'font-bold' : undefined}>
+              {getValue() as ReactNode}
+            </span>
           </>
         );
       },
@@ -214,18 +228,29 @@ const IndikatorTable = () => {
       meta: {
         tdClassNames: 'p-0!',
       },
-      cell: ({ getValue }) => {
+      cell: ({ row, getValue }) => {
         const indikatorList = getValue() as Indikator[];
         if (!indikatorList || indikatorList.length === 0) return null;
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <>
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((item) => (
-                    <tr key={item.id}>
-                      <td className='block overflow-y-auto h-[70px]'>
+                  {indikatorList.map((item, index) => (
+                    <tr key={item.id} className={bgClass}>
+                      <td
+                        className='block overflow-y-auto'
+                        ref={(el) => {
+                          if (el) {
+                            const h = el.offsetHeight;
+                            if (!rowHeights.current[row.id])
+                              rowHeights.current[row.id] = [];
+                            rowHeights.current[row.id][index] = h;
+                          }
+                        }}
+                      >
                         {item.name}
                       </td>
                     </tr>
@@ -243,18 +268,23 @@ const IndikatorTable = () => {
       meta: {
         tdClassNames: 'p-0! flex flex-col',
       },
-      cell: ({ getValue }) => {
+      cell: ({ row, getValue }) => {
         const indikatorList = getValue() as Indikator[];
         if (!indikatorList || indikatorList.length === 0) return null;
-
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <>
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((item) => (
-                    <tr key={item.id}>
-                      <td className='block overflow-y-auto h-[70px]'>
+                  {indikatorList.map((item, index) => (
+                    <tr key={item.id} className={bgClass}>
+                      <td
+                        style={{
+                          height: rowHeights.current[row.id]?.[index] || 'auto',
+                        }}
+                      >
                         {item.satuan}
                       </td>
                     </tr>
@@ -276,19 +306,25 @@ const IndikatorTable = () => {
         cell: ({ row }: any) => {
           const indikatorList = row.original.indikator ?? [];
           if (!indikatorList.length) return '\u00A0';
-
+          const isEven = row.index % 2 === 1;
+          const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
           return (
             <>
               <div>
                 <table className='w-full'>
                   <tbody className='border-0!'>
-                    {indikatorList.map((indikator: any) => {
+                    {indikatorList.map((indikator: any, index: number) => {
                       const targetValue = indikator.target?.find(
                         (t: any) => t.tahun_ke === tahun,
                       )?.target;
                       return (
-                        <tr key={indikator.id}>
-                          <td className='block overflow-y-auto h-[70px]'>
+                        <tr key={indikator.id} className={bgClass}>
+                          <td
+                            style={{
+                              height:
+                                rowHeights.current[row.id]?.[index] || 'auto',
+                            }}
+                          >
                             {targetValue ?? '-'}
                           </td>
                         </tr>
@@ -311,13 +347,19 @@ const IndikatorTable = () => {
         const data = row.original;
         const indikatorList = data.indikator as Indikator[];
         if (!indikatorList || indikatorList.length === 0) return null;
+        const isEven = row.index % 2 === 1;
+        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
         return (
           <div>
             <table className='w-full'>
               <tbody className='border-0!'>
                 {indikatorList.map((item, index) => (
-                  <tr key={item.id}>
-                    <td className='block overflow-y-auto h-[70px]'>
+                  <tr key={item.id} className={bgClass}>
+                    <td
+                      style={{
+                        height: rowHeights.current[row.id]?.[index] || 'auto',
+                      }}
+                    >
                       {getRoleId() !== 3 && (
                         <AksiButton
                           Icon={MdEdit}
@@ -405,10 +447,10 @@ const IndikatorTable = () => {
       <Tabel
         data={data || []}
         columns={columns}
-        subRows={subRows}
+        // subRows={subRows}
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
-        initialExpanded
+        // initialExpanded
       />
       {modalState === 'Add' && (
         <DialogModal
