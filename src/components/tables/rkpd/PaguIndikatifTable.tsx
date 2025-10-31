@@ -242,7 +242,7 @@ const PaguIndikatifTable = () => {
             ];
 
             updateMutation.mutate({
-              skpd_periode_id: Number(getPeriodeIDFromCookie()),
+              skpd_periode_id: Number(selectedSKPD),
               master_id: data.id,
               target: mappedPagu,
             });
