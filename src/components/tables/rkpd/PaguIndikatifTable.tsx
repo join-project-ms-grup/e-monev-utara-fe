@@ -1,16 +1,13 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
+import { MdAdd, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
-import RowExpand from '../RowExpand';
 import {
   addPagu,
-  getPagu,
   getPaguFlat,
   updatePagu,
   type PaguForm,
   type PaguMaster,
-  type PaguMasterTree,
 } from '../../../services/PaguService';
 import {
   getPeriodeAkhirFromCookie,
@@ -26,10 +23,9 @@ import FormPagu from '../../forms/FormPagu';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
-import AksiButton from '../../inputs/AksiButton';
-import { formatUang } from '../../../lib/helper';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
+import InputText from '../../inputs/InputText';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -50,7 +46,6 @@ const tableHead = () => {
         <th rowSpan={1} colSpan={5}>
           Target
         </th>
-        <th rowSpan={2}>Aksi</th>
       </tr>
       <tr>
         {periode.map((thn) => (
@@ -82,12 +77,11 @@ const PaguIndikatifTable = () => {
   //#region Modal, FormData & Tabel Data
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_pagu', selectedSKPD],
-    // queryFn: () => getPagu(Number(selectedSKPD)),
     queryFn: () => getPaguFlat(Number(selectedSKPD)),
     enabled: !!selectedSKPD,
+    refetchOnWindowFocus: false,
   });
   // Modal
-  const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
   const [openModal, setOpenModal] = useState(false);
   // Form Data
   const initialFormData: PaguForm = {
@@ -176,9 +170,6 @@ const PaguIndikatifTable = () => {
   //#endregion
 
   // #region Kolom Tabel
-  const subRows = (row: PaguMasterTree) =>
-    row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
-
   const columns: ColumnDef<PaguMaster>[] = [
     {
       id: 'kode',
@@ -198,14 +189,17 @@ const PaguIndikatifTable = () => {
     },
     {
       accessorKey: 'name',
-      cell: ({getValue, row}) => {
-        const isBold = !!row.original.type;
+      cell: ({ getValue, row }) => {
+        const typeBold = ['urusan', 'bidang'];
+        const isBold = !!typeBold.find((item) => item === row.original.type);
         return (
           <>
-          <span className={isBold ? 'font-bold' : undefined}>{getValue() as ReactNode}</span>
+            <span className={isBold ? 'font-bold' : undefined}>
+              {getValue() as ReactNode}
+            </span>
           </>
-        )
-      }
+        );
+      },
     },
     {
       header: 'Target',
@@ -218,49 +212,67 @@ const PaguIndikatifTable = () => {
         meta: { tdClassNames: 'text-center' },
         accessorFn: (row) => {
           const item = row.pagu?.find((p) => p.tahun_ke === tahun);
-          return item ? formatUang(Number(item.pagu)) : null;
+          return item ? item.pagu : null;
         },
-      })),
-    },
-    {
-      header: 'Aksi',
-      cell: (ctx) => {
-        if (ctx.row.original.pagu) {
-          const data = ctx.row.original;
+        cell: ({ row, getValue }) => {
+          const data = row.original;
+          const initialValue = getValue();
+          const [target, setTarget] = useState(initialValue);
+          const [disBtn, setDisBtn] = useState(true);
+
+          const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const newValue = e.target.value;
+            setTarget(newValue);
+            setDisBtn(!newValue || Number(initialValue) === Number(newValue));
+          };
+
+          const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            const mappedPagu = data.pagu?.map((p) => ({
+              tahun_ke: p.tahun_ke,
+              pagu:
+                Number(p.tahun_ke) === Number(tahun)
+                  ? Number(target)
+                  : Number(p.pagu) || 0,
+            })) || [
+              {
+                tahun_ke: tahun,
+                pagu: Number(target) || 0,
+              },
+            ];
+
+            updateMutation.mutate({
+              skpd_periode_id: Number(getPeriodeIDFromCookie()),
+              master_id: data.id,
+              target: mappedPagu,
+            });
+          };
+
           return (
             <>
-              {getRoleId() !== 3 && (
-                <AksiButton
-                  Icon={MdEdit}
-                  tooltip='Ubah'
-                  onClick={() => {
-                    const mappedPagu = formData.target?.map(({ tahun_ke }) => {
-                      const found = data.pagu?.find(
-                        (p) => Number(p.tahun_ke) === Number(tahun_ke),
-                      );
-                      return {
-                        tahun_ke,
-                        pagu: found?.pagu || 0,
-                      };
-                    });
-                    setFormData({
-                      master_id: data.id,
-                      master_name: data.name,
-                      skpd_periode_id: Number(getPeriodeIDFromCookie()),
-                      target: mappedPagu,
-                    });
-                    setModalState('Edit');
-                    setOpenModal(true);
-                  }}
-                />
+              {getValue() && (
+                <>
+                  <form id={`form_target_${tahun}`} onSubmit={handleSubmit}>
+                    <InputText
+                      id={`input_target_${tahun}`}
+                      Iconlabel='Rp.'
+                      inputMode='numeric'
+                      type='text'
+                      placeholder='Target...'
+                      value={target}
+                      onChange={handleChange}
+                      withButton
+                      disableButton={disBtn}
+                      buttonType='submit'
+                      invalid={!target}
+                    />
+                  </form>
+                </>
               )}
             </>
           );
-        }
-      },
-      meta: {
-        tdClassNames: 'text-center',
-      },
+        },
+      })),
     },
   ];
   // #endregion
@@ -292,7 +304,6 @@ const PaguIndikatifTable = () => {
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'
               onClick={() => {
-                setModalState('Add');
                 setOpenModal(true);
               }}
             >
@@ -312,74 +323,40 @@ const PaguIndikatifTable = () => {
       <Tabel
         data={data || []}
         columns={columns}
-        subRows={subRows}
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
-        initialExpanded
       />
-      {modalState === 'Add' && (
-        <DialogModal
-          title='Tambah data Pagu'
-          isOpen={openModal}
-          onClose={() => {
-            setFormData(initialFormData);
-            setOpenModal(false);
+      <DialogModal
+        title='Tambah data Pagu'
+        isOpen={openModal}
+        onClose={() => {
+          setFormData(initialFormData);
+          setOpenModal(false);
+        }}
+      >
+        <FormPagu
+          type='Add'
+          defaultValues={formData}
+          onSubmit={(data: PaguForm) => {
+            console.log('Data dari form modal:', data);
+            addMutation.mutate({
+              skpd_periode_id: data.skpd_periode_id,
+              master_id: data.master_id,
+              target: data.target,
+            });
           }}
         >
-          <FormPagu
-            type='Add'
-            defaultValues={formData}
-            onSubmit={(data: PaguForm) => {
-              console.log('Data dari form modal:', data);
-              addMutation.mutate({
-                skpd_periode_id: data.skpd_periode_id,
-                master_id: data.master_id,
-                target: data.target,
-              });
-            }}
-          >
-            <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-                isLoading={loadingMutation}
-              >
-                Simpan
-              </InputButton>
-            </div>
-          </FormPagu>
-        </DialogModal>
-      )}
-      {modalState === 'Edit' && (
-        <DialogModal
-          title='Ubah data Pagu'
-          isOpen={openModal}
-          onClose={() => setOpenModal(false)}
-        >
-          <FormPagu
-            type='Edit'
-            defaultValues={formData}
-            onSubmit={(data: PaguForm) => {
-              console.log('Data dari form modal:', data);
-              updateMutation.mutate({
-                skpd_periode_id: data.skpd_periode_id,
-                master_id: data.master_id,
-                target: data.target,
-              });
-            }}
-          >
-            <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-                isLoading={loadingMutation}
-              >
-                Simpan
-              </InputButton>
-            </div>
-          </FormPagu>
-        </DialogModal>
-      )}
+          <div className='flex gap-2 justify-end'>
+            <InputButton
+              type='submit'
+              className='btn btn-theme w-24'
+              isLoading={loadingMutation}
+            >
+              Simpan
+            </InputButton>
+          </div>
+        </FormPagu>
+      </DialogModal>
     </div>
   );
 };

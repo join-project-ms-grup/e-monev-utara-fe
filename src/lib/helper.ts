@@ -1,12 +1,19 @@
 export function formatUang(nilai: number): string {
-    const formatted = new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0
-    }).format(nilai);
+  const formatted = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(nilai);
 
-    return formatted.replace('Rp', 'Rp.');
+  return formatted.replace('Rp', 'Rp.');
 }
+
+export function formatRibu(nilai: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    minimumFractionDigits: 0
+  }).format(nilai);
+}
+
 
 const now = new Date();
 const formatted = now.toLocaleString('id-ID', {

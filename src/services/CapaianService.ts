@@ -117,7 +117,6 @@ export const getCapaianFlat = async (
         });
     }
     treeData.forEach((item) => flattenNode(item));
-    console.log('capaian flat', flatData)
     return flatData;
 };
 

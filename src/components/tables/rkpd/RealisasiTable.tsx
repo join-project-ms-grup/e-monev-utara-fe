@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Tabel from '../Tabel';
 import { MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
@@ -6,9 +6,9 @@ import { type ColumnDef } from '@tanstack/react-table';
 import toast from 'react-hot-toast';
 import {
   addRealisasi,
-  getRealisasi,
+  getRealisasiFlat,
   type RealisasiForm,
-  type RealisasiMasterTree,
+  type RealisasiMaster,
 } from '../../../services/RealisasiService';
 import {
   getPeriodeAkhirFromCookie,
@@ -16,7 +16,6 @@ import {
   getPeriodeMulaiFromCookie,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import RowExpand from '../RowExpand';
 import AksiButton from '../../inputs/AksiButton';
 import Spinner from '../../inputs/Spinner';
 import DialogModal from '../../inputs/DialogModal';
@@ -31,6 +30,9 @@ const tableHead = () => {
   return (
     <>
       <tr>
+        <th rowSpan={2} colSpan={5}>
+          Kode
+        </th>
         <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
         <th rowSpan={2}>Pagu</th>
         <th rowSpan={1} colSpan={5}>
@@ -66,9 +68,14 @@ const RealisasiTable = () => {
   //#endregion
 
   //#region Modal, FormData & Tabel Data
+  // const { data, refetch, isFetching } = useQuery({
+  //   queryKey: ['tabel_realisasi', selectedSKPD, tahunKe],
+  //   queryFn: () => getRealisasi(Number(selectedSKPD), Number(tahunKe)),
+  //   enabled: !!(selectedSKPD && tahunKe),
+  // });
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_realisasi', selectedSKPD, tahunKe],
-    queryFn: () => getRealisasi(Number(selectedSKPD), Number(tahunKe)),
+    queryFn: async () => getRealisasiFlat(Number(selectedSKPD), Number(tahunKe)),
     enabled: !!(selectedSKPD && tahunKe),
   });
   // Modal
@@ -130,30 +137,37 @@ const RealisasiTable = () => {
   //#endregion
 
   // #region Kolom Tabel
-  const subRows = (row: RealisasiMasterTree) =>
-    row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
+  // const subRows = (row: RealisasiMasterTree) =>
+  //   row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
 
-  const columns: ColumnDef<RealisasiMasterTree>[] = [
+  const columns: ColumnDef<RealisasiMaster>[] = [
+    {
+      id: 'kode',
+      columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
+        (label, index) => ({
+          id: `kode_${label}`,
+          meta: {
+            tdClassNames: 'w-[30px]',
+          },
+          accessorFn: (row) => row.kodeFull?.[index],
+          cell: ({ getValue }) => {
+            const value = getValue();
+            return value ?? '';
+          },
+        }),
+      ),
+    },
     {
       accessorKey: 'name',
-      header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
-      cell: (ctx) => {
-        let currentRow: any = ctx.row;
-        const kodeArray: string[] = [];
-        while (currentRow) {
-          kodeArray.unshift(currentRow.original.kode); // unshift supaya root duluan
-          currentRow = currentRow.getParentRow?.();
-        }
-
+      cell: ({ getValue, row }) => {
+        const typeBold = ['urusan', 'bidang']
+        const isBold = !!typeBold.find(item => item === row.original.type);
         return (
-          <div
-            className='inline-flex gap-2'
-            style={{ paddingLeft: `${ctx.row.depth * 1}rem` }}
-          >
-            <RowExpand showValue={false} {...ctx} />
-            <span className='font-bold'>{`[${kodeArray.join('.')}] `}</span>
-            {ctx.getValue<string>()}
-          </div>
+          <>
+            <span className={isBold ? 'font-bold' : undefined}>
+              {getValue() as ReactNode}
+            </span>
+          </>
         );
       },
     },
@@ -299,9 +313,9 @@ const RealisasiTable = () => {
         tblClassName='lg:min-w-[1500px]'
         data={data || []}
         columns={columns}
-        subRows={subRows}
+        // subRows={subRows}
         renderHeader={tableHead}
-        initialExpanded
+        // initialExpanded
       />
       <DialogModal
         title='Ubah data Realisasi'

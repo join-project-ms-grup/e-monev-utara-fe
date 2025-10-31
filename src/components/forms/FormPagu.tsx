@@ -71,7 +71,7 @@ const FormPagu: React.FC<FormProps> = ({
 
   //#region SKPD
   const idPeriodeCookie = Number(getPeriodeIDFromCookie());
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  // const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
     queryFn: async () => getSKPDPeriode(idPeriodeCookie),
@@ -426,13 +426,6 @@ const FormPagu: React.FC<FormProps> = ({
                     disabled={type === 'Edit'}
                     invalid={!field.state.meta.isValid}
                   />
-                  {/* <input
-                  id='skpd_periode_id'
-                  name='skpd_periode_id'
-                  type='hidden'
-                  value={field.state.value ?? ''}
-                  readOnly
-                /> */}
                   <ErrorField field={field} />
                 </>
               )}
@@ -458,6 +451,7 @@ const FormPagu: React.FC<FormProps> = ({
                         Tahun ke {n + 1}
                       </label>
                       <InputText
+                        Iconlabel='Rp.'
                         inputMode='numeric'
                         type='text'
                         placeholder='Target...'

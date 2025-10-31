@@ -74,11 +74,6 @@ const CapaianTable = () => {
   //#endregion
 
   //#region Modal, FormData & Tabel Data
-  // const { data, isFetching, refetch } = useQuery({
-  //   queryKey: ['tabel_capaian', selectedSKPD, tahunKe],
-  //   queryFn: async () => getCapaian(Number(selectedSKPD), Number(tahunKe)),
-  //   enabled: !!(selectedSKPD && tahunKe),
-  // });
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_capaian', selectedSKPD, tahunKe],
     queryFn: async () => getCapaianFlat(Number(selectedSKPD), Number(tahunKe)),
@@ -164,7 +159,8 @@ const CapaianTable = () => {
     {
       accessorKey: 'name',
       cell: ({ getValue, row }) => {
-        const isBold = !!row.original.type;
+        const typeBold = ['urusan', 'bidang'];
+        const isBold = !!typeBold.find((item) => item === row.original.type);
         return (
           <>
             <span className={isBold ? 'font-bold' : undefined}>

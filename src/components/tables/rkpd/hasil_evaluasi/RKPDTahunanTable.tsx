@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { exportRKPD } from '../../../../services/Excel/ExcelRKPDTahunan';
@@ -84,7 +84,10 @@ const RKPDTahunanTable = () => {
   const { data, isFetching, refetch } = useQuery({
     queryKey: ['tabel_rkpd_tahunan', selectedSKPD, tahunKe],
     queryFn: async () => {
-      const rawData = await getRKPDTahunan(Number(selectedSKPD), Number(tahunKe));
+      const rawData = await getRKPDTahunan(
+        Number(selectedSKPD),
+        Number(tahunKe),
+      );
       const flatten = flattenRKPD(rawData);
       return flatten;
     },
@@ -111,7 +114,17 @@ const RKPDTahunanTable = () => {
     },
     {
       accessorKey: 'name',
-      header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
+      cell: ({ getValue, row }) => {
+        const typeBold = ['urusan', 'bidang'];
+        const isBold = !!typeBold.find((item) => item === row.original.level);
+        return (
+          <>
+            <span className={isBold ? 'font-bold' : undefined}>
+              {getValue() as ReactNode}
+            </span>
+          </>
+        );
+      },
     },
     {
       header: 'Indikator',
@@ -285,7 +298,8 @@ const RKPDTahunanTable = () => {
     },
     {
       header: 'Perangkat Daerah Penanggung Jawab',
-      cell: () => `${dataSKPDPeriode?.find(item => item.skpd_id === Number(selectedSKPD))?.name}`,
+      cell: () =>
+        `${dataSKPDPeriode?.find((item) => item.skpd_id === Number(selectedSKPD))?.name}`,
     },
   ];
   // #endregion
@@ -334,12 +348,11 @@ const RKPDTahunanTable = () => {
               onClick={async () => {
                 if (data) {
                   toast.success('Printing...');
-                  const tahunLabel = listTahunKe.find(
-                    (t) => t.value === tahunKe,
-                  )?.label ?? '';
-                  const skpdLabel = dataSKPDPeriode?.find(
-                    (s) => s.id === Number(selectedSKPD),
-                  )?.name ?? '';
+                  const tahunLabel =
+                    listTahunKe.find((t) => t.value === tahunKe)?.label ?? '';
+                  const skpdLabel =
+                    dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+                      ?.name ?? '';
                   await exportRKPD(data, tahunLabel, skpdLabel);
                 }
               }}

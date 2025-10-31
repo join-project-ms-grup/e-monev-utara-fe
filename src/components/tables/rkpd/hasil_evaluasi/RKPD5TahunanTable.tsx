@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { MdPrint, MdRefresh } from 'react-icons/md';
@@ -106,7 +106,17 @@ const RKPD5TahunanTable = () => {
     },
     {
       accessorKey: 'name',
-      header: 'Urusan / Bidang / Program / Kegiatan / Sub Kegiatan',
+      cell: ({ getValue, row }) => {
+        const typeBold = ['urusan', 'bidang'];
+        const isBold = !!typeBold.find((item) => item === row.original.level);
+        return (
+          <>
+            <span className={isBold ? 'font-bold' : undefined}>
+              {getValue() as ReactNode}
+            </span>
+          </>
+        );
+      },
     },
     {
       header: 'Indikator',
@@ -343,9 +353,9 @@ const RKPD5TahunanTable = () => {
                   // const tahunLabel = listTahunKe.find(
                   //   (t) => t.value === tahunKe,
                   // )?.label ?? '';
-                  const skpdLabel = dataSKPDPeriode?.find(
-                    (s) => s.id === Number(selectedSKPD),
-                  )?.name ?? '';
+                  const skpdLabel =
+                    dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+                      ?.name ?? '';
                   await exportRKPD5T(data, skpdLabel);
                 }
               }}

@@ -14,6 +14,7 @@ export interface RealisasiPagu {
 
 export interface RealisasiMaster extends RealisasiPagu {
     id?: number;
+    kodeFull?: (string | number)[];
     kode?: string | number;
     name?: string;
     type?: string;
@@ -55,6 +56,45 @@ export const getRealisasi = async (skpd_periode_id: number, tahun_ke: number): P
   }
 };
 
+type ChildKey = 'bidang' | 'program' | 'kegiatan' | 'subKegiatan';
+/**
+ * Ambil semua flat data realisasi
+ */
+export const getRealisasiFlat = async (
+    skpd_periode_id: number, tahun_ke: number,
+): Promise<(RealisasiMaster & { parentId?: number | string; depth: number; })[]> => {
+    const treeData = await getRealisasi(skpd_periode_id, tahun_ke);
+    const flatData: (RealisasiMaster & { parentId?: number | string; depth: number; })[] = [];
+
+    const childKeys: ChildKey[] = ['bidang', 'program', 'kegiatan', 'subKegiatan'];
+
+    function flattenNode(
+        node: RealisasiMaster,
+        parentId?: number | string,
+        parentKodeFull: (string | number)[] = [],
+        depth = 0
+    ): void {
+        const kodeFull = [...parentKodeFull, node.kode ?? ''];
+        const flatNode = {
+            ...node,
+            parentId,
+            depth,
+            kodeFull,
+        };
+        childKeys.forEach((key) => delete (flatNode as any)[key]);
+        flatData.push(flatNode);
+        childKeys.forEach((key) => {
+            const children = (node as any)[key];
+            if (Array.isArray(children)) {
+                children.forEach((child: RealisasiMaster) =>
+                    flattenNode(child, node.id, kodeFull, depth + 1)
+                );
+            }
+        });
+    }
+    treeData.forEach((item) => flattenNode(item));
+    return flatData;
+};
 
 /**
  * Menambahkan data realisasi
