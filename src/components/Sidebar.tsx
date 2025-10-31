@@ -15,7 +15,6 @@ import {
   MdAssignment,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
-import { SITE_NAME } from '../lib/config';
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -50,9 +49,7 @@ const menuUtama: MenuItem[] = [
     label: 'Master',
     icon: <MdInventory />,
     submenu: [
-      // { label: 'Organisasi', to: '/master/organisasi' },
       { label: 'Rekening', to: '/master/rekening' },
-      // { label: 'Jadwal', to: '/master/jadwal' },
       { label: 'Role', to: '/master/role', akses: 1 && 2 },
       { label: 'Periode', to: '/master/periode' },
       { label: 'SKPD', to: '/master/skpd', akses: 1 && 2 },
@@ -64,7 +61,6 @@ const menuUtama: MenuItem[] = [
     akses: 1 && 2,
     submenu: [
       { label: 'User', to: '/konfigurasi/user' },
-      // { label: 'Transfer Data', to: '/konfigurasi/transferdata' },
     ],
   },
 ];
@@ -76,26 +72,6 @@ const menuRKPD: MenuItem[] = [
     label: 'MENU RKPD',
     akses: 3,
   },
-  // {
-  //   label: 'Renstra',
-  //   icon: <MdLibraryBooks />,
-  //   submenu: [
-  //     { label: 'Indikator Outcome\nProgram', to: '/rkpd/renstra/iop' },
-  //     { label: 'Indikator Output Kegiatan', to: '/rkpd/renstra/iok' },
-  //     { label: 'Indikator Output Sub\nKegiatan', to: '/rkpd/renstra/iosk' },
-  //   ],
-  //   akses: 3,
-  // },
-  // {
-  //   label: 'Indikator Kinerja Utama',
-  //   icon: <MdInsights />,
-  //   submenu: [
-  //     { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
-  //     { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
-  //     { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
-  //   ],
-  //   akses: 3,
-  // },
   {
     label: 'Pagu Indikatif',
     icon: <MdDragIndicator />,
@@ -104,7 +80,6 @@ const menuRKPD: MenuItem[] = [
   },
   { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
   { label: 'Capaian', icon: <MdInsights />, to: '/rkpd/capaian', akses: 2 },
-  // { label: 'Renja', icon: <MdViewList />, to: '/rkpd/renja', akses: 3 },
   {
     label: 'Realisasi',
     icon: <MdAssignmentTurnedIn />,
@@ -115,10 +90,9 @@ const menuRKPD: MenuItem[] = [
     label: 'Hasil Evaluasi',
     icon: <MdAssignment />,
     submenu: [
-      { label: 'RKPD Tahunan', to: '/rkpd/hasil_evaluasi/rkpd_tahunan' },
-      { label: 'RKPD 5 Tahunan', to: '/rkpd/hasil_evaluasi/rkpd_5_tahunan' },
-      // { label: 'RESTRA', to: '/#' },
-      // { label: 'RPJMD', to: '/#' },
+      { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd_tahunan' },
+      { label: 'Renstra', to: '/rkpd/hasil_evaluasi/rkpd_5_tahunan' },
+      { label: 'RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
     ],
     akses: 3,
   },
@@ -298,21 +272,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <div className='px-6 py-4'>
           <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
         </div>
-        {/* <div className={`aspect-auto ${sidebarOpen ? 'mr-2' : 'mr-0'}`}>
-          <img
-            src='/bengkulu-utara-logo.webp'
-            alt=''
-            className='max-w-[32px]'
-          />
-        </div> */}
-        {/* <div
-          className={`block text-nowrap text-center cursor-default ${sidebarOpen ? '' : 'hidden'}`}
-        >
-          <h4>{SITE_NAME}</h4>
-        </div> */}
       </div>
       <nav className='overflow-y-auto overflow-x-hidden sidebar-scroll space-y-2 p-4'>
-        {/* {menus.map(renderMenu)} */}
         {filteredMenus.map(renderMenu)}
       </nav>
     </aside>

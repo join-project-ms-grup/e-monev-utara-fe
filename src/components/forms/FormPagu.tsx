@@ -215,7 +215,7 @@ const FormPagu: React.FC<FormProps> = ({
           e.preventDefault();
           form.handleSubmit();
         }}
-        className='max-w-md mx-auto space-y-4'
+        className='mx-auto space-y-4'
       >
         <div className='flex flex-col space-y-4'>
           {/* Field Master Id */}
@@ -453,6 +453,7 @@ const FormPagu: React.FC<FormProps> = ({
                       <InputText
                         Iconlabel='Rp.'
                         inputMode='numeric'
+                        isMoney
                         type='text'
                         placeholder='Target...'
                         id={`target[${n}].pagu`}

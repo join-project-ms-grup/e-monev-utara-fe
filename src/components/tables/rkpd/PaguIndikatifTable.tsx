@@ -79,7 +79,6 @@ const PaguIndikatifTable = () => {
     queryKey: ['tabel_pagu', selectedSKPD],
     queryFn: () => getPaguFlat(Number(selectedSKPD)),
     enabled: !!selectedSKPD,
-    refetchOnWindowFocus: false,
   });
   // Modal
   const [openModal, setOpenModal] = useState(false);
@@ -261,8 +260,7 @@ const PaguIndikatifTable = () => {
                       placeholder='Target...'
                       value={target}
                       onChange={handleChange}
-                      withButton
-                      disableButton={disBtn}
+                      withButton={!disBtn}
                       buttonType='submit'
                       invalid={!target}
                     />
@@ -327,6 +325,7 @@ const PaguIndikatifTable = () => {
         tblClassName='lg:min-w-[1500px]'
       />
       <DialogModal
+        widthLevel={6}
         title='Tambah data Pagu'
         isOpen={openModal}
         onClose={() => {

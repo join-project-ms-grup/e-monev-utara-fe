@@ -1,8 +1,10 @@
 import { Link, useMatches } from '@tanstack/react-router';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { MdKeyboardArrowDown, MdMenu } from 'react-icons/md';
+import { MdKeyboardArrowDown, MdMenu, MdSwapHoriz } from 'react-icons/md';
 import { useAuth } from '../contexts/AuthContext';
 import Cookies from 'js-cookie';
+import AksiButton from './inputs/AksiButton';
+import { getPeriodeFromCookie } from '../lib/usercookie';
 
 type TopbarProps = {
   toggleSidebar: () => void;
@@ -24,6 +26,22 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
       </button>
       <div className='flex-1'>
         <h4>{pageTitle}</h4>
+      </div>
+      <div className='inline-flex gap-2 items-center'>
+        <b>
+          Periode: {getPeriodeFromCookie()?.mulai} -{' '}
+          {getPeriodeFromCookie()?.akhir}
+        </b>
+        <AksiButton
+          tooltip='Ubah Periode'
+          className='hover:bg-[var(--color-2)]!'
+          Icon={MdSwapHoriz}
+          onClick={() => {
+            Cookies.remove('skip_periode');
+            Cookies.remove('periode');
+            refreshPeriodeCookie();
+          }}
+        />
       </div>
       <Menu>
         <MenuButton
@@ -54,7 +72,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
               Profil
             </a>
           </MenuItem>
-          <MenuItem>
+          {/* <MenuItem>
             <a
               className='block py-1 px-2 hover:bg-gray-200 rounded cursor-pointer'
               onClick={() => {
@@ -65,7 +83,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
             >
               Ubah Periode
             </a>
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem>
             <Link
               className='block py-1 px-2 hover:bg-gray-200 rounded'

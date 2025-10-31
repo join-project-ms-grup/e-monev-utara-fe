@@ -68,7 +68,6 @@ const RekeningTable = () => {
         throw err;
       }
     },
-    refetchOnWindowFocus: false,
   });
 
   // Add

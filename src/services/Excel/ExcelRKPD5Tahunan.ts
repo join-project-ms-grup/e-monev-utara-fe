@@ -304,5 +304,5 @@ export const exportRKPD5T = async (
   const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
-  saveAs(blob, `Laporan Evaluasi Terhadap RKPD Kabupaten Bengkulu Utara Tahun ${tahun} ${waktuNowGabung}.xlsx`);
+  saveAs(blob, `Laporan Evaluasi Terhadap RKPD Kabupaten Bengkulu Utara Periode ${getPeriodeMulaiFromCookie()} - ${getPeriodeAkhirFromCookie()} ${waktuNowGabung}.xlsx`);
 };
