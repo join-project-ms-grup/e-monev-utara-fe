@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Tabel from '../Tabel';
-import { MdEdit, MdRefresh } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import { type ColumnDef } from '@tanstack/react-table';
 import toast from 'react-hot-toast';
@@ -16,7 +16,6 @@ import {
   getPeriodeMulaiFromCookie,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import AksiButton from '../../inputs/AksiButton';
 import Spinner from '../../inputs/Spinner';
 import DialogModal from '../../inputs/DialogModal';
 import FormRealisasi from '../../forms/FormRealisasi';
@@ -25,6 +24,7 @@ import type { ApiResponse } from '../../../lib/api';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import { formatUang } from '../../../lib/helper';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
+import InputText from '../../inputs/InputText';
 
 const tableHead = () => {
   return (
@@ -75,7 +75,8 @@ const RealisasiTable = () => {
   // });
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_realisasi', selectedSKPD, tahunKe],
-    queryFn: async () => getRealisasiFlat(Number(selectedSKPD), Number(tahunKe)),
+    queryFn: async () =>
+      getRealisasiFlat(Number(selectedSKPD), Number(tahunKe)),
     enabled: !!(selectedSKPD && tahunKe),
   });
   // Modal
@@ -137,9 +138,6 @@ const RealisasiTable = () => {
   //#endregion
 
   // #region Kolom Tabel
-  // const subRows = (row: RealisasiMasterTree) =>
-  //   row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
-
   const columns: ColumnDef<RealisasiMaster>[] = [
     {
       id: 'kode',
@@ -160,8 +158,8 @@ const RealisasiTable = () => {
     {
       accessorKey: 'name',
       cell: ({ getValue, row }) => {
-        const typeBold = ['urusan', 'bidang']
-        const isBold = !!typeBold.find(item => item === row.original.type);
+        const typeBold = ['urusan', 'bidang'];
+        const isBold = !!typeBold.find((item) => item === row.original.type);
         return (
           <>
             <span className={isBold ? 'font-bold' : undefined}>
@@ -180,11 +178,10 @@ const RealisasiTable = () => {
       cell: ({ getValue }) =>
         `${getValue() ? formatUang(Number(getValue())) : ''}`,
     },
+    //
     {
       header: 'Triwulan',
-      meta: {
-        tdClassNames: 'text-center',
-      },
+      meta: { tdClassNames: 'text-center' },
       columns: [1, 2, 3, 4].map((triwulan) => ({
         id: `realisasi_per_triwulan${triwulan}`,
         header: `Realisasi Per Triwulan ${triwulan}`,
@@ -193,7 +190,53 @@ const RealisasiTable = () => {
           const item = row.realisasi_per_triwulan?.find(
             (p) => p.triwulan === triwulan,
           );
-          return item ? formatUang(Number(item.realisasi)) : null;
+          return item ? Number(item.realisasi) : 0;
+        },
+        cell: ({ row }) => {
+          const data = row.original;
+          const realisasiList = data.realisasi_per_triwulan ?? [];
+          const item = realisasiList.find((p) => p.triwulan === triwulan);
+          if (!item) return '\u00A0';
+
+          if (data.type !== 'subKegiatan') return Number(item.realisasi) ?? '-';
+
+          const [realisasi, setRealisasi] = useState(Number(item.realisasi));
+          const [disBtn, setDisBtn] = useState(true);
+
+          const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            const newValue = e.target.value;
+            setRealisasi(Number(newValue));
+            setDisBtn(Number(newValue) === Number(item.realisasi));
+          };
+
+          const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            const updatedRealisasi = realisasiList.map((r) =>
+              r.triwulan === triwulan
+                ? { ...r, realisasi: Number(realisasi) }
+                : r,
+            );
+
+            addMutation.mutate({
+              id_pagu: data.id_pagu,
+              realisasi: updatedRealisasi,
+            });
+          };
+
+          return (
+            <form onSubmit={handleSubmit}>
+              <InputText
+                id={`input_realisasi_${data.id_pagu}_${triwulan}`}
+                inputMode='numeric'
+                type='text'
+                placeholder='0'
+                value={realisasi}
+                onChange={handleChange}
+                withButton={!disBtn}
+                buttonType='submit'
+              />
+            </form>
+          );
         },
       })),
     },
@@ -205,47 +248,6 @@ const RealisasiTable = () => {
       },
       cell: ({ getValue }) =>
         `${getValue() ? formatUang(Number(getValue())) : ''}`,
-    },
-    {
-      header: 'Aksi',
-      cell: (ctx) => {
-        if (
-          ctx.row.original.pagu &&
-          ctx.row.original.type?.includes('subKegiatan')
-        ) {
-          const data = ctx.row.original;
-          return (
-            <>
-              <AksiButton
-                Icon={MdEdit}
-                tooltip='Ubah'
-                onClick={() => {
-                  const mappedRealisasi = formData.realisasi?.map(
-                    ({ triwulan }) => {
-                      const found = data.realisasi_per_triwulan?.find(
-                        (p) => Number(p.triwulan) === Number(triwulan),
-                      );
-                      return {
-                        triwulan,
-                        realisasi: found?.realisasi || 0,
-                      };
-                    },
-                  );
-                  setFormData({
-                    master_name: data.name,
-                    id_pagu: data.id_pagu,
-                    realisasi: mappedRealisasi,
-                  });
-                  setOpenModal(true);
-                }}
-              />
-            </>
-          );
-        }
-      },
-      meta: {
-        tdClassNames: 'text-center',
-      },
     },
   ];
   // #endregion
@@ -313,9 +315,7 @@ const RealisasiTable = () => {
         tblClassName='lg:min-w-[1500px]'
         data={data || []}
         columns={columns}
-        // subRows={subRows}
         renderHeader={tableHead}
-        // initialExpanded
       />
       <DialogModal
         title='Ubah data Realisasi'

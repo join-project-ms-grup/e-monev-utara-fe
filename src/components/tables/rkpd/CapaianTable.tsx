@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, type ReactNode } from 'react';
-import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
 import {
@@ -12,24 +12,19 @@ import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import {
   addCapaian,
-  getCapaian,
   getCapaianFlat,
   type CapaianForm,
   type CapaianIndikator,
-  type CapaianIndikatorCapaian,
   type CapaianMaster,
-  type CapaianMasterTree,
-  type CapaianTriwulan,
 } from '../../../services/CapaianService';
 import type { ColumnDef } from '@tanstack/react-table';
-import RowExpand from '../RowExpand';
 import Spinner from '../../inputs/Spinner';
-import AksiButton from '../../inputs/AksiButton';
 import DialogModal from '../../inputs/DialogModal';
 import FormCapaian from '../../forms/FormCapaian';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
+import InputText from '../../inputs/InputText';
 
 const tableHead = () => {
   return (
@@ -43,7 +38,6 @@ const tableHead = () => {
         <th rowSpan={2}>Satuan</th>
         <th rowSpan={2}>Target</th>
         <th colSpan={6}>Capaian</th>
-        <th rowSpan={2}>Aksi</th>
       </tr>
       <tr>
         <th>Triwulan I</th>
@@ -294,14 +288,53 @@ const CapaianTable = () => {
           if (!indikatorList.length) return '\u00A0';
           const isEven = row.index % 2 === 1;
           const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
+
           return (
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
                   {indikatorList.map((item, index) => {
-                    const capaianValue = item.capaian?.capaianTriwulan?.find(
-                      (t) => t.triwulan === triwulan,
-                    )?.capaian;
+                    const initialValue =
+                      item.capaian?.capaianTriwulan?.find(
+                        (t) => t.triwulan === triwulan,
+                      )?.capaian ?? 0;
+
+                    const [capaian, setCapaian] = useState(initialValue);
+                    const [disBtn, setDisBtn] = useState(true);
+
+                    const handleChange = (
+                      e: React.ChangeEvent<HTMLInputElement>,
+                    ) => {
+                      const newValue = e.target.value;
+                      setCapaian(Number(newValue));
+                      setDisBtn(Number(newValue) === Number(initialValue));
+                    };
+
+                    const handleSubmit = (
+                      e: React.FormEvent<HTMLFormElement>,
+                    ) => {
+                      e.preventDefault();
+
+                      const id_rincian =
+                        item.target?.find(
+                          (t) => Number(t.tahun_ke) === Number(triwulan),
+                        )?.id_rincian ??
+                        item.target?.[0]?.id_rincian ??
+                        item.id;
+
+                      const mappedTriwulan = item.capaian?.capaianTriwulan?.map(
+                        (tw) =>
+                          tw.triwulan === triwulan
+                            ? { ...tw, capaian: Number(capaian) }
+                            : tw,
+                      ) || [{ triwulan, capaian: Number(capaian) }];
+
+                      addMutation.mutate({
+                        id_rincian,
+                        capaian: mappedTriwulan,
+                      });
+                    };
+
                     return (
                       <tr key={item.id} className={bgClass}>
                         <td
@@ -310,7 +343,18 @@ const CapaianTable = () => {
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
                         >
-                          {capaianValue ?? '-'}
+                          <form onSubmit={handleSubmit}>
+                            <InputText
+                              id={`input_capaian_${item.id}_${triwulan}`}
+                              inputMode='numeric'
+                              type='text'
+                              placeholder='0'
+                              value={capaian}
+                              onChange={handleChange}
+                              withButton={!disBtn}
+                              buttonType='submit'
+                            />
+                          </form>
                         </td>
                       </tr>
                     );
@@ -376,72 +420,6 @@ const CapaianTable = () => {
                         ? Math.floor(Number(item.capaian.perseCapaian) * 100) /
                           100
                         : '-'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      },
-    },
-    {
-      header: 'Aksi',
-      meta: { tdClassNames: 'p-0!' },
-      cell: ({ row }) => {
-        const data = row.original;
-        const indikatorList = data.indikator as CapaianIndikator[];
-        if (!indikatorList || indikatorList.length === 0) return null;
-        const isEven = row.index % 2 === 1;
-        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
-        return (
-          <div>
-            <table className='w-full'>
-              <tbody className='border-0!'>
-                {indikatorList.map((item, index) => (
-                  <tr key={item.id} className={bgClass}>
-                    <td
-                      style={{
-                        height: rowHeights.current[row.id]?.[index] || 'auto',
-                      }}
-                    >
-                      <AksiButton
-                        Icon={MdEdit}
-                        tooltip='Ubah'
-                        onClick={() => {
-                          const matchedTarget = item.target?.find(
-                            (t) => Number(t.tahun_ke) === Number(tahunKe),
-                          );
-
-                          const id_rincian =
-                            matchedTarget?.id_rincian ??
-                            item.target?.[0]?.id_rincian ??
-                            item.id ??
-                            undefined;
-
-                          const capaianObj =
-                            (Array.isArray(item.capaian)
-                              ? item.capaian[0]
-                              : item.capaian) ??
-                            ({} as CapaianIndikatorCapaian);
-
-                          const capaian =
-                            capaianObj.capaianTriwulan?.map(
-                              (tw: CapaianTriwulan) => ({
-                                triwulan: tw.triwulan,
-                                capaian: tw.capaian ?? 0,
-                              }),
-                            ) ?? [];
-
-                          setFormData({
-                            indikator_name: item.name ?? '',
-                            id_rincian,
-                            capaian,
-                          });
-
-                          setOpenModal(true);
-                        }}
-                      />
                     </td>
                   </tr>
                 ))}

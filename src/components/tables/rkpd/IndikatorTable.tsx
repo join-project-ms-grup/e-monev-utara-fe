@@ -1,5 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
+import { MdAdd, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
 import {
@@ -15,7 +15,6 @@ import DialogModal from '../../inputs/DialogModal';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
-import AksiButton from '../../inputs/AksiButton';
 import {
   addIndikator,
   getIndikatorFlat,
@@ -27,6 +26,7 @@ import {
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import FormIndikator from '../../forms/FormIndikator';
+import InputText from '../../inputs/InputText';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -48,7 +48,6 @@ const tableHead = () => {
         <th rowSpan={1} colSpan={5}>
           Target
         </th>
-        <th rowSpan={2}>Aksi</th>
       </tr>
       <tr>
         {periode.map((thn) => (
@@ -266,26 +265,64 @@ const IndikatorTable = () => {
         if (!indikatorList || indikatorList.length === 0) return null;
         const isEven = row.index % 2 === 1;
         const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
+
         return (
-          <>
-            <div>
-              <table className='w-full'>
-                <tbody className='border-0!'>
-                  {indikatorList.map((item, index) => (
+          <div>
+            <table className='w-full'>
+              <tbody className='border-0!'>
+                {indikatorList.map((item, index) => {
+                  const [satuan, setSatuan] = useState(item.satuan || '');
+                  const [disBtn, setDisBtn] = useState(true);
+
+                  const handleChange = (
+                    e: React.ChangeEvent<HTMLInputElement>,
+                  ) => {
+                    const newValue = e.target.value;
+                    setSatuan(newValue);
+                    setDisBtn(!newValue || newValue === (item.satuan || ''));
+                  };
+
+                  const handleSubmit = (
+                    e: React.FormEvent<HTMLFormElement>,
+                  ) => {
+                    e.preventDefault();
+                    updateMutation.mutate({
+                      id: item.id ?? 0,
+                      payload: {
+                        skpd_periode_id: Number(selectedSKPD),
+                        master_id: row.original.id,
+                        name: item.name,
+                        satuan: satuan,
+                        target: item.target || [],
+                      },
+                    });
+                  };
+
+                  return (
                     <tr key={item.id} className={bgClass}>
                       <td
                         style={{
                           height: rowHeights.current[row.id]?.[index] || 'auto',
                         }}
                       >
-                        {item.satuan}
+                        <form onSubmit={handleSubmit}>
+                          <InputText
+                            id={`input_satuan_${item.id}`}
+                            placeholder='Satuan...'
+                            value={satuan}
+                            onChange={handleChange}
+                            withButton={!disBtn}
+                            buttonType='submit'
+                            invalid={!satuan}
+                          />
+                        </form>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         );
       },
     },
@@ -301,96 +338,86 @@ const IndikatorTable = () => {
           if (!indikatorList.length) return '\u00A0';
           const isEven = row.index % 2 === 1;
           const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
+
           return (
-            <>
-              <div>
-                <table className='w-full'>
-                  <tbody className='border-0!'>
-                    {indikatorList.map((indikator: any, index: number) => {
-                      const targetValue = indikator.target?.find(
-                        (t: any) => t.tahun_ke === tahun,
-                      )?.target;
-                      return (
-                        <tr key={indikator.id} className={bgClass}>
-                          <td
-                            style={{
-                              height:
-                                rowHeights.current[row.id]?.[index] || 'auto',
-                            }}
-                          >
-                            {targetValue ?? '-'}
-                          </td>
-                        </tr>
+            <div>
+              <table className='w-full'>
+                <tbody className='border-0!'>
+                  {indikatorList.map((indikator: any, index: number) => {
+                    const initialValue =
+                      indikator.target?.find((t: any) => t.tahun_ke === tahun)
+                        ?.target ?? '';
+
+                    const [target, setTarget] = useState(initialValue);
+                    const [disBtn, setDisBtn] = useState(true);
+
+                    const handleChange = (
+                      e: React.ChangeEvent<HTMLInputElement>,
+                    ) => {
+                      const newValue = e.target.value;
+                      setTarget(newValue);
+                      setDisBtn(
+                        !newValue || Number(initialValue) === Number(newValue),
                       );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </>
+                    };
+
+                    const handleSubmit = (
+                      e: React.FormEvent<HTMLFormElement>,
+                    ) => {
+                      e.preventDefault();
+
+                      const mappedTarget = indikator.target?.map((t: any) => ({
+                        tahun_ke: t.tahun_ke,
+                        target:
+                          Number(t.tahun_ke) === Number(tahun)
+                            ? Number(target)
+                            : Number(t.target) || 0,
+                      })) || [{ tahun_ke: tahun, target: Number(target) || 0 }];
+
+                      updateMutation.mutate({
+                        id: indikator.id,
+                        payload: {
+                          skpd_periode_id: Number(selectedSKPD),
+                          master_id: row.original.id,
+                          name: indikator.name,
+                          satuan: indikator.satuan,
+                          target: mappedTarget,
+                        },
+                      });
+                    };
+
+                    return (
+                      <tr key={indikator.id} className={bgClass}>
+                        <td
+                          style={{
+                            height:
+                              rowHeights.current[row.id]?.[index] || 'auto',
+                          }}
+                        >
+                          <form onSubmit={handleSubmit}>
+                            <InputText
+                              id={`input_target_${indikator.id}_${tahun}`}
+                              inputMode='numeric'
+                              type='text'
+                              placeholder='Target...'
+                              value={target}
+                              onChange={handleChange}
+                              withButton={!disBtn}
+                              buttonType='submit'
+                              invalid={!target}
+                              isMoney
+                            />
+                          </form>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           );
         },
       })),
-    },
-    {
-      header: 'Aksi',
-      meta: {
-        tdClassNames: 'p-0!',
-      },
-      cell: ({ row }) => {
-        const data = row.original;
-        const indikatorList = data.indikator as Indikator[];
-        if (!indikatorList || indikatorList.length === 0) return null;
-        const isEven = row.index % 2 === 1;
-        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
-        return (
-          <div>
-            <table className='w-full'>
-              <tbody className='border-0!'>
-                {indikatorList.map((item, index) => (
-                  <tr key={item.id} className={bgClass}>
-                    <td
-                      style={{
-                        height: rowHeights.current[row.id]?.[index] || 'auto',
-                      }}
-                    >
-                      {getRoleId() !== 3 && (
-                        <AksiButton
-                          Icon={MdEdit}
-                          tooltip='Ubah'
-                          onClick={() => {
-                            console.log('Edit klik', data, index);
-                            const mappedTarget = formData.target?.map(
-                              ({ tahun_ke }) => {
-                                const found = data.indikator?.[
-                                  index
-                                ].target?.find(
-                                  (t) =>
-                                    Number(t.tahun_ke) === Number(tahun_ke),
-                                );
-                                return { tahun_ke, target: found?.target || 0 };
-                              },
-                            );
-                            setFormData({
-                              id: data.indikator?.[index].id,
-                              master_id: data.id,
-                              skpd_periode_id: selectedSKPD,
-                              name: data.indikator?.[index].name,
-                              satuan: data.indikator?.[index].satuan,
-                              target: mappedTarget,
-                            });
-                            setModalState('Edit');
-                            setOpenModal(true);
-                          }}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      },
     },
   ];
   // #endregion
