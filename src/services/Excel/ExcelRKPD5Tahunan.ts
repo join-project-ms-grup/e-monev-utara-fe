@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import type { FlatRKPD5TRow } from '../RKPDTahunanService';
+import type { FlatRKPD5TRow } from '../RKPDService';
 import { waktuNowGabung } from '../../lib/helper';
 import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
 

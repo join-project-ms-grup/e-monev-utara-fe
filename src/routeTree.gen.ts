@@ -51,8 +51,8 @@ import { Route as DashboardRkpdIkuIku_taggingRouteImport } from './routes/_dashb
 import { Route as DashboardRkpdIkuIku_listRouteImport } from './routes/_dashboard/rkpd/iku/iku_list'
 import { Route as DashboardRkpdIkuIku_capaianRouteImport } from './routes/_dashboard/rkpd/iku/iku_capaian'
 import { Route as DashboardRkpdHasil_evaluasiRpjmdRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/rpjmd'
-import { Route as DashboardRkpdHasil_evaluasiRkpd_tahunanRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/rkpd_tahunan'
 import { Route as DashboardRkpdHasil_evaluasiRkpd_5_tahunanRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/rkpd_5_tahunan'
+import { Route as DashboardRkpdHasil_evaluasiRkpdRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/rkpd'
 import { Route as DashboardDakKabupatenMonitoringRouteImport } from './routes/_dashboard/dak/kabupaten/monitoring'
 import { Route as DashboardDakKabupatenIdentifikasiRouteImport } from './routes/_dashboard/dak/kabupaten/identifikasi'
 
@@ -282,16 +282,16 @@ const DashboardRkpdHasil_evaluasiRpjmdRoute =
     path: '/rpjmd',
     getParentRoute: () => DashboardRkpdHasil_evaluasiRouteRoute,
   } as any)
-const DashboardRkpdHasil_evaluasiRkpd_tahunanRoute =
-  DashboardRkpdHasil_evaluasiRkpd_tahunanRouteImport.update({
-    id: '/rkpd_tahunan',
-    path: '/rkpd_tahunan',
-    getParentRoute: () => DashboardRkpdHasil_evaluasiRouteRoute,
-  } as any)
 const DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute =
   DashboardRkpdHasil_evaluasiRkpd_5_tahunanRouteImport.update({
     id: '/rkpd_5_tahunan',
     path: '/rkpd_5_tahunan',
+    getParentRoute: () => DashboardRkpdHasil_evaluasiRouteRoute,
+  } as any)
+const DashboardRkpdHasil_evaluasiRkpdRoute =
+  DashboardRkpdHasil_evaluasiRkpdRouteImport.update({
+    id: '/rkpd',
+    path: '/rkpd',
     getParentRoute: () => DashboardRkpdHasil_evaluasiRouteRoute,
   } as any)
 const DashboardDakKabupatenMonitoringRoute =
@@ -340,8 +340,8 @@ export interface FileRoutesByFullPath {
   '/rkpd/': typeof DashboardRkpdIndexRoute
   '/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
   '/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
+  '/rkpd/hasil_evaluasi/rkpd': typeof DashboardRkpdHasil_evaluasiRkpdRoute
   '/rkpd/hasil_evaluasi/rkpd_5_tahunan': typeof DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute
-  '/rkpd/hasil_evaluasi/rkpd_tahunan': typeof DashboardRkpdHasil_evaluasiRkpd_tahunanRoute
   '/rkpd/hasil_evaluasi/rpjmd': typeof DashboardRkpdHasil_evaluasiRpjmdRoute
   '/rkpd/iku/iku_capaian': typeof DashboardRkpdIkuIku_capaianRoute
   '/rkpd/iku/iku_list': typeof DashboardRkpdIkuIku_listRoute
@@ -378,8 +378,8 @@ export interface FileRoutesByTo {
   '/rkpd': typeof DashboardRkpdIndexRoute
   '/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
   '/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
+  '/rkpd/hasil_evaluasi/rkpd': typeof DashboardRkpdHasil_evaluasiRkpdRoute
   '/rkpd/hasil_evaluasi/rkpd_5_tahunan': typeof DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute
-  '/rkpd/hasil_evaluasi/rkpd_tahunan': typeof DashboardRkpdHasil_evaluasiRkpd_tahunanRoute
   '/rkpd/hasil_evaluasi/rpjmd': typeof DashboardRkpdHasil_evaluasiRpjmdRoute
   '/rkpd/iku/iku_capaian': typeof DashboardRkpdIkuIku_capaianRoute
   '/rkpd/iku/iku_list': typeof DashboardRkpdIkuIku_listRoute
@@ -427,8 +427,8 @@ export interface FileRoutesById {
   '/_dashboard/rkpd/': typeof DashboardRkpdIndexRoute
   '/_dashboard/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
   '/_dashboard/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
+  '/_dashboard/rkpd/hasil_evaluasi/rkpd': typeof DashboardRkpdHasil_evaluasiRkpdRoute
   '/_dashboard/rkpd/hasil_evaluasi/rkpd_5_tahunan': typeof DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute
-  '/_dashboard/rkpd/hasil_evaluasi/rkpd_tahunan': typeof DashboardRkpdHasil_evaluasiRkpd_tahunanRoute
   '/_dashboard/rkpd/hasil_evaluasi/rpjmd': typeof DashboardRkpdHasil_evaluasiRpjmdRoute
   '/_dashboard/rkpd/iku/iku_capaian': typeof DashboardRkpdIkuIku_capaianRoute
   '/_dashboard/rkpd/iku/iku_list': typeof DashboardRkpdIkuIku_listRoute
@@ -476,8 +476,8 @@ export interface FileRouteTypes {
     | '/rkpd/'
     | '/dak/kabupaten/identifikasi'
     | '/dak/kabupaten/monitoring'
+    | '/rkpd/hasil_evaluasi/rkpd'
     | '/rkpd/hasil_evaluasi/rkpd_5_tahunan'
-    | '/rkpd/hasil_evaluasi/rkpd_tahunan'
     | '/rkpd/hasil_evaluasi/rpjmd'
     | '/rkpd/iku/iku_capaian'
     | '/rkpd/iku/iku_list'
@@ -514,8 +514,8 @@ export interface FileRouteTypes {
     | '/rkpd'
     | '/dak/kabupaten/identifikasi'
     | '/dak/kabupaten/monitoring'
+    | '/rkpd/hasil_evaluasi/rkpd'
     | '/rkpd/hasil_evaluasi/rkpd_5_tahunan'
-    | '/rkpd/hasil_evaluasi/rkpd_tahunan'
     | '/rkpd/hasil_evaluasi/rpjmd'
     | '/rkpd/iku/iku_capaian'
     | '/rkpd/iku/iku_list'
@@ -562,8 +562,8 @@ export interface FileRouteTypes {
     | '/_dashboard/rkpd/'
     | '/_dashboard/dak/kabupaten/identifikasi'
     | '/_dashboard/dak/kabupaten/monitoring'
+    | '/_dashboard/rkpd/hasil_evaluasi/rkpd'
     | '/_dashboard/rkpd/hasil_evaluasi/rkpd_5_tahunan'
-    | '/_dashboard/rkpd/hasil_evaluasi/rkpd_tahunan'
     | '/_dashboard/rkpd/hasil_evaluasi/rpjmd'
     | '/_dashboard/rkpd/iku/iku_capaian'
     | '/_dashboard/rkpd/iku/iku_list'
@@ -878,18 +878,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRkpdHasil_evaluasiRpjmdRouteImport
       parentRoute: typeof DashboardRkpdHasil_evaluasiRouteRoute
     }
-    '/_dashboard/rkpd/hasil_evaluasi/rkpd_tahunan': {
-      id: '/_dashboard/rkpd/hasil_evaluasi/rkpd_tahunan'
-      path: '/rkpd_tahunan'
-      fullPath: '/rkpd/hasil_evaluasi/rkpd_tahunan'
-      preLoaderRoute: typeof DashboardRkpdHasil_evaluasiRkpd_tahunanRouteImport
-      parentRoute: typeof DashboardRkpdHasil_evaluasiRouteRoute
-    }
     '/_dashboard/rkpd/hasil_evaluasi/rkpd_5_tahunan': {
       id: '/_dashboard/rkpd/hasil_evaluasi/rkpd_5_tahunan'
       path: '/rkpd_5_tahunan'
       fullPath: '/rkpd/hasil_evaluasi/rkpd_5_tahunan'
       preLoaderRoute: typeof DashboardRkpdHasil_evaluasiRkpd_5_tahunanRouteImport
+      parentRoute: typeof DashboardRkpdHasil_evaluasiRouteRoute
+    }
+    '/_dashboard/rkpd/hasil_evaluasi/rkpd': {
+      id: '/_dashboard/rkpd/hasil_evaluasi/rkpd'
+      path: '/rkpd'
+      fullPath: '/rkpd/hasil_evaluasi/rkpd'
+      preLoaderRoute: typeof DashboardRkpdHasil_evaluasiRkpdRouteImport
       parentRoute: typeof DashboardRkpdHasil_evaluasiRouteRoute
     }
     '/_dashboard/dak/kabupaten/monitoring': {
@@ -986,18 +986,17 @@ const DashboardMasterRouteRouteWithChildren =
   DashboardMasterRouteRoute._addFileChildren(DashboardMasterRouteRouteChildren)
 
 interface DashboardRkpdHasil_evaluasiRouteRouteChildren {
+  DashboardRkpdHasil_evaluasiRkpdRoute: typeof DashboardRkpdHasil_evaluasiRkpdRoute
   DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute: typeof DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute
-  DashboardRkpdHasil_evaluasiRkpd_tahunanRoute: typeof DashboardRkpdHasil_evaluasiRkpd_tahunanRoute
   DashboardRkpdHasil_evaluasiRpjmdRoute: typeof DashboardRkpdHasil_evaluasiRpjmdRoute
   DashboardRkpdHasil_evaluasiIndexRoute: typeof DashboardRkpdHasil_evaluasiIndexRoute
 }
 
 const DashboardRkpdHasil_evaluasiRouteRouteChildren: DashboardRkpdHasil_evaluasiRouteRouteChildren =
   {
+    DashboardRkpdHasil_evaluasiRkpdRoute: DashboardRkpdHasil_evaluasiRkpdRoute,
     DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute:
       DashboardRkpdHasil_evaluasiRkpd_5_tahunanRoute,
-    DashboardRkpdHasil_evaluasiRkpd_tahunanRoute:
-      DashboardRkpdHasil_evaluasiRkpd_tahunanRoute,
     DashboardRkpdHasil_evaluasiRpjmdRoute:
       DashboardRkpdHasil_evaluasiRpjmdRoute,
     DashboardRkpdHasil_evaluasiIndexRoute:

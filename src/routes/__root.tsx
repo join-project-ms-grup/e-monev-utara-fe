@@ -22,6 +22,7 @@ const ToastComponent = () => {
       toastOptions={{
         duration: 5000,
       }}
+      containerClassName='z-[99999]!'
     >
       {(t) => (
         <ToastBar toast={t}>

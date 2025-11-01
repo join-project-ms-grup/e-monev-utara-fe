@@ -7,7 +7,7 @@ import {
   flattenRKPD5T,
   getRKPD5Tahunan,
   type FlatRKPD5TRow,
-} from '../../../../services/RKPDTahunanService';
+} from '../../../../services/RKPDService';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
 import InputSearchBox, {

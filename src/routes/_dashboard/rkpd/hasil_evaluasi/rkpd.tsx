@@ -1,19 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_NAME } from '../../../../lib/config';
-import RKPDTahunanTable from '../../../../components/tables/rkpd/hasil_evaluasi/RKPDTahunanTable';
+import RKPDTable from '../../../../components/tables/rkpd/hasil_evaluasi/RKPDTable';
 
 export const Route = createFileRoute(
-  '/_dashboard/rkpd/hasil_evaluasi/rkpd_tahunan',
+  '/_dashboard/rkpd/hasil_evaluasi/rkpd',
 )({
   head: () => ({
     meta: [
       {
-        title: `RKPD Tahunan - ${SITE_NAME}`,
+        title: `RKPD - ${SITE_NAME}`,
       },
     ],
   }),
   staticData: {
-    title: 'RKPD Tahunan',
+    title: 'RKPD',
   },
   component: RouteComponent,
 });
@@ -21,7 +21,7 @@ export const Route = createFileRoute(
 function RouteComponent() {
   return (
     <>
-      <RKPDTahunanTable />
+      <RKPDTable />
     </>
   );
 }

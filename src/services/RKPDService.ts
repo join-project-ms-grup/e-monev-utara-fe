@@ -57,7 +57,7 @@ export type RKPDMasterTree = RKPDMasterUrusan & RKPDMasterBidang & RKPDMasterPro
 /**
  * Ambil semua data rkpd tahunan
  */
-export const getRKPDTahunan = async (skpd_periode_id: number, tahun_ke: number): Promise<RKPDMasterTree[]> => {
+export const getRKPD = async (skpd_periode_id: number, tahun_ke: number): Promise<RKPDMasterTree[]> => {
     const response = await api.get<ApiResponse<RKPDMasterTree[]>>(`/rkpd/laporan-tahunan/${skpd_periode_id}/${tahun_ke}`);
     return response.data.data;
 };

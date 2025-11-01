@@ -4,9 +4,9 @@
 :root {
   /* Main Color */
   --bg-color: #f8f8f8;
-  --color-1: #C5172E;
-  --color-2: #DC143C;
-  --color-3: #BF092F;
+  --color-1: #c5172e;
+  --color-2: #dc143c;
+  --color-3: #bf092f;
   --color-4: #fdebd0;
   --text-1: #333;
   --text-2: #ccc;
@@ -239,6 +239,49 @@ a:hover {
     font-weight: bold;
   }
 }
+/* Tabel Excel */
+.table-excel {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-excel table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-excel th,
+.table-excel td {
+  border: 1px solid black;
+  padding: 6px 10px;
+}
+
+.table-excel td table {
+  width: 100%;
+  border-collapse: collapse; /* garis menyatu */
+  margin: 2px 0; /* beri jarak agar tidak tumpang tindih */
+}
+
+.table-excel td table tr:nth-child(even) td,
+.table-excel td table tr:nth-child(even) th {
+  border-top: 1px solid black;
+}
+
+.table-excel td table tr:first-child td,
+.table-excel td table tr:first-child th {
+  border-top: 0; /* baris pertama tanpa border */
+}
+
+.table-excel td table td,
+.table-excel td table th {
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  padding: 4px 6px;
+  background-clip: padding-box;
+}
+
+
 /* Paginasi Tabel */
 .table-button {
   display: inline-flex;

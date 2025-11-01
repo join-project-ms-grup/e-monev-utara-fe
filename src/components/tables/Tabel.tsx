@@ -38,6 +38,8 @@ interface MainTableProps<TData> {
   searchFilters?: { field: string; value: string }[];
   tblClassName?: string;
   initialExpanded?: boolean;
+  disablePagination?: boolean;
+  customTableClass?: string;
 }
 
 declare module '@tanstack/react-table' {
@@ -63,6 +65,8 @@ const Tabel = <TData,>({
   searchFilters,
   tblClassName,
   initialExpanded = false,
+  disablePagination = false,
+  customTableClass,
 }: MainTableProps<TData & { group?: string }>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -95,22 +99,26 @@ const Tabel = <TData,>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
+    ...(disablePagination
+      ? {}
+      : {
+          getPaginationRowModel: getPaginationRowModel(),
+          onPaginationChange: setPagination,
+        }),
     onColumnFiltersChange: setColumnFilters,
     filterFromLeafRows: true,
     maxLeafRowFilterDepth: subLabels?.length,
     state: {
-      pagination,
       expanded,
       columnFilters,
+      ...(disablePagination ? {} : { pagination }),
     },
   });
 
   const expandAllRows = (rows: any[]): ExpandedState => {
     const expanded: ExpandedState = {};
-    const traverse = (rows: any[]) => {
-      rows.forEach((row) => {
+    const traverse = (rws: any[]) => {
+      rws.forEach((row) => {
         expanded[row.id] = true;
         if (row.subRows?.length) traverse(row.subRows);
       });
@@ -127,82 +135,72 @@ const Tabel = <TData,>({
 
   const tableClass = clsx(tblClassName, 'w-full');
 
+  // ✅ pilih model baris sesuai pagination
+  const rowModel = disablePagination
+    ? table.getPrePaginationRowModel() // semua data
+    : table.getRowModel(); // data per halaman
+
+  const baseTableClass = 'table-responsive';
+
   return (
-    <div className=''>
-      {tabletop && (
-        <>
-          <div className='flex mb-2'>{tabletop}</div>
-        </>
-      )}
-      <div className='table-responsive'>
+    <div>
+      {tabletop && <div className='flex mb-2'>{tabletop}</div>}
+
+      <div className={clsx(!customTableClass && baseTableClass, customTableClass)}>
         <table className={tableClass || undefined}>
           <thead>
             {renderHeader
               ? renderHeader(table)
-              : table.getHeaderGroups().map((headerGroup) => {
-                  return (
-                    <tr key={headerGroup.id} id={headerGroup.id}>
-                      {headerGroup.headers.map((header) => {
-                        const meta = header.column.columnDef.meta || {};
-                        const rowSpan = meta.rowSpan ?? 1;
-                        if (meta.hidden) return null;
-                        return (
-                          <th
-                            key={header.id}
-                            colSpan={header.colSpan}
-                            rowSpan={rowSpan}
-                            {...(meta.thClassNames
-                              ? {
-                                  className: meta.thClassNames,
-                                }
-                              : {})}
+              : table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      const meta = header.column.columnDef.meta || {};
+                      if (meta.hidden) return null;
+                      return (
+                        <th
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          rowSpan={meta.rowSpan ?? 1}
+                          className={meta.thClassNames}
+                        >
+                          <div
+                            className={
+                              header.column.getCanSort()
+                                ? 'flex flex-row justify-center items-center cursor-pointer'
+                                : ''
+                            }
+                            onClick={header.column.getToggleSortingHandler()}
                           >
-                            <div
-                              {...{
-                                className: header.column.getCanSort()
-                                  ? 'flex flex-row justify-center items-center'
-                                  : '',
-                                onClick:
-                                  header.column.getToggleSortingHandler(),
-                              }}
-                            >
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
-                              {{
-                                asc: <MdArrowDropUp />,
-                                desc: <MdArrowDropDown />,
-                              }[header.column.getIsSorted() as string] ?? null}
-                            </div>
-                          </th>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                            {{
+                              asc: <MdArrowDropUp />,
+                              desc: <MdArrowDropDown />,
+                            }[header.column.getIsSorted() as string] ?? null}
+                          </div>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                ))}
           </thead>
+
           <tbody>
             {renderBody ? (
               renderBody(table)
-            ) : table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => {
+            ) : rowModel.rows.length > 0 ? (
+              rowModel.rows.map((row) => {
                 const label = subLabels?.[row.depth];
                 return (
                   <Fragment key={row.id}>
                     <tr>
                       {row.getVisibleCells().map((cell) => (
                         <td
-                          colSpan={cell.column.columnDef.meta?.tdColSpan}
                           key={cell.id}
-                          {...(cell.column.columnDef.meta?.tdClassNames
-                            ? {
-                                className:
-                                  cell.column.columnDef.meta.tdClassNames,
-                              }
-                            : {})}
+                          colSpan={cell.column.columnDef.meta?.tdColSpan}
+                          className={cell.column.columnDef.meta?.tdClassNames}
                         >
                           {flexRender(
                             cell.column.columnDef.cell,
@@ -213,27 +211,23 @@ const Tabel = <TData,>({
                     </tr>
 
                     {row.getIsExpanded() && subLabels && (
-                      <>
-                        <tr>
-                          <td
-                            colSpan={
-                              table.getAllLeafColumns().length -
-                              (subLabelPosition ?? 1)
-                            }
-                          ></td>
-                          <td colSpan={subLabelPosition}>
-                            <strong
-                              className='inline-flex'
-                              style={{
-                                paddingLeft: `${row.depth * 1}rem`,
-                              }}
-                            >
-                              <MdSubdirectoryArrowRight />
-                              {label}
-                            </strong>
-                          </td>
-                        </tr>
-                      </>
+                      <tr>
+                        <td
+                          colSpan={
+                            table.getAllLeafColumns().length -
+                            (subLabelPosition ?? 1)
+                          }
+                        ></td>
+                        <td colSpan={subLabelPosition}>
+                          <strong
+                            className='inline-flex'
+                            style={{ paddingLeft: `${row.depth * 1}rem` }}
+                          >
+                            <MdSubdirectoryArrowRight />
+                            {label}
+                          </strong>
+                        </td>
+                      </tr>
                     )}
                   </Fragment>
                 );
@@ -251,7 +245,9 @@ const Tabel = <TData,>({
           </tbody>
         </table>
       </div>
-      <Pagination table={table} />
+
+      {/* ✅ pagination hanya tampil jika aktif */}
+      {!disablePagination && <Pagination table={table} />}
     </div>
   );
 };
