@@ -71,7 +71,7 @@ function RouteComponent() {
       <div className='bg-white shadow-lg rounded-lg w-full max-w-6xl min-h-3/5 flex flex-col md:flex-row overflow-hidden'>
         <div className='relative w-full bg-[#721027] text-white flex flex-col justify-center items-center p-8 overflow-hidden'>
           <img
-            src='/auth/bglogin.jpg'
+            src='/auth/login-bg.jpg'
             alt=''
             className='w-full h-full object-cover object-[60%_center] absolute z-0'
           />
@@ -87,11 +87,11 @@ function RouteComponent() {
               <div className='w-72'>
                 <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
               </div>
-              <p className='uppercase font-bold'>
-                <span className='text-[var(--color-1)]'>M</span>onitoring,{' '}
-                <span className='text-[var(--color-1)]'>A</span>nalisis{' '}
-                <span className='text-[var(--color-1)]'>Ha</span>sil Pem
-                <span className='text-[var(--color-1)]'>b</span>angunan Daer<span className='text-[var(--color-1)]'>ah</span>
+              <p className='uppercase font-bold text-red-800'>
+                <span className='text-red-600'>M</span>onitoring,{' '}
+                <span className='text-red-600'>A</span>nalisis{' '}
+                <span className='text-red-600'>Ha</span>sil Pem
+                <span className='text-red-600'>b</span>angunan Daer<span className='text-red-600'>ah</span>
               </p>
             </div>
           </div>
