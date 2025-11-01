@@ -1,13 +1,8 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
-import { MdPrint, MdRefresh } from 'react-icons/md';
+import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
-import {
-  flattenRKPD5T,
-  getRKPD5Tahunan,
-  type FlatRKPD5TRow,
-} from '../../../../services/RKPDService';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
 import InputSearchBox, {
@@ -16,7 +11,14 @@ import InputSearchBox, {
 import Tabel from '../../Tabel';
 import Spinner from '../../../inputs/Spinner';
 import type { ColumnDef } from '@tanstack/react-table';
-import { exportRKPD5T } from '../../../../services/Excel/ExcelRKPD5Tahunan';
+import { exportRenstra } from '../../../../services/Excel/ExcelRenstra';
+import {
+  flattenRenstra,
+  getRenstra,
+  type FlatRenstraRow,
+} from '../../../../services/RenstraService';
+import { createPortal } from 'react-dom';
+import RenstraPreviewTable from './RenstraPreviewTable';
 
 const tableHead = () => {
   return (
@@ -36,7 +38,6 @@ const tableHead = () => {
         <th rowSpan={1} colSpan={2}>
           Target Kinerja Tahun yang dievaluasi
         </th>
-        <th rowSpan={2}>Perangkat Daerah Penanggung Jawab</th>
       </tr>
       <tr>
         <th>Fisik</th>
@@ -50,7 +51,7 @@ const tableHead = () => {
   );
 };
 
-const RKPD5TahunanTable = () => {
+const RenstraTable = () => {
   //#region SKPD dan Tahun ke
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
@@ -79,8 +80,8 @@ const RKPD5TahunanTable = () => {
   const { data, isFetching, refetch } = useQuery({
     queryKey: ['tabel_rkpd_5_tahunan', selectedSKPD],
     queryFn: async () => {
-      const rawData = await getRKPD5Tahunan(Number(selectedSKPD));
-      const flatten = flattenRKPD5T(rawData);
+      const rawData = await getRenstra(Number(selectedSKPD));
+      const flatten = flattenRenstra(rawData);
       return flatten;
     },
     enabled: !!selectedSKPD,
@@ -89,7 +90,7 @@ const RKPD5TahunanTable = () => {
 
   // #region Kolom Tabel
   const rowHeights = useRef<{ [key: string]: number[] }>({});
-  const columns: ColumnDef<FlatRKPD5TRow>[] = [
+  const columns: ColumnDef<FlatRenstraRow>[] = [
     {
       header: 'No',
       meta: { tdClassNames: 'text-center' },
@@ -123,7 +124,7 @@ const RKPD5TahunanTable = () => {
       accessorFn: (row) => row.indikator || [],
       meta: { tdClassNames: 'p-0!' },
       cell: ({ row, getValue }) => {
-        const indikator = getValue() as FlatRKPD5TRow['indikator'];
+        const indikator = getValue() as FlatRenstraRow['indikator'];
         if (!indikator?.length) return '';
         const isEven = row.index % 2 === 1;
         const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
@@ -168,7 +169,7 @@ const RKPD5TahunanTable = () => {
           meta: { tdClassNames: 'p-0!' },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
-            const indikator = getValue() as FlatRKPD5TRow['indikator'];
+            const indikator = getValue() as FlatRenstraRow['indikator'];
             if (!indikator?.length) return '';
             const isEven = row.index % 2 === 1;
             const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
@@ -216,7 +217,7 @@ const RKPD5TahunanTable = () => {
           meta: { tdClassNames: 'p-0!' },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
-            const indikator = getValue() as FlatRKPD5TRow['indikator'];
+            const indikator = getValue() as FlatRenstraRow['indikator'];
             if (!indikator?.length) return '';
             const isEven = row.index % 2 === 1;
             const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
@@ -272,7 +273,7 @@ const RKPD5TahunanTable = () => {
           meta: { tdClassNames: 'p-0!' },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
-            const indikator = getValue() as FlatRKPD5TRow['indikator'];
+            const indikator = getValue() as FlatRenstraRow['indikator'];
             if (!indikator?.length) return '';
             const isEven = row.index % 2 === 1;
             const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
@@ -314,14 +315,21 @@ const RKPD5TahunanTable = () => {
         },
       ],
     },
-
-    {
-      header: 'Perangkat Daerah Penanggung Jawab',
-      cell: () =>
-        `${dataSKPDPeriode?.find((item) => item.skpd_id === Number(selectedSKPD))?.name}`,
-    },
   ];
   // #endregion
+
+  const [isPreview, setIsPreview] = useState(false);
+  useEffect(() => {
+    if (isPreview) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isPreview]);
 
   return (
     <>
@@ -345,22 +353,19 @@ const RKPD5TahunanTable = () => {
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
-              tooltip='Print'
+              tooltip='Lihat tabel penuh'
               className='btn btn-theme w-9 h-9'
-              onClick={async () => {
+              onClick={() => {
                 if (data) {
-                  toast.success('Printing...');
-                  // const tahunLabel = listTahunKe.find(
-                  //   (t) => t.value === tahunKe,
-                  // )?.label ?? '';
-                  const skpdLabel =
-                    dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
-                      ?.name ?? '';
-                  await exportRKPD5T(data, skpdLabel);
+                  setIsPreview(true);
+                } else {
+                  toast.error(
+                    `${!selectedSKPD ? 'SKPD' : ''} belum diisi`,
+                  );
                 }
               }}
             >
-              <MdPrint />
+              <MdPreview />
             </InputButton>
             <InputButton
               tooltip='Refresh'
@@ -379,8 +384,59 @@ const RKPD5TahunanTable = () => {
           renderHeader={tableHead}
         />
       </div>
+      {isPreview &&
+        createPortal(
+          <div className='fixed inset-0 z-[9999] flex items-end justify-center bg-white'>
+            <div className='flex flex-col space-y-2 overflow-y-auto md:h-[100vh]'>
+              <div className='inline-flex justify-between items-center mt-2 px-2'>
+                <InputButton
+                  className='h-9'
+                  onClick={async () => {
+                    if (data) {
+                      const skpdLabel =
+                        dataSKPDPeriode?.find(
+                          (s) => s.id === Number(selectedSKPD),
+                        )?.name ?? '';
+                      toast.promise(exportRenstra(data, skpdLabel), {
+                        loading: 'Sedang mengunduh...',
+                        success: <b>Berhasil mengunduh.</b>,
+                        error: <b>Gagal mengunduh.</b>,
+                      });
+                    } else {
+                      toast.error(
+                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
+                      );
+                    }
+                  }}
+                >
+                  <span className='inline-flex items-center gap-2 px-2'>
+                    <MdPrint />
+                    Cetak Excel
+                  </span>
+                </InputButton>
+                <button
+                  onClick={() => setIsPreview(false)}
+                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+                  aria-label='Tutup preview'
+                >
+                  <MdClose />
+                </button>
+              </div>
+              <div className=''>
+                <RenstraPreviewTable
+                  data={data || []}
+                  skpd={
+                    dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+                      ?.name ?? ''
+                  }
+                />
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 };
 
-export default RKPD5TahunanTable;
+export default RenstraTable;

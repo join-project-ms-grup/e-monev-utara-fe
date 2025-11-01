@@ -135,6 +135,23 @@ export const exportRPJMD = async (
     //#region Mapping Data
     let rowIndex = startRow;
 
+    const lastRow = rowIndex;
+    const startCol = 1;
+    const endCol = 41;
+
+    for (let r = startRow - 4; r <= lastRow; r++) {
+        const row = worksheet.getRow(r);
+        for (let c = startCol; c <= endCol; c++) {
+            const cell = row.getCell(c);
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        }
+    }
+
     const rowsConfig = [
         { offset: 1, merge: 'A:AA', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
         { offset: 2, merge: 'A:AA', text: 'Predikat kinerja', align: 'right' },

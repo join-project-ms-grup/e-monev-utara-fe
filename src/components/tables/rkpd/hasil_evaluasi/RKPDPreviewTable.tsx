@@ -12,7 +12,7 @@ interface MainTableProps {
 }
 
 const RKPDPreviewTable = ({ data, listTahunKe, tahunKe, skpd }: MainTableProps) => {
-  console.log('DATA', data);
+    console.log('data', data)
   const tahunLabel = listTahunKe.find((item) => item.value === tahunKe)?.label;
   //#region Head Tabel
   const tableHead = () => {

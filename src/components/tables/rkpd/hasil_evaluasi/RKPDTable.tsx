@@ -80,8 +80,6 @@ const RKPDTable = () => {
             Target RPJMD Kabupaten/kota pada Tahun{' '}
             {listTahunKe.find((item) => item.value === tahunKe)?.label ??
               '........'}
-            <br />
-            (Akhir Periode RPJMD)
           </th>
           <th rowSpan={1} colSpan={2}>
             Realisasi Capaian Kinerja RPJMD Kabupaten/kota sampai dengan RKPD

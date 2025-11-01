@@ -59,9 +59,7 @@ const menuUtama: MenuItem[] = [
     label: 'Konfigurasi',
     icon: <MdSettings />,
     akses: 1 && 2,
-    submenu: [
-      { label: 'User', to: '/konfigurasi/user' },
-    ],
+    submenu: [{ label: 'User', to: '/konfigurasi/user' }],
   },
 ];
 
@@ -87,11 +85,21 @@ const menuRKPD: MenuItem[] = [
     akses: 2,
   },
   {
+    label: 'Indikator Kinerja Utama',
+    icon: <MdInsights />,
+    submenu: [
+      { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
+      { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
+      { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
+    ],
+    akses: 3,
+  },
+  {
     label: 'Hasil Evaluasi',
     icon: <MdAssignment />,
     submenu: [
       { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
-      { label: 'Renstra', to: '/rkpd/hasil_evaluasi/rkpd_5_tahunan' },
+      { label: 'Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
       { label: 'RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
     ],
     akses: 3,

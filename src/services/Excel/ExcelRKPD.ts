@@ -133,113 +133,112 @@ export const exportRKPD = async (
 
   data.forEach((item) => {
     const startItemRow = rowIndex;
-    const row = worksheet.getRow(startItemRow);
-    if (item.level === 'sub_kegiatan') {
-      row.getCell('A').value = subKegiatanIndex++;
-    }
-    row.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-    ['A', 'C', 'D', 'E', 'F', 'G'].forEach((col) => {
-      row.getCell(col).alignment = { horizontal: 'center', vertical: 'top' };
-    });
     const indikatorCount = item.indikator?.length || 0;
-    const persenFormat = '0.00 "%"';
 
-    const kodeStr = (item.kode ?? '').toString();
-    if (item.level === 'urusan') row.getCell('C').value = kodeStr;
-    else if (item.level === 'bidang') {
-      const [urusanKode, bidangKode] = kodeStr.split(' ');
-      row.getCell('C').value = urusanKode;
-      row.getCell('D').value = bidangKode;
-    } else if (item.level === 'program') {
-      const [urusanKode, bidangKode, programKode] = kodeStr.split(' ');
-      row.getCell('C').value = urusanKode;
-      row.getCell('D').value = bidangKode;
-      row.getCell('E').value = programKode;
-    } else if (item.level === 'kegiatan') {
-      const [urusanKode, bidangKode, programKode, kegiatanKode] = kodeStr.split(' ');
-      row.getCell('C').value = urusanKode;
-      row.getCell('D').value = bidangKode;
-      row.getCell('E').value = programKode;
-      row.getCell('F').value = kegiatanKode;
-    } else if (item.level === 'sub_kegiatan') {
-      const [urusanKode, bidangKode, programKode, kegiatanKode, subKode] = kodeStr.split(' ');
-      row.getCell('C').value = urusanKode;
-      row.getCell('D').value = bidangKode;
-      row.getCell('E').value = programKode;
-      row.getCell('F').value = kegiatanKode;
-      row.getCell('G').value = subKode;
+    const row = worksheet.getRow(startItemRow);
+
+    // Nomor urut hanya untuk sub_kegiatan
+    if (item.level === 'sub_kegiatan') row.getCell('A').value = subKegiatanIndex++;
+
+    // Alignment dasar
+    row.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+    ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach((col) => {
+      row.getCell(col).alignment = { vertical: 'top', horizontal: 'center' };
+    });
+
+    // Parsing kode fleksibel
+    const kodeParts = (item.kode ?? '').toString().split(' ');
+    switch (item.level) {
+      case 'urusan':
+        row.getCell('C').value = kodeParts[0];
+        break;
+      case 'bidang':
+        row.getCell('C').value = kodeParts[0];
+        row.getCell('D').value = kodeParts[1];
+        break;
+      case 'program':
+        row.getCell('C').value = kodeParts[0];
+        row.getCell('D').value = kodeParts[1];
+        row.getCell('E').value = kodeParts[2];
+        break;
+      case 'kegiatan':
+        row.getCell('C').value = kodeParts[0];
+        row.getCell('D').value = kodeParts[1];
+        row.getCell('E').value = kodeParts[2];
+        row.getCell('F').value = kodeParts.slice(3).join(' ');
+        break;
+      case 'sub_kegiatan':
+        row.getCell('C').value = kodeParts[0];
+        row.getCell('D').value = kodeParts[1];
+        row.getCell('E').value = kodeParts[2];
+        row.getCell('F').value = kodeParts[3];
+        row.getCell('G').value = kodeParts.slice(4).join(' ');
+        break;
     }
+
+    // Nama urusan/bidang/program/kegiatan/sub_kegiatan di kolom H
+    row.getCell('H').value = item.name;
 
     if (indikatorCount > 0) {
       item.indikator?.forEach((ind) => {
-        const row = worksheet.getRow(rowIndex++);
+        const indRow = worksheet.getRow(rowIndex++);
 
-        row.getCell('I').value = ind.name;
-        row.getCell('J').value = ind.target_akhir_periode;
-        row.getCell('L').value = 0;
-        row.getCell('M').value = 0;
-        row.getCell('N').value = ind.target_tahun_dievaluasi;
+        // Kolom I → nama indikator
+        indRow.getCell('I').value = ind.name;
+
+        // ==== Kolom K (angka) ====
+        indRow.getCell('J').value = ind.target_akhir_periode ?? 0;
+        indRow.getCell('N').value = ind.target_tahun_dievaluasi ?? 0;
         ['P', 'R', 'T', 'V'].forEach((col, i) => {
-          row.getCell(col).value = ind.triwulan?.[i]?.capaian ?? '';
+          indRow.getCell(col).value = ind.triwulan?.[i]?.capaian ?? 0;
         });
-        row.getCell('X').value = ind.total_capaian ?? '';
-        row.getCell('Z').value = Number(ind.persen_capaian);
-        row.getCell('Z').numFmt = persenFormat;
-        row.getCell('AB').value = ind.total_capaian_periode;
-        row.getCell('AD').value = Number(ind.persen_capaian_periode);
-        row.getCell('AD').numFmt = persenFormat;
-        row.getCell('AF').value = skpd;
+        indRow.getCell('X').value = ind.total_capaian ?? 0;
+        indRow.getCell('AB').value = ind.total_capaian_periode ?? 0;
 
-        const satuan = ind.satuan ? ind.satuan.replace(/"/g, '') : '';
-        let numFmt = 'General';
-        if (satuan) {
-          if (satuan.trim() === '%' || satuan.toLowerCase().includes('persen')) numFmt = '0.00 "%"';
-          else numFmt = `General "${satuan}"`;
-        }
-        ['J', 'L', 'N', 'P', 'R', 'T', 'V', 'X', 'AA', 'AB'].forEach(col => {
-          row.getCell(col).numFmt = numFmt;
+        // ==== Kolom Rp ====
+        indRow.getCell('K').value = item.pagu?.paguPeriode ?? 0;
+        indRow.getCell('M').value = 0;
+        indRow.getCell('O').value = item.pagu?.paguTahunEval ?? 0;
+        ['Q', 'S', 'U', 'W'].forEach((col, i) => {
+          indRow.getCell(col).value = Number(item.pagu?.triwulan?.[i]?.realisasi ?? 0);
+        });
+        indRow.getCell('Y').value = item.pagu?.totalRealisasi ?? 0;
+        indRow.getCell('AA').value = Number(item.pagu?.persenRealisasi ?? 0);
+        indRow.getCell('AC').value = Number(item.pagu?.persenRealisasiPeriode ?? 0);
+        indRow.getCell('AD').value = skpd;
+
+        // Format angka/persen
+        const satuan = ind.satuan ?? '';
+        const numFmtK = satuan.includes('%') ? '0.00 "%"' : 'General';
+        ['J', 'N', 'P', 'R', 'T', 'V', 'X', 'AB'].forEach((col) => {
+          indRow.getCell(col).numFmt = numFmtK;
         });
 
         const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-        ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA'].forEach(col => {
-          row.getCell(col).numFmt = fmtRupiah;
+        ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA', 'AC'].forEach((col) => {
+          indRow.getCell(col).numFmt = fmtRupiah;
         });
       });
 
+
+      // Merge cell kolom A–H jika ada lebih dari 1 indikator
       const endItemRow = rowIndex - 1;
-
-      const row = worksheet.getRow(startItemRow);
-      row.getCell('H').value = item.name;
-
       if (indikatorCount > 1) {
-        const colsToMerge = ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'Q', 'S', 'U', 'W', 'O', 'Y', 'AA', 'AC', 'AE'];
-        colsToMerge.forEach(col => {
+        ['A', 'C', 'D', 'E', 'F', 'G', 'H'].forEach((col) => {
           worksheet.mergeCells(`${col}${startItemRow}:${col}${endItemRow}`);
         });
       }
-
-      row.getCell('K').value = item.pagu?.paguPeriode;
-      row.getCell('O').value = item.pagu?.paguTahunEval;
-      row.getCell('Y').value = item.pagu?.totalRealisasi;
-      ['Q', 'S', 'U', 'W'].forEach((col, i) => {
-        row.getCell(col).value = Number(item.pagu?.triwulan?.[i]?.realisasi) ?? 0;
-      });
-      row.getCell('AA').value = Number(item.pagu?.persenRealisasi);
-      row.getCell('AA').numFmt = persenFormat;
-      row.getCell('AC').value = item.pagu?.totalRealisasiPeriode;
-      row.getCell('AE').value = Number(item.pagu?.persenRealisasiPeriode);
-      row.getCell('AE').numFmt = persenFormat;
     } else {
-      const row = worksheet.getRow(rowIndex++);
-      row.getCell('H').value = item.name;
+      rowIndex++; // jika tidak ada indikator, pindah row
     }
   });
+
 
   const lastRow = rowIndex;
   const startCol = 1;
   const endCol = 30;
 
-  for (let r = startRow; r <= lastRow; r++) {
+  for (let r = startRow - 4; r <= lastRow; r++) {
     const row = worksheet.getRow(r);
     for (let c = startCol; c <= endCol; c++) {
       const cell = row.getCell(c);

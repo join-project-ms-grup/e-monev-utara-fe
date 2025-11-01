@@ -4,7 +4,7 @@ import InputButton from '../../../inputs/InputButton';
 import { MdPrint, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import type { ColumnDef } from '@tanstack/react-table';
-import { exportRPJMD } from '../../../../services/Excel/ExcelRPJMDTable';
+import { exportRPJMD } from '../../../../services/Excel/ExcelRPJMD';
 
 const tableHead = () => {
   return (
