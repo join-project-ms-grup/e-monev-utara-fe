@@ -1,17 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router';
+import CapaianIKDTable from '../../../../components/tables/rkpd/ikd/CapaianIKDTable';
 import { SITE_NAME } from '../../../../lib/config';
-import CapaianIKUTable from '../../../../components/tables/rkpd/iku/CapaianIKUTable';
 
-export const Route = createFileRoute('/_dashboard/rkpd/iku/iku_capaian')({
+export const Route = createFileRoute('/_dashboard/rkpd/ikd/ikd_capaian')({
   head: () => ({
     meta: [
       {
-        title: `Capaian Indikator IKU - ${SITE_NAME}`,
+        title: `Capaian Indikator IKD - ${SITE_NAME}`,
       },
     ],
   }),
   staticData: {
-    title: 'Capaian Indikator IKU',
+    title: 'Capaian Indikator IKD',
   },
   component: RouteComponent,
 });
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_dashboard/rkpd/iku/iku_capaian')({
 function RouteComponent() {
   return (
     <>
-      <CapaianIKUTable />
+      <CapaianIKDTable />
     </>
   );
 }

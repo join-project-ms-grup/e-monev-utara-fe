@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import Tabel from '../../Tabel';
-import toast from 'react-hot-toast';
-import { MdCheck, MdPrint, MdRefresh } from 'react-icons/md';
-import { IoMdPricetag } from 'react-icons/io';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
-import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { fakeTaggingIku } from '../../../../dummy/datafaker';
-import { getSKPDPeriode } from '../../../../services/PeriodeService';
+import { type ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
-import { getPeriodeAkhirFromCookie, getPeriodeIDFromCookie, getPeriodeMulaiFromCookie } from '../../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../../lib/usercookie';
+import { getSKPDPeriode } from '../../../../services/PeriodeService';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -26,7 +27,8 @@ const tableHead = () => {
     <>
       <tr>
         <th rowSpan={2}>No</th>
-        <th rowSpan={2}>Indikator  Kinerja Utama</th>
+        <th rowSpan={2}>Sasaran Strategis</th>
+        <th rowSpan={2}>Indikator Kinerja Daerah</th>
         <th rowSpan={2}>Satuan</th>
         <th rowSpan={2}>Kondisi Awal {mulai - 2}</th>
         <th colSpan={periode.length}>Target Tahun</th>
@@ -42,7 +44,7 @@ const tableHead = () => {
   );
 };
 
-const TaggingIndikatorTable = () => {
+const IndikatorIKDTable = () => {
   const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
     id: (i + 1).toString(),
   }));
@@ -59,7 +61,6 @@ const TaggingIndikatorTable = () => {
       value: item.id?.toString(),
     })) || [];
   //#endregion
-
   return (
     <div className='space-y-2'>
       <div className='flex items-end justify-between'>
@@ -81,15 +82,6 @@ const TaggingIndikatorTable = () => {
         </div>
         <div className='inline-flex gap-2'>
           <InputButton
-            tooltip='Tag semua data sebagai IKU'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              toast.success('Tagging...');
-            }}
-          >
-            <IoMdPricetag />
-          </InputButton>
-          <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
             // onClick={() => refetch()}
@@ -105,4 +97,4 @@ const TaggingIndikatorTable = () => {
   );
 };
 
-export default TaggingIndikatorTable;
+export default IndikatorIKDTable;

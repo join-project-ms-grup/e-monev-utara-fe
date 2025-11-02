@@ -2,9 +2,11 @@ import { useState } from 'react';
 import Tabel from '../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import AksiButton from '../../inputs/AksiButton';
-import { MdEdit, MdRefresh } from 'react-icons/md';
+import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
+import DialogModal from '../../inputs/DialogModal';
+import FormIdentifikasiDak from '../../forms/IdentifikasiDak/FormIdentifikasiDak';
 
 type DataRow = {
   skpd: string;
@@ -62,6 +64,8 @@ const columns: ColumnDef<DataRow>[] = [
 ];
 
 const IdentifikasiDakTable = () => {
+  const [openModal, setOpenModal] = useState(false);
+
   const valTable = {
     tahun: '2025',
     tempat: 'Tempat 1',
@@ -146,6 +150,15 @@ const IdentifikasiDakTable = () => {
         </div>
         <div className='flex justify-end items-end gap-2'>
           <InputButton
+            tooltip='Tambah data'
+            className='btn btn-theme w-9 h-9'
+            onClick={() => {
+              setOpenModal(true);
+            }}
+          >
+            <MdAdd />
+          </InputButton>
+          <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
             // onClick={() => refetch()}
@@ -157,6 +170,17 @@ const IdentifikasiDakTable = () => {
         </div>
       </div>
       <Tabel data={data} columns={columns} />
+      <DialogModal
+        title='Tambah data Identifikasi DAK Kabupaten / Kota'
+        widthLevel={8}
+        isOpen={openModal}
+        onClose={() => {
+          // setFormData(initialFormData);
+          setOpenModal(false);
+        }}
+      >
+        <FormIdentifikasiDak />
+      </DialogModal>
     </div>
   );
 };

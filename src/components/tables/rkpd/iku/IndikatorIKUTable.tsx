@@ -2,165 +2,84 @@ import { useState } from 'react';
 import Tabel from '../../Tabel';
 import toast from 'react-hot-toast';
 import { MdEdit, MdRefresh } from 'react-icons/md';
-import { IoMdPricetag } from "react-icons/io";
+import { IoMdPricetag } from 'react-icons/io';
 import InputButton from '../../../inputs/InputButton';
-import InputSearchBox from '../../../inputs/InputSearchBox';
-import { createColumnHelper } from '@tanstack/react-table';
+import InputSearchBox, {
+  type OptionItem,
+} from '../../../inputs/InputSearchBox';
+import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 import { fakeIku } from '../../../../dummy/datafaker';
+import { useQuery } from '@tanstack/react-query';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../../lib/usercookie';
+import { getSKPDPeriode } from '../../../../services/PeriodeService';
 
-const IndikatorIKUTable = () => {
-  const columnHelper = createColumnHelper<any>();
-  const columns = [
-    columnHelper.group({
-      header: 'No',
-      meta: { rowSpan: 2, thClassNames: 'w-[60px]' },
-      columns: [
-        columnHelper.display({
-          header: ' ',
-          cell: ({ row }) => `${row.index + 1}`,
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'sasaran',
-      header: 'Sasaran Strategis',
-      meta: { rowSpan: 2 },
-      columns: [
-        columnHelper.accessor('sasaran', {
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'iku',
-      header: 'Indikator Kinerja Utama',
-      meta: { rowSpan: 2 },
-      columns: [
-        columnHelper.accessor('iku', {
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'deskform',
-      header: 'Deskripsi / Formulasi IKU',
-      meta: { rowSpan: 2, thClassNames: 'w-[150px]' },
-      columns: [
-        columnHelper.accessor('deskform', {
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'satuan',
-      header: 'Satuan',
-      meta: { rowSpan: 2, thClassNames: 'w-[100px]' },
-      columns: [
-        columnHelper.accessor('satuan', {
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'sumber',
-      header: 'Penyedia / Sumber Data',
-      meta: { rowSpan: 2, thClassNames: 'w-[200px]' },
-      columns: [
-        columnHelper.accessor('sumber', {
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'kondisiAwal',
-      header: 'Kondisi Kinerja Awal periode RENSTRA',
-      meta: { rowSpan: 2, thClassNames: 'w-[200px]' },
-      columns: [
-        columnHelper.accessor('kondisiAwal', {
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'target',
-      header: 'Target Capaian Setiap Tahun',
-      columns: [
-        columnHelper.accessor('2022', {
-          id: '2022',
-          header: '2022',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[200px]' },
-        }),
-        columnHelper.accessor('2023', {
-          id: '2023',
-          header: '2023',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[200px]' },
-        }),
-        columnHelper.accessor('2024', {
-          id: '2024',
-          header: '2024',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[200px]' },
-        }),
-        columnHelper.accessor('2025', {
-          id: '2025',
-          header: '2025',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[200px]' },
-        }),
-        columnHelper.accessor('2026', {
-          id: '2026',
-          header: '2026',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[200px]' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      header: 'Aksi',
-      meta: { rowSpan: 2, thClassNames: 'w-[60px]' },
-      columns: [
-        columnHelper.display({
-          header: ' ',
-          enableSorting: false,
-          cell: ({ row }) => (
-            <>
-              <div className='inline-flex gap-1'>
-                <button
-                  className='p-1 transition-all rounded-full hover:bg-green-400 hover:text-[var(--text-3)] active:scale-90'
-                  onClick={() => console.log(row.original.id)}
-                >
-                  <MdEdit className='text-xl' />
-                </button>
-              </div>
-            </>
-          ),
-          meta: {
-            hidden: true,
-            tdClassNames: 'text-center',
-          },
-        }),
-      ],
-    }),
+const tableHead = () => {
+  const mulai = Number(getPeriodeMulaiFromCookie()!);
+  const akhir = Number(getPeriodeAkhirFromCookie()!);
+
+  const periode = [
+    mulai - 1,
+    ...Array.from({ length: akhir - mulai + 1 }, (_, i) => mulai + i),
   ];
 
-  const [perangkat, setPerangkat] = useState('Perangkat Dua');
+  return (
+    <>
+      <tr>
+        <th rowSpan={2}>No</th>
+        <th rowSpan={2}>Sasaran Strategis</th>
+        <th rowSpan={2}>Indikator Kinerja Utama</th>
+        <th rowSpan={2}>Satuan</th>
+        <th rowSpan={2}>Kondisi Awal {mulai - 2}</th>
+        <th colSpan={periode.length}>Target Tahun</th>
+      </tr>
+      <tr>
+        {periode.map((thn) => (
+          <th key={thn} rowSpan={1}>
+            {thn}
+          </th>
+        ))}
+      </tr>
+    </>
+  );
+};
+
+const IndikatorIKUTable = () => {
+  const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
+    id: (i + 1).toString(),
+  }));
+
+  //#region SKPD
+  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const { data: dataSKPDPeriode } = useQuery({
+    queryKey: ['list_skpd_periode'],
+    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+  });
+  const listSKPDPeriode =
+    dataSKPDPeriode?.map((item) => ({
+      label: `[${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+  //#endregion
   return (
     <div className='space-y-2'>
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
           <div>
-            <label htmlFor='perangkat'>Perangkat Daerah</label>
+            <label htmlFor='skpd'>SKPD</label>
             <InputSearchBox
-              id='perangkat'
-              className='w-44 h-9'
+              id='skpd'
+              className='w-64 h-9'
               btnclassName='bg-white'
-              value={perangkat}
-              onChange={(e) => setPerangkat(e)}
-              options={[
-                { label: 'Perangkat Satu', value: 'Perangkat Satu' },
-                { label: 'Perangkat Dua', value: 'Perangkat Dua' },
-                { label: 'Perangkat Tiga', value: 'Perangkat Tiga' },
-                { label: 'Perangkat Empat', value: 'Perangkat Empat' },
-                { label: 'Perangkat Lima', value: 'Perangkat Lima' },
-              ]}
+              placeholder='Pilih SKPD...'
+              value={selectedSKPD.toString()}
+              options={listSKPDPeriode as OptionItem[]}
+              onChange={(val) => setSelectedSKPD(val)}
+              onClear={() => setSelectedSKPD('')}
+              withSearch
             />
           </div>
         </div>
@@ -176,7 +95,7 @@ const IndikatorIKUTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel tblClassName='md:min-w-[2400px]' data={fakeIku} columns={columns} />
+      <Tabel data={[]} columns={columns} renderHeader={tableHead} />
     </div>
   );
 };

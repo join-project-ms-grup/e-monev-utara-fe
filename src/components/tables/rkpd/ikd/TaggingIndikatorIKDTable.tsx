@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import Tabel from '../../Tabel';
 import toast from 'react-hot-toast';
-import { MdCheck, MdPrint, MdRefresh } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import { IoMdPricetag } from 'react-icons/io';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
-import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { fakeTaggingIku } from '../../../../dummy/datafaker';
+import { type ColumnDef } from '@tanstack/react-table';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import { useQuery } from '@tanstack/react-query';
 import { getPeriodeAkhirFromCookie, getPeriodeIDFromCookie, getPeriodeMulaiFromCookie } from '../../../../lib/usercookie';
@@ -26,7 +25,7 @@ const tableHead = () => {
     <>
       <tr>
         <th rowSpan={2}>No</th>
-        <th rowSpan={2}>Indikator  Kinerja Utama</th>
+        <th rowSpan={2}>Indikator  Kinerja Daerah</th>
         <th rowSpan={2}>Satuan</th>
         <th rowSpan={2}>Kondisi Awal {mulai - 2}</th>
         <th colSpan={periode.length}>Target Tahun</th>
@@ -42,7 +41,7 @@ const tableHead = () => {
   );
 };
 
-const TaggingIndikatorTable = () => {
+const TaggingIndikatorIKDTable = () => {
   const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
     id: (i + 1).toString(),
   }));
@@ -105,4 +104,4 @@ const TaggingIndikatorTable = () => {
   );
 };
 
-export default TaggingIndikatorTable;
+export default TaggingIndikatorIKDTable;

@@ -89,13 +89,21 @@ const menuRKPD: MenuItem[] = [
   {
     label: 'Indikator Kinerja Utama',
     icon: <MdShowChart />,
-    to: '/rkpd/indikator_kinerja_utama',
+    submenu: [
+      { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
+      { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
+      { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
+    ],
     akses: 3,
   },
   {
     label: 'Indikator Kinerja Daerah',
     icon: <MdLocationCity />,
-    to: '/rkpd/indikator_kinerja_daerah',
+    submenu: [
+      { label: 'Tagging Indikator', to: '/rkpd/ikd/ikd_tagging' },
+      { label: 'Indikator IKD', to: '/rkpd/ikd/ikd_list' },
+      { label: 'Capaian Indikator IKD', to: '/rkpd/ikd/ikd_capaian' },
+    ],
     akses: 3,
   },
   {

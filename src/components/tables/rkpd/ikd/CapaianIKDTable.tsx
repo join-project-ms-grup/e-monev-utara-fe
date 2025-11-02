@@ -1,53 +1,57 @@
 import { useState } from 'react';
 import Tabel from '../../Tabel';
-import toast from 'react-hot-toast';
-import { MdCheck, MdPrint, MdRefresh } from 'react-icons/md';
-import { IoMdPricetag } from 'react-icons/io';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
-import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { fakeTaggingIku } from '../../../../dummy/datafaker';
-import { getSKPDPeriode } from '../../../../services/PeriodeService';
+import { type ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
-import { getPeriodeAkhirFromCookie, getPeriodeIDFromCookie, getPeriodeMulaiFromCookie } from '../../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../../lib/usercookie';
+import { getSKPDPeriode } from '../../../../services/PeriodeService';
 
 const tableHead = () => {
-  const mulai = Number(getPeriodeMulaiFromCookie()!);
-  const akhir = Number(getPeriodeAkhirFromCookie()!);
-
-  const periode = [
-    mulai - 1,
-    ...Array.from({ length: akhir - mulai + 1 }, (_, i) => mulai + i),
-  ];
-
   return (
     <>
       <tr>
-        <th rowSpan={2}>No</th>
-        <th rowSpan={2}>Indikator  Kinerja Utama</th>
-        <th rowSpan={2}>Satuan</th>
-        <th rowSpan={2}>Kondisi Awal {mulai - 2}</th>
-        <th colSpan={periode.length}>Target Tahun</th>
-      </tr>
-      <tr>
-        {periode.map((thn) => (
-          <th key={thn} rowSpan={1}>
-            {thn}
-          </th>
-        ))}
+        <th>No</th>
+        <th>Sasaran</th>
+        <th>Indikator Kinerja Daerah</th>
+        <th>Satuan</th>
+        <th>Target Tahunan</th>
+        <th>Triwulan</th>
+        <th>Target</th>
+        <th>Realisasi</th>
+        <th>Capaian (%)</th>
+        <th>Keterangan</th>
+        <th>Aksi</th>
       </tr>
     </>
   );
 };
 
-const TaggingIndikatorTable = () => {
+const CapaianIKDTable = () => {
   const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
     id: (i + 1).toString(),
   }));
 
-  //#region SKPD
+  //#region List data periode
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+  //#endregion
+  //#region SKPD dan Tahun ke
+  const [tahunKe, setTahunKe] = useState('');
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
@@ -68,27 +72,35 @@ const TaggingIndikatorTable = () => {
             <label htmlFor='skpd'>SKPD</label>
             <InputSearchBox
               id='skpd'
-              className='w-64 h-9'
+              className='w-72 h-9'
               btnclassName='bg-white'
               placeholder='Pilih SKPD...'
               value={selectedSKPD.toString()}
               options={listSKPDPeriode as OptionItem[]}
               onChange={(val) => setSelectedSKPD(val)}
-              onClear={() => setSelectedSKPD('')}
+              onClear={() => {
+                setSelectedSKPD('');
+                setTahunKe('');
+              }}
               withSearch
+            />
+          </div>
+          <div>
+            <label htmlFor='tahun_ke'>Tahun ke</label>
+            <InputSearchBox
+              id='tahun_ke'
+              className='w-42 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Tahun ke...'
+              value={tahunKe}
+              options={listTahunKe}
+              onChange={(val) => setTahunKe(val)}
+              onClear={() => setTahunKe('')}
+              disabled={!selectedSKPD}
             />
           </div>
         </div>
         <div className='inline-flex gap-2'>
-          <InputButton
-            tooltip='Tag semua data sebagai IKU'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              toast.success('Tagging...');
-            }}
-          >
-            <IoMdPricetag />
-          </InputButton>
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -105,4 +117,4 @@ const TaggingIndikatorTable = () => {
   );
 };
 
-export default TaggingIndikatorTable;
+export default CapaianIKDTable;

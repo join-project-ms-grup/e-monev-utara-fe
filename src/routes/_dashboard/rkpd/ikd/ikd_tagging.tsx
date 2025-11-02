@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import TaggingIndikatorIKDTable from '../../../../components/tables/rkpd/ikd/TaggingIndikatorIKDTable'
 import { SITE_NAME } from '../../../../lib/config'
-import TaggingIndikatorTable from '../../../../components/tables/rkpd/iku/TaggingIndikatorTable'
 
-export const Route = createFileRoute('/_dashboard/rkpd/iku/iku_tagging')({
+export const Route = createFileRoute('/_dashboard/rkpd/ikd/ikd_tagging')({
     head: () => ({
     meta: [
       {
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_dashboard/rkpd/iku/iku_tagging')({
 function RouteComponent() {
     return (
         <>
-            <TaggingIndikatorTable />
+            <TaggingIndikatorIKDTable />
         </>
     )
 }
