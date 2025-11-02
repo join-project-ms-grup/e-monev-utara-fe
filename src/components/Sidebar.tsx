@@ -13,6 +13,8 @@ import {
   MdSpeed,
   MdPayments,
   MdAssignment,
+  MdLocationCity,
+  MdShowChart,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
 
@@ -86,12 +88,14 @@ const menuRKPD: MenuItem[] = [
   },
   {
     label: 'Indikator Kinerja Utama',
-    icon: <MdInsights />,
-    submenu: [
-      { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
-      { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
-      { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
-    ],
+    icon: <MdShowChart />,
+    to: '/rkpd/indikator_kinerja_utama',
+    akses: 3,
+  },
+  {
+    label: 'Indikator Kinerja Daerah',
+    icon: <MdLocationCity />,
+    to: '/rkpd/indikator_kinerja_daerah',
     akses: 3,
   },
   {

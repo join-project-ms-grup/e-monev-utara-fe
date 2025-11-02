@@ -24,6 +24,8 @@ import { Route as DashboardKonfigurasiIndexRouteImport } from './routes/_dashboa
 import { Route as DashboardDakIndexRouteImport } from './routes/_dashboard/dak/index'
 import { Route as DashboardRkpdRealisasiRouteImport } from './routes/_dashboard/rkpd/realisasi'
 import { Route as DashboardRkpdPagu_indikatifRouteImport } from './routes/_dashboard/rkpd/pagu_indikatif'
+import { Route as DashboardRkpdIndikator_kinerja_utamaRouteImport } from './routes/_dashboard/rkpd/indikator_kinerja_utama'
+import { Route as DashboardRkpdIndikator_kinerja_daerahRouteImport } from './routes/_dashboard/rkpd/indikator_kinerja_daerah'
 import { Route as DashboardRkpdIndikatorRouteImport } from './routes/_dashboard/rkpd/indikator'
 import { Route as DashboardRkpdCapaianRouteImport } from './routes/_dashboard/rkpd/capaian'
 import { Route as DashboardMasterSkpdRouteImport } from './routes/_dashboard/master/skpd'
@@ -131,6 +133,18 @@ const DashboardRkpdPagu_indikatifRoute =
   DashboardRkpdPagu_indikatifRouteImport.update({
     id: '/pagu_indikatif',
     path: '/pagu_indikatif',
+    getParentRoute: () => DashboardRkpdRouteRoute,
+  } as any)
+const DashboardRkpdIndikator_kinerja_utamaRoute =
+  DashboardRkpdIndikator_kinerja_utamaRouteImport.update({
+    id: '/indikator_kinerja_utama',
+    path: '/indikator_kinerja_utama',
+    getParentRoute: () => DashboardRkpdRouteRoute,
+  } as any)
+const DashboardRkpdIndikator_kinerja_daerahRoute =
+  DashboardRkpdIndikator_kinerja_daerahRouteImport.update({
+    id: '/indikator_kinerja_daerah',
+    path: '/indikator_kinerja_daerah',
     getParentRoute: () => DashboardRkpdRouteRoute,
   } as any)
 const DashboardRkpdIndikatorRoute = DashboardRkpdIndikatorRouteImport.update({
@@ -332,6 +346,8 @@ export interface FileRoutesByFullPath {
   '/master/skpd': typeof DashboardMasterSkpdRoute
   '/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
+  '/rkpd/indikator_kinerja_daerah': typeof DashboardRkpdIndikator_kinerja_daerahRoute
+  '/rkpd/indikator_kinerja_utama': typeof DashboardRkpdIndikator_kinerja_utamaRoute
   '/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
   '/dak/': typeof DashboardDakIndexRoute
@@ -370,6 +386,8 @@ export interface FileRoutesByTo {
   '/master/skpd': typeof DashboardMasterSkpdRoute
   '/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
+  '/rkpd/indikator_kinerja_daerah': typeof DashboardRkpdIndikator_kinerja_daerahRoute
+  '/rkpd/indikator_kinerja_utama': typeof DashboardRkpdIndikator_kinerja_utamaRoute
   '/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
   '/dak': typeof DashboardDakIndexRoute
@@ -419,6 +437,8 @@ export interface FileRoutesById {
   '/_dashboard/master/skpd': typeof DashboardMasterSkpdRoute
   '/_dashboard/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/_dashboard/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
+  '/_dashboard/rkpd/indikator_kinerja_daerah': typeof DashboardRkpdIndikator_kinerja_daerahRoute
+  '/_dashboard/rkpd/indikator_kinerja_utama': typeof DashboardRkpdIndikator_kinerja_utamaRoute
   '/_dashboard/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/_dashboard/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
   '/_dashboard/dak/': typeof DashboardDakIndexRoute
@@ -468,6 +488,8 @@ export interface FileRouteTypes {
     | '/master/skpd'
     | '/rkpd/capaian'
     | '/rkpd/indikator'
+    | '/rkpd/indikator_kinerja_daerah'
+    | '/rkpd/indikator_kinerja_utama'
     | '/rkpd/pagu_indikatif'
     | '/rkpd/realisasi'
     | '/dak/'
@@ -506,6 +528,8 @@ export interface FileRouteTypes {
     | '/master/skpd'
     | '/rkpd/capaian'
     | '/rkpd/indikator'
+    | '/rkpd/indikator_kinerja_daerah'
+    | '/rkpd/indikator_kinerja_utama'
     | '/rkpd/pagu_indikatif'
     | '/rkpd/realisasi'
     | '/dak'
@@ -554,6 +578,8 @@ export interface FileRouteTypes {
     | '/_dashboard/master/skpd'
     | '/_dashboard/rkpd/capaian'
     | '/_dashboard/rkpd/indikator'
+    | '/_dashboard/rkpd/indikator_kinerja_daerah'
+    | '/_dashboard/rkpd/indikator_kinerja_utama'
     | '/_dashboard/rkpd/pagu_indikatif'
     | '/_dashboard/rkpd/realisasi'
     | '/_dashboard/dak/'
@@ -688,6 +714,20 @@ declare module '@tanstack/react-router' {
       path: '/pagu_indikatif'
       fullPath: '/rkpd/pagu_indikatif'
       preLoaderRoute: typeof DashboardRkpdPagu_indikatifRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
+    }
+    '/_dashboard/rkpd/indikator_kinerja_utama': {
+      id: '/_dashboard/rkpd/indikator_kinerja_utama'
+      path: '/indikator_kinerja_utama'
+      fullPath: '/rkpd/indikator_kinerja_utama'
+      preLoaderRoute: typeof DashboardRkpdIndikator_kinerja_utamaRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
+    }
+    '/_dashboard/rkpd/indikator_kinerja_daerah': {
+      id: '/_dashboard/rkpd/indikator_kinerja_daerah'
+      path: '/indikator_kinerja_daerah'
+      fullPath: '/rkpd/indikator_kinerja_daerah'
+      preLoaderRoute: typeof DashboardRkpdIndikator_kinerja_daerahRouteImport
       parentRoute: typeof DashboardRkpdRouteRoute
     }
     '/_dashboard/rkpd/indikator': {
@@ -1057,6 +1097,8 @@ interface DashboardRkpdRouteRouteChildren {
   DashboardRkpdRenstraRouteRoute: typeof DashboardRkpdRenstraRouteRouteWithChildren
   DashboardRkpdCapaianRoute: typeof DashboardRkpdCapaianRoute
   DashboardRkpdIndikatorRoute: typeof DashboardRkpdIndikatorRoute
+  DashboardRkpdIndikator_kinerja_daerahRoute: typeof DashboardRkpdIndikator_kinerja_daerahRoute
+  DashboardRkpdIndikator_kinerja_utamaRoute: typeof DashboardRkpdIndikator_kinerja_utamaRoute
   DashboardRkpdPagu_indikatifRoute: typeof DashboardRkpdPagu_indikatifRoute
   DashboardRkpdRealisasiRoute: typeof DashboardRkpdRealisasiRoute
   DashboardRkpdIndexRoute: typeof DashboardRkpdIndexRoute
@@ -1069,6 +1111,10 @@ const DashboardRkpdRouteRouteChildren: DashboardRkpdRouteRouteChildren = {
   DashboardRkpdRenstraRouteRoute: DashboardRkpdRenstraRouteRouteWithChildren,
   DashboardRkpdCapaianRoute: DashboardRkpdCapaianRoute,
   DashboardRkpdIndikatorRoute: DashboardRkpdIndikatorRoute,
+  DashboardRkpdIndikator_kinerja_daerahRoute:
+    DashboardRkpdIndikator_kinerja_daerahRoute,
+  DashboardRkpdIndikator_kinerja_utamaRoute:
+    DashboardRkpdIndikator_kinerja_utamaRoute,
   DashboardRkpdPagu_indikatifRoute: DashboardRkpdPagu_indikatifRoute,
   DashboardRkpdRealisasiRoute: DashboardRkpdRealisasiRoute,
   DashboardRkpdIndexRoute: DashboardRkpdIndexRoute,
