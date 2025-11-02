@@ -16,8 +16,6 @@ import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/
  */
 export const exportRPJMD = async (
     data: any[],
-    tahun: string,
-    skpd: string,
     opts?: { startRow?: number },
 ) => {
     const awalPeriode = getPeriodeMulaiFromCookie();

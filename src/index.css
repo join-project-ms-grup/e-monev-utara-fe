@@ -242,7 +242,7 @@ a:hover {
 /* Tabel Excel */
 .table-excel {
   width: 100%;
-  overflow-x: auto;
+  /* overflow-x: auto; */
 }
 
 .table-excel table {

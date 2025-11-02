@@ -71,19 +71,15 @@ function RouteComponent() {
       <div className='bg-white shadow-lg rounded-lg w-full max-w-6xl min-h-3/5 flex flex-col md:flex-row overflow-hidden'>
         <div className='relative w-full bg-[#721027] text-white flex flex-col justify-center items-center p-8 overflow-hidden'>
           <img
-            src='/auth/login-bg.jpg'
+            src='/auth/bg-auth2.jpg'
             alt=''
-            className='w-full h-full object-cover object-[60%_center] absolute z-0'
+            className='w-full h-full object-cover object-top absolute z-0'
           />
-          {/* bg-[#0000001e] */}
-          <div className='flex flex-row items-center gap-4 absolute left-4 top-4 cursor-default rounded-xl px-4 py-2'>
+          {/* <div className='flex flex-row items-center gap-4 absolute left-4 top-4 cursor-default rounded-xl px-4 py-2'>
             <div>
               <img src='/bengkulu-utara-logo.webp' alt='' className='h-16 mt-4' />
             </div>
             <div>
-              {/* <h1 className='text-4xl font-bold mb-4 z-10 uppercase'>
-                {SITE_NAME}
-              </h1> */}
               <div className='w-72'>
                 <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
               </div>
@@ -94,13 +90,23 @@ function RouteComponent() {
                 <span className='text-red-600'>b</span>angunan Daer<span className='text-red-600'>ah</span>
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className='w-full md:w-2/3 flex flex-col justify-center items-center p-8'>
           <div className='h-4/5 max-w-md w-full mx-auto flex flex-col justify-center items-center p-8'>
-            <h2 className='text-2xl font-bold text-center text-gray-800 mb-6 uppercase'>
+            <div className='w-72'>
+              <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
+            </div>
+            <p className='uppercase font-bold text-red-800 text-center mb-5'>
+              <span className='text-red-600'>M</span>onitoring,{' '}
+              <span className='text-red-600'>A</span>nalisis{' '}
+              <span className='text-red-600'>Ha</span>sil Pem
+              <span className='text-red-600'>b</span>angunan Daer
+              <span className='text-red-600'>ah</span>
+            </p>
+            {/* <h2 className='text-2xl font-bold text-center text-gray-800 mb-6 uppercase'>
               Masuk
-            </h2>
+            </h2> */}
             <form onSubmit={handleSubmit} className='space-y-4 w-full'>
               <InputText
                 placeholder='Username'

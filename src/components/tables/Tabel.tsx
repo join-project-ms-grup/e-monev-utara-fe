@@ -28,18 +28,16 @@ interface MainTableProps<TData> {
   subLabels?: string[];
   subLabelPosition?: number;
   columns: ColumnDef<TData, any>[];
-  renderHeader?: (
-    table: ReturnType<typeof useReactTable<TData>>,
-  ) => React.ReactNode;
-  renderBody?: (
-    table: ReturnType<typeof useReactTable<TData>>,
-  ) => React.ReactNode;
+  renderHeader?: (table: ReturnType<typeof useReactTable<TData>>) => ReactNode;
+  renderBody?: (table: ReturnType<typeof useReactTable<TData>>) => ReactNode;
   tabletop?: ReactNode;
   searchFilters?: { field: string; value: string }[];
   tblClassName?: string;
   initialExpanded?: boolean;
   disablePagination?: boolean;
   customTableClass?: string;
+  pesanDataKosong?: ReactNode;
+  customRowAkhir?: ReactNode;
 }
 
 declare module '@tanstack/react-table' {
@@ -67,6 +65,8 @@ const Tabel = <TData,>({
   initialExpanded = false,
   disablePagination = false,
   customTableClass,
+  pesanDataKosong,
+  customRowAkhir,
 }: MainTableProps<TData & { group?: string }>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -146,7 +146,9 @@ const Tabel = <TData,>({
     <div>
       {tabletop && <div className='flex mb-2'>{tabletop}</div>}
 
-      <div className={clsx(!customTableClass && baseTableClass, customTableClass)}>
+      <div
+        className={clsx(!customTableClass && baseTableClass, customTableClass)}
+      >
         <table className={tableClass || undefined}>
           <thead>
             {renderHeader
@@ -191,56 +193,64 @@ const Tabel = <TData,>({
             {renderBody ? (
               renderBody(table)
             ) : rowModel.rows.length > 0 ? (
-              rowModel.rows.map((row) => {
-                const label = subLabels?.[row.depth];
-                return (
-                  <Fragment key={row.id}>
-                    <tr>
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          key={cell.id}
-                          colSpan={cell.column.columnDef.meta?.tdColSpan}
-                          className={cell.column.columnDef.meta?.tdClassNames}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-
-                    {row.getIsExpanded() && subLabels && (
+              <>
+                {rowModel.rows.map((row) => {
+                  const label = subLabels?.[row.depth];
+                  return (
+                    <Fragment key={row.id}>
                       <tr>
-                        <td
-                          colSpan={
-                            table.getAllLeafColumns().length -
-                            (subLabelPosition ?? 1)
-                          }
-                        ></td>
-                        <td colSpan={subLabelPosition}>
-                          <strong
-                            className='inline-flex'
-                            style={{ paddingLeft: `${row.depth * 1}rem` }}
+                        {row.getVisibleCells().map((cell) => (
+                          <td
+                            key={cell.id}
+                            colSpan={cell.column.columnDef.meta?.tdColSpan}
+                            className={cell.column.columnDef.meta?.tdClassNames}
                           >
-                            <MdSubdirectoryArrowRight />
-                            {label}
-                          </strong>
-                        </td>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
+                        ))}
                       </tr>
-                    )}
-                  </Fragment>
-                );
-              })
+
+                      {row.getIsExpanded() && subLabels && (
+                        <tr>
+                          <td
+                            colSpan={
+                              table.getAllLeafColumns().length -
+                              (subLabelPosition ?? 1)
+                            }
+                          ></td>
+                          <td colSpan={subLabelPosition}>
+                            <strong
+                              className='inline-flex'
+                              style={{ paddingLeft: `${row.depth * 1}rem` }}
+                            >
+                              <MdSubdirectoryArrowRight />
+                              {label}
+                            </strong>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
+
+                {customRowAkhir && customRowAkhir}
+              </>
             ) : (
-              <tr>
-                <td
-                  colSpan={table.getAllLeafColumns().length}
-                  className='text-center py-4'
-                >
-                  Tidak ada data
-                </td>
-              </tr>
+              <>
+                <tr>
+                  <td
+                    colSpan={table.getAllLeafColumns().length}
+                    className='text-center py-4'
+                  >
+                    {pesanDataKosong ? pesanDataKosong : 'Tidak ada data'}
+                  </td>
+                </tr>
+
+                {customRowAkhir && customRowAkhir}
+              </>
             )}
           </tbody>
         </table>

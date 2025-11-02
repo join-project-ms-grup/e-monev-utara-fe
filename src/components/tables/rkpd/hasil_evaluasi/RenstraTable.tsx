@@ -359,9 +359,7 @@ const RenstraTable = () => {
                 if (data) {
                   setIsPreview(true);
                 } else {
-                  toast.error(
-                    `${!selectedSKPD ? 'SKPD' : ''} belum diisi`,
-                  );
+                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
                 }
               }}
             >
@@ -385,6 +383,39 @@ const RenstraTable = () => {
         />
       </div>
       {isPreview &&
+        createPortal(
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
+            <div className='p-2'>
+              <RenstraPreviewTable
+                onCetak={() => {
+                  if (data) {
+                    const skpdLabel =
+                      dataSKPDPeriode?.find(
+                        (s) => s.id === Number(selectedSKPD),
+                      )?.name ?? '';
+                    toast.promise(exportRenstra(data, skpdLabel), {
+                      loading: 'Sedang mengunduh...',
+                      success: <b>Berhasil mengunduh.</b>,
+                      error: <b>Gagal mengunduh.</b>,
+                    });
+                  } else {
+                    toast.error(
+                      `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
+                    );
+                  }
+                }}
+                onClose={() => setIsPreview(false)}
+                data={data || []}
+                skpd={
+                  dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+                    ?.name ?? ''
+                }
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
+      {/* {isPreview &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex items-end justify-center bg-white'>
             <div className='flex flex-col space-y-2 overflow-y-auto md:h-[100vh]'>
@@ -434,7 +465,7 @@ const RenstraTable = () => {
             </div>
           </div>,
           document.body,
-        )}
+        )} */}
     </>
   );
 };

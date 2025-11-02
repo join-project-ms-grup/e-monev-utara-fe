@@ -255,8 +255,8 @@ export const exportRenstra = async (
   });
 
   const rowsConfig = [
-    { offset: 1, merge: 'A:AF', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
-    { offset: 2, merge: 'A:AF', text: 'Predikat kinerja', align: 'right' },
+    { offset: 1, merge: 'A:AA', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
+    { offset: 2, merge: 'A:AA', text: 'Predikat kinerja', align: 'right' },
     { offset: 3, merge: 'A:AL', text: 'Faktor pendorong pencapaian kinerja:' },
     { offset: 4, merge: 'A:AL', text: 'Faktor penghambat:' },
     { offset: 5, merge: 'A:AL', text: 'Usulan tindak lanjut pada Renja Perangkat Daerah kabupaten/kota berikutnya:' },

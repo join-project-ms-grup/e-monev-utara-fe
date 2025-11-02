@@ -279,39 +279,39 @@ export const exportRKPD = async (
   worksheet.mergeCells(`AC${rowIndex + 8}:AD${rowIndex + 8}`);
   worksheet.getRow(rowIndex + 8).getCell('AC').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 8).getCell('AC').value =
-    'Disusun';
+    'Disetujui';
   worksheet.mergeCells(`AC${rowIndex + 9}:AD${rowIndex + 9}`);
   worksheet.getRow(rowIndex + 9).getCell('AC').value =
     '......................, tanggal ...................';
-  worksheet.mergeCells(`AC${rowIndex + 10}:AD${rowIndex + 10}`);
-  worksheet.getRow(rowIndex + 10).getCell('AC').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 10).getCell('AC').value =
-    'KEPALA BAPPEDA';
   worksheet.mergeCells(`AC${rowIndex + 11}:AD${rowIndex + 11}`);
+  worksheet.getRow(rowIndex + 11).getCell('AC').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 11).getCell('AC').value =
+    'BUPATI/WALI KOTA';
+  worksheet.mergeCells(`AC${rowIndex + 12}:AD${rowIndex + 12}`);
+  worksheet.getRow(rowIndex + 12).getCell('AC').value =
     'KABUPATEN/KOTA ....................................';
-  worksheet.mergeCells(`AC${rowIndex + 16}:AD${rowIndex + 16}`);
-  worksheet.getRow(rowIndex + 16).getCell('AC').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 16).getCell('AC').value =
+  worksheet.mergeCells(`AC${rowIndex + 18}:AD${rowIndex + 18}`);
+  worksheet.getRow(rowIndex + 18).getCell('AC').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 18).getCell('AC').value =
     '(....................................)';
 
   worksheet.mergeCells(`Z${rowIndex + 8}:AA${rowIndex + 8}`);
   worksheet.getRow(rowIndex + 8).getCell('Z').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 8).getCell('Z').value =
-    'Disetujui';
+    'Disusun';
   worksheet.mergeCells(`Z${rowIndex + 9}:AA${rowIndex + 9}`);
   worksheet.getRow(rowIndex + 9).getCell('Z').value =
     '......................, tanggal ...................';
-  worksheet.mergeCells(`Z${rowIndex + 10}:AA${rowIndex + 10}`);
-  worksheet.getRow(rowIndex + 10).getCell('Z').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 10).getCell('Z').value =
-    'GUBERNUR';
   worksheet.mergeCells(`Z${rowIndex + 11}:AA${rowIndex + 11}`);
+  worksheet.getRow(rowIndex + 11).getCell('Z').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 11).getCell('Z').value =
+    'KEPALA BAPPEDA';
+  worksheet.mergeCells(`Z${rowIndex + 12}:AA${rowIndex + 12}`);
+  worksheet.getRow(rowIndex + 12).getCell('Z').value =
     'PROVINSI ....................................';
-  worksheet.mergeCells(`Z${rowIndex + 16}:AA${rowIndex + 16}`);
-  worksheet.getRow(rowIndex + 16).getCell('Z').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 16).getCell('Z').value =
+  worksheet.mergeCells(`Z${rowIndex + 18}:AA${rowIndex + 18}`);
+  worksheet.getRow(rowIndex + 18).getCell('Z').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 18).getCell('Z').value =
     '(....................................)';
   //#endregion
 

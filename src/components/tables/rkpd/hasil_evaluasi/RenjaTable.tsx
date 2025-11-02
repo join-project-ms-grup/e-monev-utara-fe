@@ -1,18 +1,21 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
 import { MdPreview, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import type { ColumnDef } from '@tanstack/react-table';
-import { exportRPJMD } from '../../../../services/Excel/ExcelRPJMD';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
 import { useQuery } from '@tanstack/react-query';
-import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+} from '../../../../lib/usercookie';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
-import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
+import RenjaPreviewTable from './RenjaPreviewTable';
+import { exportRenja } from '../../../../services/Excel/ExcelRenja';
 
 const tableHead = () => {
   return (
@@ -20,29 +23,42 @@ const tableHead = () => {
       <tr>
         <th rowSpan={2}>No</th>
         <th rowSpan={2}>Sasaran</th>
-        <th rowSpan={2}>Program Prioritas</th>
-        <th rowSpan={2}>Indikator Kinerja</th>
-        <th rowSpan={2}>Data Capaian pada Awal Tahun Perencanaan</th>
-        <th colSpan={2}>Target pada Akhir Tahun Perencanaan</th>
-        <th colSpan={2}>Capaian Pada Akhir Tahun Perencanaan</th>
+        <th rowSpan={2}> Program/ Kegiatan</th>
+        <th rowSpan={2}>
+          Indikator Kinerja Program (outcome)/ Kegiatan (output)
+        </th>
         <th colSpan={2}>
-          Rasio Capaian Akhir <br />
-          (%)
+          Target Renstra Perangkat Daerah pada Tahun{' '}
+          {getPeriodeAkhirFromCookie()}
+        </th>
+        <th colSpan={2}>
+          Realisasi Capaian Kinerja Renstra Perangkat Daerah sampai dengan Renja
+          Perangkat Daerah Tahun Lalu
+          <br />
+          (n-2)
+        </th>
+        <th colSpan={2}>
+          Target Kinerja dan Anggaran Renja Perangkat Daerah Tahun berjalan
+          (Tahun n-1) yang dievaluasi
+        </th>
+        <th colSpan={2}>
+          Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang
+          dievaluasi
         </th>
       </tr>
       <tr>
-        <th>K</th>
-        <th>Rp</th>
-        <th>K</th>
-        <th>Rp</th>
-        <th>K</th>
-        <th>Rp</th>
+        {[...Array(4)].map((_, i) => (
+          <React.Fragment key={i}>
+            <th>K</th>
+            <th>Rp.</th>
+          </React.Fragment>
+        ))}
       </tr>
     </>
   );
 };
 
-const RPJMDTable = () => {
+const RenjaTable = () => {
   //#region SKPD dan Tahun ke
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
@@ -121,17 +137,25 @@ const RPJMDTable = () => {
         </div>
         <Tabel data={[]} columns={columns} renderHeader={tableHead} />
       </div>
-
       {isPreview &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
             <div className='p-2'>
-              <RPJMDPreviewTable
+              <RenjaPreviewTable
                 data={[]}
+                skpd={
+                  dataSKPDPeriode?.find(
+                    (item) => item.id === Number(selectedSKPD),
+                  )?.name ?? ''
+                }
                 onCetak={() => {
                   const data = true;
                   if (data) {
-                    toast.promise(exportRPJMD([]), {
+                    const skpdLabel =
+                      dataSKPDPeriode?.find(
+                        (s) => s.id === Number(selectedSKPD),
+                      )?.name ?? '';
+                    toast.promise(exportRenja([], skpdLabel), {
                       loading: 'Sedang mengunduh...',
                       success: <b>Berhasil mengunduh.</b>,
                       error: <b>Gagal mengunduh.</b>,
@@ -150,4 +174,4 @@ const RPJMDTable = () => {
   );
 };
 
-export default RPJMDTable;
+export default RenjaTable;

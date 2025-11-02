@@ -101,6 +101,7 @@ const menuRKPD: MenuItem[] = [
       { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
       { label: 'Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
       { label: 'RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
+      { label: 'Renja', to: '/rkpd/hasil_evaluasi/Renja' },
     ],
     akses: 3,
   },

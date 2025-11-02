@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { exportRKPD } from '../../../../services/Excel/ExcelRKPD';
-import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
+import { MdPreview, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import {
   flattenRKPD,
@@ -393,56 +393,37 @@ const RKPDTable = () => {
       </div>
       {isPreview &&
         createPortal(
-          <div className='fixed inset-0 z-[9999] flex items-end justify-center bg-white'>
-            <div className='flex flex-col space-y-2 overflow-y-auto md:h-[100vh]'>
-              <div className='inline-flex justify-between items-center mt-2 px-2'>
-                <InputButton
-                  className='h-9'
-                  onClick={async () => {
-                    if (data) {
-                      const tahunLabel =
-                        listTahunKe.find((t) => t.value === tahunKe)?.label ??
-                        '';
-                      const skpdLabel =
-                        dataSKPDPeriode?.find(
-                          (s) => s.id === Number(selectedSKPD),
-                        )?.name ?? '';
-                      toast.promise(exportRKPD(data, tahunLabel, skpdLabel), {
-                        loading: 'Sedang mengunduh...',
-                        success: <b>Berhasil mengunduh.</b>,
-                        error: <b>Gagal mengunduh.</b>,
-                      });
-                    } else {
-                      toast.error(
-                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
-                      );
-                    }
-                  }}
-                >
-                  <span className='inline-flex items-center gap-2 px-2'>
-                    <MdPrint />
-                    Cetak Excel
-                  </span>
-                </InputButton>
-                <button
-                  onClick={() => setIsPreview(false)}
-                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-                  aria-label='Tutup preview'
-                >
-                  <MdClose />
-                </button>
-              </div>
-              <div className=''>
-                <RKPDPreviewTable
-                  data={data || []}
-                  listTahunKe={listTahunKe}
-                  tahunKe={tahunKe}
-                  skpd={
-                    dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
-                      ?.name ?? ''
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
+            <div className='p-2'>
+              <RKPDPreviewTable
+                onCetak={() => {
+                  if (data) {
+                    const tahunLabel =
+                      listTahunKe.find((t) => t.value === tahunKe)?.label ?? '';
+                    const skpdLabel =
+                      dataSKPDPeriode?.find(
+                        (s) => s.id === Number(selectedSKPD),
+                      )?.name ?? '';
+                    toast.promise(exportRKPD(data, tahunLabel, skpdLabel), {
+                      loading: 'Sedang mengunduh...',
+                      success: <b>Berhasil mengunduh.</b>,
+                      error: <b>Gagal mengunduh.</b>,
+                    });
+                  } else {
+                    toast.error(
+                      `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
+                    );
                   }
-                />
-              </div>
+                }}
+                onClose={() => setIsPreview(false)}
+                data={data || []}
+                listTahunKe={listTahunKe}
+                tahunKe={tahunKe}
+                skpd={
+                  dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+                    ?.name ?? ''
+                }
+              />
             </div>
           </div>,
           document.body,

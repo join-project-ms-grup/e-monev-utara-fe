@@ -1,18 +1,29 @@
-import React, { useRef, type ReactNode } from 'react';
+import React, { useRef } from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { FlatRKPDRow } from '../../../../services/RKPDService';
 import { formatUang } from '../../../../lib/helper';
+import { MdPrint, MdClose } from 'react-icons/md';
+import InputButton from '../../../inputs/InputButton';
 
 interface MainTableProps {
   data: FlatRKPDRow[];
   listTahunKe: { label: string; value: string }[];
   tahunKe: string;
   skpd: string;
+  onClose: () => void;
+  onCetak: () => void;
 }
 
-const RKPDPreviewTable = ({ data, listTahunKe, tahunKe, skpd }: MainTableProps) => {
-    console.log('data', data)
+const RKPDPreviewTable = ({
+  data,
+  listTahunKe,
+  tahunKe,
+  skpd,
+  onClose,
+  onCetak,
+}: MainTableProps) => {
+  console.log('data', data);
   const tahunLabel = listTahunKe.find((item) => item.value === tahunKe)?.label;
   //#region Head Tabel
   const tableHead = () => {
@@ -96,6 +107,41 @@ const RKPDPreviewTable = ({ data, listTahunKe, tahunKe, skpd }: MainTableProps) 
     );
   };
   //#endregion
+
+  const customAkhir = () => {
+    return (
+      <>
+        <tr>
+          <td colSpan={11} className='text-right'>
+            Rata-rata capaian kinerja (%)
+          </td>
+          <td colSpan={15}></td>
+        </tr>
+        <tr>
+          <td colSpan={11} className='text-right'>
+            Predikat kinerja
+          </td>
+          <td colSpan={15}></td>
+        </tr>
+        <tr>
+          <td colSpan={26}>Faktor pendorong keberhasilan kinerja:</td>
+        </tr>
+        <tr>
+          <td colSpan={26}>Faktor penghambat pencapaian kinerja:</td>
+        </tr>
+        <tr>
+          <td colSpan={26}>
+            Tindak lanjut yang diperlukan dalam triwulan berikutnya:
+          </td>
+        </tr>
+        <tr>
+          <td colSpan={26}>
+            Tindak lanjut yang diperlukan dalam RKPD berikutnya:
+          </td>
+        </tr>
+      </>
+    );
+  };
 
   const rowHeights = useRef<{ [key: string]: number[] }>({});
   const columns: ColumnDef<FlatRKPDRow>[] = [
@@ -423,13 +469,79 @@ const RKPDPreviewTable = ({ data, listTahunKe, tahunKe, skpd }: MainTableProps) 
   ];
 
   return (
-    <Tabel
-      customTableClass='table-excel'
-      data={data}
-      columns={columns}
-      renderHeader={tableHead}
-      disablePagination
-    />
+    <div className='flex flex-col p-4'>
+      <div className='flex flex-row gap-5 mb-5'>
+        <button
+          onClick={onClose}
+          className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+          aria-label='Tutup preview'
+        >
+          <MdClose />
+        </button>
+        <InputButton className='h-9' onClick={onCetak}>
+          <span className='inline-flex items-center gap-2 px-2'>
+            <MdPrint />
+            Cetak Excel
+          </span>
+        </InputButton>
+      </div>
+      <div className='border p-2 w-fit'>
+        <div className='min-w-[1500px]'>
+          <div className='flex flex-col items-center justify-center text-xl'>
+            <p>Evaluasi Terhadap Hasil RKPD</p>
+            <p>Kabupaten Bengkulu Utara</p>
+            <p>Tahun: {tahunLabel}</p>
+          </div>
+          <br />
+          <div className='text-xl'>
+            <p>Sasaran Pembangunan Tahunan Kabupaten/kota:</p>
+            <p>…………………………………………………………………………………………………………………………………………………</p>
+          </div>
+
+          <Tabel
+            customTableClass='table-excel'
+            data={data}
+            columns={columns}
+            renderHeader={tableHead}
+            customRowAkhir={customAkhir()}
+            disablePagination
+          />
+          <br />
+          <div className='flex justify-end'>
+            <div className='grid grid-cols-2 gap-48 mr-96'>
+              <div className='flex flex-col items-center'>
+                <span>Disusun</span>
+                <span>
+                  ......................., tanggal ...................
+                </span>
+                <br />
+                <span>
+                  KEPALA BAPPEDA....................................
+                </span>
+                <span>PROVINSI .................................... </span>
+                <br />
+                <br />
+                <br />
+                <span>(....................................)</span>
+              </div>
+              <div className='flex flex-col items-center'>
+                <span>Disetujui</span>
+                <span>
+                  ......................., tanggal ...................
+                </span>
+                <br />
+                <span>BUPATI/WALI KOTA....................................</span>
+                <span>KABUPATEN/KOTA .................................... </span>
+                <br />
+                <br />
+                <br />
+                <span>(....................................)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -3,14 +3,24 @@ import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import { formatUang } from '../../../../lib/helper';
 import type { FlatRenstraRow } from '../../../../services/RenstraService';
+import { MdClose, MdPrint } from 'react-icons/md';
+import InputButton from '../../../inputs/InputButton';
+import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../../../lib/usercookie';
 
 interface MainTableProps {
   data: FlatRenstraRow[];
   skpd: string;
+  onClose: () => void;
+  onCetak: () => void;
 }
 
-const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
-    console.log('data renstra', data)
+const RenstraPreviewTable = ({
+  data,
+  skpd,
+  onClose,
+  onCetak,
+}: MainTableProps) => {
+  console.log('data renstra', data);
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -20,10 +30,7 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
           <th rowSpan={2}>Sasaran</th>
           <th rowSpan={2}>Program/Kegiatan</th>
           <th rowSpan={2}>Indikator Kinerja</th>
-          <th rowSpan={2}>
-            Data Capaian Pada Awal Tahun PerencanaanData Capaian Pada Awal Tahun
-            Perencanaan
-          </th>
+          <th rowSpan={2}>Data Capaian Pada Awal Tahun Perencanaan</th>
           <th rowSpan={2} colSpan={2}>
             Target Capaian pada Akhir Tahun Perencanaan
           </th>
@@ -75,6 +82,41 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
     );
   };
   //#endregion
+
+  const customAkhir = () => {
+    return (
+      <>
+        <tr>
+          <td colSpan={27} className='text-right'>
+            Rata-rata capaian kinerja (%)
+          </td>
+          <td colSpan={11}></td>
+        </tr>
+        <tr>
+          <td colSpan={27} className='text-right'>
+            Predikat kinerja
+          </td>
+          <td colSpan={11}></td>
+        </tr>
+        <tr>
+          <td colSpan={38}>Faktor pendorong pencapaian kinerja:</td>
+        </tr>
+        <tr>
+          <td colSpan={38}>Faktor penghambat:</td>
+        </tr>
+        <tr>
+          <td colSpan={38}>
+            Usulan tindak lanjut pada Renja Perangkat Daerah kabupaten/kota berikutnya:
+          </td>
+        </tr>
+        <tr>
+          <td colSpan={38}>
+            Usulan tindak lanjut pada Renstra Perangkat Daerah kabupaten/kota berikutnya:
+          </td>
+        </tr>
+      </>
+    );
+  };
 
   const rowHeights = useRef<{ [key: string]: number[] }>({});
   const columns: ColumnDef<FlatRenstraRow>[] = [
@@ -246,9 +288,7 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
                     <table className='w-full'>
                       <tbody className='border-0!'>
                         <tr>
-                          <td>
-                            {pagu ? formatUang(Number(pagu)) : ''}
-                          </td>
+                          <td>{pagu ? formatUang(Number(pagu)) : ''}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -322,7 +362,11 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
                       <tbody className='border-0!'>
                         <tr>
                           <td>
-                            {realisasi ? formatUang(Number(realisasi)) : ((row.original.level !== 'urusan' && row.original.level !== 'bidang') && 'Rp.0')}
+                            {realisasi
+                              ? formatUang(Number(realisasi))
+                              : row.original.level !== 'urusan' &&
+                                row.original.level !== 'bidang' &&
+                                'Rp.0'}
                           </td>
                         </tr>
                       </tbody>
@@ -397,7 +441,11 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
                       <tbody className='border-0!'>
                         <tr>
                           <td>
-                            {rasio ? formatUang(Number(rasio)) : ((row.original.level !== 'urusan' && row.original.level !== 'bidang') && 'Rp.0')}
+                            {rasio
+                              ? formatUang(Number(rasio))
+                              : row.original.level !== 'urusan' &&
+                                row.original.level !== 'bidang' &&
+                                'Rp.0'}
                           </td>
                         </tr>
                       </tbody>
@@ -418,13 +466,67 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
   ];
 
   return (
-    <Tabel
-      customTableClass='table-excel'
-      data={data}
-      columns={columns}
-      renderHeader={tableHead}
-      disablePagination
-    />
+    <div className='flex flex-col p-4'>
+      <div className='flex flex-row gap-5 mb-5'>
+        <button
+          onClick={onClose}
+          className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+          aria-label='Tutup preview'
+        >
+          <MdClose />
+        </button>
+        <InputButton className='h-9' onClick={onCetak}>
+          <span className='inline-flex items-center gap-2 px-2'>
+            <MdPrint />
+            Cetak Excel
+          </span>
+        </InputButton>
+      </div>
+      <div className='border p-2 w-fit'>
+        <div className='min-w-[1500px]'>
+          <div className='flex flex-col items-center justify-center text-xl'>
+            <p>Evaluasi Terhadap Hasil Renstra Perangkat Daerah Lingkup Kabupaten/kota</p>
+            <p>Renstra Perangkat Daerah {skpd} Kabupaten Bengkulu Utara</p>
+            <p>Periode Pelaksanaan: {getPeriodeMulaiFromCookie()} - {getPeriodeAkhirFromCookie()}</p>
+          </div>
+          <br />
+          <div className='text-xl'>
+            <p>Indikator dan target Kinerja Perangkat Daerah Kabupaten/Kota yang mengacu pada Sasaran RPJMD Kabupaten/Kota:</p>
+            <p>…………………………………………………………………………………………………………………………………………………</p>
+          </div>
+          <Tabel
+            customTableClass='table-excel'
+            data={data}
+            columns={columns}
+            renderHeader={tableHead}
+            customRowAkhir={customAkhir()}
+            disablePagination
+          />
+          <br />
+          <div className='flex justify-end'>
+            <div className='grid grid-cols-2 gap-48 mr-96'>
+              <div></div>
+              <div className='flex flex-col items-center'>
+                <span>
+                  ......................., tanggal ...................
+                </span>
+                <br />
+                <span>
+                  KEPALA Perangkat Daerah....................................
+                </span>
+                <span>
+                  KABUPATEN/KOTA....................................{' '}
+                </span>
+                <br />
+                <br />
+                <br />
+                <span>(....................................)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
