@@ -72,7 +72,7 @@ const IdentifikasiDakTable = () => {
     opd: 'OPD 1',
     subJenis: 'Sub-Jenis DAK 1',
   };
-  const [formTable, setFormTable] = useState(valTable);
+  // const [formTable, setFormTable] = useState(valTable);
 
   return (
     <div className='space-y-2'>
@@ -82,19 +82,21 @@ const IdentifikasiDakTable = () => {
             <label htmlFor='tahun'>Tahun</label>
             <InputSearchBox
               id='tahun'
-              className='w-24 h-9'
+              className='w-38 h-9'
               btnclassName='bg-white'
-              value={formTable.tahun}
-              onChange={(val) =>
-                setFormTable((prev) => ({ ...prev, tahun: val }))
-              }
-              options={[
-                { label: '2026', value: '2026' },
-                { label: '2025', value: '2025' },
-                { label: '2024', value: '2024' },
-                { label: '2023', value: '2023' },
-                { label: '2022', value: '2022' },
-              ]}
+              options={[]}
+              placeholder='Pilih Tahun'
+              // value={formTable.tahun}
+              // onChange={(val) =>
+              //   setFormTable((prev) => ({ ...prev, tahun: val }))
+              // }
+              // options={[
+              //   { label: '2026', value: '2026' },
+              //   { label: '2025', value: '2025' },
+              //   { label: '2024', value: '2024' },
+              //   { label: '2023', value: '2023' },
+              //   { label: '2022', value: '2022' },
+              // ]}
             />
           </div>
           <div>
@@ -103,14 +105,16 @@ const IdentifikasiDakTable = () => {
               id='tempat'
               className='w-44 h-9'
               btnclassName='bg-white'
-              value={formTable.tempat}
-              onChange={(e) => setFormTable((prev) => ({ ...prev, tempat: e }))}
-              options={[
-                { label: 'Tempat 1', value: 'Tempat 1' },
-                { label: 'Tempat 2', value: 'Tempat 2' },
-                { label: 'Tempat 3', value: 'Tempat 3' },
-                { label: 'Tempat 4', value: 'Tempat 4' },
-              ]}
+              options={[]}
+              placeholder='Pilih Kabupaten / Kota'
+              // value={formTable.tempat}
+              // onChange={(e) => setFormTable((prev) => ({ ...prev, tempat: e }))}
+              // options={[
+              //   { label: 'Tempat 1', value: 'Tempat 1' },
+              //   { label: 'Tempat 2', value: 'Tempat 2' },
+              //   { label: 'Tempat 3', value: 'Tempat 3' },
+              //   { label: 'Tempat 4', value: 'Tempat 4' },
+              // ]}
             />
           </div>
           <div>
@@ -119,14 +123,16 @@ const IdentifikasiDakTable = () => {
               id='opd'
               className='w-44 h-9'
               btnclassName='bg-white'
-              value={formTable.opd}
-              onChange={(e) => setFormTable((prev) => ({ ...prev, opd: e }))}
-              options={[
-                { label: 'OPD 1', value: 'OPD 1' },
-                { label: 'OPD 2', value: 'OPD 2' },
-                { label: 'OPD 3', value: 'OPD 3' },
-                { label: 'OPD 4', value: 'OPD 4' },
-              ]}
+              options={[]}
+              placeholder='Pilih OPD'
+              // value={formTable.opd}
+              // onChange={(e) => setFormTable((prev) => ({ ...prev, opd: e }))}
+              // options={[
+              //   { label: 'OPD 1', value: 'OPD 1' },
+              //   { label: 'OPD 2', value: 'OPD 2' },
+              //   { label: 'OPD 3', value: 'OPD 3' },
+              //   { label: 'OPD 4', value: 'OPD 4' },
+              // ]}
             />
           </div>
           <div>
@@ -135,16 +141,18 @@ const IdentifikasiDakTable = () => {
               id='subJenis'
               className='w-44 h-9'
               btnclassName='bg-white'
-              value={formTable.subJenis}
-              onChange={(e) =>
-                setFormTable((prev) => ({ ...prev, subJenis: e }))
-              }
-              options={[
-                { label: 'Sub-Jenis DAK 1', value: 'Sub-Jenis DAK 1' },
-                { label: 'Sub-Jenis DAK 2', value: 'Sub-Jenis DAK 2' },
-                { label: 'Sub-Jenis DAK 3', value: 'Sub-Jenis DAK 3' },
-                { label: 'Sub-Jenis DAK 4', value: 'Sub-Jenis DAK 4' },
-              ]}
+              options={[]}
+              placeholder='Pilih Sub-Jenis DAK'
+              // value={formTable.subJenis}
+              // onChange={(e) =>
+              //   setFormTable((prev) => ({ ...prev, subJenis: e }))
+              // }
+              // options={[
+              //   { label: 'Sub-Jenis DAK 1', value: 'Sub-Jenis DAK 1' },
+              //   { label: 'Sub-Jenis DAK 2', value: 'Sub-Jenis DAK 2' },
+              //   { label: 'Sub-Jenis DAK 3', value: 'Sub-Jenis DAK 3' },
+              //   { label: 'Sub-Jenis DAK 4', value: 'Sub-Jenis DAK 4' },
+              // ]}
             />
           </div>
         </div>
@@ -169,10 +177,10 @@ const IdentifikasiDakTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={data} columns={columns} />
+      <Tabel data={[]} columns={columns} />
       <DialogModal
         title='Tambah data Identifikasi DAK Kabupaten / Kota'
-        widthLevel={8}
+        widthLevel={10}
         isOpen={openModal}
         onClose={() => {
           // setFormData(initialFormData);

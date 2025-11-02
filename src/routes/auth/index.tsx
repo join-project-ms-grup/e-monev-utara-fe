@@ -181,7 +181,7 @@ function RouteComponent() {
             </button>
           </div> */}
           <div className='h-1/5 text-center w-full flex flex-col items-center justify-center opacity-50 text-[0.9rem]'>
-            <p>BAPPELITBANGDA</p>
+            <p>BAPPERIDA</p>
             <p>&copy; 2025 Kabupaten Bengkulu Utara</p>
           </div>
         </div>

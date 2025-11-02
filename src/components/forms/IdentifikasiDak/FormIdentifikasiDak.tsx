@@ -8,14 +8,14 @@ const htmlFormIdentifikasiDak = () => {
   const [activeTab, setActiveTab] = useState(1);
 
   return (
-    <div className='w-full max-w-3xl mx-auto mt-8'>
-      <div className='flex border-b'>
+    <div className='w-full max-w-6xl mx-auto'>
+      <div className='flex'>
         <button
           onClick={() => setActiveTab(1)}
           className={`px-4 py-2 font-medium ${
             activeTab === 1
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
+              : 'hover:text-[var(--color-2)]'
           }`}
         >
           Jenis, Bidang, Program & Kegiatan DAK
@@ -24,8 +24,8 @@ const htmlFormIdentifikasiDak = () => {
           onClick={() => setActiveTab(2)}
           className={`px-4 py-2 font-medium ${
             activeTab === 2
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
+              : 'hover:text-[var(--color-2)]'
           }`}
         >
           Detail DAK
@@ -34,8 +34,8 @@ const htmlFormIdentifikasiDak = () => {
           onClick={() => setActiveTab(3)}
           className={`px-4 py-2 font-medium ${
             activeTab === 3
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
+              : 'hover:text-[var(--color-2)]'
           }`}
         >
           Catatan & Mekanisme Pelaksana
@@ -44,15 +44,15 @@ const htmlFormIdentifikasiDak = () => {
           onClick={() => setActiveTab(4)}
           className={`px-4 py-2 font-medium ${
             activeTab === 4
-              ? 'border-b-2 border-blue-500 text-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
+              : 'hover:text-[var(--color-2)]'
           }`}
         >
           Checklist Dokumen dan Kegiatan Pelaksanaan
         </button>
       </div>
 
-      <div className='mt-6'>
+      <div className='mt-2'>
         {activeTab === 1 && <JenisBidangProgramKegiatanDAK />}
         {activeTab === 2 && <DetailDak />}
         {activeTab === 3 && <CatatanMekanismePelaksana />}
