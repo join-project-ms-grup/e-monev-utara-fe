@@ -59,6 +59,10 @@ const DashRKPDTable = () => {
   const columns: ColumnDef<any>[] = [
     {
       header: 'Ranking',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => '-',
     },
     {
       header: 'Perangkat Daerah',
@@ -70,10 +74,18 @@ const DashRKPDTable = () => {
         {
           id: 'rCKPersen',
           header: '(%)',
+          meta: {
+            tdClassNames: 'text-center',
+          },
+          cell: () => '-',
         },
         {
           id: 'rCKPredikat',
           header: 'Predikat',
+          meta: {
+            tdClassNames: 'text-center',
+          },
+          cell: () => '-',
         },
       ],
     },
@@ -83,15 +95,27 @@ const DashRKPDTable = () => {
         {
           id: 'rCAPersen',
           header: '(%)',
+          meta: {
+            tdClassNames: 'text-center',
+          },
+          cell: () => '-',
         },
         {
           id: 'rCAPredikat',
           header: 'Predikat',
+          meta: {
+            tdClassNames: 'text-center',
+          },
+          cell: () => '-',
         },
       ],
     },
     {
       header: 'Realisasi Anggaran',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => '-',
     },
   ];
 
@@ -157,11 +181,7 @@ const DashRKPDTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel
-        data={dataSKPD || []}
-        columns={columns}
-        renderHeader={tableHead}
-      />
+      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead} />
       <div>
         <span>Keterangan Predikat:</span>
         <div className='grid grid-cols-[auto_1fr] space-x-2'>

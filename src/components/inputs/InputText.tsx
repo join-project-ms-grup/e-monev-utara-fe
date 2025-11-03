@@ -1,6 +1,6 @@
 import React from 'react';
 import type { IconType } from 'react-icons/lib';
-import { MdCheck } from 'react-icons/md';
+import { MdCheck, MdClear } from 'react-icons/md';
 import { PiWarningCircle } from 'react-icons/pi';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -14,6 +14,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   disableButton?: boolean;
   buttonType?: 'button' | 'reset' | 'submit';
   isMoney?: boolean;
+  onClear?: () => void;
 }
 
 const InputText = ({
@@ -32,6 +33,7 @@ const InputText = ({
   disabled = false,
   value,
   isMoney = false,
+  onClear,
   ...props
 }: InputProps) => {
   const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -94,10 +96,10 @@ const InputText = ({
         disabled ? 'opacity-60' : ''
       }`}
     >
-      {Icon && <Icon className="text-4xl h-full pl-2" />}
+      {Icon && <Icon className='text-4xl h-full pl-2' />}
       {Iconlabel && (
-        <div className="flex items-center pl-2">
-          <span className="cursor-default">{Iconlabel}</span>
+        <div className='flex items-center pl-2'>
+          <span className='cursor-default'>{Iconlabel}</span>
         </div>
       )}
       <input
@@ -107,15 +109,24 @@ const InputText = ({
         inputMode={inputMode}
         onBeforeInput={handleBeforeInput}
         onChange={handleChange}
-        className="h-full"
+        className='h-full'
         disabled={disabled}
       />
-      <div className="inline-flex items-center">
+      <div className='inline-flex items-center'>
         <PiWarningCircle
           className={`transition-opacity text-red-500 text-lg mr-1 ${
             invalid ? 'block opacity-100' : 'hidden opacity-0'
           }`}
         />
+        {onClear && formattedValue && (
+          <button
+            type='button'
+            className='bg-white transition-all text-red-500 hover:text-red-400 px-1'
+            onClick={onClear}
+          >
+            <MdClear className='transition-all active:scale-80' />
+          </button>
+        )}
         {withButton && (
           <button
             disabled={disableButton}

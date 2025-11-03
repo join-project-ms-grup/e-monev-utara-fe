@@ -1,206 +1,105 @@
-import React from 'react';
+import InputFile from '../../inputs/InputFile';
+import InputText from '../../inputs/InputText';
 
 const DetailDak = () => {
   return (
-    <div>
-      <h3>Detail DAK</h3>
-
-      <div>
-        <label htmlFor='paket'>Nama Paket</label>
-        <input
-          id='paket'
-          name='paket'
-          type='text'
-          placeholder='Nama Paket...'
-          maxLength={255}
-          required
-        />
+    <div className='mt-4'>
+      <div className='flex items-center justify-center mb-4'>
+        <h5>Detail DAK</h5>
       </div>
 
-      <div>
-        <label htmlFor='detail'>Detail Paket</label>
-        <textarea
-          id='detail'
-          name='detail'
-          placeholder='Detail Paket...'
-          maxLength={1000}
-          required
-        />
-      </div>
-
-      <div>
-        <label>Volume / Satuan</label>
+      <div className='space-y-2'>
         <div>
-          <input
-            id='volume'
-            name='volume'
-            type='text'
-            placeholder='Volume...'
-            value='0'
-            maxLength={12}
-            required
-          />
-          <input
-            id='satuan'
-            name='satuan'
-            type='text'
-            placeholder='Satuan...'
-            maxLength={30}
-            required
-          />
+          <label htmlFor='paket'>Nama Paket</label>
+          <InputText id='paket' placeholder='Nama Paket...' />
         </div>
-      </div>
 
-      <div>
-        <label htmlFor='waktu'>Estimasi Waktu</label>
-        <input
-          id='waktu'
-          name='waktu'
-          type='text'
-          placeholder='Estimasi Waktu...'
-          maxLength={100}
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor='penerima'>Jumlah Penerima Manfaat</label>
-        <input
-          id='penerima'
-          name='penerima'
-          type='text'
-          placeholder='Jumlah Penerima Manfaat...'
-          maxLength={255}
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor='anggaran_utama'>Anggaran DAK</label>
         <div>
-          <span>Rp.</span>
-          <input
-            id='anggaran_utama'
-            name='anggaran_utama'
-            type='text'
-            placeholder='Anggaran DAK...'
-            value='0'
-            maxLength={19}
-            required
-          />
-          <span>,-</span>
+          <label htmlFor='detail'>Detail Paket</label>
+          <InputText id='detail' placeholder='Detail Paket...' />
         </div>
-      </div>
 
-      <div>
-        <label>Alamat (Desa / Kelurahan dan Kecamatan)</label>
         <div>
-          <input
-            id='alm_deskel'
-            name='alm_deskel'
-            type='text'
-            placeholder='Desa / Kelurahan...'
-            maxLength={30}
-            required
-          />
-          <input
-            id='alm_kec'
-            name='alm_kec'
-            type='text'
-            placeholder='Kecamatan...'
-            maxLength={20}
-            required
-          />
+          <label htmlFor='volume'>Volume</label>
+          <InputText id='volume' placeholder='Volume...' />
         </div>
-      </div>
 
-      <div>
-        <label>Bujur</label>
         <div>
-          <div>
-            <input
-              id='bujur1'
-              name='bujur1'
-              type='text'
-              placeholder='Drj...'
-              value='0'
-              maxLength={6}
-              required
-            />
-            <span>°</span>
-          </div>
-          <div>
-            <input
-              id='bujur2'
-              name='bujur2'
-              type='text'
-              placeholder='Mn...'
-              value='0'
-              maxLength={6}
-              required
-            />
-            <span>'</span>
-          </div>
-          <div>
-            <input
-              id='bujur3'
-              name='bujur3'
-              type='text'
-              placeholder='Dt...'
-              value='0'
-              maxLength={6}
-              required
-            />
-            <span>''</span>
+          <label htmlFor='satuan'>Satuan</label>
+          <InputText id='satuan' placeholder='Satuan...' />
+        </div>
+
+        <div>
+          <label htmlFor='waktu'>Estimasi Waktu</label>
+          <InputText id='waktu' placeholder='Estimasi Waktu...' />
+        </div>
+
+        <div>
+          <label htmlFor='penerima'>Jumlah Penerima Manfaat</label>
+          <InputText id='penerima' placeholder='Estimasi Waktu...' />
+        </div>
+
+        <div>
+          <label htmlFor='anggaran_utama'>Anggaran DAK</label>
+          <InputText id='anggaran_utama' placeholder='Anggaran DAK...' />
+        </div>
+
+        <div>
+          <label htmlFor='alm_deskel'>Desa / Kelurahan</label>
+          <InputText id='alm_deskel' placeholder='Desa / Kelurahan...' />
+        </div>
+
+        <div>
+          <label htmlFor='alm_kec'>Kecamatan</label>
+          <InputText id='alm_kec' placeholder='Kecamatan...' />
+        </div>
+
+        <div>
+          <label htmlFor='bujur'>Bujur</label>
+          <div className='grid grid-cols-3 gap-2'>
+            <div className='inline-flex'>
+              <InputText id='bujur1' placeholder='Drj...' />
+              <span>°</span>
+            </div>
+            <div className='inline-flex'>
+              <InputText id='bujur2' placeholder='Mn...' />
+              <span>'</span>
+            </div>
+            <div className='inline-flex'>
+              <InputText id='bujur3' placeholder='Dt...' />
+              <span>''</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <label>Lintang</label>
         <div>
-          <div>
-            <input
-              id='lintang1'
-              name='lintang1'
-              type='text'
-              placeholder='Drj...'
-              value='0'
-              maxLength={6}
-              required
-            />
-            <span>°</span>
-          </div>
-          <div>
-            <input
-              id='lintang2'
-              name='lintang2'
-              type='text'
-              placeholder='Mn...'
-              value='0'
-              maxLength={6}
-              required
-            />
-            <span>'</span>
-          </div>
-          <div>
-            <input
-              id='lintang3'
-              name='lintang3'
-              type='text'
-              placeholder='Dt...'
-              value='0'
-              maxLength={6}
-              required
-            />
-            <span>''</span>
+          <label htmlFor='lintang'>Lintang</label>
+          <div className='grid grid-cols-3 gap-2'>
+            <div className='inline-flex'>
+              <InputText id='lintang1' placeholder='Drj...' />
+              <span>°</span>
+            </div>
+            <div className='inline-flex'>
+              <InputText id='lintang2' placeholder='Mn...' />
+              <span>'</span>
+            </div>
+            <div className='inline-flex'>
+              <InputText id='lintang3' placeholder='Dt...' />
+              <span>''</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <label htmlFor='img_mod'>Foto Kegiatan</label>
         <div>
+          <label htmlFor='img_mod'>Foto Kegiatan</label>
+          <InputFile
+            id='img_mod'
+            Iconlabel='Upload Gambar'
+            accept='image/*'
+            withButton
+            onChange={(e) => console.log(e.target.files?.[0])}
+          />
+          {/* <div>
           <img
             id='img_mod'
             src='https://monev-dak.bengkuluutarakab.go.id/template/assets/pict/no-image1.png'
@@ -215,6 +114,7 @@ const DetailDak = () => {
             Maksimal ukuran file <b>10 MB</b> – Format yang diizinkan:{' '}
             <b>jpg, jpeg, png, bmp, gif</b>
           </p>
+        </div> */}
         </div>
       </div>
     </div>

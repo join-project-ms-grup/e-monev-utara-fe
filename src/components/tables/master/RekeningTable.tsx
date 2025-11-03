@@ -5,13 +5,13 @@ import {
   type Master,
   type MasterUrusan,
 } from '../../../services/MasterService';
-import { type ColumnDef } from '@tanstack/react-table';
-import { MdAdd, MdRefresh } from 'react-icons/md';
+import { type ColumnDef, type Table } from '@tanstack/react-table';
+import { MdAdd, MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
 import Tabel from '../Tabel';
 import Spinner from '../../inputs/Spinner';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import InputText from '../../inputs/InputText';
 import { isDev } from '../../../lib/usercookie';
 import DialogModal from '../../inputs/DialogModal';
@@ -19,14 +19,12 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import FormRekening from '../../forms/FormRekening';
-import { tr } from '@faker-js/faker';
 
 const tableHead = () => {
   return (
     <tr>
       <th className='w-[50px]'>No</th>
-      <th className='w-[150px]'>Rekening</th>
-      <th colSpan={5}>Kode</th>
+      <th>Kode</th>
       <th>Nama</th>
     </tr>
   );
@@ -68,6 +66,110 @@ const RekeningTable = () => {
     queryKey: ['list_rekening'],
     queryFn: getRekeningFlat,
   });
+
+  const tableBody = ({
+    table,
+    selectedRekening,
+  }: {
+    table: Table<MasterUrusan & { depth: number }>;
+    selectedRekening: string;
+  }) => {
+    if (!data)
+      return (
+        <tr>
+          <td colSpan={7}>Tidak ada data</td>
+        </tr>
+      );
+
+    const levels = ['urusan', 'bidang', 'program', 'kegiatan', 'subKegiatan'];
+    const levelIndex = selectedRekening ? levels.indexOf(selectedRekening) : -1;
+
+    // Filter berdasarkan selectedRekening
+    let filteredData =
+      levelIndex >= 0
+        ? data.filter((item) => item.rekening === selectedRekening)
+        : data;
+
+    // Filter kode
+    const kodeFilter = searchFields.kode?.trim();
+    if (kodeFilter) {
+      filteredData = filteredData.filter((item) =>
+        (item.kodeFull || []).join('.').startsWith(kodeFilter),
+      );
+    }
+
+    // Filter nama
+    const nameFilter = searchFields.name?.trim().toLowerCase();
+    if (nameFilter) {
+      filteredData = filteredData.filter((item) =>
+        item.name?.toLowerCase().includes(nameFilter),
+      );
+    }
+
+    // Pagination
+    const pageIndex = table.getState().pagination.pageIndex;
+    const pageSize = table.getState().pagination.pageSize;
+    const paginatedData = filteredData.slice(
+      pageIndex * pageSize,
+      (pageIndex + 1) * pageSize,
+    );
+
+    // Mapping kodeFull ke item untuk header parent
+    const parentMap: Record<string, MasterUrusan> = {};
+    data.forEach((item) => {
+      const key = item.kodeFull?.join('.') || '-';
+      parentMap[key] = item;
+    });
+
+    const rows: JSX.Element[] = [];
+
+    paginatedData.forEach((item, idx) => {
+      if (levelIndex >= 0) {
+        // Tambahkan header parent dari Urusan sampai parent level terpilih
+        const parentCodes = item.kodeFull?.slice(0, levelIndex) || [];
+        parentCodes.forEach((code, i) => {
+          const key = parentCodes.slice(0, i + 1).join('.');
+          const nameItem = parentMap[key];
+          if (nameItem) {
+            const exists = rows.some(
+              (r) => (r.key as string) === `header-${key}`,
+            );
+            if (!exists) {
+              rows.push(
+                <tr key={`header-${key}`} className='bg-gray-200 font-bold'>
+                  <td colSpan={7}>
+                    <div
+                      className='inline-flex items-center gap-1'
+                      style={{ paddingLeft: `${i * 16}px` }}
+                    >
+                      {i > 0 && <MdSubdirectoryArrowRight />}
+                      <span>
+                        [{parentCodes.slice(0, i + 1).join('.')}]{' '}
+                        {nameItem.name}
+                      </span>
+                    </div>
+                  </td>
+                </tr>,
+              );
+            }
+          }
+        });
+      }
+
+      // Baris data level terpilih
+      rows.push(
+        <tr key={`row-${idx}`}>
+          <td className='text-center'>{idx + 1}</td>
+          <td className='text-left w-[50px]'>
+            {item.kodeFull?.join('.') ?? ''}
+          </td>
+          <td>{item.name}</td>
+        </tr>,
+      );
+    });
+
+    return <>{rows}</>;
+  };
 
   // Add
   const addMutation = useMutation({
@@ -152,9 +254,9 @@ const RekeningTable = () => {
       columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
         (label, index) => ({
           id: `kode_${label}`,
-          meta: {
-            tdClassNames: 'w-[30px]',
-          },
+          // meta: {
+          //   tdClassNames: 'w-[30px]',
+          // },
           accessorFn: (row) => row.kodeFull?.[index],
           cell: ({ getValue }) => {
             const value = getValue();
@@ -207,6 +309,7 @@ const RekeningTable = () => {
               onChange={(e) =>
                 setSearchFields((prev) => ({ ...prev, name: e.target.value }))
               }
+              onClear={() => setSearchFields((prev) => ({ ...prev, name: '' }))}
             />
           </div>
           <div className='w-42'>
@@ -221,6 +324,7 @@ const RekeningTable = () => {
               onChange={(e) => {
                 setSearchFields((prev) => ({ ...prev, kode: e.target.value }));
               }}
+              onClear={() => setSearchFields((prev) => ({ ...prev, kode: '' }))}
             />
           </div>
           <div>
@@ -275,6 +379,9 @@ const RekeningTable = () => {
         columns={columns}
         searchFilters={filters}
         renderHeader={tableHead}
+        renderBody={(table) =>
+          tableBody({ table, selectedRekening: searchFields.rekening })
+        }
       />
       {modalState === 'Add' && (
         <DialogModal
