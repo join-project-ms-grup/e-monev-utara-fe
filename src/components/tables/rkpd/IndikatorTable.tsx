@@ -82,8 +82,8 @@ const IndikatorTable = () => {
     enabled: !!selectedSKPD,
   });
   // Modal
-  const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
-  const [openModal, setOpenModal] = useState(false);
+  // const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
+  // const [openModal, setOpenModal] = useState(false);
   // Form Data
   const initialFormData: IndikatorForm = {
     id: 0,
@@ -101,49 +101,49 @@ const IndikatorTable = () => {
   };
   const [formData, setFormData] = useState<IndikatorForm>(initialFormData);
   // Clear form
-  useEffect(() => {
-    if (!openModal) {
-      const timeout = setTimeout(() => {
-        setFormData(initialFormData);
-      }, 200);
-      return () => clearTimeout(timeout);
-    } else {
-      console.log('IndikatorTable.tsx', formData);
-    }
-  }, [openModal]);
+  // useEffect(() => {
+  //   if (!openModal) {
+  //     const timeout = setTimeout(() => {
+  //       setFormData(initialFormData);
+  //     }, 200);
+  //     return () => clearTimeout(timeout);
+  //   } else {
+  //     console.log('IndikatorTable.tsx', formData);
+  //   }
+  // }, [openModal]);
   // #endregion
 
   // #region Mutasi
   const [loadingMutation, setLoadingMutation] = useState(false);
   // Add
-  const addMutation = useMutation({
-    mutationFn: async (payload: IndikatorForm) => {
-      setLoadingMutation(true);
-      return addIndikator({
-        ...payload,
-        skpd_periode_id: Number(payload.skpd_periode_id),
-        master_id: Number(payload.master_id),
-        target: payload.target?.slice(0, 5).map((t) => ({
-          target: Number(t.target),
-          tahun_ke: Number(t.tahun_ke),
-        })),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
-      setFormData(initialFormData);
-      setOpenModal(false);
-      toast.success('Data berhasil ditambahkan');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
-      }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
-  });
+  // const addMutation = useMutation({
+  //   mutationFn: async (payload: IndikatorForm) => {
+  //     setLoadingMutation(true);
+  //     return addIndikator({
+  //       ...payload,
+  //       skpd_periode_id: Number(payload.skpd_periode_id),
+  //       master_id: Number(payload.master_id),
+  //       target: payload.target?.slice(0, 5).map((t) => ({
+  //         target: Number(t.target),
+  //         tahun_ke: Number(t.tahun_ke),
+  //       })),
+  //     });
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
+  //     setFormData(initialFormData);
+  //     setOpenModal(false);
+  //     toast.success('Data berhasil ditambahkan');
+  //   },
+  //   onError: (error: AxiosError<ApiResponse<unknown>>) => {
+  //     if (error.status === 400) {
+  //       toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+  //     }
+  //   },
+  //   onSettled: () => {
+  //     setLoadingMutation(false);
+  //   },
+  // });
   // Update
   const updateMutation = useMutation({
     mutationFn: async ({
@@ -166,7 +166,7 @@ const IndikatorTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
-      setOpenModal(false);
+      // setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
@@ -443,7 +443,7 @@ const IndikatorTable = () => {
           </div>
         </div>
         <div className='flex justify-end items-end gap-2'>
-          {isDev() && (
+          {/* {isDev() && (
             <InputButton
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'
@@ -454,7 +454,7 @@ const IndikatorTable = () => {
             >
               <MdAdd />
             </InputButton>
-          )}
+          )} */}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -468,12 +468,10 @@ const IndikatorTable = () => {
       <Tabel
         data={data || []}
         columns={columns}
-        // subRows={subRows}
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
-        // initialExpanded
       />
-      {modalState === 'Add' && (
+      {/* {modalState === 'Add' && (
         <DialogModal
           title='Tambah data Indikator'
           isOpen={openModal}
@@ -543,7 +541,7 @@ const IndikatorTable = () => {
             </div>
           </FormIndikator>
         </DialogModal>
-      )}
+      )} */}
     </div>
   );
 };

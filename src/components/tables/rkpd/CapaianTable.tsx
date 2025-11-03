@@ -133,7 +133,7 @@ const CapaianTable = () => {
 
   // #region Kolom Tabel
   const rowHeights = useRef<{ [key: string]: number[] }>({});
-  const columns: ColumnDef<CapaianMaster>[] = [
+  const columns: ColumnDef<CapaianMaster & { depth: number }>[] = [
     {
       id: 'kode',
       columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
@@ -343,18 +343,21 @@ const CapaianTable = () => {
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
                         >
-                          <form onSubmit={handleSubmit}>
-                            <InputText
-                              id={`input_capaian_${item.id}_${triwulan}`}
-                              inputMode='numeric'
-                              type='text'
-                              placeholder='0'
-                              value={capaian}
-                              onChange={handleChange}
-                              withButton={!disBtn}
-                              buttonType='submit'
-                            />
-                          </form>
+                          {row.original.depth === 4 && (
+                            <form onSubmit={handleSubmit}>
+                              <InputText
+                                id={`input_capaian_${item.id}_${triwulan}`}
+                                inputMode='numeric'
+                                type='text'
+                                placeholder='0'
+                                value={capaian}
+                                onChange={handleChange}
+                                withButton={!disBtn}
+                                buttonType='submit'
+                              />
+                            </form>
+                          )}
+                          {row.original.depth !== 4 && <span>{capaian}</span>}
                         </td>
                       </tr>
                     );
