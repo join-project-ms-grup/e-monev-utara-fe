@@ -1,52 +1,51 @@
-import { useState } from 'react';
 import Tabel from '../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import AksiButton from '../../inputs/AksiButton';
 import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
-import DialogModal from '../../inputs/DialogModal';
-import FormIdentifikasiDak from '../../forms/IdentifikasiDak/FormIdentifikasiDak';
 
-const columns: ColumnDef<any>[] = [
-  {
-    id: 'no',
-    header: 'No',
-    cell: ({ row }) => `${row.index + 1}`,
-  },
-  {
-    id: 'skpd',
-    accessorKey: 'skpd',
-    header: 'SKPD / Bidang DAK',
-  },
-  {
-    id: 'program',
-    accessorKey: 'program',
-    header: 'Program / Kegiatan / Sub Kegiatan',
-  },
-  {
-    id: 'paketDetail',
-    accessorKey: 'paketDetail',
-    header: 'Paket / Detail (Volume Satuan)',
-  },
-  {
-    id: 'anggaran',
-    accessorKey: 'anggaran',
-    header: 'Anggaran DAK',
-  },
-  {
-    id: 'aksi',
-    header: 'Aksi',
-    cell: () => (
-      <>
-        <AksiButton Icon={MdEdit} />
-      </>
-    ),
-  },
-];
+interface IdentifikasiDakTable {
+  onAdd: () => void;
+}
 
-const IdentifikasiDakTable = () => {
-  const [openModal, setOpenModal] = useState(false);
+const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
+  const columns: ColumnDef<any>[] = [
+    {
+      id: 'no',
+      header: 'No',
+      cell: ({ row }) => `${row.index + 1}`,
+    },
+    {
+      id: 'skpd',
+      accessorKey: 'skpd',
+      header: 'SKPD / Bidang DAK',
+    },
+    {
+      id: 'program',
+      accessorKey: 'program',
+      header: 'Program / Kegiatan / Sub Kegiatan',
+    },
+    {
+      id: 'paketDetail',
+      accessorKey: 'paketDetail',
+      header: 'Paket / Detail (Volume Satuan)',
+    },
+    {
+      id: 'anggaran',
+      accessorKey: 'anggaran',
+      header: 'Anggaran DAK',
+    },
+    {
+      id: 'aksi',
+      header: 'Aksi',
+      cell: () => (
+        <>
+          <AksiButton Icon={MdEdit} />
+        </>
+      ),
+    },
+  ];
 
   return (
     <div className='space-y-2'>
@@ -87,9 +86,7 @@ const IdentifikasiDakTable = () => {
           <InputButton
             tooltip='Tambah data'
             className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              setOpenModal(true);
-            }}
+            onClick={onAdd}
           >
             <MdAdd />
           </InputButton>
@@ -105,17 +102,6 @@ const IdentifikasiDakTable = () => {
         </div>
       </div>
       <Tabel data={[]} columns={columns} />
-      <DialogModal
-        title='Tambah data Identifikasi DAK Kabupaten / Kota'
-        widthLevel={10}
-        isOpen={openModal}
-        onClose={() => {
-          // setFormData(initialFormData);
-          setOpenModal(false);
-        }}
-      >
-        <FormIdentifikasiDak />
-      </DialogModal>
     </div>
   );
 };

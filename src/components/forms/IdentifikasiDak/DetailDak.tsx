@@ -1,11 +1,13 @@
 import InputFile from '../../inputs/InputFile';
 import InputText from '../../inputs/InputText';
+import InputTextArea from '../../inputs/InputTextArea';
 
 const DetailDak = () => {
   return (
-    <div className='mt-4'>
-      <div className='flex items-center justify-center mb-4'>
-        <h5>Detail DAK</h5>
+    <div>
+      <div className='flex items-center mb-4'>
+        <h5 className='whitespace-nowrap mr-3'>Detail DAK</h5>
+        <div className='flex-grow h-px bg-[var(--color-3)]'></div>
       </div>
 
       <div className='space-y-2'>
@@ -15,33 +17,35 @@ const DetailDak = () => {
         </div>
 
         <div>
-          <label htmlFor='detail'>Detail Paket</label>
-          <InputText id='detail' placeholder='Detail Paket...' />
+          <div>
+            <label htmlFor='detail'>Detail Paket</label>
+            <InputTextArea id='detail' placeholder='Detail Paket...' />
+          </div>
         </div>
+        <div className='grid grid-cols-5 gap-2'>
+          <div>
+            <label htmlFor='volume'>Volume</label>
+            <InputText id='volume' placeholder='Volume...' />
+          </div>
 
-        <div>
-          <label htmlFor='volume'>Volume</label>
-          <InputText id='volume' placeholder='Volume...' />
-        </div>
+          <div>
+            <label htmlFor='satuan'>Satuan</label>
+            <InputText id='satuan' placeholder='Satuan...' />
+          </div>
 
-        <div>
-          <label htmlFor='satuan'>Satuan</label>
-          <InputText id='satuan' placeholder='Satuan...' />
-        </div>
+          <div>
+            <label htmlFor='waktu'>Estimasi Waktu</label>
+            <InputText id='waktu' placeholder='Estimasi Waktu...' />
+          </div>
 
-        <div>
-          <label htmlFor='waktu'>Estimasi Waktu</label>
-          <InputText id='waktu' placeholder='Estimasi Waktu...' />
-        </div>
-
-        <div>
-          <label htmlFor='penerima'>Jumlah Penerima Manfaat</label>
-          <InputText id='penerima' placeholder='Estimasi Waktu...' />
-        </div>
-
-        <div>
-          <label htmlFor='anggaran_utama'>Anggaran DAK</label>
-          <InputText id='anggaran_utama' placeholder='Anggaran DAK...' />
+          <div>
+            <label htmlFor='penerima'>Jumlah Penerima Manfaat</label>
+            <InputText id='penerima' placeholder='Estimasi Waktu...' />
+          </div>
+          <div>
+            <label htmlFor='anggaran_utama'>Anggaran DAK</label>
+            <InputText id='anggaran_utama' placeholder='Anggaran DAK...' />
+          </div>
         </div>
 
         <div>
@@ -94,27 +98,9 @@ const DetailDak = () => {
           <label htmlFor='img_mod'>Foto Kegiatan</label>
           <InputFile
             id='img_mod'
-            Iconlabel='Upload Gambar'
             accept='image/*'
-            withButton
             onChange={(e) => console.log(e.target.files?.[0])}
           />
-          {/* <div>
-          <img
-            id='img_mod'
-            src='https://monev-dak.bengkuluutarakab.go.id/template/assets/pict/no-image1.png'
-            alt='Preview'
-            width='200'
-            height='116'
-          />
-          <div>
-            <input type='file' name='file_gambar' accept='image/*' required />
-          </div>
-          <p>
-            Maksimal ukuran file <b>10 MB</b> – Format yang diizinkan:{' '}
-            <b>jpg, jpeg, png, bmp, gif</b>
-          </p>
-        </div> */}
         </div>
       </div>
     </div>

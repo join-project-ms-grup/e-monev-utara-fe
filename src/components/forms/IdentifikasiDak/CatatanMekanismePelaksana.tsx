@@ -1,89 +1,53 @@
-import React from 'react';
+import InputTextArea from '../../inputs/InputTextArea';
+import InputSearchBox from '../../inputs/InputSearchBox';
+import InputText from '../../inputs/InputText';
 
 const CatatanMekanismePelaksana = () => {
   return (
     <div>
-      <div>
-        <h3>Catatan</h3>
+      <div className='flex items-center mb-4'>
+        <h5 className='whitespace-nowrap mr-3'>
+          Catatan & Mekanisme Pelaksanaan
+        </h5>
+        <div className='flex-grow h-px bg-[var(--color-3)]'></div>
+      </div>
+
+      <div className='space-y-2'>
         <div>
           <label htmlFor='catatan'>Catatan</label>
-          <textarea
-            id='catatan'
-            name='catatan'
-            placeholder='Catatan...'
-            maxLength={1000}
-          ></textarea>
+          <InputTextArea id='catatan' placeholder='Catatan...' />
         </div>
-      </div>
-      <div>
         <div>
-          <div>Mekanisme Pelaksana</div>
-          <div>
-            <a href='#'>
-              <i></i>
-            </a>
-          </div>
+          <label htmlFor='imekanisme'>Mekanisme</label>
+          <InputSearchBox
+            id='imekanisme'
+            placeholder='Pilih Mekanisme'
+            options={[
+              { label: 'Kontrak', value: 'kontrak' },
+              { label: 'Swakelola', value: 'swakelola' },
+              { label: 'eKatalog', value: 'ekatalog' },
+            ]}
+          />
         </div>
-
         <div>
-          <div>
-            <label htmlFor='imekanisme'>Mekanisme</label>
-            <div>
-              <select id='imekanisme' name='imekanisme' required>
-                <option value=''>-- Pilih Mekanisme --</option>
-                <option value='Kontrak'>Kontrak</option>
-                <option value='Swakelola'>Swakelola</option>
-                <option value='eKatalog'>eKatalog</option>
-              </select>
-              <span>Mekanisme belum dipilih!</span>
-            </div>
-          </div>
-
-          <div id='meka-group'>
-            <div>
-              <label htmlFor='imekanisme_vol'>Volume</label>
-              <div>
-                <input
-                  name='imekanisme_vol'
-                  type='text'
-                  id='imekanisme_vol'
-                  placeholder='Volume...'
-                  maxLength={19}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor='imekanisme_rp'>Uang</label>
-              <div>
-                <div>
-                  <span>Rp.</span>
-                  <input
-                    name='imekanisme_rp'
-                    type='text'
-                    id='imekanisme_rp'
-                    placeholder='Uang...'
-                    value='0'
-                    maxLength={19}
-                  />
-                  <span>,-</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor='imetode_pembayaran'>Metode Pembayaran</label>
-            <div>
-              <input
-                name='imetode_pembayaran'
-                type='text'
-                id='imetode_pembayaran'
-                placeholder='Metode Pembayaran...'
-                maxLength={100}
-              />
-            </div>
-          </div>
+          <label htmlFor='imekanisme_vol'>Volume</label>
+          <InputText id='imekanisme_vol' placeholder='Volume...' />
+        </div>
+        <div>
+          <label htmlFor='imekanisme_rp'>Uang</label>
+          <InputText
+            id='imekanisme_rp'
+            inputMode='numeric'
+            isMoney
+            placeholder='Uang...'
+          />
+        </div>
+        <div>
+          <label htmlFor='imetode_pembayaran'>Metode Pembayaran</label>
+          <InputText
+            id='imetode_pembayaran'
+            placeholder='Metode pembayaran...'
+          />
         </div>
       </div>
     </div>

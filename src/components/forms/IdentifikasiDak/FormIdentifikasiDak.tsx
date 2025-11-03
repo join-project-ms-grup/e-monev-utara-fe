@@ -1,63 +1,48 @@
-import React, { useState } from 'react';
+import { type FormEvent } from 'react';
 import JenisBidangProgramKegiatanDAK from './JenisBidangProgramKegiatanDAK';
 import DetailDak from './DetailDak';
 import CatatanMekanismePelaksana from './CatatanMekanismePelaksana';
 import ChecklistDokumenKegiatan from './ChecklistDokumenKegiatan';
+import AksiButton from '../../inputs/AksiButton';
+import { MdArrowBack } from 'react-icons/md';
+import InputButton from '../../inputs/InputButton';
+import toast from 'react-hot-toast';
 
-const htmlFormIdentifikasiDak = () => {
-  const [activeTab, setActiveTab] = useState(1);
+interface htmlFormIdentifikasiDak {
+  onBack: () => void;
+}
+
+const htmlFormIdentifikasiDak = ({ onBack }: htmlFormIdentifikasiDak) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast.error('Error')
+  };
 
   return (
-    <div className='w-full max-w-6xl mx-auto'>
-      <div className='flex'>
-        <button
-          onClick={() => setActiveTab(1)}
-          className={`px-4 py-2 font-medium ${
-            activeTab === 1
-              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
-              : 'hover:text-[var(--color-2)]'
-          }`}
-        >
-          Jenis, Bidang, Program & Kegiatan DAK
-        </button>
-        <button
-          onClick={() => setActiveTab(2)}
-          className={`px-4 py-2 font-medium ${
-            activeTab === 2
-              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
-              : 'hover:text-[var(--color-2)]'
-          }`}
-        >
-          Detail DAK
-        </button>
-        <button
-          onClick={() => setActiveTab(3)}
-          className={`px-4 py-2 font-medium ${
-            activeTab === 3
-              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
-              : 'hover:text-[var(--color-2)]'
-          }`}
-        >
-          Catatan & Mekanisme Pelaksana
-        </button>
-        <button
-          onClick={() => setActiveTab(4)}
-          className={`px-4 py-2 font-medium ${
-            activeTab === 4
-              ? 'border-b-2 border-[var(--color-2)] text-[var(--color-2)]'
-              : 'hover:text-[var(--color-2)]'
-          }`}
-        >
-          Checklist Dokumen dan Kegiatan Pelaksanaan
-        </button>
+    <div className='w-full mx-auto'>
+      <div className='inline-flex items-center gap-2'>
+        <AksiButton
+          Icon={MdArrowBack}
+          className='hover:bg-[var(--color-2)]!'
+          onClick={onBack}
+          tooltip='Kembali'
+        />
+        <span className='font-bold'>Tambah Data Identifikasi DAK Kabupaten / Kota</span>
       </div>
-
-      <div className='mt-2'>
-        {activeTab === 1 && <JenisBidangProgramKegiatanDAK />}
-        {activeTab === 2 && <DetailDak />}
-        {activeTab === 3 && <CatatanMekanismePelaksana />}
-        {activeTab === 4 && <ChecklistDokumenKegiatan />}
-      </div>
+      <br />
+      <br />
+      <form onSubmit={handleSubmit} className='space-y-2'>
+        <div className='space-y-8'>
+          <JenisBidangProgramKegiatanDAK />
+          <DetailDak />
+          <CatatanMekanismePelaksana />
+          <ChecklistDokumenKegiatan />
+        </div>
+        <InputButton className='float-end px-2'>Simpan</InputButton>
+        {/* <button className='bg-red-300 px-2 py-1 rounded float-end'>
+          Submit
+        </button> */}
+      </form>
     </div>
   );
 };

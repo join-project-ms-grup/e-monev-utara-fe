@@ -1,17 +1,19 @@
-import React from 'react';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import InputText from '../../inputs/InputText';
 
 const JenisBidangProgramKegiatanDAK = () => {
   return (
-    <div className='mt-4'>
-      <div className='flex items-center justify-center mb-4'>
-        <h5>Jenis, Bidang, Program & Kegiatan DAK</h5>
+    <div>
+      <div className='flex items-center mb-4'>
+        <h5 className='whitespace-nowrap mr-3'>
+          Jenis, Bidang, Program & Kegiatan DAK
+        </h5>
+        <div className='flex-grow h-px bg-[var(--color-3)]'></div>
       </div>
 
       <input type='hidden' name='idak_jenis' value='1' />
       <div className='space-y-2'>
-        <div className='grid grid-cols-3 gap-2'>
+        <div className='grid lg:grid-cols-3 gap-2'>
           <div>
             <label htmlFor='subJenisDak'>Sub-Jenis DAK</label>
             <InputSearchBox
@@ -44,7 +46,7 @@ const JenisBidangProgramKegiatanDAK = () => {
           </div>
         </div>
         {/*  */}
-        <div className='grid grid-cols-[1fr_2fr] gap-2'>
+        <div className='grid lg:grid-cols-[1fr_2fr_2fr] gap-2'>
           <div>
             <label htmlFor='tahun'>Tahun</label>
             <InputSearchBox
@@ -55,18 +57,6 @@ const JenisBidangProgramKegiatanDAK = () => {
               placeholder='Pilih Tahun'
             />
           </div>
-          <div>
-            <label htmlFor='idaerah'>Kabupaten / Kota</label>
-            <InputSearchBox
-              id='idaerah'
-              className='h-9'
-              btnclassName='bg-white'
-              options={[]}
-              placeholder='Pilih Kabupaten / Kota'
-            />
-          </div>
-        </div>
-        <div className='grid grid-cols-2 gap-2'>
           <div>
             <label htmlFor='iskpd'>OPD</label>
             <InputSearchBox
