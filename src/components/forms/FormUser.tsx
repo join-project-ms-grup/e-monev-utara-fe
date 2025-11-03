@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import InputButton from '../inputs/InputButton';
 import type { UserForm } from '../../services/UserService';
 import { useForm } from '@tanstack/react-form';
-import { userSchema, userSchemaSubmit } from './schemas/SchemaUser';
+import { mapErrors, mapToInput, userSchema, userSchemaSubmit } from './schemas/SchemaUser';
 import InputText from '../inputs/InputText';
 import ErrorField from './ErrorField';
 import { getRoleAdmin, getRoleDev } from '../../services/RoleService';
@@ -35,6 +35,15 @@ export const FormUser: React.FC<FormProps> = ({
   onSubmit,
 }) => {
   // Form
+  //#region Form
+  const validateWith = (schema: any, value: any) => {
+    const input = mapToInput(value);
+    const result = schema.safeParse(input);
+    return result.success
+      ? { fields: {} }
+      : { fields: mapErrors(result.error.format()) };
+  };
+
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -49,66 +58,11 @@ export const FormUser: React.FC<FormProps> = ({
       }
     },
     validators: {
-      onChange: ({ value }) => {
-        const input = {
-          name: value.name?.toString() ?? '',
-          fullname: value.fullname?.toString() ?? '',
-          email: value.email?.toString() ?? '',
-          role_id: value.role_id?.toString() ?? '',
-          skpd_id: value.skpd_id?.toString() ?? '',
-          password: value.password?.toString() ?? '',
-          passwordConfirm: value.passwordConfirm?.toString() ?? '',
-        };
-
-        const result = userSchema.safeParse(input);
-
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              name: errors.name?._errors[0],
-              fullname: errors.fullname?._errors[0],
-              email: errors.email?._errors[0],
-              role_id: errors.role_id?._errors[0],
-              skpd_id: errors.skpd_id?._errors[0],
-              password: errors.password?._errors[0],
-              passwordConfirm: errors.passwordConfirm?._errors[0],
-            },
-          };
-        }
-      },
-      onSubmit: ({ value }) => {
-        const input = {
-          name: value.name?.toString() ?? '',
-          fullname: value.fullname?.toString() ?? '',
-          email: value.email?.toString() ?? '',
-          role_id: value.role_id?.toString() ?? '',
-          skpd_id: value.skpd_id?.toString() ?? '',
-          password: value.password?.toString() ?? '',
-          passwordConfirm: value.passwordConfirm?.toString() ?? '',
-        };
-        const result = userSchemaSubmit.safeParse(input);
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              name: errors.name?._errors[0],
-              fullname: errors.fullname?._errors[0],
-              email: errors.email?._errors[0],
-              role_id: errors.role_id?._errors[0],
-              skpd_id: errors.skpd_id?._errors[0],
-              password: errors.password?._errors[0],
-              passwordConfirm: errors.passwordConfirm?._errors[0],
-            },
-          };
-        }
-      },
+      onChange: ({ value }) => validateWith(userSchema, value),
+      onSubmit: ({ value }) => validateWith(userSchemaSubmit, value),
     },
   });
+  //#endregion
 
   const { data: roleData, isFetching } = useQuery({
     queryKey: ['formuser_rolelist'],

@@ -1,4 +1,5 @@
 import api, { type ApiResponse } from "../lib/api";
+import { isAdmin } from "../lib/usercookie";
 import type { RoleType } from "./RoleService";
 
 export interface UserType {
@@ -26,8 +27,15 @@ export type UserForm = Pick<UserType, 'id' | 'name' | 'fullname' | 'email' | 'ro
  */
 export const getUsers = async (): Promise<UserType[]> => {
   const response = await api.get<ApiResponse<UserType[]>>("/user/list");
-  return response.data.data;
+  const users = response.data.data;
+
+  if (isAdmin()) {
+    return users.filter(user => user.role_id !== 1);
+  }
+
+  return users;
 };
+
 
 /**
  * Menambahkan data user

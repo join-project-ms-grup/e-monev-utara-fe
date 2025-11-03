@@ -20,7 +20,7 @@ import type { ApiResponse } from '../../lib/api';
 import { FormUser } from '../forms/FormUser';
 import InputToggle from '../inputs/InputToggle';
 import Tabel from './Tabel';
-import { isDev } from '../../lib/usercookie';
+import { getRoleId, isAdmin, isDev } from '../../lib/usercookie';
 
 const UserTable = () => {
   const queryClient = useQueryClient();
@@ -58,7 +58,7 @@ const UserTable = () => {
   // Data fetching
   const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_user'],
+    queryKey: ['tabel_user', getRoleId()],
     queryFn: getUsers,
   });
 
@@ -235,18 +235,19 @@ const UserTable = () => {
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-end'>
-          {isDev() && (
-            <InputButton
-              tooltip='Tambah data'
-              className='btn btn-theme w-9 h-9'
-              onClick={() => {
-                setModalState('Add');
-                setOpenModal(true);
-              }}
-            >
-              <MdAdd />
-            </InputButton>
-          )}
+          {isDev() ||
+            (isAdmin() && (
+              <InputButton
+                tooltip='Tambah data'
+                className='btn btn-theme w-9 h-9'
+                onClick={() => {
+                  setModalState('Add');
+                  setOpenModal(true);
+                }}
+              >
+                <MdAdd />
+              </InputButton>
+            ))}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'

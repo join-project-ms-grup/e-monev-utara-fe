@@ -47,6 +47,13 @@ export function isDev(): boolean {
   return roleId === 1;
 }
 /**
+ * Cek apakah user admin
+ */
+export function isAdmin(): boolean {
+  const roleId = getRoleId();
+  return roleId === 2;
+}
+/**
  * Logic untuk pemilihan periode developer
  */
 export function skipPeriode(): boolean {
