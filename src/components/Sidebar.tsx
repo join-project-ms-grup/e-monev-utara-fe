@@ -110,9 +110,9 @@ const menuRKPD: MenuItem[] = [
     label: 'Hasil Evaluasi',
     icon: <MdAssignment />,
     submenu: [
-      { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
-      { label: 'Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
       { label: 'RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
+      { label: 'Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
+      { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
       { label: 'Renja', to: '/rkpd/hasil_evaluasi/Renja' },
     ],
     akses: 3,

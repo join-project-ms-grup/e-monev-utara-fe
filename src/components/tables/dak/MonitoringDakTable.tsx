@@ -5,12 +5,15 @@ import AksiButton from '../../inputs/AksiButton';
 import {
   MdAssignmentTurnedIn,
   MdContentPasteSearch,
-  MdEdit,
   MdRefresh,
   MdSave,
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
+import {
+  getPeriodeMulaiFromCookie,
+  getPeriodeAkhirFromCookie,
+} from '../../../lib/usercookie';
 
 type DataRowKeys =
   | 'name'
@@ -190,9 +193,21 @@ const columns: ColumnDef<DataRow>[] = [
     cell: () => (
       //   <button className='px-2 py-1 bg-blue-500 text-white rounded'>Edit</button>
       <div className='flex justify-center'>
-        <AksiButton hoverColor='bg-red-400' tooltip='Identifikasi Masalah' Icon={MdContentPasteSearch} />
-        <AksiButton hoverColor='bg-green-400' tooltip='Simpan Data' Icon={MdSave} />
-        <AksiButton hoverColor='bg-amber-400' tooltip='Data Ditindak' Icon={MdAssignmentTurnedIn} />
+        <AksiButton
+          hoverColor='bg-red-400'
+          tooltip='Identifikasi Masalah'
+          Icon={MdContentPasteSearch}
+        />
+        <AksiButton
+          hoverColor='bg-green-400'
+          tooltip='Simpan Data'
+          Icon={MdSave}
+        />
+        <AksiButton
+          hoverColor='bg-amber-400'
+          tooltip='Data Ditindak'
+          Icon={MdAssignmentTurnedIn}
+        />
       </div>
     ),
   },
@@ -238,52 +253,43 @@ const tableHead = () => {
 };
 
 const IdentifikasiDakTable = () => {
-  const valTable = {
-    tahun: '2025',
-    tempat: 'Tempat 1',
-    opd: 'OPD 1',
-    subJenis: 'Sub-Jenis DAK 1',
-    triwulan: 'IV',
-  };
-  const [formTable, setFormTable] = useState(valTable);
+  // const valTable = {
+  //   tahun: '2025',
+  //   tempat: 'Tempat 1',
+  //   opd: 'OPD 1',
+  //   subJenis: 'Sub-Jenis DAK 1',
+  //   triwulan: 'IV',
+  // };
+  // const [formTable, setFormTable] = useState(valTable);
+
+  //#region List data periode
+  const [tahunKe, setTahunKe] = useState('');
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+  //#endregion
 
   return (
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
           <div>
-            <label htmlFor='tahun'>Tahun</label>
+            <label htmlFor='tahun_ke'>Tahun</label>
             <InputSearchBox
-              id='tahun'
-              className='w-24 h-9'
+              id='tahun_ke'
+              className='w-42 h-9'
               btnclassName='bg-white'
-              value={formTable.tahun}
-              onChange={(val) =>
-                setFormTable((prev) => ({ ...prev, tahun: val }))
-              }
-              options={[
-                { label: '2026', value: '2026' },
-                { label: '2025', value: '2025' },
-                { label: '2024', value: '2024' },
-                { label: '2023', value: '2023' },
-                { label: '2022', value: '2022' },
-              ]}
-            />
-          </div>
-          <div>
-            <label htmlFor='tempat'>Kabupaten / Kota</label>
-            <InputSearchBox
-              id='tempat'
-              className='w-44 h-9'
-              btnclassName='bg-white'
-              value={formTable.tempat}
-              onChange={(e) => setFormTable((prev) => ({ ...prev, tempat: e }))}
-              options={[
-                { label: 'Tempat 1', value: 'Tempat 1' },
-                { label: 'Tempat 2', value: 'Tempat 2' },
-                { label: 'Tempat 3', value: 'Tempat 3' },
-                { label: 'Tempat 4', value: 'Tempat 4' },
-              ]}
+              placeholder='Pilih Tahun ke...'
+              value={tahunKe}
+              options={listTahunKe}
+              onChange={(val) => setTahunKe(val)}
+              onClear={() => setTahunKe('')}
             />
           </div>
           <div>
@@ -292,14 +298,8 @@ const IdentifikasiDakTable = () => {
               id='opd'
               className='w-44 h-9'
               btnclassName='bg-white'
-              value={formTable.opd}
-              onChange={(e) => setFormTable((prev) => ({ ...prev, opd: e }))}
-              options={[
-                { label: 'OPD 1', value: 'OPD 1' },
-                { label: 'OPD 2', value: 'OPD 2' },
-                { label: 'OPD 3', value: 'OPD 3' },
-                { label: 'OPD 4', value: 'OPD 4' },
-              ]}
+              placeholder='Pilih OPD'
+              options={[]}
             />
           </div>
           <div>
@@ -308,16 +308,8 @@ const IdentifikasiDakTable = () => {
               id='subJenis'
               className='w-44 h-9'
               btnclassName='bg-white'
-              value={formTable.subJenis}
-              onChange={(e) =>
-                setFormTable((prev) => ({ ...prev, subJenis: e }))
-              }
-              options={[
-                { label: 'Sub-Jenis DAK 1', value: 'Sub-Jenis DAK 1' },
-                { label: 'Sub-Jenis DAK 2', value: 'Sub-Jenis DAK 2' },
-                { label: 'Sub-Jenis DAK 3', value: 'Sub-Jenis DAK 3' },
-                { label: 'Sub-Jenis DAK 4', value: 'Sub-Jenis DAK 4' },
-              ]}
+              placeholder='Pilih Sub-Jenis DAK'
+              options={[]}
             />
           </div>
           <div>
@@ -326,10 +318,7 @@ const IdentifikasiDakTable = () => {
               id='triwulan'
               className='w-44 h-9'
               btnclassName='bg-white'
-              value={formTable.triwulan}
-              onChange={(e) =>
-                setFormTable((prev) => ({ ...prev, triwulan: e }))
-              }
+              placeholder='Pilih Triwulan'
               options={[
                 { label: 'I', value: 'I' },
                 { label: 'II', value: 'II' },
@@ -352,8 +341,8 @@ const IdentifikasiDakTable = () => {
         </div>
       </div>
       <Tabel
-        tblClassName='md:min-w-[2800px]'
-        data={data}
+        // tblClassName='md:min-w-[2800px]'
+        data={[]}
         columns={columns}
         renderHeader={tableHead}
       />
