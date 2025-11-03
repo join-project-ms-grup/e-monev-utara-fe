@@ -1,142 +1,127 @@
-import { fakeRKPDDashboardData } from '../../dummy/datafaker';
 import Tabel from './Tabel';
-import { createColumnHelper } from '@tanstack/react-table';
-import RowExpand from './RowExpand';
-import RowExpandValue from './RowExpandValue';
+import { type ColumnDef } from '@tanstack/react-table';
 import toast from 'react-hot-toast';
 import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../inputs/InputButton';
 import { exportRankingRKPD } from '../../services/ExcelService';
 import InputSearchBox from '../inputs/InputSearchBox';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import {
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+  getPeriodeAkhirFromCookie,
+} from '../../lib/usercookie';
+import { getSKPDPeriode } from '../../services/PeriodeService';
+import { getSKPD } from '../../services/SKPDService';
 
-const dummy = fakeRKPDDashboardData;
+const tableHead = () => {
+  return (
+    <>
+      <tr>
+        <th rowSpan={2}>Ranking</th>
+        <th rowSpan={2}>Perangkat Daerah</th>
+        <th colSpan={2}>Rata - Rata Capaian Kinerja</th>
+        <th colSpan={2}>Rata - Rata Capaian Anggaran</th>
+        <th rowSpan={2}>Realisasi Anggaran</th>
+      </tr>
+      <tr>
+        <th>(%)</th>
+        <th>Predikat</th>
+        <th>(%)</th>
+        <th>Predikat</th>
+      </tr>
+    </>
+  );
+};
 
 const DashRKPDTable = () => {
-  const columnHelper = createColumnHelper<any>();
-  const columns = [
-    columnHelper.group({
-      header: ' ',
-      meta: { rowSpan: 2, thClassNames: 'w-[5%]' },
-      columns: [
-        columnHelper.display({
-          header: ' ',
-          meta: {
-            hidden: true,
-            tdClassNames: 'flex items-center justify-center',
-          },
-          cell: (ctx) => <RowExpand {...ctx} />,
-        }),
-      ],
+  //#region SKPD dan Tahun ke
+  const [tahunKe, setTahunKe] = useState('');
+  const { data: dataSKPD } = useQuery({
+    queryKey: ['list_skpd'],
+    queryFn: async () => getSKPD(),
+  });
+  //#endregion
+  //#region List data periode
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
     }),
-    columnHelper.group({
-      id: 'ranking',
+  );
+  //#endregion
+  const [triwulan, setTriwulan] = useState('');
+
+  const columns: ColumnDef<any>[] = [
+    {
       header: 'Ranking',
-      meta: { rowSpan: 2, thClassNames: 'w-[5%]' },
-      columns: [
-        columnHelper.accessor('ranking', {
-          id: 'ranking',
-          header: 'Ranking',
-          meta: { hidden: true, tdClassNames: 'text-center' },
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'perangkat',
+    },
+    {
       header: 'Perangkat Daerah',
-      meta: { rowSpan: 2 },
-      columns: [
-        columnHelper.accessor('perangkat', {
-          id: 'perangkat',
-          header: 'Perangkat Daerah',
-          meta: { hidden: true },
-          cell: (ctx) => <RowExpandValue {...ctx} />,
-        }),
-      ],
-    }),
-    columnHelper.group({
-      id: 'capaiankinerja',
+      accessorKey: 'name',
+    },
+    {
       header: 'Rata - Rata Capaian Kinerja',
       columns: [
-        columnHelper.accessor('persentaseKinerja', {
-          id: 'persentaseKinerja',
+        {
+          id: 'rCKPersen',
           header: '(%)',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
-        }),
-        columnHelper.accessor('predikatKinerja', {
-          id: 'predikatKinerja',
+        },
+        {
+          id: 'rCKPredikat',
           header: 'Predikat',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
-        }),
+        },
       ],
-    }),
-    columnHelper.group({
-      id: 'capaiananggaran',
+    },
+    {
       header: 'Rata - Rata Capaian Anggaran',
       columns: [
-        columnHelper.accessor('persentaseAnggaran', {
-          id: 'persentaseAnggaran',
+        {
+          id: 'rCAPersen',
           header: '(%)',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
-        }),
-        columnHelper.accessor('predikatAnggaran', {
-          id: 'predikatAnggaran',
+        },
+        {
+          id: 'rCAPredikat',
           header: 'Predikat',
-          meta: { tdClassNames: 'text-center', thClassNames: 'w-[10%]' },
-        }),
+        },
       ],
-    }),
-    columnHelper.group({
-      id: 'anggaran',
+    },
+    {
       header: 'Realisasi Anggaran',
-      meta: { rowSpan: 2, thClassNames: 'w-[15%]' },
-      columns: [
-        columnHelper.accessor('anggaran', {
-          id: 'anggaran',
-          header: 'Realisasi Anggaran',
-          cell: ({ getValue }) => {
-            const formatter = new Intl.NumberFormat('id-ID');
-            return `Rp. ${formatter.format(getValue())}`;
-          },
-          meta: { hidden: true },
-        }),
-      ],
-    }),
+    },
   ];
-
-  const subRows = (row: any) =>
-    row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
-
-  const [tahun, setTahun] = useState('2025');
-  const [triwulan, setTriwulan] = useState('III');
 
   return (
     <>
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
           <div>
-            <label htmlFor='tahun'>Tahun</label>
+            <label htmlFor='tahun_ke'>Tahun</label>
             <InputSearchBox
-              id='tahun'
-              className='w-24 h-9'
+              id='tahun_ke'
+              className='w-42 h-9'
               btnclassName='bg-white'
-              value={tahun}
-              onChange={(e) => setTahun(e)}
-              options={[
-                { label: '2026', value: '2026' },
-                { label: '2025', value: '2025' },
-                { label: '2024', value: '2024' },
-                { label: '2023', value: '2023' },
-                { label: '2022', value: '2022' },
-              ]}
+              placeholder='Pilih Tahun...'
+              value={tahunKe}
+              options={listTahunKe}
+              onChange={(val) => setTahunKe(val)}
+              onClear={() => {
+                setTahunKe('');
+                setTriwulan('');
+              }}
             />
           </div>
           <div>
             <label htmlFor='triwulan'>s.d Triwulan</label>
             <InputSearchBox
               id='triwulan'
-              className='w-24 h-9'
+              className='w-42 h-9'
               btnclassName='bg-white'
+              placeholder='Pilih Triwulan...'
               value={triwulan}
               onChange={(e) => setTriwulan(e)}
               options={[
@@ -145,6 +130,8 @@ const DashRKPDTable = () => {
                 { label: 'III', value: 'III' },
                 { label: 'IV', value: 'IV' },
               ]}
+              onClear={() => setTriwulan('')}
+              disabled={!tahunKe}
             />
           </div>
         </div>
@@ -154,7 +141,7 @@ const DashRKPDTable = () => {
             className='btn btn-theme w-9 h-9'
             onClick={() => {
               toast.success('Printing...');
-              exportRankingRKPD([], '2025');
+              exportRankingRKPD([], tahunMulai.toString());
             }}
           >
             <MdPrint />
@@ -171,11 +158,9 @@ const DashRKPDTable = () => {
         </div>
       </div>
       <Tabel
-        subRows={subRows}
-        subLabels={['Program', 'Kegiatan', 'Sub Kegiatan']}
-        subLabelPosition={6}
-        data={dummy}
+        data={dataSKPD || []}
         columns={columns}
+        renderHeader={tableHead}
       />
       <div>
         <span>Keterangan Predikat:</span>

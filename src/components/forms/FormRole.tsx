@@ -5,6 +5,7 @@ import { useForm } from '@tanstack/react-form';
 import { roleSchema, roleSchemaSubmit } from './schemas/SchemaRole';
 import InputText from '../inputs/InputText';
 import ErrorField from './ErrorField';
+import InputSearchBox from '../inputs/InputSearchBox';
 
 interface BaseFormProps {
   children?: React.ReactElement;
@@ -110,6 +111,7 @@ const FormRole: React.FC<FormProps> = ({
                   value={field.state.value!}
                   onChange={(e) => field.handleChange(e.target.value)}
                   invalid={!field.state.meta.isValid}
+                  readOnly
                 />
                 <ErrorField field={field} />
               </div>
@@ -120,15 +122,31 @@ const FormRole: React.FC<FormProps> = ({
             {(field) => (
               <div className='flex-1'>
                 <label htmlFor='name'>Role</label>
-                <InputText
-                  // Icon={MdCalendarMonth}
+                <InputSearchBox
+                  id='name'
+                  placeholder='Pilih Role'
+                  className='h-9'
+                  options={[
+                    { label: 'Developer', value: '1' },
+                    { label: 'Administrator', value: '2' },
+                    { label: 'RKPD', value: '3' },
+                    { label: 'DAK', value: '4' },
+                  ]}
+                  value={field.state.value}
+                  onChange={(val) => {
+                    form.setFieldValue('kode', val)
+                    field.handleChange(val)}
+                  }
+                  invalid={!field.state.meta.isValid}
+                />
+                {/* <InputText
                   type='text'
                   placeholder='Nama role...'
                   id='name'
                   value={field.state.value!}
                   onChange={(e) => field.handleChange(e.target.value)}
                   invalid={!field.state.meta.isValid}
-                />
+                /> */}
                 <ErrorField field={field} />
               </div>
             )}

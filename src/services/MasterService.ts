@@ -2,6 +2,7 @@ import api, { type ApiResponse } from "../lib/api";
 
 export interface Master {
   id?: number;
+  kodeFull?: (string | number)[];
   kode?: string | number;
   name?: string;
   rekening?: string;
@@ -47,7 +48,7 @@ export const getRekening = async (): Promise<MasterUrusan[]> => {
           parent: prog.id,
           ...keg,
           subKegiatan: keg.subKegiatan?.map((subkeg) => ({
-            rekening: 'sub kegiatan',
+            rekening: 'subKegiatan',
             parent: keg.id,
             ...subkeg,
           })),
@@ -55,74 +56,107 @@ export const getRekening = async (): Promise<MasterUrusan[]> => {
       })),
     })),
   }));
-  console.log('GETREKENING', cleanData)
   return cleanData;
 };
 
-export const getRekeningFlat = async (): Promise<Master[]> => {
-  const response = await api.get<ApiResponse<MasterUrusan[]>>("/master/list/all");
-  const rawData = response.data.data;
+type ChildKey = 'bidang' | 'program' | 'kegiatan' | 'subKegiatan';
+export const getRekeningFlat = async (
+): Promise<(Master & { depth: number; })[]> => {
+  const treeData = await getRekening();
+  const flatData: (Master & { depth: number; })[] = [];
 
-  const flatData: Master[] = [];
+  const childKeys: ChildKey[] = ['bidang', 'program', 'kegiatan', 'subKegiatan'];
 
-  rawData.forEach((urusan) => {
-    flatData.push({
-      rekening: "urusan",
-      id: urusan.id,
-      kode: urusan.kode,
-      name: urusan.name,
-      parent: '',
-      type: urusan.type,
+  function flattenNode(
+    node: Master,
+    parentKodeFull: (string | number)[] = [],
+    depth = 0
+  ): void {
+    const kodeFull = [...parentKodeFull, node.kode ?? ''];
+    const flatNode = {
+      ...node,
+      depth,
+      kodeFull,
+    };
+    childKeys.forEach((key) => delete (flatNode as any)[key]);
+    flatData.push(flatNode);
+    childKeys.forEach((key) => {
+      const children = (node as any)[key];
+      if (Array.isArray(children)) {
+        children.forEach((child: Master) =>
+          flattenNode(child, kodeFull, depth + 1)
+        );
+      }
     });
-
-    urusan.bidang?.forEach((bid) => {
-      flatData.push({
-        rekening: "bidang",
-        id: bid.id,
-        kode: bid.kode,
-        name: bid.name,
-        parent: urusan.id,
-        type: bid.type,
-      });
-
-      bid.program?.forEach((prog) => {
-        flatData.push({
-          rekening: "program",
-          id: prog.id,
-          kode: prog.kode,
-          name: prog.name,
-          parent: bid.id,
-          type: prog.type,
-        });
-
-        prog.kegiatan?.forEach((keg) => {
-          flatData.push({
-            rekening: "kegiatan",
-            id: keg.id,
-            kode: keg.kode,
-            name: keg.name,
-            parent: prog.id,
-            type: keg.type,
-          });
-
-          keg.subKegiatan?.forEach((sub) => {
-            flatData.push({
-              rekening: "sub kegiatan",
-              id: sub.id,
-              kode: sub.kode,
-              name: sub.name,
-              parent: keg.id,
-              type: sub.type,
-            });
-          });
-        });
-      });
-    });
-  });
-
+  }
+  treeData.forEach((item) => flattenNode(item));
+  console.log('MASTER', flatData)
   return flatData;
 };
 
+// export const getRekeningFlat = async (): Promise<Master[]> => {
+//   const response = await api.get<ApiResponse<MasterUrusan[]>>("/master/list/all");
+//   const rawData = response.data.data;
+
+//   const flatData: Master[] = [];
+
+//   rawData.forEach((urusan) => {
+//     flatData.push({
+//       rekening: "urusan",
+//       id: urusan.id,
+//       kode: urusan.kode,
+//       name: urusan.name,
+//       parent: '',
+//       type: urusan.type,
+//     });
+
+//     urusan.bidang?.forEach((bid) => {
+//       flatData.push({
+//         rekening: "bidang",
+//         id: bid.id,
+//         kode: bid.kode,
+//         name: bid.name,
+//         parent: urusan.id,
+//         type: bid.type,
+//       });
+
+//       bid.program?.forEach((prog) => {
+//         flatData.push({
+//           rekening: "program",
+//           id: prog.id,
+//           kode: prog.kode,
+//           name: prog.name,
+//           parent: bid.id,
+//           type: prog.type,
+//         });
+
+//         prog.kegiatan?.forEach((keg) => {
+//           flatData.push({
+//             rekening: "kegiatan",
+//             id: keg.id,
+//             kode: keg.kode,
+//             name: keg.name,
+//             parent: prog.id,
+//             type: keg.type,
+//           });
+
+//           keg.subKegiatan?.forEach((sub) => {
+//             flatData.push({
+//               rekening: "sub kegiatan",
+//               id: sub.id,
+//               kode: sub.kode,
+//               name: sub.name,
+//               parent: keg.id,
+//               type: sub.type,
+//             });
+//           });
+//         });
+//       });
+//     });
+//   });
+
+//   return flatData;
+// };
 
 /**
  * Ambil semua urusan

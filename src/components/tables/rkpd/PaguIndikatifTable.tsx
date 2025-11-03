@@ -13,7 +13,7 @@ import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
-  getRoleId,
+  isDev,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
@@ -263,6 +263,7 @@ const PaguIndikatifTable = () => {
                       withButton={!disBtn}
                       buttonType='submit'
                       invalid={!target}
+                      isMoney
                     />
                   </form>
                 </>
@@ -297,7 +298,7 @@ const PaguIndikatifTable = () => {
           </div>
         </div>
         <div className='flex justify-between gap-2 items-end'>
-          {getRoleId() !== 3 && (
+          {isDev() && (
             <InputButton
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'

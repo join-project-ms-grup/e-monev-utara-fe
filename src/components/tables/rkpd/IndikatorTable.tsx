@@ -7,6 +7,7 @@ import {
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
   getRoleId,
+  isDev,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
@@ -442,7 +443,7 @@ const IndikatorTable = () => {
           </div>
         </div>
         <div className='flex justify-end items-end gap-2'>
-          {getRoleId() !== 3 && (
+          {isDev() && (
             <InputButton
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'

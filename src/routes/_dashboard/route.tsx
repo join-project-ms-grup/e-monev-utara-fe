@@ -22,6 +22,7 @@ import Cookies from 'js-cookie';
 import { useAuth } from '../../contexts/AuthContext';
 import AksiButton from '../../components/inputs/AksiButton';
 import { getRoleId, isDev, skipPeriode } from '../../lib/usercookie';
+import BackToTop from '../../components/BackToTop';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {
@@ -82,6 +83,7 @@ function MainComponent() {
           <Footer />
         </div>
       </div>
+      <BackToTop />
     </>
   );
 }

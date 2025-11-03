@@ -17,6 +17,7 @@ import FormSKPD from '../../forms/FormSKPD';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
 import Tabel from '../Tabel';
+import { isDev } from '../../../lib/usercookie';
 
 const SKPDTable = () => {
   const queryClient = useQueryClient();
@@ -197,16 +198,18 @@ const SKPDTable = () => {
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-end'>
-          <InputButton
-            tooltip='Tambah data'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              setModalState('Add');
-              setOpenModal(true);
-            }}
-          >
-            <MdAdd />
-          </InputButton>
+          {isDev() && (
+            <InputButton
+              tooltip='Tambah data'
+              className='btn btn-theme w-9 h-9'
+              onClick={() => {
+                setModalState('Add');
+                setOpenModal(true);
+              }}
+            >
+              <MdAdd />
+            </InputButton>
+          )}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'

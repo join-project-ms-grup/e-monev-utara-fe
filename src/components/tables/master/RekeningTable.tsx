@@ -1,29 +1,36 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  addMaster,
-  getRekening,
+  getRekeningFlat,
   updateMaster,
   type Master,
-  type MasterTree,
   type MasterUrusan,
 } from '../../../services/MasterService';
 import { type ColumnDef } from '@tanstack/react-table';
-import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
+import { MdAdd, MdRefresh } from 'react-icons/md';
 import Tabel from '../Tabel';
 import Spinner from '../../inputs/Spinner';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import { useEffect, useState } from 'react';
 import InputText from '../../inputs/InputText';
-import RowExpand from '../RowExpand';
-import RowExpandValue from '../RowExpandValue';
-import { getRoleId } from '../../../lib/usercookie';
+import { isDev } from '../../../lib/usercookie';
 import DialogModal from '../../inputs/DialogModal';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import FormRekening from '../../forms/FormRekening';
-import AksiButton from '../../inputs/AksiButton';
+import { tr } from '@faker-js/faker';
+
+const tableHead = () => {
+  return (
+    <tr>
+      <th className='w-[50px]'>No</th>
+      <th className='w-[150px]'>Rekening</th>
+      <th colSpan={5}>Kode</th>
+      <th>Nama</th>
+    </tr>
+  );
+};
 
 const RekeningTable = () => {
   const queryClient = useQueryClient();
@@ -58,27 +65,19 @@ const RekeningTable = () => {
   // Data fetching
   const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_rekening'],
-    queryFn: async () => {
-      try {
-        const result = await getRekening();
-        return result;
-      } catch (err) {
-        console.error('Terjadi error:', err);
-        throw err;
-      }
-    },
+    queryKey: ['list_rekening'],
+    queryFn: getRekeningFlat,
   });
 
   // Add
   const addMutation = useMutation({
     mutationFn: async (payload: Master) => {
       setLoadingMutation(true);
-      console.log(payload)
+      console.log(payload);
       // return addMaster(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_rekening'] });
+      queryClient.invalidateQueries({ queryKey: ['list_rekening'] });
       setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
@@ -99,7 +98,7 @@ const RekeningTable = () => {
       return updateMaster(id, payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_rekening'] });
+      queryClient.invalidateQueries({ queryKey: ['list_rekening'] });
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
@@ -112,28 +111,6 @@ const RekeningTable = () => {
       setLoadingMutation(false);
     },
   });
-  // Delete
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      setLoadingMutation(true);
-      console.log(id);
-      // return deletePeriode(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_periode'] });
-      toast.success('Data berhasil dihapus');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-      setOpenModal(false);
-    },
-  });
-
-  const subRows = (row: MasterTree) =>
-    row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
 
   const [searchFields, setSearchFields] = useState({
     name: '',
@@ -151,28 +128,11 @@ const RekeningTable = () => {
     setFilters(newFilters);
   }, [searchFields]);
 
-  const columns: ColumnDef<MasterUrusan>[] = [
-    {
-      header: ' ',
-      cell: (ctx) => <RowExpand {...ctx} />,
-      meta: {
-        thClassNames: 'w-[60px]',
-        tdClassNames: 'text-center',
-      },
-    },
+  const columns: ColumnDef<MasterUrusan & { depth: number }>[] = [
     {
       header: 'No',
       cell: ({ row }) => `${row.index + 1}`,
       meta: {
-        thClassNames: 'w-[60px]',
-        tdClassNames: 'text-center',
-      },
-    },
-    {
-      accessorKey: 'kode',
-      header: 'Kode',
-      meta: {
-        thClassNames: 'w-[150px]',
         tdClassNames: 'text-center',
       },
     },
@@ -182,41 +142,62 @@ const RekeningTable = () => {
       enableSorting: false,
       filterFn: 'equalsString',
       meta: {
-        thClassNames: 'w-[200px]',
-        tdClassNames: 'text-center capitalize',
+        tdClassNames: 'capitalize',
+      },
+      cell: ({ getValue }) =>
+        getValue() === 'subKegiatan' ? 'Sub Kegiatan' : getValue(),
+    },
+    {
+      id: 'kode',
+      columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
+        (label, index) => ({
+          id: `kode_${label}`,
+          meta: {
+            tdClassNames: 'w-[30px]',
+          },
+          accessorFn: (row) => row.kodeFull?.[index],
+          cell: ({ getValue }) => {
+            const value = getValue();
+            return value ?? '';
+          },
+        }),
+      ),
+      filterFn: (row, columnId, filterValue) => {
+        const kodeArray = row.original.kodeFull || [];
+        const joined = kodeArray.join('.');
+        const search = String(filterValue).trim();
+        return joined.startsWith(search);
       },
     },
     {
       accessorKey: 'name',
       header: 'Nama',
-      cell: (ctx) => <RowExpandValue {...ctx} />,
     },
-    {
-      header: 'Aksi',
-      cell: ({ row }) => (
-        <>
-          <AksiButton
-            Icon={MdEdit}
-            onClick={() => {
-              setModalState('Edit');
-              setFormData(row.original);
-              setOpenModal(true);
-            }}
-          />
-        </>
-      ),
-      meta: {
-        // thClassNames: 'w-[200px]',
-        tdClassNames: 'text-center',
-      },
-    },
+    // {
+    //   header: 'Aksi',
+    //   cell: ({ row }) => (
+    //     <>
+    //       <AksiButton
+    //         Icon={MdEdit}
+    //         onClick={() => {
+    //           setModalState('Edit');
+    //           setFormData(row.original);
+    //           setOpenModal(true);
+    //         }}
+    //       />
+    //     </>
+    //   ),
+    //   meta: {
+    //     tdClassNames: 'text-center',
+    //   },
+    // },
   ];
 
   return (
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
-          <div>
+          <div className='w-96'>
             <label htmlFor='nama'>Nama</label>
             <InputText
               id='nama'
@@ -228,25 +209,25 @@ const RekeningTable = () => {
               }
             />
           </div>
-          <div className='w-28'>
+          <div className='w-42'>
             <label htmlFor='kode'>Kode</label>
             <InputText
               id='kode'
               inputMode='numeric'
-              maxLength={9}
+              maxLength={20}
               placeholder='Cari kode...'
               wrapperClassname='bg-white'
               value={searchFields.kode}
-              onChange={(e) =>
-                setSearchFields((prev) => ({ ...prev, kode: e.target.value }))
-              }
+              onChange={(e) => {
+                setSearchFields((prev) => ({ ...prev, kode: e.target.value }));
+              }}
             />
           </div>
           <div>
             <label htmlFor='rekening'>Rekening</label>
             <InputSearchBox
               id='rekening'
-              className='w-44 h-9'
+              className='h-9'
               btnclassName='bg-white'
               placeholder='Pilih rekening...'
               value={searchFields.rekening}
@@ -255,7 +236,7 @@ const RekeningTable = () => {
                 { label: 'Bidang', value: 'bidang' },
                 { label: 'Program', value: 'program' },
                 { label: 'Kegiatan', value: 'kegiatan' },
-                { label: 'Sub Kegiatan', value: 'sub kegiatan' },
+                { label: 'Sub Kegiatan', value: 'subKegiatan' },
               ]}
               onChange={(e) =>
                 setSearchFields((prev) => ({ ...prev, rekening: e }))
@@ -267,7 +248,7 @@ const RekeningTable = () => {
           </div>
         </div>
         <div className='flex justify-end items-end gap-2'>
-          {getRoleId() === 1 && (
+          {isDev() && (
             <InputButton
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'
@@ -292,10 +273,8 @@ const RekeningTable = () => {
       <Tabel
         data={data || []}
         columns={columns}
-        subRows={subRows}
-        subLabels={['Bidang', 'Program', 'Kegiatan', 'SubKegiatan']}
         searchFilters={filters}
-        subLabelPosition={2}
+        renderHeader={tableHead}
       />
       {modalState === 'Add' && (
         <DialogModal
@@ -363,33 +342,6 @@ const RekeningTable = () => {
               </InputButton>
             </div>
           </FormRekening>
-        </DialogModal>
-      )}
-      {modalState === 'Delete' && (
-        <DialogModal
-          title='Hapus data Rekening'
-          isOpen={openModal}
-          onClose={() => setOpenModal(false)}
-        >
-          <p>
-            Yakin ingin menghapus data{' '}
-            <i>
-              {formData.kode}
-            </i>{' '}
-            ?
-          </p>
-          <div className='flex gap-2 justify-end'>
-            <InputButton
-              type='button'
-              className='btn btn-theme w-24'
-              isLoading={loadingMutation}
-              onClick={() => {
-                deleteMutation.mutate(formData.id!);
-              }}
-            >
-              Hapus
-            </InputButton>
-          </div>
         </DialogModal>
       )}
     </div>
