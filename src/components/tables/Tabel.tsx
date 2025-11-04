@@ -195,16 +195,27 @@ const Tabel = <TData,>({
           <tbody>
             {isLoading ? (
               <tr>
-                <td
-                  colSpan={table.getAllLeafColumns().length}
-                >
+                <td colSpan={table.getAllLeafColumns().length}>
                   <div className='py-1 flex items-center justify-center'>
                     <Spinner size={24} color='red' />
                   </div>
                 </td>
               </tr>
             ) : renderBody ? (
-              renderBody(table)
+              <>
+                {rowModel.rows.length > 0 ? (
+                  renderBody(table)
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={table.getAllLeafColumns().length}
+                      className='text-center py-4 text-xl'
+                    >
+                      {pesanDataKosong ? pesanDataKosong : 'TIDAK ADA DATA'}
+                    </td>
+                  </tr>
+                )}
+              </>
             ) : rowModel.rows.length > 0 ? (
               <>
                 {rowModel.rows.map((row) => {
@@ -248,7 +259,6 @@ const Tabel = <TData,>({
                     </Fragment>
                   );
                 })}
-
                 {customRowAkhir && customRowAkhir}
               </>
             ) : (

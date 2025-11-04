@@ -1,23 +1,18 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import type { FlatRKPDRow } from '../RKPDService';
 import { waktuNowGabung } from '../../lib/helper';
+import type { FlatRKPD } from '../RKPDService';
 
 /**
- * Export RKPD mimic dari file sumber.
+ * Export RKPD.
  *
- * Data dapat berupa:
- *  - Array of objects: keys cocok dengan headerKeys array (lihat mapping di bawah)
- *  - Array of arrays: setiap item array ditulis langsung mulai dari kolom A
- *
- * @param data array data
+ * @param data array data FlatRKPDRow[]
  * @param tahun string tahun (mis. '2025')
  * @param opts.startRow (optional) baris mulai data (default 13)
  */
 export const exportRKPD = async (
-  data: FlatRKPDRow[],
+  data: FlatRKPD[],
   tahun: string,
-  skpd: string,
   opts?: { startRow?: number },
 ) => {
   const startRow = opts?.startRow ?? 13;
@@ -129,109 +124,99 @@ export const exportRKPD = async (
 
   //#region Mapping Data
   let rowIndex = startRow;
-  let subKegiatanIndex = 1;
+  let nomorUrut = 1;
+  // let subKegiatanIndex = 1;
 
-  data.forEach((item) => {
-    const startItemRow = rowIndex;
-    const indikatorCount = item.indikator?.length || 0;
+  // 1️⃣ Kelompokkan data berdasarkan rekening
+  const groupedByRekening: Record<string, typeof data> = {};
+  for (const item of data) {
+    if (!groupedByRekening[item.rekening]) groupedByRekening[item.rekening] = [];
+    groupedByRekening[item.rekening].push(item);
+  }
 
-    const row = worksheet.getRow(startItemRow);
+  // 2️⃣ Iterasi setiap kelompok rekening
+  for (const [rekening, group] of Object.entries(groupedByRekening)) {
+    const startMergeRow = rowIndex; // baris pertama dari kelompok ini
 
-    // Nomor urut hanya untuk sub_kegiatan
-    if (item.level === 'sub_kegiatan') row.getCell('A').value = subKegiatanIndex++;
+    for (const item of group) {
+      const row = worksheet.getRow(rowIndex++);
 
-    // Alignment dasar
-    row.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-    ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach((col) => {
-      row.getCell(col).alignment = { vertical: 'top', horizontal: 'center' };
-    });
+      row.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
 
-    // Parsing kode fleksibel
-    const kodeParts = (item.kode ?? '').toString().split(' ');
-    switch (item.level) {
-      case 'urusan':
-        row.getCell('C').value = kodeParts[0];
-        break;
-      case 'bidang':
-        row.getCell('C').value = kodeParts[0];
-        row.getCell('D').value = kodeParts[1];
-        break;
-      case 'program':
-        row.getCell('C').value = kodeParts[0];
-        row.getCell('D').value = kodeParts[1];
-        row.getCell('E').value = kodeParts[2];
-        break;
-      case 'kegiatan':
-        row.getCell('C').value = kodeParts[0];
-        row.getCell('D').value = kodeParts[1];
-        row.getCell('E').value = kodeParts[2];
-        row.getCell('F').value = kodeParts.slice(3).join(' ');
-        break;
-      case 'sub_kegiatan':
-        row.getCell('C').value = kodeParts[0];
-        row.getCell('D').value = kodeParts[1];
-        row.getCell('E').value = kodeParts[2];
-        row.getCell('F').value = kodeParts[3];
-        row.getCell('G').value = kodeParts.slice(4).join(' ');
-        break;
-    }
+      // if (item.level === 'sub_kegiatan') row.getCell('A').value = subKegiatanIndex++;
+      row.getCell('A').value = nomorUrut++;
+      row.getCell('A').alignment = { vertical: 'middle', horizontal: 'center' };
+      row.getCell('B').value = item.sasaran;
+      row.getCell('C').value = item.kode_urusan;
+      row.getCell('D').value = item.kode_bidang;
+      row.getCell('E').value = item.kode_program;
+      row.getCell('F').value = item.kode_kegiatan;
+      row.getCell('G').value = item.kode_subKegiatan;
+      row.getCell('H').value = item.rekening;
+      row.getCell('I').value = item.indikator_kinerja;
 
-    // Nama urusan/bidang/program/kegiatan/sub_kegiatan di kolom H
-    row.getCell('H').value = item.name;
+      // Jangan render angka kalau urusan/bidang
+      if (item.level !== 'urusan' && item.level !== 'bidang') {
+        row.getCell('J').value = Number(item.target_rpjmd_kinerja);
+        row.getCell('K').value = Number(item.target_rpjmd_anggaran);
+        row.getCell('L').value = Number(item.realisasi_rpjmd_kinerja);
+        row.getCell('M').value = Number(item.realisasi_rpjmd_anggaran);
 
-    if (indikatorCount > 0) {
-      item.indikator?.forEach((ind) => {
-        const indRow = worksheet.getRow(rowIndex++);
+        row.getCell('N').value = Number(item.target_rkpd_kinerja);
+        row.getCell('O').value = Number(item.target_rkpd_anggaran);
 
-        // Kolom I → nama indikator
-        indRow.getCell('I').value = ind.name;
+        row.getCell('P').value = Number(item.realisasi_triwulan_I_kinerja);
+        row.getCell('Q').value = Number(item.realisasi_triwulan_I_anggaran);
+        row.getCell('R').value = Number(item.realisasi_triwulan_II_kinerja);
+        row.getCell('S').value = Number(item.realisasi_triwulan_II_anggaran);
+        row.getCell('T').value = Number(item.realisasi_triwulan_III_kinerja);
+        row.getCell('U').value = Number(item.realisasi_triwulan_III_anggaran);
+        row.getCell('V').value = Number(item.realisasi_triwulan_IV_kinerja);
+        row.getCell('W').value = Number(item.realisasi_triwulan_IV_anggaran);
 
-        // ==== Kolom K (angka) ====
-        indRow.getCell('J').value = ind.target_akhir_periode ?? 0;
-        indRow.getCell('N').value = ind.target_tahun_dievaluasi ?? 0;
-        ['P', 'R', 'T', 'V'].forEach((col, i) => {
-          indRow.getCell(col).value = ind.triwulan?.[i]?.capaian ?? 0;
-        });
-        indRow.getCell('X').value = ind.total_capaian ?? 0;
-        indRow.getCell('AB').value = ind.total_capaian_periode ?? 0;
+        row.getCell('X').value = Number(item.realisasi_rkpd_kinerja);
+        row.getCell('Y').value = Number(item.realisasi_rkpd_anggaran);
 
-        // ==== Kolom Rp ====
-        indRow.getCell('K').value = item.pagu?.paguPeriode ?? 0;
-        indRow.getCell('M').value = 0;
-        indRow.getCell('O').value = item.pagu?.paguTahunEval ?? 0;
-        ['Q', 'S', 'U', 'W'].forEach((col, i) => {
-          indRow.getCell(col).value = Number(item.pagu?.triwulan?.[i]?.realisasi ?? 0);
-        });
-        indRow.getCell('Y').value = item.pagu?.totalRealisasi ?? 0;
-        indRow.getCell('AA').value = Number(item.pagu?.persenRealisasi ?? 0);
-        indRow.getCell('AC').value = Number(item.pagu?.persenRealisasiPeriode ?? 0);
-        indRow.getCell('AD').value = skpd;
+        row.getCell('Z').value = Number(item.realisasi_rpjmd_sd_tahun_kinerja);
+        row.getCell('AA').value = Number(item.realisasi_rpjmd_sd_tahun_anggaran);
 
-        // Format angka/persen
-        const satuan = ind.satuan ?? '';
-        const numFmtK = satuan.includes('%') ? '0.00 "%"' : 'General';
-        ['J', 'N', 'P', 'R', 'T', 'V', 'X', 'AB'].forEach((col) => {
-          indRow.getCell(col).numFmt = numFmtK;
-        });
+        row.getCell('AB').value = Number(item.tingkat_capaian_rpjmd_kinerja);
+        row.getCell('AC').value = Number(item.tingkat_capaian_rpjmd_anggaran);
+      }
 
-        const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-        ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA', 'AC'].forEach((col) => {
-          indRow.getCell(col).numFmt = fmtRupiah;
-        });
+      row.getCell('AD').value = item.perangkat_daerah;
+
+      const satuan = item.satuan ?? '';
+      const numFmtK = satuan.includes('%') ? '0.00 "%"' : 'General';
+      ['J', 'N', 'P', 'R', 'T', 'V', 'X', 'AB'].forEach((col) => {
+        row.getCell(col).numFmt = numFmtK;
       });
 
+      const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+      ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA', 'AC'].forEach((col) => {
+        row.getCell(col).numFmt = fmtRupiah;
+      });
 
-      // Merge cell kolom A–H jika ada lebih dari 1 indikator
-      const endItemRow = rowIndex - 1;
-      if (indikatorCount > 1) {
-        ['A', 'C', 'D', 'E', 'F', 'G', 'H'].forEach((col) => {
-          worksheet.mergeCells(`${col}${startItemRow}:${col}${endItemRow}`);
+      if (item.level === 'urusan' || item.level === 'bidang') {
+        ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
+          row.getCell(col).font = { bold: true };
         });
       }
-    } else {
-      rowIndex++; // jika tidak ada indikator, pindah row
+      ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
+        row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+      });
     }
-  });
+
+    const endMergeRow = rowIndex - 1; // baris terakhir dari kelompok ini
+
+    // 3️⃣ Merge sel untuk kolom "kode" (C–G) dan "rekening" (H)
+    worksheet.mergeCells(`C${startMergeRow}:C${endMergeRow}`);
+    worksheet.mergeCells(`D${startMergeRow}:D${endMergeRow}`);
+    worksheet.mergeCells(`E${startMergeRow}:E${endMergeRow}`);
+    worksheet.mergeCells(`F${startMergeRow}:F${endMergeRow}`);
+    worksheet.mergeCells(`G${startMergeRow}:G${endMergeRow}`);
+    worksheet.mergeCells(`H${startMergeRow}:H${endMergeRow}`);
+  }
 
 
   const lastRow = rowIndex;

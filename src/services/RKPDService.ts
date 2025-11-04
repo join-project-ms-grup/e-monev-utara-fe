@@ -62,155 +62,189 @@ export const getRKPD = async (skpd_periode_id: number, tahun_ke: number): Promis
     return response.data.data;
 };
 
+export interface FlatRKPD {
+    level: string;
+    sasaran: string;
+    kode_urusan: string;
+    kode_bidang: string;
+    kode_program: string;
+    kode_kegiatan: string;
+    kode_subKegiatan: string;
+    rekening: string;
+    indikator_kinerja: string;
+    satuan: string;
+    target_rpjmd_kinerja: number | string;
+    target_rpjmd_anggaran: number | string;
 
-export interface FlatRKPDRow {
-    level: 'urusan' | 'bidang' | 'program' | 'kegiatan' | 'sub_kegiatan';
-    kode?: string | number;
-    name?: string;
-    indikator?: {
-        id?: number;
-        name?: string;
-        satuan?: string;
-        target_tahun_dievaluasi?: number;
-        target_akhir_periode?: number;
-        triwulan?: { triwulan: number; capaian: number }[];
-        total_capaian?: number;
-        persen_capaian?: number | string;
-        total_capaian_periode?: number;
-        persen_capaian_periode?: number | string;
-    }[];
-    pagu?: {
-        triwulan?: { triwulan: number; realisasi: string | number }[]
-        paguPeriode?: number;
-        paguTahunEval?: number;
-        totalRealisasi?: number;
-        persenRealisasi?: string;
-        totalRealisasiPeriode?: number;
-        persenRealisasiPeriode?: string;
-    };
+    realisasi_rpjmd_kinerja: number | string;
+    realisasi_rpjmd_anggaran: number | string;
+
+    target_rkpd_kinerja: number | string;
+    target_rkpd_anggaran: number | string;
+
+    realisasi_triwulan_I_kinerja: number | string;
+    realisasi_triwulan_I_anggaran: number | string;
+
+    realisasi_triwulan_II_kinerja: number | string;
+    realisasi_triwulan_II_anggaran: number | string;
+
+    realisasi_triwulan_III_kinerja: number | string;
+    realisasi_triwulan_III_anggaran: number | string;
+
+    realisasi_triwulan_IV_kinerja: number | string;
+    realisasi_triwulan_IV_anggaran: number | string;
+
+    realisasi_rkpd_kinerja: number | string;
+    realisasi_rkpd_anggaran: number | string;
+
+    realisasi_rpjmd_sd_tahun_kinerja: number | string;
+    realisasi_rpjmd_sd_tahun_anggaran: number | string;
+
+    tingkat_capaian_rpjmd_kinerja: number | string;
+    tingkat_capaian_rpjmd_anggaran: number | string;
+
+    perangkat_daerah: string;
 }
 
-export const flattenRKPD = (data: RKPDMasterUrusan[]): FlatRKPDRow[] => {
-    const rows: FlatRKPDRow[] = [];
+export async function flatRKPD(
+    dataRespons: RKPDMasterUrusan[],
+    skpd: string
+): Promise<FlatRKPD[]> {
+    const dataExcel: FlatRKPD[] = [];
 
-    data.forEach((urusan) => {
-        rows.push({ level: 'urusan', kode: urusan.kode, name: urusan.name });
+    const pushRow = (
+        level: string,
+        kodeParts: string[],
+        name: string,
+        indikator?: Indikator[],
+        pagu?: RKPDPagu
+    ) => {
+        const [kode_urusan, kode_bidang, kode_program, kode_kegiatan, kode_subKegiatan] = kodeParts;
+
+        if (indikator && indikator.length > 0) {
+            indikator.forEach((ind) => {
+                const indikatorNames = ind.name?.toString().split('\n\n') ?? [''];
+                const targetRpjmdList = ind.target_akhir_periode?.toString().split('\n\n') ?? [''];
+                const realisasiRpjmdList = ind.total_capaian_periode?.toString().split('\n\n') ?? [''];
+                const targetRkpdList = ind.target_tahun_dievaluasi?.toString().split('\n\n') ?? [''];
+
+                indikatorNames.forEach((nama, idx) => {
+                    dataExcel.push({
+                        level,
+                        sasaran: '',
+
+                        kode_urusan,
+                        kode_bidang,
+                        kode_program,
+                        kode_kegiatan,
+                        kode_subKegiatan,
+
+                        rekening: name ?? '',
+                        indikator_kinerja: nama.trim(),
+                        satuan: ind.satuan ?? '',
+
+                        target_rpjmd_kinerja: targetRpjmdList[idx]?.trim() ?? '',
+                        target_rpjmd_anggaran: pagu?.paguPeriode ?? '',
+
+                        realisasi_rpjmd_kinerja: realisasiRpjmdList[idx]?.trim() ?? '',
+                        realisasi_rpjmd_anggaran: pagu?.totalRealisasiPeriode ?? '',
+
+                        target_rkpd_kinerja: targetRkpdList[idx]?.trim() ?? '',
+                        target_rkpd_anggaran: pagu?.paguTahunEval ?? '',
+
+                        realisasi_triwulan_I_kinerja:
+                            ind.triwulan?.find((t) => t.triwulan === 1)?.capaian ?? '',
+                        realisasi_triwulan_I_anggaran:
+                            pagu?.triwulan?.find((t) => t.triwulan === 1)?.realisasi ?? '',
+
+                        realisasi_triwulan_II_kinerja:
+                            ind.triwulan?.find((t) => t.triwulan === 2)?.capaian ?? '',
+                        realisasi_triwulan_II_anggaran:
+                            pagu?.triwulan?.find((t) => t.triwulan === 2)?.realisasi ?? '',
+
+                        realisasi_triwulan_III_kinerja:
+                            ind.triwulan?.find((t) => t.triwulan === 3)?.capaian ?? '',
+                        realisasi_triwulan_III_anggaran:
+                            pagu?.triwulan?.find((t) => t.triwulan === 3)?.realisasi ?? '',
+
+                        realisasi_triwulan_IV_kinerja:
+                            ind.triwulan?.find((t) => t.triwulan === 4)?.capaian ?? '',
+                        realisasi_triwulan_IV_anggaran:
+                            pagu?.triwulan?.find((t) => t.triwulan === 4)?.realisasi ?? '',
+
+                        realisasi_rkpd_kinerja: ind.total_capaian ?? '',
+                        realisasi_rkpd_anggaran: pagu?.totalRealisasi ?? '',
+
+                        realisasi_rpjmd_sd_tahun_kinerja: ind.total_capaian_periode ?? '',
+                        realisasi_rpjmd_sd_tahun_anggaran: pagu?.totalRealisasiPeriode ?? '',
+
+                        tingkat_capaian_rpjmd_kinerja: ind.persen_capaian_periode ?? '',
+                        tingkat_capaian_rpjmd_anggaran: pagu?.persenRealisasiPeriode ?? '',
+
+                        perangkat_daerah: skpd,
+                    });
+                });
+            });
+        } else {
+            dataExcel.push({
+                level,
+                sasaran: '',
+                kode_urusan,
+                kode_bidang,
+                kode_program,
+                kode_kegiatan,
+                kode_subKegiatan,
+                rekening: name ?? '',
+                indikator_kinerja: '',
+                satuan: '',
+                target_rpjmd_kinerja: '',
+                target_rpjmd_anggaran: pagu?.paguPeriode ?? '',
+                realisasi_rpjmd_kinerja: '',
+                realisasi_rpjmd_anggaran: pagu?.totalRealisasiPeriode ?? '',
+                target_rkpd_kinerja: '',
+                target_rkpd_anggaran: pagu?.paguTahunEval ?? '',
+                realisasi_triwulan_I_kinerja: '',
+                realisasi_triwulan_I_anggaran:
+                    pagu?.triwulan?.find((t) => t.triwulan === 1)?.realisasi ?? '',
+                realisasi_triwulan_II_kinerja: '',
+                realisasi_triwulan_II_anggaran:
+                    pagu?.triwulan?.find((t) => t.triwulan === 2)?.realisasi ?? '',
+                realisasi_triwulan_III_kinerja: '',
+                realisasi_triwulan_III_anggaran:
+                    pagu?.triwulan?.find((t) => t.triwulan === 3)?.realisasi ?? '',
+                realisasi_triwulan_IV_kinerja: '',
+                realisasi_triwulan_IV_anggaran:
+                    pagu?.triwulan?.find((t) => t.triwulan === 4)?.realisasi ?? '',
+                realisasi_rkpd_kinerja: '',
+                realisasi_rkpd_anggaran: pagu?.totalRealisasi ?? '',
+                realisasi_rpjmd_sd_tahun_kinerja: '',
+                realisasi_rpjmd_sd_tahun_anggaran: pagu?.totalRealisasiPeriode ?? '',
+                tingkat_capaian_rpjmd_kinerja: '',
+                tingkat_capaian_rpjmd_anggaran: pagu?.persenRealisasiPeriode ?? '',
+                perangkat_daerah: skpd,
+            });
+        }
+    };
+
+    dataRespons.forEach((urusan) => {
+        pushRow('urusan', [urusan.kode?.toString() ?? '', '', '', '', ''], urusan.name ?? '', urusan.indikator, urusan.pagu);
 
         urusan.bidang?.forEach((bidang) => {
-            rows.push({ level: 'bidang', kode: `${urusan.kode} ${bidang.kode}`, name: bidang.name });
+            pushRow('bidang', [urusan.kode?.toString() ?? '', bidang.kode?.toString() ?? '', '', '', ''], bidang.name ?? '', bidang.indikator, bidang.pagu);
 
             bidang.program?.forEach((program) => {
-                rows.push({
-                    level: 'program',
-                    kode: `${urusan.kode} ${bidang.kode} ${program.kode}`,
-                    name: program.name,
-                    indikator: program.indikator?.map(i => ({
-                        id: i.id ?? 0,
-                        name: i.name ?? '',
-                        satuan: i.satuan ?? '',
-                        target_tahun_dievaluasi: i.target_tahun_dievaluasi ?? 0,
-                        target_akhir_periode: i.target_akhir_periode ?? 0,
-                        triwulan: i.triwulan?.map(t => ({
-                            triwulan: Number(t.triwulan ?? 0),
-                            capaian: t.capaian ?? 0,
-                        })) ?? [],
-                        total_capaian: i.total_capaian ?? 0,
-                        persen_capaian: i.persen_capaian ?? '0',
-                        total_capaian_periode: i.total_capaian_periode ?? 0,
-                        persen_capaian_periode: i.persen_capaian_periode ?? '0',
-                    })),
-                    pagu: program.pagu
-                        ? {
-                            triwulan: program.pagu.triwulan?.map(t => ({
-                                triwulan: Number(t.triwulan ?? 0),
-                                realisasi: t.realisasi ?? 0,
-                            })) ?? [],
-                            paguPeriode: program.pagu.paguPeriode ?? 0,
-                            paguTahunEval: program.pagu.paguTahunEval ?? 0,
-                            totalRealisasi: program.pagu.totalRealisasi ?? 0,
-                            persenRealisasi: program.pagu.persenRealisasi ?? '0',
-                            totalRealisasiPeriode: program.pagu.totalRealisasiPeriode ?? 0,
-                            persenRealisasiPeriode: program.pagu.persenRealisasiPeriode ?? '0',
-                        }
-                        : undefined
-                });
+                pushRow('program', [urusan.kode?.toString() ?? '', bidang.kode?.toString() ?? '', program.kode?.toString() ?? '', '', ''], program.name ?? '', program.indikator, program.pagu);
 
                 program.kegiatan?.forEach((kegiatan) => {
-                    rows.push({
-                        level: 'kegiatan',
-                        kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode}`,
-                        name: kegiatan.name,
-                        indikator: kegiatan.indikator?.map(i => ({
-                            id: i.id ?? 0,
-                            name: i.name ?? '',
-                            satuan: i.satuan ?? '',
-                            target_tahun_dievaluasi: i.target_tahun_dievaluasi ?? 0,
-                            target_akhir_periode: i.target_akhir_periode ?? 0,
-                            triwulan: i.triwulan?.map(t => ({
-                                triwulan: Number(t.triwulan ?? 0),
-                                capaian: t.capaian ?? 0,
-                            })) ?? [],
-                            total_capaian: i.total_capaian ?? 0,
-                            persen_capaian: i.persen_capaian ?? '0',
-                            total_capaian_periode: i.total_capaian_periode ?? 0,
-                            persen_capaian_periode: i.persen_capaian_periode ?? '0',
-                        })),
-                        pagu: kegiatan.pagu
-                            ? {
-                                triwulan: kegiatan.pagu.triwulan?.map(t => ({
-                                    triwulan: Number(t.triwulan ?? 0),
-                                    realisasi: t.realisasi ?? 0,
-                                })) ?? [],
-                                paguPeriode: kegiatan.pagu.paguPeriode ?? 0,
-                                paguTahunEval: kegiatan.pagu.paguTahunEval ?? 0,
-                                totalRealisasi: kegiatan.pagu.totalRealisasi ?? 0,
-                                persenRealisasi: kegiatan.pagu.persenRealisasi ?? '0',
-                                totalRealisasiPeriode: kegiatan.pagu.totalRealisasiPeriode ?? 0,
-                                persenRealisasiPeriode: kegiatan.pagu.persenRealisasiPeriode ?? '0',
-                            }
-                            : undefined,
-                    });
+                    pushRow('kegiatan', [urusan.kode?.toString() ?? '', bidang.kode?.toString() ?? '', program.kode?.toString() ?? '', kegiatan.kode?.toString() ?? '', ''], kegiatan.name ?? '', kegiatan.indikator, kegiatan.pagu);
 
                     kegiatan.subKegiatan?.forEach((sub) => {
-                        rows.push({
-                            level: 'sub_kegiatan',
-                            kode: `${urusan.kode} ${bidang.kode} ${program.kode} ${kegiatan.kode} ${sub.kode}`,
-                            name: sub.name,
-                            indikator: sub.indikator?.map(i => ({
-                                id: i.id ?? 0,
-                                name: i.name ?? '',
-                                satuan: i.satuan ?? '',
-                                target_tahun_dievaluasi: i.target_tahun_dievaluasi ?? 0,
-                                target_akhir_periode: i.target_akhir_periode ?? 0,
-                                triwulan: i.triwulan?.map(t => ({
-                                    triwulan: Number(t.triwulan ?? 0),
-                                    capaian: t.capaian ?? 0,
-                                })) ?? [],
-                                total_capaian: i.total_capaian ?? 0,
-                                persen_capaian: i.persen_capaian ?? '0',
-                                total_capaian_periode: i.total_capaian_periode ?? 0,
-                                persen_capaian_periode: i.persen_capaian_periode ?? '0',
-                            })),
-                            pagu: sub.pagu
-                                ? {
-                                    triwulan: sub.pagu.triwulan?.map(t => ({
-                                        triwulan: Number(t.triwulan ?? 0),
-                                        realisasi: t.realisasi ?? 0,
-                                    })) ?? [],
-                                    paguPeriode: sub.pagu.paguPeriode ?? 0,
-                                    paguTahunEval: sub.pagu.paguTahunEval ?? 0,
-                                    totalRealisasi: sub.pagu.totalRealisasi ?? 0,
-                                    persenRealisasi: sub.pagu.persenRealisasi ?? '0',
-                                    totalRealisasiPeriode: sub.pagu.totalRealisasiPeriode ?? 0,
-                                    persenRealisasiPeriode: sub.pagu.persenRealisasiPeriode ?? '0',
-                                }
-                                : undefined,
-                        });
+                        pushRow('sub_kegiatan', [urusan.kode?.toString() ?? '', bidang.kode?.toString() ?? '', program.kode?.toString() ?? '', kegiatan.kode?.toString() ?? '', sub.kode?.toString() ?? ''], sub.name ?? '', sub.indikator, sub.pagu);
                     });
                 });
             });
         });
     });
 
-    return rows;
-};
+    return dataExcel;
+}
