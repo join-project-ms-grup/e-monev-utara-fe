@@ -258,7 +258,7 @@ const UserTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={data || []} columns={columns} />
+      <Tabel data={data || []} columns={columns} isLoading={isFetching} />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data User'

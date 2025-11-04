@@ -26,6 +26,8 @@ import type { ApiResponse } from '../../../lib/api';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputText from '../../inputs/InputText';
+import PesanSKPDTabel from '../../PesanSKPDTabel';
+import { formatUang } from '../../../lib/helper';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -263,7 +265,8 @@ const PaguIndikatifTable = () => {
                       withButton={!disBtn}
                       buttonType='submit'
                       invalid={!target}
-                      isMoney
+                      isRibu
+                      tooltip={formatUang(target)}
                     />
                   </form>
                 </>
@@ -324,6 +327,8 @@ const PaguIndikatifTable = () => {
         columns={columns}
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
+        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+        isLoading={isFetching}
       />
       <DialogModal
         widthLevel={6}

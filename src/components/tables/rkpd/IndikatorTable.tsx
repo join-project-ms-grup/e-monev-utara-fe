@@ -1,23 +1,19 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { MdAdd, MdRefresh } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import Tabel from '../Tabel';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
-  getRoleId,
-  isDev,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import DialogModal from '../../inputs/DialogModal';
+import { useRef, useState, type ReactNode } from 'react';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import {
-  addIndikator,
   getIndikatorFlat,
   updateIndikator,
   type Indikator,
@@ -26,8 +22,9 @@ import {
 } from '../../../services/IndikatorService';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
-import FormIndikator from '../../forms/FormIndikator';
 import InputText from '../../inputs/InputText';
+import PesanSKPDTabel from '../../PesanSKPDTabel';
+import { formatRibu } from '../../../lib/helper';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -40,19 +37,19 @@ const tableHead = () => {
   return (
     <>
       <tr>
-        <th rowSpan={2} colSpan={5}>
+        <th rowSpan={2} colSpan={5} className='w-[50px]'>
           Kode
         </th>
-        <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={2}>Indikator</th>
-        <th rowSpan={2}>Satuan</th>
+        <th rowSpan={2} className='w-[20%]'>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
+        <th rowSpan={2} className='w-[25%]'>Indikator</th>
+        <th rowSpan={2} className='w-[150px]'>Satuan</th>
         <th rowSpan={1} colSpan={5}>
           Target
         </th>
       </tr>
       <tr>
         {periode.map((thn) => (
-          <th key={thn} rowSpan={1}>
+          <th key={thn} rowSpan={1} className='w-[200px]'>
             {thn}
           </th>
         ))}
@@ -81,69 +78,10 @@ const IndikatorTable = () => {
     queryFn: async () => getIndikatorFlat(Number(selectedSKPD)),
     enabled: !!selectedSKPD,
   });
-  // Modal
-  // const [modalState, setModalState] = useState<'Add' | 'Edit'>('Add');
-  // const [openModal, setOpenModal] = useState(false);
-  // Form Data
-  const initialFormData: IndikatorForm = {
-    id: 0,
-    skpd_periode_id: '',
-    master_id: '',
-    name: '',
-    satuan: '',
-    target: [
-      { tahun_ke: '1', target: '' },
-      { tahun_ke: '2', target: '' },
-      { tahun_ke: '3', target: '' },
-      { tahun_ke: '4', target: '' },
-      { tahun_ke: '5', target: '' },
-    ],
-  };
-  const [formData, setFormData] = useState<IndikatorForm>(initialFormData);
-  // Clear form
-  // useEffect(() => {
-  //   if (!openModal) {
-  //     const timeout = setTimeout(() => {
-  //       setFormData(initialFormData);
-  //     }, 200);
-  //     return () => clearTimeout(timeout);
-  //   } else {
-  //     console.log('IndikatorTable.tsx', formData);
-  //   }
-  // }, [openModal]);
   // #endregion
 
   // #region Mutasi
   const [loadingMutation, setLoadingMutation] = useState(false);
-  // Add
-  // const addMutation = useMutation({
-  //   mutationFn: async (payload: IndikatorForm) => {
-  //     setLoadingMutation(true);
-  //     return addIndikator({
-  //       ...payload,
-  //       skpd_periode_id: Number(payload.skpd_periode_id),
-  //       master_id: Number(payload.master_id),
-  //       target: payload.target?.slice(0, 5).map((t) => ({
-  //         target: Number(t.target),
-  //         tahun_ke: Number(t.tahun_ke),
-  //       })),
-  //     });
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
-  //     setFormData(initialFormData);
-  //     setOpenModal(false);
-  //     toast.success('Data berhasil ditambahkan');
-  //   },
-  //   onError: (error: AxiosError<ApiResponse<unknown>>) => {
-  //     if (error.status === 400) {
-  //       toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
-  //     }
-  //   },
-  //   onSettled: () => {
-  //     setLoadingMutation(false);
-  //   },
-  // });
   // Update
   const updateMutation = useMutation({
     mutationFn: async ({
@@ -166,7 +104,6 @@ const IndikatorTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_indikator'] });
-      // setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
@@ -181,8 +118,6 @@ const IndikatorTable = () => {
   // #endregion
 
   // #region Kolom Tabel
-  // const subRows = (row: IndikatorMasterTree) =>
-  //   row.bidang ?? row.program ?? row.kegiatan ?? row.subKegiatan ?? undefined;
   const rowHeights = useRef<{ [key: string]: number[] }>({});
   const columns: ColumnDef<IndikatorMaster>[] = [
     {
@@ -315,6 +250,8 @@ const IndikatorTable = () => {
                             withButton={!disBtn}
                             buttonType='submit'
                             invalid={!satuan}
+                            disabled={loadingMutation}
+                            tooltip={satuan}
                           />
                         </form>
                       </td>
@@ -406,7 +343,8 @@ const IndikatorTable = () => {
                               withButton={!disBtn}
                               buttonType='submit'
                               invalid={!target}
-                              isMoney
+                              isRibu
+                              tooltip={formatRibu(target)}
                             />
                           </form>
                         </td>
@@ -443,18 +381,6 @@ const IndikatorTable = () => {
           </div>
         </div>
         <div className='flex justify-end items-end gap-2'>
-          {/* {isDev() && (
-            <InputButton
-              tooltip='Tambah data'
-              className='btn btn-theme w-9 h-9'
-              onClick={() => {
-                setModalState('Add');
-                setOpenModal(true);
-              }}
-            >
-              <MdAdd />
-            </InputButton>
-          )} */}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -469,79 +395,10 @@ const IndikatorTable = () => {
         data={data || []}
         columns={columns}
         renderHeader={tableHead}
-        tblClassName='lg:min-w-[1500px]'
+        tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
+        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+        isLoading={isFetching}
       />
-      {/* {modalState === 'Add' && (
-        <DialogModal
-          title='Tambah data Indikator'
-          isOpen={openModal}
-          widthLevel={6}
-          onClose={() => {
-            setFormData(initialFormData);
-            setOpenModal(false);
-          }}
-        >
-          <FormIndikator
-            type='Add'
-            defaultValues={formData}
-            onSubmit={(data: IndikatorForm) => {
-              console.log('Data dari form modal:', data);
-              addMutation.mutate({
-                skpd_periode_id: data.skpd_periode_id,
-                master_id: data.master_id,
-                name: data.name,
-                satuan: data.satuan,
-                target: data.target,
-              });
-            }}
-          >
-            <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-                isLoading={loadingMutation}
-              >
-                Simpan
-              </InputButton>
-            </div>
-          </FormIndikator>
-        </DialogModal>
-      )}
-      {modalState === 'Edit' && (
-        <DialogModal
-          title='Ubah data Indikator'
-          isOpen={openModal}
-          onClose={() => setOpenModal(false)}
-        >
-          <FormIndikator
-            type='Edit'
-            defaultValues={formData}
-            onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', data);
-              updateMutation.mutate({
-                id,
-                payload: {
-                  skpd_periode_id: payload.skpd_periode_id,
-                  master_id: payload.master_id,
-                  name: payload.name,
-                  satuan: payload.satuan,
-                  target: payload.target,
-                },
-              });
-            }}
-          >
-            <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-                isLoading={loadingMutation}
-              >
-                Simpan
-              </InputButton>
-            </div>
-          </FormIndikator>
-        </DialogModal>
-      )} */}
     </div>
   );
 };

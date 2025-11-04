@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import Tabel from '../../Tabel';
-import toast from 'react-hot-toast';
-import { MdCheck, MdRefresh } from 'react-icons/md';
-import { IoMdPricetag, IoMdPricetags } from 'react-icons/io';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
-import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { fakeCapaianIku, fakeTaggingIku } from '../../../../dummy/datafaker';
+import { type ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
 import {
   getPeriodeAkhirFromCookie,
@@ -16,6 +13,7 @@ import {
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
   return (
@@ -115,7 +113,12 @@ const CapaianIKUTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={[]} columns={columns} renderHeader={tableHead} />
+      <Tabel
+        data={[]}
+        columns={columns}
+        renderHeader={tableHead}
+        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} tahun={tahunKe} butuhTahun />}
+      />
     </div>
   );
 };

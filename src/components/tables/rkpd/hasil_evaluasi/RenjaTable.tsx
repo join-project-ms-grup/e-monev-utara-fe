@@ -16,6 +16,7 @@ import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import { createPortal } from 'react-dom';
 import RenjaPreviewTable from './RenjaPreviewTable';
 import { exportRenja } from '../../../../services/Excel/ExcelRenja';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
   return (
@@ -72,7 +73,7 @@ const RenjaTable = () => {
     })) || [];
   //#endregion
 
-  const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
+  const columns: ColumnDef<any>[] = Array.from({ length: 12 }, (_, i) => ({
     id: (i + 1).toString(),
   }));
 
@@ -118,7 +119,7 @@ const RenjaTable = () => {
                 if (data && selectedSKPD) {
                   setIsPreview(true);
                 } else {
-                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
+                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                 }
               }}
             >
@@ -135,7 +136,12 @@ const RenjaTable = () => {
             </InputButton>
           </div>
         </div>
-        <Tabel data={[]} columns={columns} renderHeader={tableHead} />
+        <Tabel
+          data={[]}
+          columns={columns}
+          renderHeader={tableHead}
+          pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+        />
       </div>
       {isPreview &&
         createPortal(
@@ -164,7 +170,7 @@ const RenjaTable = () => {
                         error: <b>Gagal mengunduh.</b>,
                       });
                     } else {
-                      toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
+                      toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                     }
                   }}
                 >

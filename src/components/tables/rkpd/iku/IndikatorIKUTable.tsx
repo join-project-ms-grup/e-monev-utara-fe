@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import Tabel from '../../Tabel';
-import toast from 'react-hot-toast';
-import { MdEdit, MdRefresh } from 'react-icons/md';
-import { IoMdPricetag } from 'react-icons/io';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
-import { createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { fakeIku } from '../../../../dummy/datafaker';
+import { type ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
 import {
   getPeriodeAkhirFromCookie,
@@ -16,6 +13,7 @@ import {
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -95,7 +93,12 @@ const IndikatorIKUTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={[]} columns={columns} renderHeader={tableHead} />
+      <Tabel
+        data={[]}
+        columns={columns}
+        renderHeader={tableHead}
+        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+      />
     </div>
   );
 };

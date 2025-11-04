@@ -25,25 +25,34 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import InputText from '../../inputs/InputText';
+import PesanSKPDTabel from '../../PesanSKPDTabel';
+import { formatRibu } from '../../../lib/helper';
 
 const tableHead = () => {
   return (
     <>
       <tr>
-        <th rowSpan={2} colSpan={5}>
+        <th rowSpan={2} colSpan={5} className='w-[50px]'>
           Kode
         </th>
-        <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={2}>Indikator</th>
-        <th rowSpan={2}>Satuan</th>
+        <th rowSpan={2} className='w-[20%]'>
+          Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
+        </th>
+        <th rowSpan={2} className='w-[25%]'>
+          Indikator
+        </th>
+        <th rowSpan={2} className='w-[150px]'>
+          Satuan
+        </th>
         <th rowSpan={2}>Target</th>
         <th colSpan={6}>Capaian</th>
       </tr>
       <tr>
-        <th>Triwulan I</th>
-        <th>Triwulan II</th>
-        <th>Triwulan III</th>
-        <th>Triwulan IV</th>
+        {['Triwulan I', 'Triwulan II', 'Triwulan III', 'Triwulan IV'].map((tri) => (
+          <th key={tri} rowSpan={1} className='w-[150px]'>
+            {tri}
+          </th>
+        ))}
         <th>Total</th>
         <th>(%)</th>
       </tr>
@@ -226,6 +235,7 @@ const CapaianTable = () => {
                         style={{
                           height: rowHeights.current[row.id]?.[index] || 'auto',
                         }}
+                        className='text-center'
                       >
                         {item.satuan}
                       </td>
@@ -242,7 +252,7 @@ const CapaianTable = () => {
       accessorFn: (row) => row.indikator,
       header: 'Target',
       meta: {
-        tdClassNames: 'p-0!',
+        tdClassNames: 'text-center p-0!',
       },
       cell: ({ row, getValue }) => {
         const indikatorList = getValue() as CapaianIndikator[];
@@ -278,7 +288,7 @@ const CapaianTable = () => {
     },
     {
       header: 'Capaian Triwulan',
-      meta: { tdClassNames: 'text-center' },
+      // meta: { tdClassNames: 'text-center' },
       columns: [1, 2, 3, 4].map((triwulan) => ({
         id: `triwulan_${triwulan}`,
         header: `Triwulan ${triwulan}`,
@@ -354,10 +364,14 @@ const CapaianTable = () => {
                                 onChange={handleChange}
                                 withButton={!disBtn}
                                 buttonType='submit'
+                                tooltip={formatRibu(capaian)}
+                                isRibu
                               />
                             </form>
                           )}
-                          {row.original.depth !== 4 && <span>{capaian}</span>}
+                          {row.original.depth !== 4 && (
+                            <span>{formatRibu(capaian)}</span>
+                          )}
                         </td>
                       </tr>
                     );
@@ -389,7 +403,7 @@ const CapaianTable = () => {
                         height: rowHeights.current[row.id]?.[index] || 'auto',
                       }}
                     >
-                      {item.capaian?.capaianTotal ?? '-'}
+                      {formatRibu(item.capaian?.capaianTotal ?? 0)}
                     </td>
                   </tr>
                 ))}
@@ -497,10 +511,16 @@ const CapaianTable = () => {
       <Tabel
         data={data || []}
         columns={columns}
-        // subRows={subRows}
         renderHeader={tableHead}
-        tblClassName='lg:min-w-[1500px]'
-        // initialExpanded
+        tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
+        pesanDataKosong={
+          <PesanSKPDTabel
+            selectedSKPD={selectedSKPD}
+            tahun={tahunKe}
+            butuhTahun
+          />
+        }
+        isLoading={isFetching}
       />
       <DialogModal
         title='Tambah data Realisasi'

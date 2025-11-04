@@ -38,7 +38,7 @@ const CatatanMekanismePelaksana = () => {
           <InputText
             id='imekanisme_rp'
             inputMode='numeric'
-            isMoney
+            isRibu
             placeholder='Uang...'
           />
         </div>

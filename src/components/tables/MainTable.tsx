@@ -150,7 +150,7 @@ const MainTable = <TData,>({
                 colSpan={table.getAllLeafColumns().length}
                 className='text-center py-4'
               >
-                Tidak ada data
+                TIDAK ADA DATA
               </td>
             </tr>
           )}

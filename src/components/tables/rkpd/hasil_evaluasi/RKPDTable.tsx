@@ -23,7 +23,8 @@ import Spinner from '../../../inputs/Spinner';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
 import RKPDPreviewTable from './RKPDPreviewTable';
-import { formatUang } from '../../../../lib/helper';
+import { formatRibu, formatUang } from '../../../../lib/helper';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const RKPDTable = () => {
   //#region SKPD dan Tahun ke
@@ -70,11 +71,13 @@ const RKPDTable = () => {
         <tr>
           <th rowSpan={2}>No</th>
           <th rowSpan={2}>Sasaran</th>
-          <th rowSpan={2}>Kode</th>
-          <th rowSpan={2}>
+          <th rowSpan={2} className='w-[50px]'>
+            Kode
+          </th>
+          <th rowSpan={2} className='w-[20%]'>
             Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
           </th>
-          <th rowSpan={2}>
+          <th rowSpan={2} className='w-[25%]'>
             Indikator Kinerja Program (Outcome)/ Kegiatan (output)
           </th>
           <th rowSpan={1} colSpan={2}>
@@ -93,12 +96,16 @@ const RKPDTable = () => {
           </th>
         </tr>
         <tr>
-          <th>Fisik</th>
-          <th>Rp.</th>
-          <th>Fisik</th>
-          <th>Rp.</th>
-          <th>Fisik</th>
-          <th>Rp.</th>
+          {Array.from({ length: 3 }, (_, i) => (
+            <>
+              <th key={i} className='w-[200px]'>
+                Fisik
+              </th>
+              <th key={i + 1} className='w-[200px]'>
+                Rp.
+              </th>
+            </>
+          ))}
         </tr>
       </>
     );
@@ -181,7 +188,7 @@ const RKPDTable = () => {
           id: 'fisik_akhir',
           header: 'Fisik',
           meta: {
-            tdClassNames: 'p-0!',
+            tdClassNames: 'p-0! text-center',
           },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
@@ -200,8 +207,23 @@ const RKPDTable = () => {
                             height:
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
+                          className='whitespace-break-spaces'
                         >
-                          {`${i.target_akhir_periode} ${i.satuan}`}
+                          {i.satuan === '%'
+                            ? (i.target_akhir_periode ?? '')
+                                .toString()
+                                .split(/\n+/)
+                                .filter((v) => v.trim() !== '')
+                                .map((v) => `${v.trim()} ${i.satuan}`)
+                                .join('\n')
+                            : (i.target_akhir_periode ?? '')
+                                .toString()
+                                .split(/\n+/)
+                                .filter((v) => v.trim() !== '')
+                                .map(
+                                  (v) => `${formatRibu(Number(v))} ${i.satuan}`,
+                                )
+                                .join('\n')}
                         </td>
                       </tr>
                     ))}
@@ -214,6 +236,9 @@ const RKPDTable = () => {
         {
           id: 'rp_akhir',
           header: 'Rp.',
+          meta: {
+            tdClassNames: 'text-center',
+          },
           accessorFn: (row) => row.pagu?.paguPeriode ?? '',
           cell: ({ row, getValue }) => {
             if (
@@ -234,7 +259,7 @@ const RKPDTable = () => {
           id: 'fisik_sebelum',
           header: 'Fisik',
           meta: {
-            tdClassNames: 'p-0!',
+            tdClassNames: 'p-0! text-center',
           },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
@@ -242,22 +267,44 @@ const RKPDTable = () => {
             if (!indikator || indikator.length === 0) return '';
             const isEven = row.index % 2 === 1;
             const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
+
             return (
               <div>
                 <table className='w-full'>
                   <tbody className='border-0!'>
-                    {indikator.map((i, index) => (
-                      <tr key={i.id} className={bgClass}>
-                        <td
-                          style={{
-                            height:
-                              rowHeights.current[row.id]?.[index] || 'auto',
-                          }}
-                        >
-                          {`${i.total_capaian_periode} ${i.satuan}`}
-                        </td>
-                      </tr>
-                    ))}
+                    {indikator.map((i, index) => {
+                      if (!i.total_capaian_periode) {
+                        return '-';
+                      }
+                      return (
+                        <tr key={i.id} className={bgClass}>
+                          <td
+                            style={{
+                              height:
+                                rowHeights.current[row.id]?.[index] || 'auto',
+                            }}
+                            className='whitespace-break-spaces'
+                          >
+                            {i.satuan === '%'
+                              ? (i.total_capaian_periode ?? '')
+                                  .toString()
+                                  .split(/\n+/)
+                                  .filter((v) => v.trim() !== '')
+                                  .map((v) => `${v.trim()} ${i.satuan}`)
+                                  .join('\n')
+                              : (i.total_capaian_periode ?? '')
+                                  .toString()
+                                  .split(/\n+/)
+                                  .filter((v) => v.trim() !== '')
+                                  .map(
+                                    (v) =>
+                                      `${formatRibu(Number(v))} ${i.satuan}`,
+                                  )
+                                  .join('\n')}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -267,6 +314,9 @@ const RKPDTable = () => {
         {
           id: 'rp_sebelum',
           header: 'Rp.',
+          meta: {
+            tdClassNames: 'text-center',
+          },
           accessorFn: (row) => row.pagu?.totalRealisasiPeriode ?? '',
           cell: ({ row, getValue }) => {
             if (
@@ -287,7 +337,7 @@ const RKPDTable = () => {
           id: 'fisik_evaluasi',
           header: 'Fisik',
           meta: {
-            tdClassNames: 'p-0!',
+            tdClassNames: 'p-0! text-center',
           },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
@@ -306,8 +356,23 @@ const RKPDTable = () => {
                             height:
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
+                          className='whitespace-break-spaces'
                         >
-                          {`${i.target_tahun_dievaluasi} ${i.satuan}`}
+                          {i.satuan === '%'
+                            ? (i.target_tahun_dievaluasi ?? '')
+                                .toString()
+                                .split(/\n+/)
+                                .filter((v) => v.trim() !== '')
+                                .map((v) => `${v.trim()} ${i.satuan}`)
+                                .join('\n')
+                            : (i.target_tahun_dievaluasi ?? '')
+                                .toString()
+                                .split(/\n+/)
+                                .filter((v) => v.trim() !== '')
+                                .map(
+                                  (v) => `${formatRibu(Number(v))} ${i.satuan}`,
+                                )
+                                .join('\n')}
                         </td>
                       </tr>
                     ))}
@@ -320,6 +385,9 @@ const RKPDTable = () => {
         {
           id: 'rp_evaluasi',
           header: 'Rp.',
+          meta: {
+            tdClassNames: 'text-center',
+          },
           accessorFn: (row) => row.pagu?.paguTahunEval ?? '',
           cell: ({ row, getValue }) => {
             if (
@@ -395,7 +463,7 @@ const RKPDTable = () => {
                   setIsPreview(true);
                 } else {
                   toast.error(
-                    `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
+                    `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
                   );
                 }
               }}
@@ -413,10 +481,18 @@ const RKPDTable = () => {
           </div>
         </div>
         <Tabel
-          tblClassName='lg:min-w-[1500px]'
+          tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
+          pesanDataKosong={
+            <PesanSKPDTabel
+              selectedSKPD={selectedSKPD}
+              tahun={tahunKe}
+              butuhTahun
+            />
+          }
+          isLoading={isFetching}
         />
       </div>
       {isPreview &&
@@ -449,7 +525,7 @@ const RKPDTable = () => {
                       });
                     } else {
                       toast.error(
-                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
+                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
                       );
                     }
                   }}

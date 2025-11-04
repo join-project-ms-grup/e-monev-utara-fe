@@ -19,6 +19,8 @@ import {
 } from '../../../../services/RenstraService';
 import { createPortal } from 'react-dom';
 import RenstraPreviewTable from './RenstraPreviewTable';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
+import { formatRibu, formatUang } from '../../../../lib/helper';
 
 const tableHead = () => {
   return (
@@ -26,9 +28,15 @@ const tableHead = () => {
       <tr>
         <th rowSpan={2}>No</th>
         <th rowSpan={2}>Sasaran</th>
-        <th rowSpan={2}>Kode</th>
-        <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={2}>Indikator</th>
+        <th rowSpan={2} className='w-[50px]'>
+          Kode
+        </th>
+        <th rowSpan={2} className='w-[20%]'>
+          Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
+        </th>
+        <th rowSpan={2} className='w-[25%]'>
+          Indikator
+        </th>
         <th rowSpan={1} colSpan={2}>
           Target Akhir Tahun RPJM/Renstra
         </th>
@@ -40,12 +48,16 @@ const tableHead = () => {
         </th>
       </tr>
       <tr>
-        <th>Fisik</th>
-        <th>Rp.</th>
-        <th>Fisik</th>
-        <th>Rp.</th>
-        <th>Fisik</th>
-        <th>Rp.</th>
+        {Array.from({ length: 3 }, (_, i) => (
+          <>
+            <th key={i} className='w-[200px]'>
+              Fisik
+            </th>
+            <th key={i + 1} className='w-[200px]'>
+              Rp.
+            </th>
+          </>
+        ))}
       </tr>
     </>
   );
@@ -63,17 +75,6 @@ const RenstraTable = () => {
       label: `[${item.id}] ${item.name}`,
       value: item.id?.toString(),
     })) || [];
-  //#endregion
-  //#region List data periode
-  // const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
-  // const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
-  // const listTahunKe = Array.from(
-  //   { length: tahunAkhir - tahunMulai + 1 },
-  //   (_, i) => ({
-  //     label: `${tahunMulai + i}`,
-  //     value: `${i + 1}`,
-  //   }),
-  // );
   //#endregion
 
   //#region RKPD Data Flatten
@@ -166,7 +167,7 @@ const RenstraTable = () => {
         {
           id: 'fisik_akhir',
           header: 'Fisik',
-          meta: { tdClassNames: 'p-0!' },
+          meta: { tdClassNames: 'p-0! text-center' },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
             const indikator = getValue() as FlatRenstraRow['indikator'];
@@ -185,8 +186,21 @@ const RenstraTable = () => {
                             height:
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
+                          className='whitespace-break-spaces'
                         >
-                          {i.totalTarget}
+                          {i.satuan === '%'
+                            ? i.totalTarget
+                                .toString()
+                                .split(/\n+/)
+                                .filter((v) => v.trim() !== '')
+                                .map((v) => `${v.trim()} ${i.satuan}`)
+                                .join('\n')
+                            : i.totalTarget
+                                .toString()
+                                .split(/\n+/)
+                                .filter((v) => v.trim() !== '')
+                                .map((v) => `${formatRibu(Number(v))} ${i.satuan}`)
+                                .join('\n')}
                         </td>
                       </tr>
                     ))}
@@ -199,8 +213,11 @@ const RenstraTable = () => {
         {
           id: 'rp_akhir',
           header: 'Rp.',
+          meta: {
+            tdClassNames: 'text-center',
+          },
           accessorFn: (row) => row.pagu?.totalPagu,
-          cell: ({ getValue }) => `${getValue() ? getValue() : ''}`,
+          cell: ({ getValue }) => `${getValue() ? formatUang(getValue()) : ''}`,
         },
       ],
     },
@@ -214,7 +231,7 @@ const RenstraTable = () => {
         {
           id: 'fisik_sebelum',
           header: 'Fisik',
-          meta: { tdClassNames: 'p-0!' },
+          meta: { tdClassNames: 'p-0! text-center' },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
             const indikator = getValue() as FlatRenstraRow['indikator'];
@@ -230,6 +247,11 @@ const RenstraTable = () => {
                       const capaianSebelum = i.capaian_per_tahun
                         ?.filter((t) => Number(t.tahun_ke) < 5)
                         .reduce((sum, t) => sum + (Number(t.capaian) || 0), 0);
+
+                      if (capaianSebelum === 0) {
+                        return '-';
+                      }
+
                       return (
                         <tr key={i.id} className={bgClass}>
                           <td
@@ -238,7 +260,9 @@ const RenstraTable = () => {
                                 rowHeights.current[row.id]?.[index] || 'auto',
                             }}
                           >
-                            {capaianSebelum || 0}
+                            {i.satuan === '%'
+                              ? capaianSebelum + ' ' + i.satuan
+                              : formatRibu(capaianSebelum) + ' ' + i.satuan}
                           </td>
                         </tr>
                       );
@@ -252,11 +276,19 @@ const RenstraTable = () => {
         {
           id: 'rp_sebelum',
           header: 'Rp.',
+          meta: { tdClassNames: 'text-center' },
           accessorFn: (row) =>
             row.pagu?.realisasi_per_tahun
               ?.filter((r) => Number(r.tahun_ke) < 5)
-              .reduce((sum, r) => sum + (Number(r.realisasi) || 0), 0) ?? '',
-          cell: ({ getValue }) => `${getValue() ? getValue() : ''}`,
+              .reduce((sum, r) => sum + (Number(r.realisasi) || 0), 0) ?? '-',
+          cell: ({ row, getValue }) => {
+            if (
+              ['urusan', 'bidang'].some((l) => row.original.level.includes(l))
+            ) {
+              return;
+            }
+            return `${getValue() ? formatUang(getValue()) : '-'}`;
+          },
         },
       ],
     },
@@ -270,7 +302,7 @@ const RenstraTable = () => {
         {
           id: 'fisik_evaluasi',
           header: 'Fisik',
-          meta: { tdClassNames: 'p-0!' },
+          meta: { tdClassNames: 'p-0! text-center' },
           accessorFn: (row) => row.indikator || [],
           cell: ({ row, getValue }) => {
             const indikator = getValue() as FlatRenstraRow['indikator'];
@@ -286,6 +318,10 @@ const RenstraTable = () => {
                       const targetEvaluasi = i.target_per_tahun?.find(
                         (t) => Number(t.tahun_ke) === 5,
                       );
+
+                      if (targetEvaluasi?.target === 0) {
+                        return '-';
+                      }
                       return (
                         <tr key={i.id} className={bgClass}>
                           <td
@@ -294,7 +330,11 @@ const RenstraTable = () => {
                                 rowHeights.current[row.id]?.[index] || 'auto',
                             }}
                           >
-                            {targetEvaluasi?.target ?? 0}
+                            {i.satuan === '%'
+                              ? targetEvaluasi?.target + ' ' + i.satuan
+                              : formatRibu(targetEvaluasi?.target ?? 0) +
+                                ' ' +
+                                i.satuan}
                           </td>
                         </tr>
                       );
@@ -308,10 +348,18 @@ const RenstraTable = () => {
         {
           id: 'rp_evaluasi',
           header: 'Rp.',
+          meta: { tdClassNames: 'text-center' },
           accessorFn: (row) =>
             row.pagu?.pagu_per_tahun?.find((p) => Number(p.tahun_ke) === 5)
               ?.pagu ?? '',
-          cell: ({ getValue }) => `${getValue() ? getValue() : ''}`,
+          cell: ({ row, getValue }) => {
+            if (
+              ['urusan', 'bidang'].some((l) => row.original.level.includes(l))
+            ) {
+              return;
+            }
+            return `${getValue() ? formatUang(getValue()) : '-'}`;
+          },
         },
       ],
     },
@@ -359,7 +407,7 @@ const RenstraTable = () => {
                 if (data) {
                   setIsPreview(true);
                 } else {
-                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
+                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                 }
               }}
             >
@@ -376,10 +424,12 @@ const RenstraTable = () => {
           </div>
         </div>
         <Tabel
-          tblClassName='lg:min-w-[1500px]'
+          tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
+          pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+          isLoading={isFetching}
         />
       </div>
       {isPreview &&
@@ -409,7 +459,7 @@ const RenstraTable = () => {
                       });
                     } else {
                       toast.error(
-                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
+                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
                       );
                     }
                   }}

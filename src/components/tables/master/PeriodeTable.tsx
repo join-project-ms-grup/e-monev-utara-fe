@@ -44,8 +44,6 @@ const PeriodeTable = () => {
         setFormData(initialFormData);
       }, 200);
       return () => clearTimeout(timeout);
-    } else {
-      console.log('PeriodeTable.tsx',formData);
     }
   }, [openModal]);
 
@@ -225,7 +223,7 @@ const PeriodeTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={data || []} columns={columns} />
+      <Tabel data={data || []} columns={columns} isLoading={isFetching} />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data Periode'

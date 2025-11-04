@@ -13,6 +13,7 @@ import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
   return (
@@ -102,7 +103,7 @@ const RPJMDTable = () => {
                 if (data && selectedSKPD) {
                   setIsPreview(true);
                 } else {
-                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
+                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                 }
               }}
             >
@@ -119,7 +120,12 @@ const RPJMDTable = () => {
             </InputButton>
           </div>
         </div>
-        <Tabel data={[]} columns={columns} renderHeader={tableHead} />
+        <Tabel
+          data={[]}
+          columns={columns}
+          renderHeader={tableHead}
+          pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+        />
       </div>
 
       {isPreview &&
@@ -145,7 +151,9 @@ const RPJMDTable = () => {
                         error: <b>Gagal mengunduh.</b>,
                       });
                     } else {
-                      toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
+                      toast.error(
+                        `${!selectedSKPD ? 'SKPD' : ''} belum dipilih`,
+                      );
                     }
                   }}
                 >

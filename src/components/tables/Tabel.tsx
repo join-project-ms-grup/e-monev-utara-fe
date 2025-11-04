@@ -20,6 +20,7 @@ import {
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import Pagination from './Pagination';
 import clsx from 'clsx';
+import Spinner from '../inputs/Spinner';
 
 interface MainTableProps<TData> {
   sorting?: boolean;
@@ -38,6 +39,7 @@ interface MainTableProps<TData> {
   customTableClass?: string;
   pesanDataKosong?: ReactNode;
   customRowAkhir?: ReactNode;
+  isLoading?: boolean;
 }
 
 declare module '@tanstack/react-table' {
@@ -67,6 +69,7 @@ const Tabel = <TData,>({
   customTableClass,
   pesanDataKosong,
   customRowAkhir,
+  isLoading = false,
 }: MainTableProps<TData & { group?: string }>) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -190,7 +193,17 @@ const Tabel = <TData,>({
           </thead>
 
           <tbody>
-            {renderBody ? (
+            {isLoading ? (
+              <tr>
+                <td
+                  colSpan={table.getAllLeafColumns().length}
+                >
+                  <div className='py-1 flex items-center justify-center'>
+                    <Spinner size={24} color='red' />
+                  </div>
+                </td>
+              </tr>
+            ) : renderBody ? (
               renderBody(table)
             ) : rowModel.rows.length > 0 ? (
               <>
@@ -243,9 +256,9 @@ const Tabel = <TData,>({
                 <tr>
                   <td
                     colSpan={table.getAllLeafColumns().length}
-                    className='text-center py-4'
+                    className='text-center py-4 text-xl'
                   >
-                    {pesanDataKosong ? pesanDataKosong : 'Tidak ada data'}
+                    {pesanDataKosong ? pesanDataKosong : 'TIDAK ADA DATA'}
                   </td>
                 </tr>
 

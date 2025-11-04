@@ -10,7 +10,12 @@ import InputSearchBox, {
 import { type ColumnDef } from '@tanstack/react-table';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import { useQuery } from '@tanstack/react-query';
-import { getPeriodeAkhirFromCookie, getPeriodeIDFromCookie, getPeriodeMulaiFromCookie } from '../../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../../lib/usercookie';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -25,7 +30,7 @@ const tableHead = () => {
     <>
       <tr>
         <th rowSpan={2}>No</th>
-        <th rowSpan={2}>Indikator  Kinerja Daerah</th>
+        <th rowSpan={2}>Indikator Kinerja Daerah</th>
         <th rowSpan={2}>Satuan</th>
         <th rowSpan={2}>Kondisi Awal {mulai - 2}</th>
         <th colSpan={periode.length}>Target Tahun</th>
@@ -99,7 +104,12 @@ const TaggingIndikatorIKDTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={[]} columns={columns} renderHeader={tableHead} />
+      <Tabel
+        data={[]}
+        columns={columns}
+        renderHeader={tableHead}
+        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+      />
     </div>
   );
 };

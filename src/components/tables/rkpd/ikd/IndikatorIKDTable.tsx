@@ -13,6 +13,7 @@ import {
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
   const mulai = Number(getPeriodeMulaiFromCookie()!);
@@ -92,7 +93,12 @@ const IndikatorIKDTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={[]} columns={columns} renderHeader={tableHead} />
+      <Tabel
+        data={[]}
+        columns={columns}
+        renderHeader={tableHead}
+        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+      />
     </div>
   );
 };

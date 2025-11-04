@@ -414,7 +414,7 @@ const FormPagu: React.FC<FormProps> = ({
                       <InputText
                         Iconlabel='Rp.'
                         inputMode='numeric'
-                        isMoney
+                        isRibu
                         type='text'
                         placeholder='Target...'
                         id={`target[${n}].pagu`}

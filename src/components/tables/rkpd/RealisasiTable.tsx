@@ -22,9 +22,10 @@ import FormRealisasi from '../../forms/FormRealisasi';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
-import { formatUang } from '../../../lib/helper';
+import { formatRibu, formatUang } from '../../../lib/helper';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputText from '../../inputs/InputText';
+import PesanSKPDTabel from '../../PesanSKPDTabel';
 
 const tableHead = () => {
   return (
@@ -38,7 +39,6 @@ const tableHead = () => {
         <th rowSpan={1} colSpan={5}>
           Triwulan
         </th>
-        <th rowSpan={2}>Aksi</th>
       </tr>
       <tr>
         <th>I</th>
@@ -68,11 +68,6 @@ const RealisasiTable = () => {
   //#endregion
 
   //#region Modal, FormData & Tabel Data
-  // const { data, refetch, isFetching } = useQuery({
-  //   queryKey: ['tabel_realisasi', selectedSKPD, tahunKe],
-  //   queryFn: () => getRealisasi(Number(selectedSKPD), Number(tahunKe)),
-  //   enabled: !!(selectedSKPD && tahunKe),
-  // });
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tabel_realisasi', selectedSKPD, tahunKe],
     queryFn: async () =>
@@ -228,12 +223,15 @@ const RealisasiTable = () => {
               <InputText
                 id={`input_realisasi_${data.id_pagu}_${triwulan}`}
                 inputMode='numeric'
+                Iconlabel='Rp.'
                 type='text'
                 placeholder='0'
                 value={realisasi}
                 onChange={handleChange}
                 withButton={!disBtn}
                 buttonType='submit'
+                isRibu
+                tooltip={formatUang(realisasi).toString()}
               />
             </form>
           );
@@ -316,6 +314,14 @@ const RealisasiTable = () => {
         data={data || []}
         columns={columns}
         renderHeader={tableHead}
+        pesanDataKosong={
+          <PesanSKPDTabel
+            selectedSKPD={selectedSKPD}
+            tahun={tahunKe}
+            butuhTahun
+          />
+        }
+        isLoading={isFetching}
       />
       <DialogModal
         title='Ubah data Realisasi'

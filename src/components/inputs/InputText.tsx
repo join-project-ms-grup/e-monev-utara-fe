@@ -13,8 +13,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   withButton?: boolean;
   disableButton?: boolean;
   buttonType?: 'button' | 'reset' | 'submit';
-  isMoney?: boolean;
+  isRibu?: boolean;
   onClear?: () => void;
+  tooltip?: string;
+  tooltipId?: string;
 }
 
 const InputText = ({
@@ -32,8 +34,10 @@ const InputText = ({
   wrapperClassname,
   disabled = false,
   value,
-  isMoney = false,
+  isRibu = false,
   onClear,
+  tooltip,
+  tooltipId = 'tooltip',
   ...props
 }: InputProps) => {
   const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -63,7 +67,7 @@ const InputText = ({
     let rawValue = e.target.value.replace(/[^\d.]/g, '');
 
     let cleanValue = rawValue;
-    if (isMoney) {
+    if (isRibu) {
       cleanValue = rawValue.replace(/\./g, '');
       const formatted = cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       e.target.value = formatted;
@@ -85,7 +89,7 @@ const InputText = ({
 
   const formattedValue =
     typeof value === 'string' || typeof value === 'number'
-      ? inputMode === 'numeric' && isMoney
+      ? inputMode === 'numeric' && isRibu
         ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
         : value.toString()
       : '';
@@ -111,6 +115,8 @@ const InputText = ({
         onChange={handleChange}
         className='h-full'
         disabled={disabled}
+        {...(tooltip ? { 'data-tooltip-id': tooltipId } : {})}
+        {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
       />
       <div className='inline-flex items-center'>
         <PiWarningCircle

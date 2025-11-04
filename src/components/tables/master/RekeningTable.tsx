@@ -77,7 +77,7 @@ const RekeningTable = () => {
     if (!data)
       return (
         <tr>
-          <td colSpan={7}>Tidak ada data</td>
+          <td colSpan={7}>TIDAK ADA DATA</td>
         </tr>
       );
 
@@ -382,6 +382,7 @@ const RekeningTable = () => {
         renderBody={(table) =>
           tableBody({ table, selectedRekening: searchFields.rekening })
         }
+        isLoading={isFetching}
       />
       {modalState === 'Add' && (
         <DialogModal

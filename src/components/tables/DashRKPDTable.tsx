@@ -14,6 +14,7 @@ import {
 } from '../../lib/usercookie';
 import { getSKPDPeriode } from '../../services/PeriodeService';
 import { getSKPD } from '../../services/SKPDService';
+import Spinner from '../inputs/Spinner';
 
 const tableHead = () => {
   return (
@@ -38,7 +39,7 @@ const tableHead = () => {
 const DashRKPDTable = () => {
   //#region SKPD dan Tahun ke
   const [tahunKe, setTahunKe] = useState('');
-  const { data: dataSKPD } = useQuery({
+  const { data: dataSKPD, isFetching, refetch } = useQuery({
     queryKey: ['list_skpd'],
     queryFn: async () => getSKPD(),
   });
@@ -173,15 +174,15 @@ const DashRKPDTable = () => {
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
-            // onClick={() => refetch()}
-            // disabled={isFetching}
+            onClick={() => refetch()}
+            disabled={isFetching}
           >
-            {/* {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />} */}
+            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
             <MdRefresh />
           </InputButton>
         </div>
       </div>
-      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead} />
+      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead} isLoading={isFetching} />
       <div>
         <span>Keterangan Predikat:</span>
         <div className='grid grid-cols-[auto_1fr] space-x-2'>
