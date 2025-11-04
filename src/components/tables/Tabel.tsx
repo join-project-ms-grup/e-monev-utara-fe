@@ -193,15 +193,7 @@ const Tabel = <TData,>({
           </thead>
 
           <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={table.getAllLeafColumns().length}>
-                  <div className='py-1 flex items-center justify-center'>
-                    <Spinner size={24} color='red' />
-                  </div>
-                </td>
-              </tr>
-            ) : renderBody ? (
+            {renderBody ? (
               <>
                 {rowModel.rows.length > 0 ? (
                   renderBody(table)
@@ -274,6 +266,15 @@ const Tabel = <TData,>({
 
                 {customRowAkhir && customRowAkhir}
               </>
+            )}
+            {isLoading && (
+              <tr>
+                <td colSpan={table.getAllLeafColumns().length}>
+                  <div className='flex items-center justify-center'>
+                    <Spinner size={24} color='red' />
+                  </div>
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

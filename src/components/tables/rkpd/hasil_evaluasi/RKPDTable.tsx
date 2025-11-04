@@ -382,7 +382,7 @@ const RKPDTable = () => {
               onClick={() => refetch()}
               disabled={isFetching}
             >
-              {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+              {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
             </InputButton>
           </div>
         </div>
@@ -399,7 +399,7 @@ const RKPDTable = () => {
               butuhTahun
             />
           }
-          isLoading={isFetching}
+          
         />
       </div>
       {isPreview &&

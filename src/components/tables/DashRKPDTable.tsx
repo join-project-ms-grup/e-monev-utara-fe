@@ -177,12 +177,12 @@ const DashRKPDTable = () => {
             onClick={() => refetch()}
             disabled={isFetching}
           >
-            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
             <MdRefresh />
           </InputButton>
         </div>
       </div>
-      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead} isLoading={isFetching} />
+      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead}  />
       <div>
         <span>Keterangan Predikat:</span>
         <div className='grid grid-cols-[auto_1fr] space-x-2'>

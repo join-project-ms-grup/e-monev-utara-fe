@@ -419,7 +419,7 @@ const RenstraTable = () => {
               onClick={() => refetch()}
               disabled={isFetching}
             >
-              {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+              {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
             </InputButton>
           </div>
         </div>
@@ -429,7 +429,7 @@ const RenstraTable = () => {
           columns={columns}
           renderHeader={tableHead}
           pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
-          isLoading={isFetching}
+          
         />
       </div>
       {isPreview &&

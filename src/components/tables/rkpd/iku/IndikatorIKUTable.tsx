@@ -88,7 +88,7 @@ const IndikatorIKUTable = () => {
             // onClick={() => refetch()}
             // disabled={isFetching}
           >
-            {/* {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />} */}
+            {/* {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />} */}
             <MdRefresh />
           </InputButton>
         </div>

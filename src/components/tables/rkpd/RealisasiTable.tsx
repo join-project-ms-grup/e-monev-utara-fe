@@ -305,7 +305,7 @@ const RealisasiTable = () => {
             onClick={() => refetch()}
             disabled={isFetching}
           >
-            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
         </div>
       </div>
@@ -321,7 +321,7 @@ const RealisasiTable = () => {
             butuhTahun
           />
         }
-        isLoading={isFetching}
+        
       />
       <DialogModal
         title='Ubah data Realisasi'

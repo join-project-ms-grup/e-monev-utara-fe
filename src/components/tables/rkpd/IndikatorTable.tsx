@@ -19,44 +19,13 @@ import {
   type Indikator,
   type IndikatorForm,
   type IndikatorMaster,
+  type IndikatorTarget,
 } from '../../../services/IndikatorService';
 import { getSKPDPeriode } from '../../../services/PeriodeService';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import InputText from '../../inputs/InputText';
 import PesanSKPDTabel from '../../PesanSKPDTabel';
 import { formatRibu } from '../../../lib/helper';
-
-const tableHead = () => {
-  const mulai = Number(getPeriodeMulaiFromCookie()!);
-  const akhir = Number(getPeriodeAkhirFromCookie()!);
-
-  const periode = Array.from(
-    { length: akhir - mulai + 1 },
-    (_, i) => mulai + i,
-  );
-  return (
-    <>
-      <tr>
-        <th rowSpan={2} colSpan={5} className='w-[50px]'>
-          Kode
-        </th>
-        <th rowSpan={2} className='w-[20%]'>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={2} className='w-[25%]'>Indikator</th>
-        <th rowSpan={2} className='w-[150px]'>Satuan</th>
-        <th rowSpan={1} colSpan={5}>
-          Target
-        </th>
-      </tr>
-      <tr>
-        {periode.map((thn) => (
-          <th key={thn} rowSpan={1} className='w-[200px]'>
-            {thn}
-          </th>
-        ))}
-      </tr>
-    </>
-  );
-};
 
 const IndikatorTable = () => {
   const queryClient = useQueryClient();
@@ -96,10 +65,11 @@ const IndikatorTable = () => {
         ...payload,
         skpd_periode_id: Number(payload.skpd_periode_id),
         master_id: Number(payload.master_id),
-        target: payload.target?.slice(0, 5).map((t) => ({
-          target: Number(t.target),
-          tahun_ke: Number(t.tahun_ke),
-        })),
+        target: payload.target,
+        // target: payload.target?.slice(0, 5).map((t) => ({
+        //   target: Number(t.target),
+        //   tahun_ke: Number(t.tahun_ke),
+        // })),
       });
     },
     onSuccess: () => {
@@ -116,6 +86,46 @@ const IndikatorTable = () => {
     },
   });
   // #endregion
+
+  //#region Table Head
+  const mulai = Number(getPeriodeMulaiFromCookie()!);
+  const akhir = Number(getPeriodeAkhirFromCookie()!);
+
+  const periode = Array.from(
+    { length: akhir - mulai + 1 },
+    (_, i) => mulai + i,
+  );
+  const tableHead = () => {
+    return (
+      <>
+        <tr>
+          <th rowSpan={2} colSpan={5} className='w-[50px]'>
+            Kode
+          </th>
+          <th rowSpan={2} className='w-[20%]'>
+            Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
+          </th>
+          <th rowSpan={2} className='w-[25%]'>
+            Indikator
+          </th>
+          <th rowSpan={2} className='w-[150px]'>
+            Satuan
+          </th>
+          <th rowSpan={1} colSpan={periode.length}>
+            Target
+          </th>
+        </tr>
+        <tr>
+          {periode.map((thn) => (
+            <th key={thn} rowSpan={1} className='w-[200px]'>
+              {thn}
+            </th>
+          ))}
+        </tr>
+      </>
+    );
+  };
+  //#endregion
 
   // #region Kolom Tabel
   const rowHeights = useRef<{ [key: string]: number[] }>({});
@@ -229,7 +239,12 @@ const IndikatorTable = () => {
                         master_id: row.original.id,
                         name: item.name,
                         satuan: satuan,
-                        target: item.target || [],
+                        target: item.target
+                        // target: item.target?.slice(0, 5).map((t) => ({
+                        //   target: Number(t.target),
+                        //   tahun_ke: Number(t.tahun_ke),
+                        // })),
+                        // target: item.target || [],
                       },
                     });
                   };
@@ -267,7 +282,7 @@ const IndikatorTable = () => {
     {
       header: 'Target',
       meta: { tdClassNames: 'text-center' },
-      columns: [1, 2, 3, 4, 5].map((tahun) => ({
+      columns: periode.map((tahun, indexTahun) => ({
         id: `tahun_ke_${tahun}`,
         header: `Target ${tahun}`,
         meta: { tdClassNames: 'text-center p-0!' },
@@ -281,10 +296,11 @@ const IndikatorTable = () => {
             <div>
               <table className='w-full'>
                 <tbody className='border-0!'>
-                  {indikatorList.map((indikator: any, index: number) => {
+                  {indikatorList.map((indikator: Indikator, index: number) => {
                     const initialValue =
-                      indikator.target?.find((t: any) => t.tahun_ke === tahun)
-                        ?.target ?? '';
+                      indikator.target?.find(
+                        (t: any) => t.tahun_ke === indexTahun + 1,
+                      )?.target ?? '';
 
                     const [target, setTarget] = useState(initialValue);
                     const [disBtn, setDisBtn] = useState(true);
@@ -304,24 +320,43 @@ const IndikatorTable = () => {
                     ) => {
                       e.preventDefault();
 
-                      const mappedTarget = indikator.target?.map((t: any) => ({
-                        tahun_ke: t.tahun_ke,
-                        target:
-                          Number(t.tahun_ke) === Number(tahun)
-                            ? Number(target)
-                            : Number(t.target) || 0,
-                      })) || [{ tahun_ke: tahun, target: Number(target) || 0 }];
+                      const totalTahun = periode.length;
+                      const mappedTarget = Array.from(
+                        { length: totalTahun },
+                        (_, i) => {
+                          const tahunKe = i + 1;
+                          const existing = indikator.target?.find(
+                            (t: IndikatorTarget) =>
+                              Number(t.tahun_ke) === tahunKe,
+                          );
 
-                      updateMutation.mutate({
-                        id: indikator.id,
-                        payload: {
-                          skpd_periode_id: Number(selectedSKPD),
-                          master_id: row.original.id,
-                          name: indikator.name,
-                          satuan: indikator.satuan,
-                          target: mappedTarget,
+                          return {
+                            tahun_ke: tahunKe,
+                            target:
+                              tahunKe === Number(indexTahun + 1)
+                                ? target.toString()
+                                : existing?.target?.toString() || '0',
+                          };
                         },
-                      });
+                      );
+
+                      if (indikator.id) {
+                        updateMutation.mutate({
+                          id: indikator.id,
+                          payload: {
+                            skpd_periode_id: Number(selectedSKPD),
+                            master_id: row.original.id,
+                            name: indikator.name,
+                            satuan: indikator.satuan?.toString(),
+                            target: mappedTarget.filter((t) => t.tahun_ke <= 5),
+                            // target: mappedTarget,
+                          },
+                        });
+                      } else {
+                        toast.error(
+                          'Terjadi kesalahan di server. Silakan coba lagi nanti.',
+                        );
+                      }
                     };
 
                     return (
@@ -344,7 +379,7 @@ const IndikatorTable = () => {
                               buttonType='submit'
                               invalid={!target}
                               isRibu
-                              tooltip={formatRibu(target)}
+                              tooltip={formatRibu(Number(target))}
                             />
                           </form>
                         </td>
@@ -387,7 +422,7 @@ const IndikatorTable = () => {
             onClick={() => refetch()}
             disabled={isFetching}
           >
-            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
         </div>
       </div>
@@ -397,7 +432,6 @@ const IndikatorTable = () => {
         renderHeader={tableHead}
         tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
         pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
-        isLoading={isFetching}
       />
     </div>
   );

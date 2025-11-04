@@ -29,37 +29,6 @@ import InputText from '../../inputs/InputText';
 import PesanSKPDTabel from '../../PesanSKPDTabel';
 import { formatUang } from '../../../lib/helper';
 
-const tableHead = () => {
-  const mulai = Number(getPeriodeMulaiFromCookie()!);
-  const akhir = Number(getPeriodeAkhirFromCookie()!);
-
-  const periode = Array.from(
-    { length: akhir - mulai + 1 },
-    (_, i) => mulai + i,
-  );
-
-  return (
-    <>
-      <tr>
-        <th rowSpan={2} colSpan={5}>
-          Kode
-        </th>
-        <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={1} colSpan={5}>
-          Target
-        </th>
-      </tr>
-      <tr>
-        {periode.map((thn) => (
-          <th key={thn} rowSpan={1}>
-            {thn}
-          </th>
-        ))}
-      </tr>
-    </>
-  );
-};
-
 const PaguIndikatifTable = () => {
   const queryClient = useQueryClient();
   const idPeriodeCookie = Number(getPeriodeIDFromCookie());
@@ -170,6 +139,40 @@ const PaguIndikatifTable = () => {
   });
   //#endregion
 
+  //#region Table Head
+  const mulai = Number(getPeriodeMulaiFromCookie()!);
+  const akhir = Number(getPeriodeAkhirFromCookie()!);
+
+  const periode = Array.from(
+    { length: akhir - mulai + 1 },
+    (_, i) => mulai + i,
+  );
+  const tableHead = () => {
+    return (
+      <>
+        <tr>
+          <th rowSpan={2} colSpan={5}>
+            Kode
+          </th>
+          <th rowSpan={2}>
+            Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
+          </th>
+          <th rowSpan={1} colSpan={periode.length}>
+            Target
+          </th>
+        </tr>
+        <tr>
+          {periode.map((thn) => (
+            <th key={thn} rowSpan={1}>
+              {thn}
+            </th>
+          ))}
+        </tr>
+      </>
+    );
+  };
+  //#endregion
+
   // #region Kolom Tabel
   const columns: ColumnDef<PaguMaster>[] = [
     {
@@ -207,12 +210,12 @@ const PaguIndikatifTable = () => {
       meta: {
         tdClassNames: 'text-center',
       },
-      columns: [1, 2, 3, 4, 5].map((tahun) => ({
+      columns: periode.map((tahun, index) => ({
         id: `pagu${tahun}`,
         header: `Pagu ${tahun}`,
         meta: { tdClassNames: 'text-center' },
         accessorFn: (row) => {
-          const item = row.pagu?.find((p) => p.tahun_ke === tahun);
+          const item = row.pagu?.find((p) => p.tahun_ke === index + 1);
           return item ? item.pagu : null;
         },
         cell: ({ row, getValue }) => {
@@ -232,7 +235,7 @@ const PaguIndikatifTable = () => {
             const mappedPagu = data.pagu?.map((p) => ({
               tahun_ke: p.tahun_ke,
               pagu:
-                Number(p.tahun_ke) === Number(tahun)
+                Number(p.tahun_ke) === Number(index + 1)
                   ? Number(target)
                   : Number(p.pagu) || 0,
             })) || [
@@ -318,7 +321,7 @@ const PaguIndikatifTable = () => {
             onClick={() => refetch()}
             disabled={isFetching}
           >
-            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
         </div>
       </div>
@@ -328,7 +331,7 @@ const PaguIndikatifTable = () => {
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
         pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
-        isLoading={isFetching}
+        
       />
       <DialogModal
         widthLevel={6}

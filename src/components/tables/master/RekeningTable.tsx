@@ -370,7 +370,7 @@ const RekeningTable = () => {
             onClick={() => refetch()}
             disabled={isFetching}
           >
-            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
         </div>
       </div>
@@ -382,7 +382,7 @@ const RekeningTable = () => {
         renderBody={(table) =>
           tableBody({ table, selectedRekening: searchFields.rekening })
         }
-        isLoading={isFetching}
+        
       />
       {modalState === 'Add' && (
         <DialogModal

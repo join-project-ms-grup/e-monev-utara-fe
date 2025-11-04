@@ -254,11 +254,11 @@ const UserTable = () => {
             onClick={() => refetch()}
             disabled={isFetching}
           >
-            {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />}
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
         </div>
       </div>
-      <Tabel data={data || []} columns={columns} isLoading={isFetching} />
+      <Tabel data={data || []} columns={columns}  />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data User'
