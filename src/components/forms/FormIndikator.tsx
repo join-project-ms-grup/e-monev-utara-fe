@@ -160,7 +160,7 @@ const FormIndikator: React.FC<FormProps> = ({
     }
   };
   const { data: dataUrusan } = useQuery({
-    queryKey: ['list_urusan'],
+    queryKey: ['listUrusan'],
     queryFn: getUrusan,
   });
   const { data: dataBidang } = useQuery({

@@ -100,6 +100,41 @@ const FormPagu: React.FC<FormProps> = ({
 
   const [pilihanParent, setPilihanParent] =
     useState<PilihanParent>(initPilihanParent);
+
+  const getListQuery = (key: string, parentId?: string) =>
+    useQuery({
+      queryKey: [key, parentId],
+      queryFn: () => (parentId ? getChildren(Number(parentId)) : getUrusan()),
+      enabled: key === 'listUrusan' || !!parentId,
+    });
+
+  const { data: dataUrusan } = getListQuery('listUrusan');
+  const { data: dataBidang } = getListQuery('listBidang', pilihanParent.urusan);
+  const { data: dataProgram } = getListQuery(
+    'listProgram',
+    pilihanParent.bidang,
+  );
+  const { data: dataKegiatan } = getListQuery(
+    'listKegiatan',
+    pilihanParent.program,
+  );
+  const { data: dataSubKegiatan } = getListQuery(
+    'listSubKegiatan',
+    pilihanParent.kegiatan,
+  );
+
+  const mapList = (data?: any[]) =>
+    data?.map((item) => ({
+      label: `[${item.kode} - ${item.id}] ${item.name}`,
+      value: item.id?.toString(),
+    })) || [];
+
+  const listUrusan = mapList(dataUrusan);
+  const listBidang = mapList(dataBidang);
+  const listProgram = mapList(dataProgram);
+  const listKegiatan = mapList(dataKegiatan);
+  const listSubKegiatan = mapList(dataSubKegiatan);
+
   const levelKeys = [
     'urusan',
     'bidang',
@@ -107,6 +142,20 @@ const FormPagu: React.FC<FormProps> = ({
     'kegiatan',
     'subkegiatan',
   ] as const;
+
+  const handleChangeLevel = (level: keyof PilihanParent, value: string) => {
+    const levelIndex = levelKeys.indexOf(level);
+
+    const updated: PilihanParent = { ...pilihanParent };
+    updated[level] = value;
+
+    for (let i = levelIndex + 1; i < levelKeys.length; i++) {
+      updated[levelKeys[i]] = '';
+    }
+
+    setPilihanParent(updated);
+  };
+
   useEffect(() => {
     const updatedPilihan: PilihanParent = { ...pilihanParent };
     let foundEmpty = false;
@@ -156,56 +205,6 @@ const FormPagu: React.FC<FormProps> = ({
       form.setFieldValue('master_id', parentValue);
     }
   };
-  const { data: dataUrusan } = useQuery({
-    queryKey: ['list_urusan'],
-    queryFn: getUrusan,
-  });
-  const { data: dataBidang } = useQuery({
-    queryKey: ['listBidang', pilihanParent.urusan],
-    queryFn: () => getChildren(Number(pilihanParent.urusan)),
-    enabled: !!pilihanParent.urusan,
-  });
-  const { data: dataProgram } = useQuery({
-    queryKey: ['listProgram', pilihanParent.bidang],
-    queryFn: () => getChildren(Number(pilihanParent.bidang)),
-    enabled: !!pilihanParent.bidang,
-  });
-  const { data: dataKegiatan } = useQuery({
-    queryKey: ['listKegiatan', pilihanParent.program],
-    queryFn: () => getChildren(Number(pilihanParent.program)),
-    enabled: !!pilihanParent.program,
-  });
-  const { data: dataSubKegiatan } = useQuery({
-    queryKey: ['listSubKegiatan', pilihanParent.kegiatan],
-    queryFn: () => getChildren(Number(pilihanParent.kegiatan)),
-    enabled: !!pilihanParent.kegiatan,
-  });
-
-  const listUrusan =
-    dataUrusan?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
-      value: item.id?.toString(),
-    })) || [];
-  const listBidang =
-    dataBidang?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
-      value: item.id?.toString(),
-    })) || [];
-  const listProgram =
-    dataProgram?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
-      value: item.id?.toString(),
-    })) || [];
-  const listKegiatan =
-    dataKegiatan?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
-      value: item.id?.toString(),
-    })) || [];
-  const listSubKegiatan =
-    dataSubKegiatan?.map((item) => ({
-      label: `[${item.kode} - ${item.id}] ${item.name}`,
-      value: item.id?.toString(),
-    })) || [];
   // #endregion
 
   return (
@@ -228,8 +227,14 @@ const FormPagu: React.FC<FormProps> = ({
                       defaultOptionLabel='Pilih Tujuan'
                       options={listRekening}
                       value={selectedRek}
-                      onChange={(val) => setSelectedRek(val)}
-                      onClear={() => setSelectedRek('')}
+                      onChange={(val) => {
+                        setSelectedRek(val);
+                        setPilihanParent(initPilihanParent);
+                      }}
+                      onClear={() => {
+                        setSelectedRek('');
+                        setPilihanParent(initPilihanParent);
+                      }}
                       invalid={!field.state.meta.isValid && !selectedRek}
                     />
                     {!selectedRek && <ErrorField field={field} />}
@@ -244,16 +249,9 @@ const FormPagu: React.FC<FormProps> = ({
                           id='listurusan'
                           tooltip
                           options={listUrusan as OptionItem[]}
-                          onChange={(e) =>
-                            setPilihanParent((prev) => ({ ...prev, urusan: e }))
-                          }
                           value={pilihanParent.urusan}
-                          onClear={() =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              urusan: '',
-                            }))
-                          }
+                          onChange={(e) => handleChangeLevel('urusan', e)}
+                          onClear={() => handleChangeLevel('urusan', '')}
                           defaultOptionLabel='Pilih Urusan'
                           className='h-9'
                           withSearch
@@ -271,16 +269,9 @@ const FormPagu: React.FC<FormProps> = ({
                           id='listbidang'
                           tooltip
                           options={listBidang as OptionItem[]}
-                          onChange={(e) =>
-                            setPilihanParent((prev) => ({ ...prev, bidang: e }))
-                          }
                           value={pilihanParent.bidang}
-                          onClear={() =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              bidang: '',
-                            }))
-                          }
+                          onChange={(e) => handleChangeLevel('bidang', e)}
+                          onClear={() => handleChangeLevel('bidang', '')}
                           defaultOptionLabel='Pilih Bidang'
                           className='h-9'
                           withSearch
@@ -299,19 +290,9 @@ const FormPagu: React.FC<FormProps> = ({
                           id='listprogram'
                           tooltip
                           options={listProgram as OptionItem[]}
-                          onChange={(e) =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              program: e,
-                            }))
-                          }
                           value={pilihanParent.program}
-                          onClear={() =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              program: '',
-                            }))
-                          }
+                          onChange={(e) => handleChangeLevel('program', e)}
+                          onClear={() => handleChangeLevel('program', '')}
                           defaultOptionLabel='Pilih Program'
                           className='h-9'
                           withSearch
@@ -332,19 +313,9 @@ const FormPagu: React.FC<FormProps> = ({
                           id='listkegiatan'
                           tooltip
                           options={listKegiatan as OptionItem[]}
-                          onChange={(e) =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              kegiatan: e,
-                            }))
-                          }
                           value={pilihanParent.kegiatan}
-                          onClear={() =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              kegiatan: '',
-                            }))
-                          }
+                          onChange={(e) => handleChangeLevel('kegiatan', e)}
+                          onClear={() => handleChangeLevel('kegiatan', '')}
                           defaultOptionLabel='Pilih Kegiatan'
                           className='h-9'
                           withSearch
@@ -367,19 +338,9 @@ const FormPagu: React.FC<FormProps> = ({
                           id='listsubkegiatan'
                           tooltip
                           options={listSubKegiatan as OptionItem[]}
-                          onChange={(e) =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              subkegiatan: e,
-                            }))
-                          }
                           value={pilihanParent.subkegiatan}
-                          onClear={() =>
-                            setPilihanParent((prev) => ({
-                              ...prev,
-                              subkegiatan: '',
-                            }))
-                          }
+                          onChange={(e) => handleChangeLevel('subkegiatan', e)}
+                          onClear={() => handleChangeLevel('subkegiatan', '')}
                           defaultOptionLabel='Pilih Sub Kegiatan'
                           className='h-9'
                           withSearch
