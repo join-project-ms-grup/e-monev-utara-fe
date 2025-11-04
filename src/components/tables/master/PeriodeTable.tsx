@@ -32,7 +32,7 @@ const PeriodeTable = () => {
     id: Number(''),
     mulai: '',
     akhir: '',
-    status: false,
+    status: true,
     skpds: 'all'
   };
 
@@ -88,7 +88,6 @@ const PeriodeTable = () => {
       payload: PeriodeForm;
     }) => {
       setLoadingMutation(true);
-      // return console.log(id, payload)
       return updatePeriode(id, payload);
     },
     onSuccess: () => {

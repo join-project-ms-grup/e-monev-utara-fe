@@ -8,7 +8,7 @@ import { useForm, useStore } from '@tanstack/react-form';
 import { MdCalendarMonth } from 'react-icons/md';
 import InputText from '../inputs/InputText';
 import InputToggle from '../inputs/InputToggle';
-import { periodeSchema, periodeSchemaSubmit } from './schemas/SchemaPeriode';
+import { mapErrors, mapToInput, periodeSchema, periodeSchemaSubmit } from './schemas/SchemaPeriode';
 import ErrorField from './ErrorField';
 import { useQuery } from '@tanstack/react-query';
 import { getSKPD, type SKPDType } from '../../services/SKPDService';
@@ -40,6 +40,14 @@ const FormPeriode: React.FC<FormProps> = ({
   defaultValues,
 }) => {
   // #region Form
+  const validateWith = (schema: any, value: any) => {
+    const input = mapToInput(value);
+    const result = schema.safeParse(input);
+    return result.success
+      ? { fields: {} }
+      : { fields: mapErrors(result.error.format()) };
+  };
+
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -54,44 +62,8 @@ const FormPeriode: React.FC<FormProps> = ({
       }
     },
     validators: {
-      onChange: ({ value }) => {
-        const input = {
-          mulai: value.mulai?.toString() ?? '',
-          akhir: value.akhir?.toString() ?? '',
-        };
-
-        const result = periodeSchema.safeParse(input);
-
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              mulai: errors.mulai?._errors[0],
-              akhir: errors.akhir?._errors[0],
-            },
-          };
-        }
-      },
-      onSubmit: ({ value }) => {
-        const input = {
-          mulai: value.mulai?.toString() ?? '',
-          akhir: value.akhir?.toString() ?? '',
-        };
-        const result = periodeSchemaSubmit.safeParse(input);
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              mulai: errors.mulai?._errors[0],
-              akhir: errors.akhir?._errors[0],
-            },
-          };
-        }
-      },
+      onChange: ({ value }) => validateWith(periodeSchema, value),
+      onSubmit: ({ value }) => validateWith(periodeSchemaSubmit, value),
     },
   });
   // #endregion
