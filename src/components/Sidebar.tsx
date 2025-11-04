@@ -52,7 +52,6 @@ const menuUtama: MenuItem[] = [
     icon: <MdInventory />,
     submenu: [
       { label: 'Rekening', to: '/master/rekening' },
-      { label: 'Role', to: '/master/role', akses: 1 && 2 },
       { label: 'Periode', to: '/master/periode' },
       { label: 'SKPD', to: '/master/skpd', akses: 1 && 2 },
     ],
@@ -61,7 +60,10 @@ const menuUtama: MenuItem[] = [
     label: 'Konfigurasi',
     icon: <MdSettings />,
     akses: 1 && 2,
-    submenu: [{ label: 'User', to: '/konfigurasi/user' }],
+    submenu: [
+      { label: 'Role', to: '/master/role', akses: 1 && 2 },
+      { label: 'User', to: '/konfigurasi/user' }
+    ],
   },
 ];
 
@@ -69,8 +71,14 @@ const menuUtama: MenuItem[] = [
 const menuRKPD: MenuItem[] = [
   {
     type: 'separator',
-    label: 'MENU RKPD',
-    akses: 3,
+    label: 'PERENCANAAN',
+    akses: 1,
+  },
+  {
+    label: 'Renja',
+    icon: <MdDragIndicator />,
+    to: '/rkpd/hasil_evaluasi/Renja',
+    akses: 3
   },
   {
     label: 'Pagu Indikatif',
@@ -79,9 +87,14 @@ const menuRKPD: MenuItem[] = [
     akses: 3,
   },
   { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
-  { label: 'Capaian', icon: <MdInsights />, to: '/rkpd/capaian', akses: 2 },
   {
-    label: 'Realisasi',
+    type: 'separator',
+    label: 'Realisasi dan Hasil',
+    akses: 3,
+  },
+  { label: 'Capaian Kinerja', icon: <MdInsights />, to: '/rkpd/capaian', akses: 2 },
+  {
+    label: 'Realisasi Anggaran',
     icon: <MdAssignmentTurnedIn />,
     to: '/rkpd/realisasi',
     akses: 2,
@@ -113,7 +126,6 @@ const menuRKPD: MenuItem[] = [
       { label: 'RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
       { label: 'Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
       { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
-      { label: 'Renja', to: '/rkpd/hasil_evaluasi/Renja' },
     ],
     akses: 3,
   },
