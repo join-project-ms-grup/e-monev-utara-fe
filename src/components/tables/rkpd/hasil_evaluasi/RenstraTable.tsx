@@ -385,44 +385,18 @@ const RenstraTable = () => {
       {isPreview &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
-            <div className='p-2'>
-              <RenstraPreviewTable
-                onCetak={() => {
-                  if (data) {
-                    const skpdLabel =
-                      dataSKPDPeriode?.find(
-                        (s) => s.id === Number(selectedSKPD),
-                      )?.name ?? '';
-                    toast.promise(exportRenstra(data, skpdLabel), {
-                      loading: 'Sedang mengunduh...',
-                      success: <b>Berhasil mengunduh.</b>,
-                      error: <b>Gagal mengunduh.</b>,
-                    });
-                  } else {
-                    toast.error(
-                      `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
-                    );
-                  }
-                }}
-                onClose={() => setIsPreview(false)}
-                data={data || []}
-                skpd={
-                  dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
-                    ?.name ?? ''
-                }
-              />
-            </div>
-          </div>,
-          document.body,
-        )}
-      {/* {isPreview &&
-        createPortal(
-          <div className='fixed inset-0 z-[9999] flex items-end justify-center bg-white'>
-            <div className='flex flex-col space-y-2 overflow-y-auto md:h-[100vh]'>
-              <div className='inline-flex justify-between items-center mt-2 px-2'>
+            <div className='border-b'>
+              <div className='flex flex-row justify-between p-2'>
+                <button
+                  onClick={() => setIsPreview(false)}
+                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+                  aria-label='Tutup preview'
+                >
+                  <MdClose />
+                </button>
                 <InputButton
                   className='h-9'
-                  onClick={async () => {
+                  onClick={() => {
                     if (data) {
                       const skpdLabel =
                         dataSKPDPeriode?.find(
@@ -445,27 +419,20 @@ const RenstraTable = () => {
                     Cetak Excel
                   </span>
                 </InputButton>
-                <button
-                  onClick={() => setIsPreview(false)}
-                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-                  aria-label='Tutup preview'
-                >
-                  <MdClose />
-                </button>
               </div>
-              <div className=''>
-                <RenstraPreviewTable
-                  data={data || []}
-                  skpd={
-                    dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
-                      ?.name ?? ''
-                  }
-                />
-              </div>
+            </div>
+            <div className='p-2'>
+              <RenstraPreviewTable
+                data={data || []}
+                skpd={
+                  dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+                    ?.name ?? ''
+                }
+              />
             </div>
           </div>,
           document.body,
-        )} */}
+        )}
     </>
   );
 };

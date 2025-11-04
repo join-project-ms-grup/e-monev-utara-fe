@@ -3,16 +3,12 @@ import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { FlatRKPDRow } from '../../../../services/RKPDService';
 import { formatUang } from '../../../../lib/helper';
-import { MdPrint, MdClose } from 'react-icons/md';
-import InputButton from '../../../inputs/InputButton';
 
 interface MainTableProps {
   data: FlatRKPDRow[];
   listTahunKe: { label: string; value: string }[];
   tahunKe: string;
   skpd: string;
-  onClose: () => void;
-  onCetak: () => void;
 }
 
 const RKPDPreviewTable = ({
@@ -20,8 +16,6 @@ const RKPDPreviewTable = ({
   listTahunKe,
   tahunKe,
   skpd,
-  onClose,
-  onCetak,
 }: MainTableProps) => {
   console.log('data', data);
   const tahunLabel = listTahunKe.find((item) => item.value === tahunKe)?.label;
@@ -470,21 +464,6 @@ const RKPDPreviewTable = ({
 
   return (
     <div className='flex flex-col p-4'>
-      <div className='flex flex-row gap-5 mb-5'>
-        <button
-          onClick={onClose}
-          className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-          aria-label='Tutup preview'
-        >
-          <MdClose />
-        </button>
-        <InputButton className='h-9' onClick={onCetak}>
-          <span className='inline-flex items-center gap-2 px-2'>
-            <MdPrint />
-            Cetak Excel
-          </span>
-        </InputButton>
-      </div>
       <div className='border p-2 w-fit'>
         <div className='min-w-[1500px]'>
           <div className='flex flex-col items-center justify-center text-xl'>
@@ -515,9 +494,7 @@ const RKPDPreviewTable = ({
                   ......................., tanggal ...................
                 </span>
                 <br />
-                <span>
-                  KEPALA BAPPEDA....................................
-                </span>
+                <span>KEPALA BAPPEDA....................................</span>
                 <span>PROVINSI .................................... </span>
                 <br />
                 <br />
@@ -530,8 +507,12 @@ const RKPDPreviewTable = ({
                   ......................., tanggal ...................
                 </span>
                 <br />
-                <span>BUPATI/WALI KOTA....................................</span>
-                <span>KABUPATEN/KOTA .................................... </span>
+                <span>
+                  BUPATI/WALI KOTA....................................
+                </span>
+                <span>
+                  KABUPATEN/KOTA ....................................{' '}
+                </span>
                 <br />
                 <br />
                 <br />

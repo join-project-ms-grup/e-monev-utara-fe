@@ -8,11 +8,9 @@ import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../../.
 
 interface MainTableProps {
   data: FlatRenstraRow[];
-  onClose: () => void;
-  onCetak: () => void;
 }
 
-const RPJMDPreviewTable = ({ data, onClose, onCetak }: MainTableProps) => {
+const RPJMDPreviewTable = ({ data}: MainTableProps) => {
   console.log('data renstra', data);
   //#region Head Tabel
   const tableHead = () => {
@@ -123,21 +121,6 @@ const RPJMDPreviewTable = ({ data, onClose, onCetak }: MainTableProps) => {
 
   return (
     <div className='flex flex-col p-4'>
-      <div className='flex flex-row gap-5 mb-5'>
-        <button
-          onClick={onClose}
-          className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-          aria-label='Tutup preview'
-        >
-          <MdClose />
-        </button>
-        <InputButton className='h-9' onClick={onCetak}>
-          <span className='inline-flex items-center gap-2 px-2'>
-            <MdPrint />
-            Cetak Excel
-          </span>
-        </InputButton>
-      </div>
       <div className='border p-2 w-fit'>
         <div className='min-w-[1500px]'>
           <div className='flex flex-col items-center justify-center text-xl'>

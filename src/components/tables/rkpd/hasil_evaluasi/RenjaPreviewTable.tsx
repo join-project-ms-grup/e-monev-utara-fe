@@ -12,15 +12,11 @@ import InputButton from '../../../inputs/InputButton';
 interface MainTableProps {
   data: FlatRenstraRow[];
   skpd: string;
-  onClose: () => void;
-  onCetak: () => void;
 }
 
 const RenjaPreviewTable = ({
   data,
   skpd,
-  onCetak,
-  onClose,
 }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
@@ -141,21 +137,6 @@ const RenjaPreviewTable = ({
 
   return (
     <div className='flex flex-col p-4'>
-      <div className='flex flex-row gap-5 mb-5'>
-        <button
-          onClick={onClose}
-          className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-          aria-label='Tutup preview'
-        >
-          <MdClose />
-        </button>
-        <InputButton className='h-9' onClick={onCetak}>
-          <span className='inline-flex items-center gap-2 px-2'>
-            <MdPrint />
-            Cetak Excel
-          </span>
-        </InputButton>
-      </div>
       <div className='border p-2 w-fit'>
         <div className='min-w-[1500px]'>
           <div className='flex flex-col items-center justify-center text-xl'>

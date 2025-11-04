@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { exportRKPD } from '../../../../services/Excel/ExcelRKPD';
-import { MdPreview, MdRefresh } from 'react-icons/md';
+import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import {
   flattenRKPD,
@@ -23,6 +23,7 @@ import Spinner from '../../../inputs/Spinner';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
 import RKPDPreviewTable from './RKPDPreviewTable';
+import { formatUang } from '../../../../lib/helper';
 
 const RKPDTable = () => {
   //#region SKPD dan Tahun ke
@@ -200,7 +201,7 @@ const RKPDTable = () => {
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
                         >
-                          {i.target_akhir_periode}
+                          {`${i.target_akhir_periode} ${i.satuan}`}
                         </td>
                       </tr>
                     ))}
@@ -214,6 +215,15 @@ const RKPDTable = () => {
           id: 'rp_akhir',
           header: 'Rp.',
           accessorFn: (row) => row.pagu?.paguPeriode ?? '',
+          cell: ({ row, getValue }) => {
+            if (
+              ['urusan', 'bidang'].some((l) => row.original.level.includes(l))
+            ) {
+              return;
+            } else {
+              return <>{formatUang(Number(getValue()))}</>;
+            }
+          },
         },
       ],
     },
@@ -244,7 +254,7 @@ const RKPDTable = () => {
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
                         >
-                          {i.total_capaian_periode}
+                          {`${i.total_capaian_periode} ${i.satuan}`}
                         </td>
                       </tr>
                     ))}
@@ -258,6 +268,15 @@ const RKPDTable = () => {
           id: 'rp_sebelum',
           header: 'Rp.',
           accessorFn: (row) => row.pagu?.totalRealisasiPeriode ?? '',
+          cell: ({ row, getValue }) => {
+            if (
+              ['urusan', 'bidang'].some((l) => row.original.level.includes(l))
+            ) {
+              return;
+            } else {
+              return <>{formatUang(Number(getValue()))}</>;
+            }
+          },
         },
       ],
     },
@@ -288,7 +307,7 @@ const RKPDTable = () => {
                               rowHeights.current[row.id]?.[index] || 'auto',
                           }}
                         >
-                          {i.target_tahun_dievaluasi}
+                          {`${i.target_tahun_dievaluasi} ${i.satuan}`}
                         </td>
                       </tr>
                     ))}
@@ -302,6 +321,15 @@ const RKPDTable = () => {
           id: 'rp_evaluasi',
           header: 'Rp.',
           accessorFn: (row) => row.pagu?.paguTahunEval ?? '',
+          cell: ({ row, getValue }) => {
+            if (
+              ['urusan', 'bidang'].some((l) => row.original.level.includes(l))
+            ) {
+              return;
+            } else {
+              return <>{formatUang(Number(getValue()))}</>;
+            }
+          },
         },
       ],
     },
@@ -393,29 +421,48 @@ const RKPDTable = () => {
       </div>
       {isPreview &&
         createPortal(
-          <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
-            <div className='p-2'>
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
+            <div className='border-b'>
+              <div className='flex flex-row justify-between p-2'>
+                <button
+                  onClick={() => setIsPreview(false)}
+                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+                  aria-label='Tutup preview'
+                >
+                  <MdClose />
+                </button>
+                <InputButton
+                  className='h-9'
+                  onClick={() => {
+                    if (data) {
+                      const tahunLabel =
+                        listTahunKe.find((t) => t.value === tahunKe)?.label ??
+                        '';
+                      const skpdLabel =
+                        dataSKPDPeriode?.find(
+                          (s) => s.id === Number(selectedSKPD),
+                        )?.name ?? '';
+                      toast.promise(exportRKPD(data, tahunLabel, skpdLabel), {
+                        loading: 'Sedang mengunduh...',
+                        success: <b>Berhasil mengunduh.</b>,
+                        error: <b>Gagal mengunduh.</b>,
+                      });
+                    } else {
+                      toast.error(
+                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
+                      );
+                    }
+                  }}
+                >
+                  <span className='inline-flex items-center gap-2 px-2'>
+                    <MdPrint />
+                    Cetak Excel
+                  </span>
+                </InputButton>
+              </div>
+            </div>
+            <div className='p-2 overflow-auto'>
               <RKPDPreviewTable
-                onCetak={() => {
-                  if (data) {
-                    const tahunLabel =
-                      listTahunKe.find((t) => t.value === tahunKe)?.label ?? '';
-                    const skpdLabel =
-                      dataSKPDPeriode?.find(
-                        (s) => s.id === Number(selectedSKPD),
-                      )?.name ?? '';
-                    toast.promise(exportRKPD(data, tahunLabel, skpdLabel), {
-                      loading: 'Sedang mengunduh...',
-                      success: <b>Berhasil mengunduh.</b>,
-                      error: <b>Gagal mengunduh.</b>,
-                    });
-                  } else {
-                    toast.error(
-                      `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum diisi`,
-                    );
-                  }
-                }}
-                onClose={() => setIsPreview(false)}
                 data={data || []}
                 listTahunKe={listTahunKe}
                 tahunKe={tahunKe}

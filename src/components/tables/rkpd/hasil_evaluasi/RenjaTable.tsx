@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
-import { MdPreview, MdRefresh } from 'react-icons/md';
+import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import type { ColumnDef } from '@tanstack/react-table';
 import InputSearchBox, {
@@ -140,6 +140,41 @@ const RenjaTable = () => {
       {isPreview &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
+            <div className='border-b'>
+              <div className='flex flex-row justify-between p-2'>
+                <button
+                  onClick={() => setIsPreview(false)}
+                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+                  aria-label='Tutup preview'
+                >
+                  <MdClose />
+                </button>
+                <InputButton
+                  className='h-9'
+                  onClick={() => {
+                    const data = true;
+                    if (data) {
+                      const skpdLabel =
+                        dataSKPDPeriode?.find(
+                          (s) => s.id === Number(selectedSKPD),
+                        )?.name ?? '';
+                      toast.promise(exportRenja([], skpdLabel), {
+                        loading: 'Sedang mengunduh...',
+                        success: <b>Berhasil mengunduh.</b>,
+                        error: <b>Gagal mengunduh.</b>,
+                      });
+                    } else {
+                      toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
+                    }
+                  }}
+                >
+                  <span className='inline-flex items-center gap-2 px-2'>
+                    <MdPrint />
+                    Cetak Excel
+                  </span>
+                </InputButton>
+              </div>
+            </div>
             <div className='p-2'>
               <RenjaPreviewTable
                 data={[]}
@@ -148,23 +183,6 @@ const RenjaTable = () => {
                     (item) => item.id === Number(selectedSKPD),
                   )?.name ?? ''
                 }
-                onCetak={() => {
-                  const data = true;
-                  if (data) {
-                    const skpdLabel =
-                      dataSKPDPeriode?.find(
-                        (s) => s.id === Number(selectedSKPD),
-                      )?.name ?? '';
-                    toast.promise(exportRenja([], skpdLabel), {
-                      loading: 'Sedang mengunduh...',
-                      success: <b>Berhasil mengunduh.</b>,
-                      error: <b>Gagal mengunduh.</b>,
-                    });
-                  } else {
-                    toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum diisi`);
-                  }
-                }}
-                onClose={() => setIsPreview(false)}
               />
             </div>
           </div>,
