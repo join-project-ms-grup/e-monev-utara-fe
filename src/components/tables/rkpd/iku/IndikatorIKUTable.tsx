@@ -16,13 +16,21 @@ import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
+  // const mulai = Number(getPeriodeMulaiFromCookie()!);
+  // const akhir = Number(getPeriodeAkhirFromCookie()!);
+
+  // const periode = [
+  //   mulai - 1,
+  //   ...Array.from({ length: akhir - mulai + 1 }, (_, i) => mulai + i),
+  // ];
+
   const mulai = Number(getPeriodeMulaiFromCookie()!);
   const akhir = Number(getPeriodeAkhirFromCookie()!);
 
-  const periode = [
-    mulai - 1,
-    ...Array.from({ length: akhir - mulai + 1 }, (_, i) => mulai + i),
-  ];
+  const periode = Array.from(
+    { length: akhir - mulai + 1 },
+    (_, i) => mulai + i,
+  );
 
   return (
     <>
@@ -31,7 +39,7 @@ const tableHead = () => {
         <th rowSpan={2}>Sasaran Strategis</th>
         <th rowSpan={2}>Indikator Kinerja Utama</th>
         <th rowSpan={2}>Satuan</th>
-        <th rowSpan={2}>Kondisi Awal {mulai - 2}</th>
+        <th rowSpan={2}>Kondisi Awal {mulai - 1}</th>
         <th colSpan={periode.length}>Target Tahun</th>
       </tr>
       <tr>
@@ -88,7 +96,7 @@ const IndikatorIKUTable = () => {
             // onClick={() => refetch()}
             // disabled={isFetching}
           >
-            {/* {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />} */}
+            {/* {isFetching ? <Spinner color='var(--text-1)' /> : <MdRefresh />} */}
             <MdRefresh />
           </InputButton>
         </div>

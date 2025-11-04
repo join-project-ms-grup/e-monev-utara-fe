@@ -18,13 +18,20 @@ import {
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
+  // const mulai = Number(getPeriodeMulaiFromCookie()!);
+  // const akhir = Number(getPeriodeAkhirFromCookie()!);
+
+  // const periode = [
+  //   mulai - 1,
+  //   ...Array.from({ length: akhir - mulai + 1 }, (_, i) => mulai + i),
+  // ];
   const mulai = Number(getPeriodeMulaiFromCookie()!);
   const akhir = Number(getPeriodeAkhirFromCookie()!);
 
-  const periode = [
-    mulai - 1,
-    ...Array.from({ length: akhir - mulai + 1 }, (_, i) => mulai + i),
-  ];
+  const periode = Array.from(
+    { length: akhir - mulai + 1 },
+    (_, i) => mulai + i,
+  );
 
   return (
     <>
@@ -32,7 +39,7 @@ const tableHead = () => {
         <th rowSpan={2}>No</th>
         <th rowSpan={2}>Indikator Kinerja Daerah</th>
         <th rowSpan={2}>Satuan</th>
-        <th rowSpan={2}>Kondisi Awal {mulai - 2}</th>
+        <th rowSpan={2}>Kondisi Awal {mulai - 1}</th>
         <th colSpan={periode.length}>Target Tahun</th>
       </tr>
       <tr>
