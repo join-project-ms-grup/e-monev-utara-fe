@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
-import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
-import toast from 'react-hot-toast';
+import { MdRefresh } from 'react-icons/md';
 import type { ColumnDef } from '@tanstack/react-table';
 import InputSearchBox, {
   type OptionItem,
@@ -11,49 +10,21 @@ import { useQuery } from '@tanstack/react-query';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
 import { getSKPDPeriode } from '../../../../services/PeriodeService';
-import { createPortal } from 'react-dom';
-import RenjaPreviewTable from './RenjaPreviewTable';
-import { exportRenja } from '../../../../services/Excel/ExcelRenja';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 
 const tableHead = () => {
   return (
     <>
       <tr>
-        <th rowSpan={2}>No</th>
-        <th rowSpan={2}>Sasaran</th>
-        <th rowSpan={2}> Program/ Kegiatan</th>
-        <th rowSpan={2}>
-          Indikator Kinerja Program (outcome)/ Kegiatan (output)
-        </th>
-        <th colSpan={2}>
-          Target Renstra Perangkat Daerah pada Tahun{' '}
-          {getPeriodeAkhirFromCookie()}
-        </th>
-        <th colSpan={2}>
-          Realisasi Capaian Kinerja Renstra Perangkat Daerah sampai dengan Renja
-          Perangkat Daerah Tahun Lalu
-          <br />
-          (n-2)
-        </th>
-        <th colSpan={2}>
-          Target Kinerja dan Anggaran Renja Perangkat Daerah Tahun berjalan
-          (Tahun n-1) yang dievaluasi
-        </th>
-        <th colSpan={2}>
-          Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang
-          dievaluasi
-        </th>
-      </tr>
-      <tr>
-        {[...Array(4)].map((_, i) => (
-          <React.Fragment key={i}>
-            <th>K</th>
-            <th>Rp.</th>
-          </React.Fragment>
-        ))}
+        <th>No</th>
+        <th>Kode Sub Kegiatan</th>
+        <th>Nama Sub Kegiatan</th>
+        <th>Pagu (Rp.)</th>
+        <th>Waktu Pelaksanaan</th>
+        <th>Detail</th>
       </tr>
     </>
   );
@@ -61,6 +32,17 @@ const tableHead = () => {
 
 const RenjaTable = () => {
   //#region SKPD dan Tahun ke
+  const [tahunKe, setTahunKe] = useState('');
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
@@ -73,28 +55,38 @@ const RenjaTable = () => {
     })) || [];
   //#endregion
 
-  const columns: ColumnDef<any>[] = Array.from({ length: 12 }, (_, i) => ({
+  const columns: ColumnDef<any>[] = Array.from({ length: 6 }, (_, i) => ({
     id: (i + 1).toString(),
   }));
-
-  const [isPreview, setIsPreview] = useState(false);
-  useEffect(() => {
-    if (isPreview) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isPreview]);
 
   return (
     <>
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
+            <div>
+              <label htmlFor='tahun_ke'>Tahun ke</label>
+              <InputSearchBox
+                id='tahun_ke'
+                className='w-42 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih Tahun ke...'
+                value={tahunKe}
+                options={listTahunKe}
+                onChange={(val) => setTahunKe(val)}
+                onClear={() => setTahunKe('')}
+              />
+            </div>
+            <div>
+              <label htmlFor='jadwal'>Jadwal</label>
+              <InputSearchBox
+                id='jadwal'
+                className='w-42 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih Jadwal...'
+                options={[]}
+              />
+            </div>
             <div>
               <label htmlFor='skpd'>SKPD</label>
               <InputSearchBox
@@ -106,25 +98,23 @@ const RenjaTable = () => {
                 options={listSKPDPeriode as OptionItem[]}
                 onChange={(val) => setSelectedSKPD(val)}
                 onClear={() => setSelectedSKPD('')}
+                tooltip
                 withSearch
+              />
+            </div>
+            <div>
+              <label htmlFor='urusan'>Bidang Urusan</label>
+              <InputSearchBox
+                id='urusan'
+                className='w-72 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih Bidang Urusan...'
+                options={[]}
+                tooltip
               />
             </div>
           </div>
           <div className='inline-flex gap-2'>
-            <InputButton
-              tooltip='Lihat tabel penuh'
-              className='btn btn-theme w-9 h-9'
-              onClick={() => {
-                const data = true;
-                if (data && selectedSKPD) {
-                  setIsPreview(true);
-                } else {
-                  toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
-                }
-              }}
-            >
-              <MdPreview />
-            </InputButton>
             <InputButton
               tooltip='Refresh'
               className='btn btn-theme w-9 h-9'
@@ -143,57 +133,6 @@ const RenjaTable = () => {
           pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
         />
       </div>
-      {isPreview &&
-        createPortal(
-          <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
-            <div className='border-b'>
-              <div className='flex flex-row justify-between p-2'>
-                <button
-                  onClick={() => setIsPreview(false)}
-                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-                  aria-label='Tutup preview'
-                >
-                  <MdClose />
-                </button>
-                <InputButton
-                  className='h-9'
-                  onClick={() => {
-                    const data = true;
-                    if (data) {
-                      const skpdLabel =
-                        dataSKPDPeriode?.find(
-                          (s) => s.id === Number(selectedSKPD),
-                        )?.name ?? '';
-                      toast.promise(exportRenja([], skpdLabel), {
-                        loading: 'Sedang mengunduh...',
-                        success: <b>Berhasil mengunduh.</b>,
-                        error: <b>Gagal mengunduh.</b>,
-                      });
-                    } else {
-                      toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
-                    }
-                  }}
-                >
-                  <span className='inline-flex items-center gap-2 px-2'>
-                    <MdPrint />
-                    Cetak Excel
-                  </span>
-                </InputButton>
-              </div>
-            </div>
-            <div className='p-2'>
-              <RenjaPreviewTable
-                data={[]}
-                skpd={
-                  dataSKPDPeriode?.find(
-                    (item) => item.id === Number(selectedSKPD),
-                  )?.name ?? ''
-                }
-              />
-            </div>
-          </div>,
-          document.body,
-        )}
     </>
   );
 };
