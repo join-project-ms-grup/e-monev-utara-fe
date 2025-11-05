@@ -22,6 +22,7 @@ import { Route as DashboardRkpdIndexRouteImport } from './routes/_dashboard/rkpd
 import { Route as DashboardMasterIndexRouteImport } from './routes/_dashboard/master/index'
 import { Route as DashboardKonfigurasiIndexRouteImport } from './routes/_dashboard/konfigurasi/index'
 import { Route as DashboardDakIndexRouteImport } from './routes/_dashboard/dak/index'
+import { Route as DashboardRkpdRenjaRouteImport } from './routes/_dashboard/rkpd/renja'
 import { Route as DashboardRkpdRealisasiRouteImport } from './routes/_dashboard/rkpd/realisasi'
 import { Route as DashboardRkpdPagu_indikatifRouteImport } from './routes/_dashboard/rkpd/pagu_indikatif'
 import { Route as DashboardRkpdIndikatorRouteImport } from './routes/_dashboard/rkpd/indikator'
@@ -57,7 +58,6 @@ import { Route as DashboardRkpdIkdIkd_capaianRouteImport } from './routes/_dashb
 import { Route as DashboardRkpdHasil_evaluasiRpjmdRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/rpjmd'
 import { Route as DashboardRkpdHasil_evaluasiRkpdRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/rkpd'
 import { Route as DashboardRkpdHasil_evaluasiRenstraRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/renstra'
-import { Route as DashboardRkpdHasil_evaluasiRenjaRouteImport } from './routes/_dashboard/rkpd/hasil_evaluasi/renja'
 import { Route as DashboardDakKabupatenMonitoringRouteImport } from './routes/_dashboard/dak/kabupaten/monitoring'
 import { Route as DashboardDakKabupatenIdentifikasiRouteImport } from './routes/_dashboard/dak/kabupaten/identifikasi'
 
@@ -126,6 +126,11 @@ const DashboardDakIndexRoute = DashboardDakIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardDakRouteRoute,
+} as any)
+const DashboardRkpdRenjaRoute = DashboardRkpdRenjaRouteImport.update({
+  id: '/renja',
+  path: '/renja',
+  getParentRoute: () => DashboardRkpdRouteRoute,
 } as any)
 const DashboardRkpdRealisasiRoute = DashboardRkpdRealisasiRouteImport.update({
   id: '/realisasi',
@@ -322,12 +327,6 @@ const DashboardRkpdHasil_evaluasiRenstraRoute =
     path: '/renstra',
     getParentRoute: () => DashboardRkpdHasil_evaluasiRouteRoute,
   } as any)
-const DashboardRkpdHasil_evaluasiRenjaRoute =
-  DashboardRkpdHasil_evaluasiRenjaRouteImport.update({
-    id: '/renja',
-    path: '/renja',
-    getParentRoute: () => DashboardRkpdHasil_evaluasiRouteRoute,
-  } as any)
 const DashboardDakKabupatenMonitoringRoute =
   DashboardDakKabupatenMonitoringRouteImport.update({
     id: '/monitoring',
@@ -368,13 +367,13 @@ export interface FileRoutesByFullPath {
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
   '/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
+  '/rkpd/renja': typeof DashboardRkpdRenjaRoute
   '/dak/': typeof DashboardDakIndexRoute
   '/konfigurasi/': typeof DashboardKonfigurasiIndexRoute
   '/master/': typeof DashboardMasterIndexRoute
   '/rkpd/': typeof DashboardRkpdIndexRoute
   '/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
   '/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
-  '/rkpd/hasil_evaluasi/renja': typeof DashboardRkpdHasil_evaluasiRenjaRoute
   '/rkpd/hasil_evaluasi/renstra': typeof DashboardRkpdHasil_evaluasiRenstraRoute
   '/rkpd/hasil_evaluasi/rkpd': typeof DashboardRkpdHasil_evaluasiRkpdRoute
   '/rkpd/hasil_evaluasi/rpjmd': typeof DashboardRkpdHasil_evaluasiRpjmdRoute
@@ -410,13 +409,13 @@ export interface FileRoutesByTo {
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
   '/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
+  '/rkpd/renja': typeof DashboardRkpdRenjaRoute
   '/dak': typeof DashboardDakIndexRoute
   '/konfigurasi': typeof DashboardKonfigurasiIndexRoute
   '/master': typeof DashboardMasterIndexRoute
   '/rkpd': typeof DashboardRkpdIndexRoute
   '/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
   '/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
-  '/rkpd/hasil_evaluasi/renja': typeof DashboardRkpdHasil_evaluasiRenjaRoute
   '/rkpd/hasil_evaluasi/renstra': typeof DashboardRkpdHasil_evaluasiRenstraRoute
   '/rkpd/hasil_evaluasi/rkpd': typeof DashboardRkpdHasil_evaluasiRkpdRoute
   '/rkpd/hasil_evaluasi/rpjmd': typeof DashboardRkpdHasil_evaluasiRpjmdRoute
@@ -464,13 +463,13 @@ export interface FileRoutesById {
   '/_dashboard/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
   '/_dashboard/rkpd/pagu_indikatif': typeof DashboardRkpdPagu_indikatifRoute
   '/_dashboard/rkpd/realisasi': typeof DashboardRkpdRealisasiRoute
+  '/_dashboard/rkpd/renja': typeof DashboardRkpdRenjaRoute
   '/_dashboard/dak/': typeof DashboardDakIndexRoute
   '/_dashboard/konfigurasi/': typeof DashboardKonfigurasiIndexRoute
   '/_dashboard/master/': typeof DashboardMasterIndexRoute
   '/_dashboard/rkpd/': typeof DashboardRkpdIndexRoute
   '/_dashboard/dak/kabupaten/identifikasi': typeof DashboardDakKabupatenIdentifikasiRoute
   '/_dashboard/dak/kabupaten/monitoring': typeof DashboardDakKabupatenMonitoringRoute
-  '/_dashboard/rkpd/hasil_evaluasi/renja': typeof DashboardRkpdHasil_evaluasiRenjaRoute
   '/_dashboard/rkpd/hasil_evaluasi/renstra': typeof DashboardRkpdHasil_evaluasiRenstraRoute
   '/_dashboard/rkpd/hasil_evaluasi/rkpd': typeof DashboardRkpdHasil_evaluasiRkpdRoute
   '/_dashboard/rkpd/hasil_evaluasi/rpjmd': typeof DashboardRkpdHasil_evaluasiRpjmdRoute
@@ -518,13 +517,13 @@ export interface FileRouteTypes {
     | '/rkpd/indikator'
     | '/rkpd/pagu_indikatif'
     | '/rkpd/realisasi'
+    | '/rkpd/renja'
     | '/dak/'
     | '/konfigurasi/'
     | '/master/'
     | '/rkpd/'
     | '/dak/kabupaten/identifikasi'
     | '/dak/kabupaten/monitoring'
-    | '/rkpd/hasil_evaluasi/renja'
     | '/rkpd/hasil_evaluasi/renstra'
     | '/rkpd/hasil_evaluasi/rkpd'
     | '/rkpd/hasil_evaluasi/rpjmd'
@@ -560,13 +559,13 @@ export interface FileRouteTypes {
     | '/rkpd/indikator'
     | '/rkpd/pagu_indikatif'
     | '/rkpd/realisasi'
+    | '/rkpd/renja'
     | '/dak'
     | '/konfigurasi'
     | '/master'
     | '/rkpd'
     | '/dak/kabupaten/identifikasi'
     | '/dak/kabupaten/monitoring'
-    | '/rkpd/hasil_evaluasi/renja'
     | '/rkpd/hasil_evaluasi/renstra'
     | '/rkpd/hasil_evaluasi/rkpd'
     | '/rkpd/hasil_evaluasi/rpjmd'
@@ -613,13 +612,13 @@ export interface FileRouteTypes {
     | '/_dashboard/rkpd/indikator'
     | '/_dashboard/rkpd/pagu_indikatif'
     | '/_dashboard/rkpd/realisasi'
+    | '/_dashboard/rkpd/renja'
     | '/_dashboard/dak/'
     | '/_dashboard/konfigurasi/'
     | '/_dashboard/master/'
     | '/_dashboard/rkpd/'
     | '/_dashboard/dak/kabupaten/identifikasi'
     | '/_dashboard/dak/kabupaten/monitoring'
-    | '/_dashboard/rkpd/hasil_evaluasi/renja'
     | '/_dashboard/rkpd/hasil_evaluasi/renstra'
     | '/_dashboard/rkpd/hasil_evaluasi/rkpd'
     | '/_dashboard/rkpd/hasil_evaluasi/rpjmd'
@@ -736,6 +735,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dak/'
       preLoaderRoute: typeof DashboardDakIndexRouteImport
       parentRoute: typeof DashboardDakRouteRoute
+    }
+    '/_dashboard/rkpd/renja': {
+      id: '/_dashboard/rkpd/renja'
+      path: '/renja'
+      fullPath: '/rkpd/renja'
+      preLoaderRoute: typeof DashboardRkpdRenjaRouteImport
+      parentRoute: typeof DashboardRkpdRouteRoute
     }
     '/_dashboard/rkpd/realisasi': {
       id: '/_dashboard/rkpd/realisasi'
@@ -982,13 +988,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRkpdHasil_evaluasiRenstraRouteImport
       parentRoute: typeof DashboardRkpdHasil_evaluasiRouteRoute
     }
-    '/_dashboard/rkpd/hasil_evaluasi/renja': {
-      id: '/_dashboard/rkpd/hasil_evaluasi/renja'
-      path: '/renja'
-      fullPath: '/rkpd/hasil_evaluasi/renja'
-      preLoaderRoute: typeof DashboardRkpdHasil_evaluasiRenjaRouteImport
-      parentRoute: typeof DashboardRkpdHasil_evaluasiRouteRoute
-    }
     '/_dashboard/dak/kabupaten/monitoring': {
       id: '/_dashboard/dak/kabupaten/monitoring'
       path: '/monitoring'
@@ -1083,7 +1082,6 @@ const DashboardMasterRouteRouteWithChildren =
   DashboardMasterRouteRoute._addFileChildren(DashboardMasterRouteRouteChildren)
 
 interface DashboardRkpdHasil_evaluasiRouteRouteChildren {
-  DashboardRkpdHasil_evaluasiRenjaRoute: typeof DashboardRkpdHasil_evaluasiRenjaRoute
   DashboardRkpdHasil_evaluasiRenstraRoute: typeof DashboardRkpdHasil_evaluasiRenstraRoute
   DashboardRkpdHasil_evaluasiRkpdRoute: typeof DashboardRkpdHasil_evaluasiRkpdRoute
   DashboardRkpdHasil_evaluasiRpjmdRoute: typeof DashboardRkpdHasil_evaluasiRpjmdRoute
@@ -1092,8 +1090,6 @@ interface DashboardRkpdHasil_evaluasiRouteRouteChildren {
 
 const DashboardRkpdHasil_evaluasiRouteRouteChildren: DashboardRkpdHasil_evaluasiRouteRouteChildren =
   {
-    DashboardRkpdHasil_evaluasiRenjaRoute:
-      DashboardRkpdHasil_evaluasiRenjaRoute,
     DashboardRkpdHasil_evaluasiRenstraRoute:
       DashboardRkpdHasil_evaluasiRenstraRoute,
     DashboardRkpdHasil_evaluasiRkpdRoute: DashboardRkpdHasil_evaluasiRkpdRoute,
@@ -1175,6 +1171,7 @@ interface DashboardRkpdRouteRouteChildren {
   DashboardRkpdIndikatorRoute: typeof DashboardRkpdIndikatorRoute
   DashboardRkpdPagu_indikatifRoute: typeof DashboardRkpdPagu_indikatifRoute
   DashboardRkpdRealisasiRoute: typeof DashboardRkpdRealisasiRoute
+  DashboardRkpdRenjaRoute: typeof DashboardRkpdRenjaRoute
   DashboardRkpdIndexRoute: typeof DashboardRkpdIndexRoute
 }
 
@@ -1188,6 +1185,7 @@ const DashboardRkpdRouteRouteChildren: DashboardRkpdRouteRouteChildren = {
   DashboardRkpdIndikatorRoute: DashboardRkpdIndikatorRoute,
   DashboardRkpdPagu_indikatifRoute: DashboardRkpdPagu_indikatifRoute,
   DashboardRkpdRealisasiRoute: DashboardRkpdRealisasiRoute,
+  DashboardRkpdRenjaRoute: DashboardRkpdRenjaRoute,
   DashboardRkpdIndexRoute: DashboardRkpdIndexRoute,
 }
 

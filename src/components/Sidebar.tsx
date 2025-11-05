@@ -77,7 +77,7 @@ const menuRKPD: MenuItem[] = [
   {
     label: 'Renja',
     icon: <MdDragIndicator />,
-    to: '/rkpd/hasil_evaluasi/Renja',
+    to: '/rkpd/renja',
     akses: 3
   },
   {
