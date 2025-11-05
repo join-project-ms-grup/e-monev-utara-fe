@@ -180,7 +180,6 @@ const DashRKPDTable = () => {
             disabled={isFetching}
           >
             {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
-            <MdRefresh />
           </InputButton>
         </div>
       </div>
