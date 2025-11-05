@@ -8,11 +8,9 @@ import InputSearchBox from '../inputs/InputSearchBox';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
   getPeriodeAkhirFromCookie,
 } from '../../lib/usercookie';
-import { getSKPDPeriode } from '../../services/PeriodeService';
 import { getSKPD } from '../../services/SKPDService';
 import Spinner from '../inputs/Spinner';
 
@@ -39,7 +37,11 @@ const tableHead = () => {
 const DashRKPDTable = () => {
   //#region SKPD dan Tahun ke
   const [tahunKe, setTahunKe] = useState('');
-  const { data: dataSKPD, isFetching, refetch } = useQuery({
+  const {
+    data: dataSKPD,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ['list_skpd'],
     queryFn: async () => getSKPD(),
   });
@@ -182,7 +184,7 @@ const DashRKPDTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead}  />
+      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead} />
       <div>
         <span>Keterangan Predikat:</span>
         <div className='grid grid-cols-[auto_1fr] space-x-2'>
