@@ -15,6 +15,9 @@ import {
   MdAssignment,
   MdLocationCity,
   MdShowChart,
+  MdEventNote,
+  MdAssessment,
+  MdMonitor,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
 
@@ -51,6 +54,7 @@ const menuUtama: MenuItem[] = [
     label: 'Master',
     icon: <MdInventory />,
     submenu: [
+      { label: 'Jadwal', to: '/master/jadwal' },
       { label: 'Rekening', to: '/master/rekening' },
       { label: 'Periode', to: '/master/periode' },
       { label: 'SKPD', to: '/master/skpd', akses: 1 && 2 },
@@ -61,7 +65,7 @@ const menuUtama: MenuItem[] = [
     icon: <MdSettings />,
     akses: 1 && 2,
     submenu: [
-      { label: 'Role', to: '/master/role', akses: 1 && 2 },
+      { label: 'Role', to: '/konfigurasi/role', akses: 1 && 2 },
       { label: 'User', to: '/konfigurasi/user' }
     ],
   },
@@ -76,7 +80,7 @@ const menuRKPD: MenuItem[] = [
   },
   {
     label: 'Renja',
-    icon: <MdDragIndicator />,
+    icon: <MdEventNote />,
     to: '/rkpd/renja',
     akses: 3
   },
@@ -139,12 +143,15 @@ const menuDAK: MenuItem[] = [
     akses: 4,
   },
   {
-    label: 'DAK Kabupaten',
-    icon: <MdPayments />,
-    submenu: [
-      { label: 'Identifikasi DAK', to: '/dak/kabupaten/identifikasi' },
-      { label: 'Monitoring DAK', to: '/dak/kabupaten/monitoring' },
-    ],
+    label: 'Identifikasi DAK',
+    icon: <MdAssessment />,
+    to: '/dak/identifikasi',
+    akses: 4,
+  },
+  {
+    label: 'Monitoring DAK',
+    icon: <MdMonitor />,
+    to: '/dak/monitoring',
     akses: 4,
   },
   {

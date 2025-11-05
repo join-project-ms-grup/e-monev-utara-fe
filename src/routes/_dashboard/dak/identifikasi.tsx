@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { SITE_NAME } from '../../../../lib/config';
-import IdentifikasiDakTable from '../../../../components/tables/dak/IdentifikasiDakTable';
 import { useState } from 'react';
-import FormIdentifikasiDak from '../../../../components/forms/IdentifikasiDak/FormIdentifikasiDak';
+import FormIdentifikasiDak from '../../../components/forms/IdentifikasiDak/FormIdentifikasiDak';
+import IdentifikasiDakTable from '../../../components/tables/dak/IdentifikasiDakTable';
+import { SITE_NAME } from '../../../lib/config';
 
-export const Route = createFileRoute('/_dashboard/dak/kabupaten/identifikasi')({
+export const Route = createFileRoute('/_dashboard/dak/identifikasi')({
   head: () => ({
     meta: [
       {

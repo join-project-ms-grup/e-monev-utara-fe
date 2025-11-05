@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { SITE_NAME } from '../../../../lib/config';
-import MonitoringDakTable from '../../../../components/tables/dak/MonitoringDakTable';
+import MonitoringDakTable from '../../../components/tables/dak/MonitoringDakTable';
+import { SITE_NAME } from '../../../lib/config';
 
-export const Route = createFileRoute('/_dashboard/dak/kabupaten/monitoring')({
+export const Route = createFileRoute('/_dashboard/dak/monitoring')({
   head: () => ({
     meta: [
       {

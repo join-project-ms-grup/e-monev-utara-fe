@@ -4,7 +4,7 @@ import RoleTable from '../../../components/tables/master/RoleTable';
 import { getRoleId } from '../../../lib/usercookie';
 import toast from 'react-hot-toast';
 
-export const Route = createFileRoute('/_dashboard/master/role')({
+export const Route = createFileRoute('/_dashboard/konfigurasi/role')({
   beforeLoad: () => {
     const roleId = getRoleId();
     if (roleId) {

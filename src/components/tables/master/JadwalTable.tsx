@@ -1,77 +1,96 @@
-import { jadwalDummy, type JadwalType } from '../../../dummy/dummy_data';
-import { createColumnHelper } from '@tanstack/react-table';
-import { MdNewspaper } from 'react-icons/md';
-import MainTable from '../MainTable';
+import type { ColumnDef } from '@tanstack/react-table';
+import Tabel from '../Tabel';
+import { MdRefresh } from 'react-icons/md';
+import InputButton from '../../inputs/InputButton';
+import InputSearchBox from '../../inputs/InputSearchBox';
+import { useState } from 'react';
+import {
+  getPeriodeMulaiFromCookie,
+  getPeriodeAkhirFromCookie,
+} from '../../../lib/usercookie';
 
 const JadwalTable = () => {
-  const columnHelper = createColumnHelper<JadwalType>();
-  //   const [data, _setData] = useState(() => [...jadwalDummy]);
-  const columns = [
-    columnHelper.accessor('id', {
+  //#region Tahun Ke
+  const [tahunKe, setTahunKe] = useState('');
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+  //#endregion
+
+  const columns: ColumnDef<any>[] = [
+    {
       header: 'No',
-      cell: (info) => (
-        <span className='flex justify-center'>{info.getValue()}</span>
-      ),
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor((row) => row.tahun, {
-      id: 'lastName',
-      cell: (info) => (
-        <span className='flex justify-center'>{info.getValue()}</span>
-      ),
+    },
+    {
       header: 'Tahun',
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('tipe_tahap', {
+    },
+    {
       header: 'Tipe Tahap',
-      cell: (info) => (
-        <span className='flex justify-center'>{info.getValue()}</span>
-      ),
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('tahap', {
+    },
+    {
       header: 'Tahap',
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('jadwal', {
+    },
+    {
       header: 'Jadwal',
-      cell: (info) => (
-        <span className='flex justify-center'>{info.getValue()}</span>
-      ),
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.accessor('status', {
+    },
+    {
       header: 'Status',
-      cell: (info) => (
-        <span
-          className={`flex justify-center ${info.getValue().includes('Selesai') ? ' text-green-700' : 'text-red-700'}`}
-        >
-          {info.getValue()}
-        </span>
-      ),
-      footer: (info) => info.column.id,
-    }),
-    columnHelper.display({
-      id: 'aksi',
+    },
+    {
       header: 'Aksi',
-      cell: (info) => (
-        <div className='flex justify-center'>
-          <button
-            className='inline-flex items-center gap-1 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600'
-            onClick={() => console.log('Edit', info.row.original)}
-          >
-            <MdNewspaper /> Durasi Jadwal
-          </button>
-        </div>
-      ),
-      footer: (info) => info.column.id,
-    }),
+    },
   ];
 
+  const PesanDataKosong = () => {
+    if (tahunKe) {
+      return <>TIDAK ADA DATA</>;
+    } else {
+      return <>TAHUN BELUM DIPILIH</>
+    }
+  };
+
   return (
-    <>
-      <MainTable data={jadwalDummy} columns={columns} />
-    </>
+    <div className='space-y-2'>
+      <div className='flex items-end justify-between'>
+        <div className='inline-flex gap-2'>
+          <div>
+            <label htmlFor='tahun_ke'>Tahun Anggaran</label>
+            <InputSearchBox
+              id='tahun_ke'
+              className='w-42 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Tahun ke...'
+              value={tahunKe}
+              options={listTahunKe}
+              onChange={(val) => setTahunKe(val)}
+              onClear={() => setTahunKe('')}
+            />
+          </div>
+        </div>
+        <div className='inline-flex gap-2'>
+          <InputButton
+            tooltip='Refresh'
+            className='btn btn-theme w-9 h-9'
+            // onClick={() => refetch()}
+            // disabled={isFetching}
+          >
+            {/* {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />} */}
+            <MdRefresh />
+          </InputButton>
+        </div>
+      </div>
+      <Tabel
+        data={[]}
+        columns={columns}
+        pesanDataKosong={<PesanDataKosong />}
+      />
+    </div>
   );
 };
 
