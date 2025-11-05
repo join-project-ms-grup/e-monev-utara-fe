@@ -252,9 +252,14 @@ const PaguIndikatifTable = () => {
             });
           };
 
-          return (
-            <>
-              {getValue() && (
+          if (isDev()) {
+            if (
+              row.original.type === 'urusan' ||
+              row.original.type === 'bidang'
+            ) {
+              return '';
+            } else {
+              return (
                 <>
                   <form id={`form_target_${tahun}`} onSubmit={handleSubmit}>
                     <InputText
@@ -273,9 +278,18 @@ const PaguIndikatifTable = () => {
                     />
                   </form>
                 </>
-              )}
-            </>
-          );
+              );
+            }
+          } else {
+            if (
+              row.original.type === 'urusan' ||
+              row.original.type === 'bidang'
+            ) {
+              return '';
+            } else {
+              return formatUang(target);
+            }
+          }
         },
       })),
     },
@@ -331,7 +345,6 @@ const PaguIndikatifTable = () => {
         renderHeader={tableHead}
         tblClassName='lg:min-w-[1500px]'
         pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
-        
       />
       <DialogModal
         widthLevel={6}

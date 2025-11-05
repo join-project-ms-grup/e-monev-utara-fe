@@ -6,6 +6,7 @@ import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
+  isDev,
 } from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Spinner from '../../inputs/Spinner';
@@ -179,7 +180,7 @@ const IndikatorTable = () => {
                   {indikatorList.map((item, index) => (
                     <tr key={item.id} className={bgClass}>
                       <td
-                        className='block overflow-y-auto'
+                        className='block overflow-y-auto whitespace-break-spaces'
                         ref={(el) => {
                           if (el) {
                             const h = el.offsetHeight;
@@ -204,7 +205,7 @@ const IndikatorTable = () => {
       accessorFn: (row) => row.indikator,
       header: 'Satuan',
       meta: {
-        tdClassNames: 'p-0!',
+        tdClassNames: 'p-0! text-center',
       },
       cell: ({ row, getValue }) => {
         const indikatorList = getValue() as Indikator[];
@@ -239,7 +240,7 @@ const IndikatorTable = () => {
                         master_id: row.original.id,
                         name: item.name,
                         satuan: satuan,
-                        target: item.target
+                        target: item.target,
                         // target: item.target?.slice(0, 5).map((t) => ({
                         //   target: Number(t.target),
                         //   tahun_ke: Number(t.tahun_ke),
@@ -249,29 +250,34 @@ const IndikatorTable = () => {
                     });
                   };
 
-                  return (
-                    <tr key={item.id} className={bgClass}>
-                      <td
-                        style={{
-                          height: rowHeights.current[row.id]?.[index] || 'auto',
-                        }}
-                      >
-                        <form onSubmit={handleSubmit}>
-                          <InputText
-                            id={`input_satuan_${item.id}`}
-                            placeholder='Satuan...'
-                            value={satuan}
-                            onChange={handleChange}
-                            withButton={!disBtn}
-                            buttonType='submit'
-                            invalid={!satuan}
-                            disabled={loadingMutation}
-                            tooltip={satuan}
-                          />
-                        </form>
-                      </td>
-                    </tr>
-                  );
+                  if (isDev()) {
+                    return (
+                      <tr key={item.id} className={bgClass}>
+                        <td
+                          style={{
+                            height:
+                              rowHeights.current[row.id]?.[index] || 'auto',
+                          }}
+                        >
+                          <form onSubmit={handleSubmit}>
+                            <InputText
+                              id={`input_satuan_${item.id}`}
+                              placeholder='Satuan...'
+                              value={satuan}
+                              onChange={handleChange}
+                              withButton={!disBtn}
+                              buttonType='submit'
+                              invalid={!satuan}
+                              disabled={loadingMutation}
+                              tooltip={satuan}
+                            />
+                          </form>
+                        </td>
+                      </tr>
+                    );
+                  } else {
+                    return satuan;
+                  }
                 })}
               </tbody>
             </table>
@@ -359,32 +365,40 @@ const IndikatorTable = () => {
                       }
                     };
 
-                    return (
-                      <tr key={indikator.id} className={bgClass}>
-                        <td
-                          style={{
-                            height:
-                              rowHeights.current[row.id]?.[index] || 'auto',
-                          }}
-                        >
-                          <form onSubmit={handleSubmit}>
-                            <InputText
-                              id={`input_target_${indikator.id}_${tahun}`}
-                              inputMode='numeric'
-                              type='text'
-                              placeholder='Target...'
-                              value={target}
-                              onChange={handleChange}
-                              withButton={!disBtn}
-                              buttonType='submit'
-                              invalid={!target}
-                              isRibu
-                              tooltip={formatRibu(Number(target))}
-                            />
-                          </form>
-                        </td>
-                      </tr>
-                    );
+                    if (isDev()) {
+                      return (
+                        <tr key={indikator.id} className={bgClass}>
+                          <td
+                            style={{
+                              height:
+                                rowHeights.current[row.id]?.[index] || 'auto',
+                            }}
+                          >
+                            <form onSubmit={handleSubmit}>
+                              <InputText
+                                id={`input_target_${indikator.id}_${tahun}`}
+                                inputMode='numeric'
+                                type='text'
+                                placeholder='Target...'
+                                value={target}
+                                onChange={handleChange}
+                                withButton={!disBtn}
+                                buttonType='submit'
+                                invalid={!target}
+                                isRibu
+                                tooltip={formatRibu(Number(target))}
+                              />
+                            </form>
+                          </td>
+                        </tr>
+                      );
+                    } else {
+                      return (
+                        <span className='whitespace-break-spaces'>
+                          {target}
+                        </span>
+                      );
+                    }
                   })}
                 </tbody>
               </table>
