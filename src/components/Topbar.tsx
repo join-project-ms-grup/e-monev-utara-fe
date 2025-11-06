@@ -17,7 +17,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
   const pageTitle = matches[matches.length - 1].staticData?.title;
 
   return (
-    <header className='z-10 sticky top-0 h-[70px] text-gray-800 p-4 flex justify-between items-center space-x-4 border-b-1 border-gray-200 bg-[#f8f8f8]'>
+    <header className='z-10 sticky top-0 h-[70px] text-gray-800 p-4 flex justify-between items-center space-x-4 border-b-1 border-gray-200 bg-white'>
       <button
         className='transition-all active:scale-80 hover:opacity-60'
         onClick={toggleSidebar}

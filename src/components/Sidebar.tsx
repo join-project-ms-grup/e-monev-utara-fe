@@ -11,7 +11,6 @@ import {
   MdFiberManualRecord,
   MdDragIndicator,
   MdSpeed,
-  MdPayments,
   MdAssignment,
   MdLocationCity,
   MdShowChart,
@@ -19,7 +18,9 @@ import {
   MdAssessment,
   MdMonitor,
 } from 'react-icons/md';
+import { BiSolidBook } from 'react-icons/bi';
 import { getRoleId } from '../lib/usercookie';
+import InputButton from './inputs/InputButton';
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -66,7 +67,7 @@ const menuUtama: MenuItem[] = [
     akses: 1 && 2,
     submenu: [
       { label: 'Role', to: '/konfigurasi/role', akses: 1 && 2 },
-      { label: 'User', to: '/konfigurasi/user' }
+      { label: 'User', to: '/konfigurasi/user' },
     ],
   },
 ];
@@ -82,7 +83,7 @@ const menuRKPD: MenuItem[] = [
     label: 'Renja',
     icon: <MdEventNote />,
     to: '/rkpd/renja',
-    akses: 3
+    akses: 3,
   },
   {
     label: 'Pagu Indikatif',
@@ -96,7 +97,12 @@ const menuRKPD: MenuItem[] = [
     label: 'Realisasi dan Hasil',
     akses: 3,
   },
-  { label: 'Capaian Kinerja', icon: <MdInsights />, to: '/rkpd/capaian', akses: 2 },
+  {
+    label: 'Capaian Kinerja',
+    icon: <MdInsights />,
+    to: '/rkpd/capaian',
+    akses: 2,
+  },
   {
     label: 'Realisasi Anggaran',
     icon: <MdAssignmentTurnedIn />,
@@ -309,8 +315,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       className={`flex flex-col bg-white text-[#333] sticky top-0 whitespace-break-spaces h-screen transition-all duration-200 ${sidebarOpen ? 'w-72' : 'w-20'}`}
     >
       <div className='flex flex-row items-center justify-center'>
-        <div className='px-6 py-4'>
-          <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
+        <div className='h-[70px] flex flex-1 items-center justify-center'>
+          {sidebarOpen ? (
+            <img
+              src='/mahabbah.png'
+              className='w-52 mb-1'
+              alt='MAHABBAH LOGO'
+            />
+          ) : (
+            <img
+              src='/mahabbah-small.png'
+              className='w-12'
+              alt='MAHABBAH LOGO'
+            />
+          )}
         </div>
       </div>
       <nav className='overflow-y-auto overflow-x-hidden sidebar-scroll space-y-2 p-4'>

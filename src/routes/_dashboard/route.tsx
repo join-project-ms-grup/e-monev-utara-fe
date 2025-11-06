@@ -86,6 +86,25 @@ function MainComponent() {
       <BackToTop />
     </>
   );
+
+  // return (
+  //   <>
+  //     <div className='flex flex-col min-h-screen'>
+  //       <TopBar toggleSidebar={toggleSidebar} />
+  //       <div className='flex'>
+  //         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+  //         <div className='flex flex-1 flex-col'>
+  //           <main className='flex-1 px-8 py-2 z-0'>
+  //             <Breadcrumb className='px-8 pt-2' />
+  //             <Outlet />
+  //           </main>
+  //           <Footer />
+  //         </div>
+  //       </div>
+  //     </div>
+  //     <BackToTop />
+  //   </>
+  // );
 }
 
 function PeriodeComponent() {

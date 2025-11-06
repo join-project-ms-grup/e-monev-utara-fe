@@ -90,6 +90,51 @@ export const getRenstra = async (skpd_periode_id: number): Promise<RenstraMaster
     return response.data.data;
 };
 
+export interface FlatRenstra {
+    level: string;
+    sasaran: string;
+    kode_urusan: string;
+    kode_bidang: string;
+    kode_program: string;
+    kode_kegiatan: string;
+    kode_subKegiatan: string;
+    rekening: string;
+    indikator_kinerja: string;
+    satuan: string;
+    target_rpjmd_kinerja: number | string;
+    target_rpjmd_anggaran: number | string;
+    realisasi_rpjmd_kinerja: number | string;
+    realisasi_rpjmd_anggaran: number | string;
+    target_rkpd_kinerja: number | string;
+    target_rkpd_anggaran: number | string;
+    realisasi_triwulan_I_kinerja: number | string;
+    realisasi_triwulan_I_anggaran: number | string;
+    realisasi_triwulan_II_kinerja: number | string;
+    realisasi_triwulan_II_anggaran: number | string;
+    realisasi_triwulan_III_kinerja: number | string;
+    realisasi_triwulan_III_anggaran: number | string;
+    realisasi_triwulan_IV_kinerja: number | string;
+    realisasi_triwulan_IV_anggaran: number | string;
+    realisasi_rkpd_kinerja: number | string;
+    realisasi_rkpd_anggaran: number | string;
+    realisasi_rpjmd_sd_tahun_kinerja: number | string;
+    realisasi_rpjmd_sd_tahun_anggaran: number | string;
+    tingkat_capaian_rpjmd_kinerja: number | string;
+    tingkat_capaian_rpjmd_anggaran: number | string;
+    tingkat_capaian_rkpd_kinerja: number | string;
+    tingkat_capaian_rkpd_anggaran: number | string;
+    perangkat_daerah: string;
+    target_per_tahun: IndikatorTargetRenstra[];
+    capaian_per_tahun: IndikatorCapaianRenstra[];
+    rasio_per_tahun: IndikatorRasioRenstra[];
+    pagu_per_tahun: RenstraPaguTahun[];
+    realisasi_per_tahun: RenstraRealisasiTahun[];
+    rasio_per_tahun_pagu: RenstraRasioTahun[];
+    total_target: number | string;
+    total_realisasi: number | string;
+}
+
+
 export interface FlatRenstraRow {
     level: 'urusan' | 'bidang' | 'program' | 'kegiatan' | 'sub_kegiatan';
     kode?: string | number;
