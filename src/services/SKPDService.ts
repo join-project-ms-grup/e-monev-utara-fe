@@ -15,7 +15,7 @@ export type SKPDForm = Pick<SKPDType, 'id' | 'kode' | 'name' | 'shortname' | 'st
  * Ambil semua SKPD
  */
 export const getSKPD = async (): Promise<SKPDType[]> => {
-  const response = await api.get<ApiResponse<SKPDType[]>>("/skpd/list");
+  const response = await api.get<ApiResponse<SKPDType[]>>("/config/skpd/list");
   return response.data.data;
 };
 
@@ -23,7 +23,7 @@ export const getSKPD = async (): Promise<SKPDType[]> => {
  * Menambahkan data SKPD
  */
 export const addSKPD = async (payload: SKPDForm): Promise<SKPDForm> => {
-  const response = await api.post<ApiResponse<SKPDForm>>("/skpd/add", payload);
+  const response = await api.post<ApiResponse<SKPDForm>>("/config/skpd/add", payload);
   return response.data.data;
 };
 
@@ -31,7 +31,7 @@ export const addSKPD = async (payload: SKPDForm): Promise<SKPDForm> => {
  * Update data SKPD
  */
 export const updateSKPD = async (id: number, payload: SKPDForm): Promise<SKPDForm> => {
-  const response = await api.put<ApiResponse<SKPDForm>>(`/skpd/update/${id}`, payload);
+  const response = await api.put<ApiResponse<SKPDForm>>(`/config/skpd/update/${id}`, payload);
   return response.data.data;
 };
 

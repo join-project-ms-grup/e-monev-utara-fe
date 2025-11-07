@@ -21,7 +21,7 @@ export interface SKPDPeriode{
  * Ambil semua data periode
  */
 export const getPeriode = async (): Promise<Periode[]> => {
-    const response = await api.get<ApiResponse<Periode[]>>("/periode/list");
+    const response = await api.get<ApiResponse<Periode[]>>("/config/periode/list");
     return response.data.data;
 };
 
@@ -29,7 +29,7 @@ export const getPeriode = async (): Promise<Periode[]> => {
  * Menambahkan data periode
  */
 export const addPeriode = async (payload: PeriodeForm): Promise<PeriodeForm> => {
-    const response = await api.post<ApiResponse<PeriodeForm>>("/periode/add", payload);
+    const response = await api.post<ApiResponse<PeriodeForm>>("/config/periode/add", payload);
     return response.data.data;
 };
 
@@ -37,7 +37,7 @@ export const addPeriode = async (payload: PeriodeForm): Promise<PeriodeForm> => 
  * Update data periode
  */
 export const updatePeriode = async (id: number, payload: PeriodeForm): Promise<PeriodeForm> => {
-    const response = await api.put<ApiResponse<PeriodeForm>>(`/periode/update/${id}`, payload);
+    const response = await api.put<ApiResponse<PeriodeForm>>(`/config/periode/update/${id}`, payload);
     return response.data.data;
 };
 

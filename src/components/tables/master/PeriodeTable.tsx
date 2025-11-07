@@ -33,7 +33,6 @@ const PeriodeTable = () => {
     mulai: '',
     akhir: '',
     status: true,
-    skpds: 'all'
   };
 
   const [formData, setFormData] = useState<PeriodeForm>(initialFormData);
@@ -242,7 +241,6 @@ const PeriodeTable = () => {
                 mulai: Number(data.mulai),
                 akhir: Number(data.akhir),
                 status: data.status,
-                skpds: (data.skpds === 'all' ? 'all' : data.skpds?.toString().split(',').map(item => Number(item.trim())))
               });
             }}
           >
@@ -275,7 +273,6 @@ const PeriodeTable = () => {
                   mulai: Number(payload.mulai),
                   akhir: Number(payload.akhir),
                   status: payload.status,
-                  skpds: (payload.skpds === 'all' ? 'all' : payload.skpds?.toString().split(',').map(item => Number(item.trim())))
                 },
               });
             }}

@@ -2,7 +2,7 @@ import React from 'react';
 import InputButton from '../inputs/InputButton';
 import type { SKPDForm } from '../../services/SKPDService';
 import { useForm } from '@tanstack/react-form';
-import { skpdSchema, skpdSchemaSubmit } from './schemas/SchemaSKPD';
+import { mapErrors, mapToInput, skpdSchema, skpdSchemaSubmit } from './schemas/SchemaSKPD';
 import InputText from '../inputs/InputText';
 import ErrorField from './ErrorField';
 import InputToggle from '../inputs/InputToggle';
@@ -30,6 +30,14 @@ const FormSKPD: React.FC<FormProps> = ({
   onSubmit,
   defaultValues,
 }) => {
+  const validateWith = (schema: any, value: any) => {
+    const input = mapToInput(value);
+    const result = schema.safeParse(input);
+    return result.success
+      ? { fields: {} }
+      : { fields: mapErrors(result.error.format()) };
+  };
+
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -44,50 +52,8 @@ const FormSKPD: React.FC<FormProps> = ({
       }
     },
     validators: {
-      onChange: ({ value }) => {
-        const input = {
-          kode: value.kode?.toString() ?? '',
-          name: value.name?.toString() ?? '',
-          shortname: value.shortname?.toString() ?? '',
-          status: value.status?.toString() ?? '',
-        };
-
-        const result = skpdSchema.safeParse(input);
-
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              kode: errors.kode?._errors[0],
-              name: errors.name?._errors[0],
-              shortname: errors.shortname?._errors[0],
-            },
-          };
-        }
-      },
-      onSubmit: ({ value }) => {
-        const input = {
-          kode: value.kode?.toString() ?? '',
-          name: value.name?.toString() ?? '',
-          shortname: value.shortname?.toString() ?? '',
-          status: value.status?.toString() ?? '',
-        };
-        const result = skpdSchemaSubmit.safeParse(input);
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              kode: errors.kode?._errors[0],
-              name: errors.name?._errors[0],
-              shortname: errors.shortname?._errors[0],
-            },
-          };
-        }
-      },
+      onChange: ({ value }) => validateWith(skpdSchema, value),
+      onSubmit: ({ value }) => validateWith(skpdSchemaSubmit, value),
     },
   });
 

@@ -171,20 +171,17 @@ const UserTable = () => {
       enableSorting: false,
       meta: {
         thClassNames: 'w-[15%]',
-        tdClassNames: 'text-center',
+        tdClassNames: 'flex items-center justify-center',
       },
       cell: ({ cell, row }) => (
-        <>
+        <div className='w-30'>
           <InputToggle
-            checked={cell.getValue()!}
-            defaultChecked={cell.getValue()!}
-            onToggle={() => {
-              setStatusMutation.mutate(row.original.id!);
-            }}
-            onLabel={'Aktif'}
-            offLabel={'Nonaktif'}
+            onLabel='Aktif'
+            offLabel='Nonaktif'
+            checked={cell.getValue()}
+            onToggle={() => setStatusMutation.mutate(row.original.id!)}
           />
-        </>
+        </div>
       ),
     }),
     columnHelper.display({
@@ -258,7 +255,7 @@ const UserTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={data || []} columns={columns}  />
+      <Tabel data={data || []} columns={columns} />
       {modalState === 'Add' && (
         <DialogModal
           title='Tambah data User'

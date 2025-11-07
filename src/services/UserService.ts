@@ -26,7 +26,7 @@ export type UserForm = Pick<UserType, 'id' | 'name' | 'fullname' | 'email' | 'ro
  * Ambil semua user
  */
 export const getUsers = async (): Promise<UserType[]> => {
-  const response = await api.get<ApiResponse<UserType[]>>("/user/list");
+  const response = await api.get<ApiResponse<UserType[]>>("/config/user/list");
   const users = response.data.data;
 
   if (isAdmin()) {
@@ -41,7 +41,7 @@ export const getUsers = async (): Promise<UserType[]> => {
  * Menambahkan data user
  */
 export const addUser = async (payload: UserForm): Promise<UserForm> => {
-    const response = await api.post<ApiResponse<UserForm>>("/user/add", payload);
+    const response = await api.post<ApiResponse<UserForm>>("/config/user/add", payload);
     return response.data.data;
 };
 
@@ -49,7 +49,7 @@ export const addUser = async (payload: UserForm): Promise<UserForm> => {
  * Update data user
  */
 export const updateUser = async (id: number, payload: UserForm): Promise<UserForm> => {
-    const response = await api.put<ApiResponse<UserForm>>(`/user/update/${id}`, payload);
+    const response = await api.put<ApiResponse<UserForm>>(`/config/user/update/${id}`, payload);
     return response.data.data;
 };
 
@@ -57,7 +57,7 @@ export const updateUser = async (id: number, payload: UserForm): Promise<UserFor
  * Patch status user
  */
 export const setStatusUser = async (id: number) => {
-  const response = await api.patch<ApiResponse<UserForm>>(`/user/status/${id}`);
+  const response = await api.patch<ApiResponse<UserForm>>(`/config/user/status/${id}`);
   return response.data.data;
 };
 
