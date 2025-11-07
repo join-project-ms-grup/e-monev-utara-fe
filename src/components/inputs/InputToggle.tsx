@@ -33,7 +33,7 @@ const InputToggle = ({
   return (
     <label
       htmlFor={id}
-      className={`relative inline-grid grid-cols-2 rounded-full shadow-sm ${checked ? 'bg-green-500' : 'bg-red-500'} font-bold select-none overflow-hidden transition-all duration-300 ${
+      className={`h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm ${checked ? 'bg-green-500' : 'bg-red-500'} font-bold select-none overflow-hidden transition-all duration-300 ${
         disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
       }`}
     >
