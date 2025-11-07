@@ -1,8 +1,7 @@
 import { Fragment, useState } from 'react';
 import Tabel from '../../Tabel';
 import toast from 'react-hot-toast';
-import { MdClose, MdRefresh } from 'react-icons/md';
-import { IoMdPricetag } from 'react-icons/io';
+import { MdRefresh, MdTag } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -16,17 +15,16 @@ import {
 } from '../../../../lib/usercookie';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
-  flatIKU,
+  flatIK,
   getIKSKPD,
   getIKU,
   toggleTagIKU,
-  type FlatIKU,
+  type FlatIK,
 } from '../../../../services/IKUIKDService';
 import Spinner from '../../../inputs/Spinner';
 import AksiButton from '../../../inputs/AksiButton';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../../lib/api';
-import { id } from 'zod/v4/locales';
 
 const TaggingIndikatorTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
@@ -44,16 +42,20 @@ const TaggingIndikatorTable = () => {
   //#endregion
 
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['list_iku', selectedSKPD, idPeriode],
+    queryKey: [
+      'list_iku',
+      selectedSKPD ? Number(selectedSKPD) : 'all',
+      idPeriode,
+    ],
     queryFn: async () => {
       const rawData = await getIKU({
-        skpd_id: Number(selectedSKPD),
+        skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
         periodeId: idPeriode,
       });
-      const flatData = flatIKU(rawData);
+      const flatData = flatIK(rawData);
       return flatData;
     },
-    enabled: !!(selectedSKPD && idPeriode),
+    enabled: !!idPeriode,
   });
 
   const mulaiPeriode = Number(getPeriodeMulaiFromCookie()!);
@@ -67,7 +69,7 @@ const TaggingIndikatorTable = () => {
     ),
   ];
 
-  const columns: ColumnDef<FlatIKU>[] = [
+  const columns: ColumnDef<FlatIK>[] = [
     {
       header: 'No',
     },
@@ -111,13 +113,19 @@ const TaggingIndikatorTable = () => {
     );
   };
 
-  const tableBody = (table: Table<FlatIKU>) => {
-    let lastSkpd = '';
-    let counter = 1;
+  const tableBody = (table: Table<FlatIK>) => {
+    const rowModel = table.getRowModel();
+    const { pageIndex, pageSize } = table.getState().pagination ?? {
+      pageIndex: 0,
+      pageSize: 10,
+    };
 
-    // Kelompokkan data berdasarkan SKPD + uraian
-    const grouped: Record<string, FlatIKU[]> = {};
-    table.options.data?.forEach((item) => {
+    let lastSkpd = '';
+    let counter = pageIndex * pageSize + 1;
+    const grouped: Record<string, FlatIK[]> = {};
+
+    rowModel.rows.forEach((row) => {
+      const item = row.original;
       const key = `${item.skpdName}-${item.uraianId}`;
       if (!grouped[key]) grouped[key] = [];
       grouped[key].push(item);
@@ -127,12 +135,6 @@ const TaggingIndikatorTable = () => {
       <>
         {Object.values(grouped).map((group) => {
           const firstItem = group[0];
-
-          // Map target tahun ke kolom
-          const targetsByYear: Record<number, string> = {};
-          group.forEach((t) => {
-            targetsByYear[t.targetTahun] = t.target;
-          });
 
           const headerRow =
             firstItem.skpdName !== lastSkpd ? (
@@ -158,49 +160,25 @@ const TaggingIndikatorTable = () => {
           return (
             <Fragment key={`${firstItem.skpdName}-${firstItem.uraianId}`}>
               {headerRow}
-              <tr className='odd gradeX' id={`dtTb${firstItem.uraianId}`}>
-                <td
-                  style={{
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    width: '1%',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {counter++}
-                </td>
-                <td style={{ textAlign: 'left', verticalAlign: 'middle' }}>
-                  {firstItem.uraianName}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {firstItem.satuan}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {firstItem.base_line}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {targetsByYear[2025] ?? ''}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {targetsByYear[2026] ?? ''}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {targetsByYear[2027] ?? ''}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {targetsByYear[2028] ?? ''}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {targetsByYear[2029] ?? ''}
-                </td>
-                <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                  {targetsByYear[2030] ?? ''}
-                </td>
+              <tr
+                className='odd gradeX text-center'
+                id={`dtTb${firstItem.uraianId}`}
+              >
+                <td>{counter++}</td>
+                <td className='text-left!'>{firstItem.uraianName}</td>
+                <td>{firstItem.satuan}</td>
+                <td>{firstItem.base_line}</td>
+                <td>{firstItem.t_1_target}</td>
+                <td>{firstItem.t_2_target}</td>
+                <td>{firstItem.t_3_target}</td>
+                <td>{firstItem.t_4_target}</td>
+                <td>{firstItem.t_5_target}</td>
+                <td>{firstItem.t_6_target}</td>
                 <td>
                   <AksiButton
-                    Icon={MdClose}
-                    className='text-red-500 hover:text-white hover:bg-red-500'
-                    tooltip='Hapus Tag IKU ?'
+                    Icon={MdTag}
+                    className='text-green-500 hover:text-white hover:bg-green-500!'
+                    tooltip='Tag Sebagai IKD ?'
                     onClick={() => {
                       toggleIKUMutation.mutate({
                         id: firstItem.uraianId,
@@ -231,13 +209,10 @@ const TaggingIndikatorTable = () => {
       periodeId: number;
     }) => {
       setLoadingMutation(true);
-      // return console.log(payload)
       return toggleTagIKU({ id, skpd_id, periodeId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['list_iku', selectedSKPD, idPeriode],
-      });
+      queryClient.invalidateQueries({ queryKey: ['list_iku'] });
 
       toast.success('Data berhasil diperbarui');
     },
@@ -272,17 +247,18 @@ const TaggingIndikatorTable = () => {
           </div>
         </div>
         <div className='inline-flex gap-2'>
-          <InputButton
+          {/* <InputButton
             tooltip='Tag semua data sebagai IKU'
             className='btn btn-theme h-9'
             onClick={() => {
               toast.success('Tagging...');
             }}
           >
-            <span className='inline-flex items-center px-2 gap-2'>
-              <IoMdPricetag /> Tag Semua
+            <span className='inline-flex items-center px-2 gap-1'>
+              <MdTag />
+              Tag Semua
             </span>
-          </InputButton>
+          </InputButton> */}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'

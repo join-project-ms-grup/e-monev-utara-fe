@@ -13,7 +13,7 @@ export const Route = createFileRoute(
     ],
   }),
   staticData: {
-    title: 'RKPD',
+    title: '',
   },
   component: RouteComponent,
 });

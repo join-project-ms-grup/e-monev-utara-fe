@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_dashboard/rkpd')({
     }
   },
   staticData: {
-    title: 'RKPD',
+    title: '',
   },
   component: Outlet,
 });
