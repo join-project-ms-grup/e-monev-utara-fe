@@ -1,8 +1,7 @@
 import { Fragment, useState } from 'react';
 import Tabel from '../../Tabel';
 import toast from 'react-hot-toast';
-import { MdClose, MdRefresh, MdTag } from 'react-icons/md';
-import { IoMdPricetag } from 'react-icons/io';
+import { MdRefresh, MdTag } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -50,7 +49,6 @@ const TaggingIndikatorIKDTable = () => {
         periodeId: idPeriode,
       });
       const flatData = flatIK(rawData);
-      console.log('flat data', flatData);
       return flatData;
     },
     enabled: !!idPeriode,
@@ -248,17 +246,6 @@ const TaggingIndikatorIKDTable = () => {
           </div>
         </div>
         <div className='inline-flex gap-2'>
-          {/* <InputButton
-            tooltip='Tag semua data sebagai IKU'
-            className='btn btn-theme h-9'
-            onClick={() => {
-              toast.success('Tagging...');
-            }}
-          >
-            <span className='inline-flex items-center px-2 gap-2'>
-              <MdTag /> Tag Semua
-            </span>
-          </InputButton> */}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -274,7 +261,6 @@ const TaggingIndikatorIKDTable = () => {
         columns={columns}
         renderHeader={tableHead}
         renderBody={(table) => tableBody(table)}
-        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
       />
     </div>
   );
