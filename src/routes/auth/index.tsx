@@ -2,7 +2,7 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useMutation } from '@tanstack/react-query';
 import { SITE_NAME } from '../../lib/config';
 import { useState } from 'react';
-import { MdKey, MdPerson } from 'react-icons/md';
+import { MdClose, MdKey, MdPerson } from 'react-icons/md';
 import InputButton from '../../components/inputs/InputButton';
 import { useAuth } from '../../contexts/AuthContext';
 import api, { type ApiResponse } from '../../lib/api';
@@ -33,6 +33,7 @@ export const Route = createFileRoute('/auth/')({
 function RouteComponent() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [showLogin, setShowLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -67,107 +68,87 @@ function RouteComponent() {
   };
 
   return (
-    <div className='flex items-center justify-center h-screen authbg'>
-      <div className='bg-white shadow-lg rounded-lg w-full max-w-6xl min-h-3/5 flex flex-col md:flex-row overflow-hidden'>
-        <div className='relative w-full bg-[#721027] text-white flex flex-col justify-center items-center p-8 overflow-hidden'>
-          <img
-            src='/auth/bg-auth2.jpg'
-            alt=''
-            className='w-full h-full object-cover object-top absolute z-0'
-          />
-        </div>
-        <div className='w-full md:w-2/3 flex flex-col justify-center items-center p-8'>
-          <div className='h-4/5 max-w-md w-full mx-auto flex flex-col justify-center items-center p-8'>
-            <div className='w-72'>
-              <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
-            </div>
-            <p className='uppercase font-bold text-center mb-5'>
-              <span className='text-red-600 text-xl'>M</span>onitoring,{' '}
-              <span className='text-red-600 text-xl'>A</span>nalisis{' '}
-              <span className='text-red-600 text-xl'>Ha</span>sil Pem
-              <span className='text-red-600 text-xl'>b</span>angunan Daer
-              <span className='text-red-600 text-xl'>ah</span>
-            </p>
-            {/* <h2 className='text-2xl font-bold text-center text-gray-800 mb-6 uppercase'>
+    <div
+      className='relative flex items-center justify-center h-screen'
+      style={{
+        backgroundImage: "url('/auth/bg-full.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* Tombol login hanya tampil saat kotak login tidak muncul */}
+      <button
+        className={`absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-all duration-300
+    transform ${showLogin ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100 pointer-events-auto'}`}
+        onClick={() => setShowLogin(true)}
+      >
+        Login
+      </button>
+
+      {/* Kotak login */}
+      <div
+        className={`bg-white/90 shadow-lg rounded-lg w-full max-w-md p-8 backdrop-blur-sm z-10
+          transform transition-all duration-300 ease-out
+          ${showLogin ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
+      >
+        {/* Tombol silang di pojok kanan atas kotak login */}
+        <button
+          className='absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition'
+          onClick={() => setShowLogin(false)}
+        >
+          <MdClose size={24} />
+        </button>
+
+        <div className='w-full flex flex-col justify-center items-center'>
+          <div className='w-48 mb-6'>
+            <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
+          </div>
+          <p className='uppercase font-bold text-center mb-6 text-gray-700'>
+            <span className='text-red-600 text-xl'>M</span>onitoring,{' '}
+            <span className='text-red-600 text-xl'>A</span>nalisis{' '}
+            <span className='text-red-600 text-xl'>Ha</span>sil Pem
+            <span className='text-red-600 text-xl'>b</span>angunan Daer
+            <span className='text-red-600 text-xl'>ah</span>
+          </p>
+          <form onSubmit={handleSubmit} className='space-y-4 w-full'>
+            <InputText
+              placeholder='Username'
+              name='username'
+              Icon={MdPerson}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              type='text'
+              required
+            />
+            <InputText
+              placeholder='Password'
+              name='password'
+              Icon={MdKey}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type='password'
+              required
+            />
+            <InputButton
+              type='submit'
+              disabled={mutation.isPending}
+              isLoading={mutation.isPending}
+              className='w-full'
+            >
               Masuk
-            </h2> */}
-            <form onSubmit={handleSubmit} className='space-y-4 w-full'>
-              <InputText
-                placeholder='Username'
-                name='username'
-                Icon={MdPerson}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                type='text'
-                required
-              />
-              <InputText
-                placeholder='Password'
-                name='password'
-                Icon={MdKey}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type='password'
-                required
-              />
-              <InputButton
-                type='submit'
-                disabled={mutation.isPending}
-                isLoading={mutation.isPending}
-                className='w-full'
-              >
-                Masuk
-              </InputButton>
-            </form>
-            <p className='mt-4 text-center text-gray-600'>
-              Belum punya akun?{' '}
-              <a href='#' className='text-[#E63946]'>
-                Hubungi admin
-              </a>
-            </p>
-          </div>
-          {/* <div className='inline-flex gap-2'>
-            <button
-              className='text-red-200 hover:text-red-100 transition-all'
-              onClick={() => {
-                setUsername('admin');
-                setPassword('admin123');
-              }}
-            >
-              Developer
-            </button>
-            <button
-              className='text-red-200 hover:text-red-100 transition-all'
-              onClick={() => {
-                setUsername('admin2');
-                setPassword('admin123');
-              }}
-            >
-              Admin2
-            </button>
-            <button
-              className='text-red-200 hover:text-red-100 transition-all'
-              onClick={() => {
-                setUsername('rkpd');
-                setPassword('rkpd123');
-              }}
-            >
-              RKPD
-            </button>
-            <button
-              className='text-red-200 hover:text-red-100 transition-all'
-              onClick={() => {
-                setUsername('dak');
-                setPassword('dak123');
-              }}
-            >
-              DAK
-            </button>
-          </div> */}
-          <div className='h-1/5 text-center w-full flex flex-col items-center justify-center opacity-50 text-[0.9rem]'>
-            <p>BAPPERIDA</p>
-            <p>&copy; 2025 Kabupaten Bengkulu Utara</p>
-          </div>
+            </InputButton>
+          </form>
+          <p className='mt-4 text-center text-gray-600 text-sm'>
+            Belum punya akun?{' '}
+            <a href='#' className='text-[#E63946]'>
+              Hubungi admin
+            </a>
+          </p>
+        </div>
+        <div className='mt-6 text-center opacity-50 text-xs'>
+          <p>BAPPERIDA</p>
+          <p>&copy; 2025 Kabupaten Bengkulu Utara</p>
         </div>
       </div>
     </div>
