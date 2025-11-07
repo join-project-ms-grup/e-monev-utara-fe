@@ -213,7 +213,6 @@ const TaggingIndikatorTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['list_iku'] });
-
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {

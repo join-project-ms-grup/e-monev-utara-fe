@@ -42,7 +42,11 @@ const TaggingIndikatorIKDTable = () => {
   //#endregion
 
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['list_ikd', (selectedSKPD ? Number(selectedSKPD) : 'all'), idPeriode],
+    queryKey: [
+      'list_ikd',
+      selectedSKPD ? Number(selectedSKPD) : 'all',
+      idPeriode,
+    ],
     queryFn: async () => {
       const rawData = await getIKD({
         skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
@@ -209,10 +213,7 @@ const TaggingIndikatorIKDTable = () => {
       return toggleTagIKU({ id, skpd_id, periodeId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['list_iku', selectedSKPD, idPeriode],
-      });
-
+      queryClient.invalidateQueries({ queryKey: ['list_iku'] });
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
