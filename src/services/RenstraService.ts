@@ -86,7 +86,7 @@ export type RenstraMasterTree =
  * Ambil semua data renstra
  */
 export const getRenstra = async (skpd_periode_id: number): Promise<RenstraMasterTree[]> => {
-    const response = await api.get<ApiResponse<RenstraMasterTree[]>>(`/rkpd/laporan/${skpd_periode_id}`);
+    const response = await api.get<ApiResponse<RenstraMasterTree[]>>(`/renstra/hasil/renstra/${skpd_periode_id}`);
     return response.data.data;
 };
 

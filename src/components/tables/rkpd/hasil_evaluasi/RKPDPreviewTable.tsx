@@ -247,9 +247,7 @@ const RKPDPreviewTable = ({ data, listTahunKe, tahunKe }: MainTableProps) => {
                 </td>
                 <td className='border text-center px-2 py-1'>
                   {!isHeaderLevel
-                    ? formatUang(
-                        Number(row.original.tingkat_capaian_rpjmd_anggaran),
-                      )
+                    ? `${row.original.tingkat_capaian_rpjmd_anggaran} %`
                     : ''}
                 </td>
 
@@ -407,27 +405,14 @@ const RKPDPreviewTable = ({ data, listTahunKe, tahunKe }: MainTableProps) => {
           <br />
           <div className='flex justify-end'>
             <div className='grid grid-cols-2 gap-48 mr-96'>
-              <div className='flex flex-col items-center'>
-                <span>Disusun</span>
-                <span>
-                  ......................., tanggal ...................
-                </span>
-                <br />
-                <span>KEPALA BAPPEDA....................................</span>
-                <span>PROVINSI .................................... </span>
-                <br />
-                <br />
-                <br />
-                <span>(....................................)</span>
-              </div>
-              <div className='flex flex-col items-center'>
+              <div className='col-start-2 flex flex-col items-center'>
                 <span>Disetujui</span>
                 <span>
                   ......................., tanggal ...................
                 </span>
                 <br />
                 <span>
-                  BUPATI/WALI KOTA....................................
+                  KEPALA SKPD....................................
                 </span>
                 <span>
                   KABUPATEN/KOTA ....................................{' '}

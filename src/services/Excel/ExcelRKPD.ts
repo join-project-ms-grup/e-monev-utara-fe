@@ -193,7 +193,7 @@ export const exportRKPD = async (
       });
 
       const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-      ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA', 'AC'].forEach((col) => {
+      ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AC'].forEach((col) => {
         row.getCell(col).numFmt = fmtRupiah;
       });
 
@@ -205,6 +205,9 @@ export const exportRKPD = async (
       ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
         row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
       });
+
+      row.getCell('Z').numFmt = '0.00%';
+      row.getCell('AA').numFmt = '0.00%';
     }
 
     const endMergeRow = rowIndex - 1; // baris terakhir dari kelompok ini
@@ -271,7 +274,7 @@ export const exportRKPD = async (
   worksheet.mergeCells(`AC${rowIndex + 11}:AD${rowIndex + 11}`);
   worksheet.getRow(rowIndex + 11).getCell('AC').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 11).getCell('AC').value =
-    'BUPATI/WALI KOTA';
+    'KEPALA SKPD';
   worksheet.mergeCells(`AC${rowIndex + 12}:AD${rowIndex + 12}`);
   worksheet.getRow(rowIndex + 12).getCell('AC').value =
     'KABUPATEN/KOTA ....................................';
@@ -280,24 +283,24 @@ export const exportRKPD = async (
   worksheet.getRow(rowIndex + 18).getCell('AC').value =
     '(....................................)';
 
-  worksheet.mergeCells(`Z${rowIndex + 8}:AA${rowIndex + 8}`);
-  worksheet.getRow(rowIndex + 8).getCell('Z').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 8).getCell('Z').value =
-    'Disusun';
-  worksheet.mergeCells(`Z${rowIndex + 9}:AA${rowIndex + 9}`);
-  worksheet.getRow(rowIndex + 9).getCell('Z').value =
-    '......................, tanggal ...................';
-  worksheet.mergeCells(`Z${rowIndex + 11}:AA${rowIndex + 11}`);
-  worksheet.getRow(rowIndex + 11).getCell('Z').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 11).getCell('Z').value =
-    'KEPALA BAPPEDA';
-  worksheet.mergeCells(`Z${rowIndex + 12}:AA${rowIndex + 12}`);
-  worksheet.getRow(rowIndex + 12).getCell('Z').value =
-    'PROVINSI ....................................';
-  worksheet.mergeCells(`Z${rowIndex + 18}:AA${rowIndex + 18}`);
-  worksheet.getRow(rowIndex + 18).getCell('Z').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 18).getCell('Z').value =
-    '(....................................)';
+  // worksheet.mergeCells(`Z${rowIndex + 8}:AA${rowIndex + 8}`);
+  // worksheet.getRow(rowIndex + 8).getCell('Z').alignment = { horizontal: 'center' }
+  // worksheet.getRow(rowIndex + 8).getCell('Z').value =
+  //   'Disusun';
+  // worksheet.mergeCells(`Z${rowIndex + 9}:AA${rowIndex + 9}`);
+  // worksheet.getRow(rowIndex + 9).getCell('Z').value =
+  //   '......................, tanggal ...................';
+  // worksheet.mergeCells(`Z${rowIndex + 11}:AA${rowIndex + 11}`);
+  // worksheet.getRow(rowIndex + 11).getCell('Z').alignment = { horizontal: 'center' }
+  // worksheet.getRow(rowIndex + 11).getCell('Z').value =
+  //   'KEPALA BAPPEDA';
+  // worksheet.mergeCells(`Z${rowIndex + 12}:AA${rowIndex + 12}`);
+  // worksheet.getRow(rowIndex + 12).getCell('Z').value =
+  //   'PROVINSI ....................................';
+  // worksheet.mergeCells(`Z${rowIndex + 18}:AA${rowIndex + 18}`);
+  // worksheet.getRow(rowIndex + 18).getCell('Z').alignment = { horizontal: 'center' }
+  // worksheet.getRow(rowIndex + 18).getCell('Z').value =
+  //   '(....................................)';
   //#endregion
 
   const buffer = await workbook.xlsx.writeBuffer();

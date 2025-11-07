@@ -144,30 +144,17 @@ const RPJMDPreviewTable = ({ data}: MainTableProps) => {
           <br />
           <div className='flex justify-end'>
             <div className='grid grid-cols-2 gap-48 mr-96'>
-              <div className='flex flex-col items-center'>
-                <span>Disusun</span>
-                <span>
-                  ......................., tanggal ...................
-                </span>
-                <br />
-                <span>KEPALA BAPPEDA</span>
-                <span>KABUPATEN/KOTA.................................... </span>
-                <br />
-                <br />
-                <br />
-                <span>(....................................)</span>
-              </div>
-              <div className='flex flex-col items-center'>
+              <div className='col-start-2 flex flex-col items-center'>
                 <span>Disetujui</span>
                 <span>
                   ......................., tanggal ...................
                 </span>
                 <br />
                 <span>
-                  GUBERNUR
+                  KEPALA SKPD
                 </span>
                 <span>
-                  PROVINSI....................................{' '}
+                  KABUPATEN/KOTA....................................{' '}
                 </span>
                 <br />
                 <br />

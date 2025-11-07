@@ -286,7 +286,7 @@ export const exportRenstra = async (
   worksheet.mergeCells(`AK${rowIndex + 10}:AL${rowIndex + 10}`);
   worksheet.getRow(rowIndex + 10).getCell('AK').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 10).getCell('AK').value =
-    'KEPALA KEPALA Perangkat Daerah ..................';
+    'KEPALA Perangkat Daerah ..................';
   worksheet.mergeCells(`AK${rowIndex + 11}:AL${rowIndex + 11}`);
   worksheet.getRow(rowIndex + 11).getCell('AK').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 11).getCell('AK').value =

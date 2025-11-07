@@ -451,7 +451,7 @@ const RenstraTable = () => {
                       const skpdLabel =
                         dataSKPDPeriode?.find(
                           (s) => s.id === Number(selectedSKPD),
-                        )?.name ?? '';
+                        )?.skpd_name ?? '';
                       toast.promise(exportRenstra(data, skpdLabel), {
                         loading: 'Sedang mengunduh...',
                         success: <b>Berhasil mengunduh.</b>,
@@ -476,7 +476,7 @@ const RenstraTable = () => {
                 data={data || []}
                 skpd={
                   dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
-                    ?.name ?? ''
+                    ?.skpd_name ?? ''
                 }
               />
             </div>
