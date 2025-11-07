@@ -38,7 +38,7 @@ function RouteComponent() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await api.post('/auth/login', { username, password });
+      const res = await api.post('/config/auth/login', { username, password });
       return res.data.data;
     },
     onSuccess: (data) => {
@@ -75,22 +75,6 @@ function RouteComponent() {
             alt=''
             className='w-full h-full object-cover object-top absolute z-0'
           />
-          {/* <div className='flex flex-row items-center gap-4 absolute left-4 top-4 cursor-default rounded-xl px-4 py-2'>
-            <div>
-              <img src='/bengkulu-utara-logo.webp' alt='' className='h-16 mt-4' />
-            </div>
-            <div>
-              <div className='w-72'>
-                <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
-              </div>
-              <p className='uppercase font-bold text-red-800'>
-                <span className='text-red-600'>M</span>onitoring,{' '}
-                <span className='text-red-600'>A</span>nalisis{' '}
-                <span className='text-red-600'>Ha</span>sil Pem
-                <span className='text-red-600'>b</span>angunan Daer<span className='text-red-600'>ah</span>
-              </p>
-            </div>
-          </div> */}
         </div>
         <div className='w-full md:w-2/3 flex flex-col justify-center items-center p-8'>
           <div className='h-4/5 max-w-md w-full mx-auto flex flex-col justify-center items-center p-8'>
