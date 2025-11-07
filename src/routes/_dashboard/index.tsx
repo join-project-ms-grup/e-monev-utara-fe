@@ -76,8 +76,11 @@ function RouteComponent() {
           </div>
         </div>
         <div className='relative'>
-          <h4>E-MAHHABAH</h4>
-          <p>Sistem Monitoring, Analisis Hasil Pembangunan Daerah</p>
+          <h4>E-MAHABBAH</h4>
+          <p>
+            Sistem <b>M</b>onitoring, <b>A</b>nalisis <b>HA</b>sil Pem<b>B</b>
+            angunan Daer<b>AH</b>
+          </p>
           <p>BAPPERIDA Kabupaten Bengkulu Utara</p>
         </div>
         <div className='absolute bottom-0 right-0'>

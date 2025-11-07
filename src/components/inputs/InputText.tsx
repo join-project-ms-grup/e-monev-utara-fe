@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { IconType } from 'react-icons/lib';
-import { MdCheck, MdClear } from 'react-icons/md';
+import {
+  MdCheck,
+  MdClear,
+  MdVisibility,
+  MdVisibilityOff,
+} from 'react-icons/md';
 import { PiWarningCircle } from 'react-icons/pi';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -42,32 +47,25 @@ const InputText = ({
   IconlabelPos = 'left',
   ...props
 }: InputProps) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
-    // hanya batasi jika benar-benar numeric
     if (inputMode === 'numeric') {
       const inputEvent = e as unknown as InputEvent;
       const nextValue = inputEvent.data;
-
-      // izinkan angka dan titik
       if (nextValue && !/[\d.]/.test(nextValue)) {
         e.preventDefault();
       }
     }
-
-    if (onBeforeInput) {
-      onBeforeInput(e as React.InputEvent<HTMLInputElement>);
-    }
+    onBeforeInput?.(e as React.InputEvent<HTMLInputElement>);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // kalau bukan numeric, biarkan seperti biasa
     if (inputMode !== 'numeric') {
       onChange?.(e);
       return;
     }
-
     let rawValue = e.target.value.replace(/[^\d.]/g, '');
-
     let cleanValue = rawValue;
     if (isRibu) {
       cleanValue = rawValue.replace(/\./g, '');
@@ -80,10 +78,7 @@ const InputText = ({
     if (onChange) {
       const syntheticEvent = {
         ...e,
-        target: {
-          ...e.target,
-          value: cleanValue,
-        },
+        target: { ...e.target, value: cleanValue },
       };
       onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
     }
@@ -109,7 +104,7 @@ const InputText = ({
         </div>
       )}
       <input
-        type={type}
+        type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
         {...props}
         value={formattedValue}
         inputMode={inputMode}
@@ -133,6 +128,17 @@ const InputText = ({
             onClick={onClear}
           >
             <MdClear className='transition-all active:scale-80' />
+          </button>
+        )}
+        {type === 'password' && (
+          <button
+            type='button'
+            className='bg-white pr-2 text-gray-600 hover:text-gray-800'
+            onMouseDown={() => setShowPassword(true)}
+            onMouseUp={() => setShowPassword(false)}
+            onMouseLeave={() => setShowPassword(false)}
+          >
+            {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
           </button>
         )}
         {withButton && (
