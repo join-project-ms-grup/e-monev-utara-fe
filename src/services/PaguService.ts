@@ -40,7 +40,7 @@ export interface PaguForm {
  * Ambil semua data pagu
  */
 export const getPagu = async (id: number): Promise<PaguMasterTree[]> => {
-  const response = await api.get<ApiResponse<PaguMasterTree[]>>(`/pagu/list/${id}`);
+  const response = await api.get<ApiResponse<PaguMasterTree[]>>(`/rkpd/pagu/list/${id}`);
   return response.data.data;
 };
 
@@ -90,7 +90,7 @@ export const getPaguFlat = async (
  * Menambahkan data pagu
  */
 export const addPagu = async (payload: PaguForm): Promise<PaguForm> => {
-  const response = await api.post<ApiResponse<PaguForm>>("/pagu/add", payload);
+  const response = await api.post<ApiResponse<PaguForm>>("/rkpd/pagu/add", payload);
   return response.data.data;
 };
 
@@ -98,6 +98,6 @@ export const addPagu = async (payload: PaguForm): Promise<PaguForm> => {
  * Update data pagu
  */
 export const updatePagu = async (payload: PaguForm): Promise<PaguForm> => {
-  const response = await api.put<ApiResponse<PaguForm>>("/pagu/update", payload);
+  const response = await api.put<ApiResponse<PaguForm>>("/rkpd/pagu/update", payload);
   return response.data.data;
 };

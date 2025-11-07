@@ -49,7 +49,7 @@ export interface IndikatorForm {
  * Ambil semua data indikator
  */
 export const getIndikator = async (id: number): Promise<IndikatorMasterTree[]> => {
-  const response = await api.get<ApiResponse<IndikatorMasterTree[]>>(`/indikator/list/${id}`);
+  const response = await api.get<ApiResponse<IndikatorMasterTree[]>>(`/rkpd/indikator/list/${id}`);
   return response.data.data;
 };
 
@@ -97,7 +97,7 @@ export const getIndikatorFlat = async (
  * Menambahkan data indikator
  */
 export const addIndikator = async (payload: IndikatorForm): Promise<IndikatorForm> => {
-  const response = await api.post<ApiResponse<IndikatorForm>>("/indikator/add", payload);
+  const response = await api.post<ApiResponse<IndikatorForm>>("/rkpd/indikator/add", payload);
   return response.data.data;
 };
 
@@ -105,6 +105,6 @@ export const addIndikator = async (payload: IndikatorForm): Promise<IndikatorFor
  * Update data indikator
  */
 export const updateIndikator = async (id: number, payload: IndikatorForm): Promise<IndikatorForm> => {
-  const response = await api.put<ApiResponse<IndikatorForm>>(`/indikator/update/${id}`, payload);
+  const response = await api.put<ApiResponse<IndikatorForm>>(`/rkpd/indikator/update/${id}`, payload);
   return response.data.data;
 };

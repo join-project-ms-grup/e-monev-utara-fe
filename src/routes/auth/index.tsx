@@ -81,12 +81,12 @@ function RouteComponent() {
             <div className='w-72'>
               <img src='/mahabbah.png' alt='MAHABBAH LOGO' />
             </div>
-            <p className='uppercase font-bold text-red-800 text-center mb-5'>
-              <span className='text-red-600'>M</span>onitoring,{' '}
-              <span className='text-red-600'>A</span>nalisis{' '}
-              <span className='text-red-600'>Ha</span>sil Pem
-              <span className='text-red-600'>b</span>angunan Daer
-              <span className='text-red-600'>ah</span>
+            <p className='uppercase font-bold text-center mb-5'>
+              <span className='text-red-600 text-xl'>M</span>onitoring,{' '}
+              <span className='text-red-600 text-xl'>A</span>nalisis{' '}
+              <span className='text-red-600 text-xl'>Ha</span>sil Pem
+              <span className='text-red-600 text-xl'>b</span>angunan Daer
+              <span className='text-red-600 text-xl'>ah</span>
             </p>
             {/* <h2 className='text-2xl font-bold text-center text-gray-800 mb-6 uppercase'>
               Masuk

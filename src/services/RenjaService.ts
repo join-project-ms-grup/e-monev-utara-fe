@@ -1,53 +1,85 @@
 import api, { type ApiResponse } from "../lib/api";
 
 export interface RenjaMasterUrusan extends RenjaMaster {
-    bidang?: RenjaMasterBidang[];
+  bidang?: RenjaMasterBidang[];
 }
 export interface RenjaMasterBidang extends RenjaMaster {
-    program?: RenjaMasterProgram[];
+  program?: RenjaMasterProgram[];
 }
 export interface RenjaMasterProgram extends RenjaMaster {
-    kegiatan?: RenjaMasterKegiatan[];
+  kegiatan?: RenjaMasterKegiatan[];
 }
 export interface RenjaMasterKegiatan extends RenjaMaster {
-    subKegiatan?: RenjaMasterSubKegiatan[];
+  subKegiatan?: RenjaMasterSubKegiatan[];
 }
 export interface RenjaMasterSubKegiatan extends RenjaMaster {
 }
 export type RenjaMasterTree = RenjaMasterUrusan & RenjaMasterBidang & RenjaMasterProgram & RenjaMasterKegiatan & RenjaMasterSubKegiatan;
 
 export interface RenjaMaster {
-    id: number;
-    kode: string;
-    name: string;
-    type?: string;
-    pagu?: number;
+  id: number;
+  kode: string;
+  name: string;
+  type?: string;
+  pagu?: number;
 }
 
 export interface RenjaSKPD {
-    kode: string;
-    nama: string;
-    pagu: string;
+  kode: string;
+  nama: string;
+  pagu: string;
 }
 
 export interface Renja {
-    data_rekening: RenjaMasterTree[]
-    data_skpd: RenjaSKPD;
+  data_rekening: RenjaMasterTree[]
+  data_skpd: RenjaSKPD;
 }
 
 export interface RenjaGetForm {
-    skpd_periode_id: number;
-    tahun_ke: number;
-    bidang: number | null
+  skpd_periode_id: number;
+  tahun_ke: number;
+  bidang: number | null
+}
+
+export interface RenjaDetailGetForm {
+  skpd_periode_id: number;
+  tahun_ke: number;
+  sub_id: number
+}
+
+export interface RenjaDetail {
+  skpd: string;
+  urusan: string;
+  bidang: string;
+  program: string;
+  kegiatan: string;
+  subKegiatan: string;
+  waktu: string;
+  pagu: string;
+  lokasi: string;
+  indikator: [
+    {
+      name: string;
+      target: string;
+    },
+  ],
 }
 
 export const getRenja = async (payload: RenjaGetForm): Promise<Renja> => {
-    const response = await api.post<ApiResponse<Renja>>("/rkpd/renja/list-sub", payload);
-    return response.data.data;
+  const response = await api.post<ApiResponse<Renja>>("/rkpd/renja/list-sub", payload);
+  return response.data.data;
 };
+
+export const getRenjaDetail = async (payload: RenjaDetailGetForm): Promise<RenjaDetail> => {
+  const response = await api.post<ApiResponse<RenjaDetail>>("/rkpd/renja/detail-sub", payload);
+  return response.data.data;
+};
+
+
 
 export interface FlatRenja {
   level: string;
+  id: number;
   kode_urusan: string;
   kode_bidang: string;
   kode_program: string;
@@ -67,6 +99,7 @@ export async function flatRenja(
 
   const pushRow = (
     level: string,
+    id: number,
     kodeParts: string[],
     name: string,
     pagu?: number,
@@ -77,6 +110,7 @@ export async function flatRenja(
 
     dataExcel.push({
       level,
+      id,
       kode_urusan,
       kode_bidang,
       kode_program,
@@ -94,6 +128,7 @@ export async function flatRenja(
   dataRekening.forEach((urusan) => {
     pushRow(
       "urusan",
+      urusan.id,
       [urusan.kode ?? "", "", "", "", ""],
       urusan.name,
       urusan.pagu,
@@ -102,6 +137,7 @@ export async function flatRenja(
     urusan.bidang?.forEach((bidang) => {
       pushRow(
         "bidang",
+        bidang.id,
         [urusan.kode ?? "", bidang.kode ?? "", "", "", ""],
         bidang.name,
         bidang.pagu,
@@ -111,6 +147,7 @@ export async function flatRenja(
       bidang.program?.forEach((program) => {
         pushRow(
           "program",
+          program.id,
           [urusan.kode ?? "", bidang.kode ?? "", program.kode ?? "", "", ""],
           program.name,
           program.pagu,
@@ -120,6 +157,7 @@ export async function flatRenja(
         program.kegiatan?.forEach((kegiatan) => {
           pushRow(
             "kegiatan",
+            kegiatan.id,
             [
               urusan.kode ?? "",
               bidang.kode ?? "",
@@ -135,6 +173,7 @@ export async function flatRenja(
           kegiatan.subKegiatan?.forEach((sub) => {
             pushRow(
               "sub_kegiatan",
+              sub.id,
               [
                 urusan.kode ?? "",
                 bidang.kode ?? "",

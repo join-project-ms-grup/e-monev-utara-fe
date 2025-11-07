@@ -76,7 +76,7 @@ export const FormUser: React.FC<FormProps> = ({
   });
   const listSKPD =
     dataSKPD?.map((item) => ({
-      label: `[${item.id}] ${item.name}`,
+      label: `${item.skpd_name}`,
       value: item.id?.toString(),
     })) || [];
   //#endregion

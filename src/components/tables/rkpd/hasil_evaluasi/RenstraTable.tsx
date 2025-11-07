@@ -72,7 +72,7 @@ const RenstraTable = () => {
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
-      label: `[${item.id}] ${item.name}`,
+      label: `${item.skpd_name}`,
       value: item.id?.toString(),
     })) || [];
   //#endregion

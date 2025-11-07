@@ -38,7 +38,7 @@ const IndikatorTable = () => {
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
-      label: `[${item.id}] ${item.name}`,
+      label: `${item.skpd_name}`,
       value: item.id?.toString(),
     })) || [];
   //#endregion
@@ -395,7 +395,7 @@ const IndikatorTable = () => {
                     } else {
                       return (
                         <span className='whitespace-break-spaces'>
-                          {target}
+                          {target ? target : '0'}
                         </span>
                       );
                     }

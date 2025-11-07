@@ -1,8 +1,14 @@
-import { useState, type JSX } from 'react';
+import { Fragment, useState, type JSX } from 'react';
 import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
-import { MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
-import type { ColumnDef } from '@tanstack/react-table';
+import {
+  MdDetails,
+  MdInfo,
+  MdRefresh,
+  MdSubdirectoryArrowRight,
+} from 'react-icons/md';
+import { FaInfo } from 'react-icons/fa';
+import type { ColumnDef, Table } from '@tanstack/react-table';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
@@ -17,27 +23,38 @@ import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
   flatRenja,
   getRenja,
+  getRenjaDetail,
   type FlatRenja,
+  type RenjaDetail,
 } from '../../../../services/RenjaService';
 import Spinner from '../../../inputs/Spinner';
 import { formatUang } from '../../../../lib/helper';
-
-const tableHead = () => {
-  return (
-    <>
-      <tr>
-        <th>No</th>
-        <th>Kode Sub Kegiatan</th>
-        <th>Nama Sub Kegiatan</th>
-        <th>Pagu (Rp.)</th>
-        <th>Waktu Pelaksanaan</th>
-        <th>Detail</th>
-      </tr>
-    </>
-  );
-};
+import AksiButton from '../../../inputs/AksiButton';
+import DialogModal from '../../../inputs/DialogModal';
 
 const RenjaTable = () => {
+  //#region Form Data dan Modal
+  const [openModal, setOpenModal] = useState(false);
+  const initialFormData: RenjaDetail = {
+    skpd: '',
+    urusan: '',
+    bidang: '',
+    program: '',
+    kegiatan: '',
+    subKegiatan: '',
+    waktu: '',
+    pagu: '',
+    lokasi: '',
+    indikator: [
+      {
+        name: '',
+        target: '',
+      },
+    ],
+  };
+  const [formData, setFormData] = useState<RenjaDetail>(initialFormData);
+  //#endregion
+
   //#region SKPD, Tahun ke, Bidang
   const [tahunKe, setTahunKe] = useState('');
   const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
@@ -79,7 +96,6 @@ const RenjaTable = () => {
   const columns: ColumnDef<FlatRenja>[] = [
     {
       header: 'No',
-      cell: ({ row }) => row.index + 1,
     },
     {
       accessorKey: 'kode',
@@ -89,7 +105,6 @@ const RenjaTable = () => {
     },
     {
       accessorKey: 'pagu',
-      cell: ({ getValue }) => formatUang(Number(getValue())),
     },
     {
       header: 'Waktu Pelaksanaan',
@@ -99,90 +114,118 @@ const RenjaTable = () => {
     },
   ];
 
-  // const tableBody = ({ data }: { data?: FlatRenja[] }) => {
-  //   if (!data || data.length === 0)
-  //     return (
-  //       <tr>
-  //         <td colSpan={7} className='text-center'>
-  //           TIDAK ADA DATA
-  //         </td>
-  //       </tr>
-  //     );
+  const tableHead = () => {
+    return (
+      <>
+        <tr>
+          <th>No</th>
+          <th>Kode Sub Kegiatan</th>
+          <th>Nama Sub Kegiatan</th>
+          <th>Pagu</th>
+          <th>Waktu Pelaksanaan</th>
+          <th>Detail</th>
+        </tr>
+      </>
+    );
+  };
 
-  //   const rows: JSX.Element[] = [];
+  const tableBody = (table: Table<FlatRenja & { group?: string }>) => {
+    const rows = table.getRowModel().rows;
+    if (!rows.length)
+      return (
+        <tr>
+          <td colSpan={12}>TIDAK ADA DATA</td>
+        </tr>
+      );
+    const { pageIndex, pageSize } = table.getState().pagination ?? {
+      pageIndex: 0,
+      pageSize: rows.length,
+    };
 
-  //   // Untuk memastikan header tidak duplikat
-  //   const addedHeaders = new Set<string>();
+    const allRows = table.getPrePaginationRowModel().rows;
+    let subKegiatanOffset = 0;
+    for (let i = 0; i < pageIndex * pageSize; i++) {
+      if (allRows[i].original.kode_subKegiatan) subKegiatanOffset++;
+    }
 
-  //   // Iterasi data secara urut berdasarkan hierarki
-  //   data.forEach((item, idx) => {
-  //     const kodeLevels = [
-  //       {
-  //         kode: item.kode_urusan,
-  //         label: item.kode_urusan,
-  //         name: item.rekening,
-  //       },
-  //       {
-  //         kode: `${item.kode_urusan}.${item.kode_bidang}`,
-  //         label: item.kode_bidang,
-  //         name: item.rekening,
-  //       },
-  //       {
-  //         kode: `${item.kode_urusan}.${item.kode_bidang}.${item.kode_program}`,
-  //         label: item.kode_program,
-  //         name: item.rekening,
-  //       },
-  //       {
-  //         kode: `${item.kode_urusan}.${item.kode_bidang}.${item.kode_program}.${item.kode_kegiatan}`,
-  //         label: item.kode_kegiatan,
-  //         name: item.rekening,
-  //       },
-  //       {
-  //         kode: `${item.kode_urusan}.${item.kode_bidang}.${item.kode_program}.${item.kode_kegiatan}.${item.kode_subKegiatan}`,
-  //         label: item.kode_subKegiatan,
-  //         name: item.rekening,
-  //       },
-  //     ];
+    let subkegiatanIdx = subKegiatanOffset + 1;
+    const renderedHeaderKeys = new Set<string>();
 
-  //     // Tambahkan header dari level atas sampai kegiatan
-  //     kodeLevels.slice(0, 4).forEach((lvl, i) => {
-  //       if (!lvl.kode || addedHeaders.has(lvl.kode)) return;
-  //       addedHeaders.add(lvl.kode);
+    return (
+      <>
+        {rows.map((row) => {
+          const item = row.original;
+          const codes = [
+            item.kode_urusan,
+            item.kode_bidang,
+            item.kode_program,
+            item.kode_kegiatan,
+            item.kode_subKegiatan,
+          ].filter(Boolean);
 
-  //       rows.push(
-  //         <tr key={`header-${lvl.kode}`} className='bg-gray-200 font-bold'>
-  //           <td colSpan={7}>
-  //             <div
-  //               className='inline-flex items-center gap-1'
-  //               style={{ paddingLeft: `${i * 16}px` }}
-  //             >
-  //               {i > 0 && <MdSubdirectoryArrowRight />}
-  //               <span>
-  //                 [{lvl.kode}] {lvl.name}
-  //               </span>
-  //             </div>
-  //           </td>
-  //         </tr>,
-  //       );
-  //     });
+          const headerRows: JSX.Element[] = [];
 
-  //     // Baris data sub-kegiatan
-  //     const kodeFull = `${item.kode_urusan}.${item.kode_bidang}.${item.kode_program}.${item.kode_kegiatan}.${item.kode_subKegiatan}`;
+          codes.forEach((code, i) => {
+            if (i === codes.length - 1) return;
+            const key = codes.slice(0, i + 1).join('.');
+            if (!renderedHeaderKeys.has(key)) {
+              renderedHeaderKeys.add(key);
+              headerRows.push(
+                <tr key={`header-${key}`} className='bg-gray-200 font-bold'>
+                  <td colSpan={12}>
+                    <div
+                      style={{ paddingLeft: `${i * 16}px` }}
+                      className='inline-flex items-center gap-1'
+                    >
+                      {i > 0 && <MdSubdirectoryArrowRight />}
+                      <span>
+                        [{codes.slice(0, i + 1).join('.')}] {item.rekening}
+                      </span>
+                    </div>
+                  </td>
+                </tr>,
+              );
+            }
+          });
 
-  //     rows.push(
-  //       <tr key={`row-${idx}`} className='border-t'>
-  //         <td className='text-center'>{idx + 1}</td>
-  //         <td className='text-left w-[50px]'>{kodeFull}</td>
-  //         <td>{item.rekening}</td>
-  //         <td className='text-right'>{formatUang(Number(item.pagu))}</td>
-  //         <td className='text-center'>-</td>
-  //         <td className='text-center'>Detail</td>
-  //       </tr>,
-  //     );
-  //   });
+          const rowElement = (
+            <Fragment key={row.id}>
+              {headerRows}
+              {item.kode_subKegiatan && (
+                <tr>
+                  <td>{subkegiatanIdx++}</td>
+                  <td>{codes.join('.')}</td>
+                  <td>{item.rekening}</td>
+                  <td className='text-center'>
+                    {formatUang(Number(item.pagu))}
+                  </td>
+                  <td className='text-center'>-</td>
+                  <td>
+                    <AksiButton
+                      Icon={FaInfo}
+                      iconClassName='scale-75'
+                      tooltip='Informasi Data'
+                      onClick={async () => {
+                        const detailR = await getRenjaDetail({
+                          skpd_periode_id: Number(selectedSKPD),
+                          tahun_ke: Number(tahunKe),
+                          sub_id: item.id,
+                        });
+                        setFormData(detailR);
+                        setOpenModal(true);
+                      }}
+                    />
+                  </td>
+                </tr>
+              )}
+            </Fragment>
+          );
 
-  //   return <>{rows}</>;
-  // };
+          return rowElement;
+        })}
+      </>
+    );
+  };
 
   return (
     <>
@@ -244,7 +287,7 @@ const RenjaTable = () => {
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
-          // renderBody={() => tableBody({ data })}
+          renderBody={(table) => tableBody(table)}
           pesanDataKosong={
             <PesanSKPDTabel
               selectedSKPD={selectedSKPD}
@@ -253,8 +296,155 @@ const RenjaTable = () => {
             />
           }
         />
+        <DialogModal
+          widthLevel={10}
+          title='Informasi Data'
+          isOpen={openModal}
+          onClose={() => {
+            setTimeout(() => {
+              setFormData(initialFormData);
+            }, 300);
+            setOpenModal(false);
+          }}
+        >
+          <DetailRenja
+            formData={formData}
+            tahun={listTahunKe.find((item) => item.value === tahunKe)?.label}
+          />
+        </DialogModal>
       </div>
     </>
+  );
+};
+
+const DetailRenja = ({
+  formData,
+  tahun,
+}: {
+  formData: RenjaDetail;
+  tahun?: string;
+}) => {
+  return (
+    <div className='grid grid-cols-2 grid-rows-2 gap-2'>
+      <div className='col-start-1 row-span-2'>
+        <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
+          <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
+            Detail Program Kegiatan
+          </div>
+          <div className='p-4 table-excel'>
+            <table>
+              <tbody>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Tahun</td>
+                  <td>{tahun}</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Jadwal</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>SKPD</td>
+                  <td>{formData.skpd}</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Urusan</td>
+                  <td>{formData.urusan}</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Bidang</td>
+                  <td>{formData.bidang}</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Program</td>
+                  <td>{formData.program}</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Kegiatan</td>
+                  <td>{formData.kegiatan}</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Sub Kegiatan</td>
+                  <td>{formData.subKegiatan}</td>
+                </tr>
+                <tr>
+                  <td className='text-right pr-4 font-bold'>Waktu</td>
+                  <td>{formData.waktu}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {/*  */}
+      <div>
+        <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
+          <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
+            Anggaran & Lokasi
+          </div>
+          <div className='p-4 table-excel space-y-4'>
+            <table>
+              <thead>
+                <tr>
+                  <th colSpan={3}>Pagu</th>
+                </tr>
+                <tr>
+                  <th>{Number(tahun) - 1}</th>
+                  <th>{tahun}</th>
+                  <th>{Number(tahun) - 1}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className='text-center'>
+                  <td>0</td>
+                  <td>{formatUang(Number(formData.pagu))}</td>
+                  <td>0</td>
+                </tr>
+              </tbody>
+            </table>
+            <table>
+              <thead>
+                <tr>
+                  <th>Lokasi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className='text-center'>
+                  <td>{formData.lokasi}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {/*  */}
+      <div>
+        <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
+          <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
+            Indikator Sub Kegiatan
+          </div>
+          <div className='p-4 table-excel'>
+            <table>
+              <thead>
+                <tr>
+                  <th>Narasi</th>
+                  <th>Target</th>
+                </tr>
+              </thead>
+              <tbody>
+                {formData.indikator.map((item, index) => {
+                  return (
+                    <tr key={index}>
+                      <td>{item.name}</td>
+                      <td className='text-center'>{item.target}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
