@@ -29,7 +29,7 @@ export type MasterTree = MasterUrusan & MasterBidang & MasterProgram & MasterKeg
  * Ambil semua data
  */
 export const getRekening = async (): Promise<MasterUrusan[]> => {
-  const response = await api.get<ApiResponse<MasterUrusan[]>>("/master/list/all");
+  const response = await api.get<ApiResponse<MasterUrusan[]>>("/rkpd/master/list/all");
 
   const rawData = response.data.data;
   const cleanData = rawData.map((urusan) => ({
@@ -162,7 +162,7 @@ export const getRekeningFlat = async (
  * Ambil semua urusan
  */
 export const getUrusan = async (): Promise<Master[]> => {
-  const response = await api.get<ApiResponse<Master[]>>("/master/list/urusan");
+  const response = await api.get<ApiResponse<Master[]>>("/rkpd/master/list/urusan");
   return response.data.data;
 };
 
@@ -170,7 +170,7 @@ export const getUrusan = async (): Promise<Master[]> => {
  * Ambil semua children
  */
 export const getChildren = async (id: number): Promise<Master[]> => {
-  const response = await api.get<ApiResponse<Master[]>>(`/master/list/children/${id}`);
+  const response = await api.get<ApiResponse<Master[]>>(`/rkpd/master/list/children/${id}`);
   return response.data.data;
 };
 
@@ -184,7 +184,7 @@ export interface MasterFilter {
 }
 
 export const getMasterFilter = async (payload: MasterFilter): Promise<MasterUrusan[]> => {
-  const response = await api.post<ApiResponse<MasterUrusan[]>>("/master/children-from", payload);
+  const response = await api.post<ApiResponse<MasterUrusan[]>>("/rkpd/master/children-from", payload);
   const rawData = response.data.data;
   const dataArray = Array.isArray(rawData) ? rawData : [rawData];
   const cleanData = dataArray.map((urusan) => ({
@@ -215,7 +215,7 @@ export const getMasterFilter = async (payload: MasterFilter): Promise<MasterUrus
 };
 
 export const getMasterRaw = async (payload: MasterFilter): Promise<MasterUrusan[]> => {
-  const response = await api.post<ApiResponse<any[]>>("/master/children-from", payload);
+  const response = await api.post<ApiResponse<any[]>>("/rkpd/master/children-from", payload);
   const data = response.data.data;
   console.log(data)
   return data
@@ -225,7 +225,7 @@ export const getMasterRaw = async (payload: MasterFilter): Promise<MasterUrusan[
  * Menambahkan data master
  */
 export const addMaster = async (payload: Master): Promise<Master> => {
-  const response = await api.post<ApiResponse<Master>>("/master/add", payload);
+  const response = await api.post<ApiResponse<Master>>("/rkpd/master/add", payload);
   return response.data.data;
 };
 
@@ -233,6 +233,6 @@ export const addMaster = async (payload: Master): Promise<Master> => {
  * Update data master
  */
 export const updateMaster = async (id: number, payload: Master): Promise<Master> => {
-  const response = await api.put<ApiResponse<Master>>(`/master/update/${id}`, payload);
+  const response = await api.put<ApiResponse<Master>>(`/rkpd/master/update/${id}`, payload);
   return response.data.data;
 };

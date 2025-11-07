@@ -1,92 +1,55 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import Tabel from '../Tabel';
-import { MdRefresh } from 'react-icons/md';
+import { useEffect, useState, type JSX } from 'react';
+import { MdEdit, MdInput, MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
-import { type ColumnDef } from '@tanstack/react-table';
-import toast from 'react-hot-toast';
-import {
-  addRealisasi,
-  getRealisasiFlat,
-  type RealisasiForm,
-  type RealisasiMaster,
-} from '../../../services/RealisasiService';
+import Tabel from '../Tabel';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
 } from '../../../lib/usercookie';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getSKPDPeriode } from '../../../services/PeriodeService';
+import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
+import type { ColumnDef } from '@tanstack/react-table';
 import Spinner from '../../inputs/Spinner';
+import PesanSKPDTabel from '../../PesanSKPDTabel';
+import {
+  flatRealisasi,
+  getRealisasi,
+  type FlatRealisasi,
+  type RealisasiForm,
+} from '../../../services/RealisasiService';
+import AksiButton from '../../inputs/AksiButton';
+import { formatUang } from '../../../lib/helper';
 import DialogModal from '../../inputs/DialogModal';
 import FormRealisasi from '../../forms/FormRealisasi';
-import type { AxiosError } from 'axios';
-import type { ApiResponse } from '../../../lib/api';
-import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
-import { formatRibu, formatUang } from '../../../lib/helper';
-import { getSKPDPeriode } from '../../../services/PeriodeService';
-import InputText from '../../inputs/InputText';
-import PesanSKPDTabel from '../../PesanSKPDTabel';
-
-const tableHead = () => {
-  return (
-    <>
-      <tr>
-        <th rowSpan={2} colSpan={5}>
-          Kode
-        </th>
-        <th rowSpan={2}>Urusan / Bidang / Program / Kegiatan / Sub Kegiatan</th>
-        <th rowSpan={2}>Pagu</th>
-        <th rowSpan={1} colSpan={5}>
-          Triwulan
-        </th>
-      </tr>
-      <tr>
-        <th>I</th>
-        <th>II</th>
-        <th>III</th>
-        <th>IV</th>
-        <th>Total</th>
-      </tr>
-    </>
-  );
-};
 
 const RealisasiTable = () => {
   const queryClient = useQueryClient();
-  //#region SKPD dan Tahun ke
-  const [tahunKe, setTahunKe] = useState('');
-  const [selectedSKPD, setSelectedSKPD] = useState('');
-  const { data: dataSKPDPeriode } = useQuery({
-    queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
-  });
-  const listSKPDPeriode =
-    dataSKPDPeriode?.map((item) => ({
-      label: `[${item.id}] ${item.name}`,
-      value: item.id?.toString(),
-    })) || [];
-  //#endregion
-
-  //#region Modal, FormData & Tabel Data
-  const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_realisasi', selectedSKPD, tahunKe],
-    queryFn: async () =>
-      getRealisasiFlat(Number(selectedSKPD), Number(tahunKe)),
-    enabled: !!(selectedSKPD && tahunKe),
-  });
   // Modal
   const [openModal, setOpenModal] = useState(false);
+
   // Form Data
   const initialFormData: RealisasiForm = {
-    master_name: '',
+    rekening_kode: '',
+    rekening_name: '',
+    indikator_name: '',
     id_pagu: 0,
+    id_rincian: 0,
     realisasi: [
-      { triwulan: '1', realisasi: '' },
-      { triwulan: '2', realisasi: '' },
-      { triwulan: '3', realisasi: '' },
-      { triwulan: '4', realisasi: '' },
+      { triwulan: 1, realisasi: 0 },
+      { triwulan: 2, realisasi: 0 },
+      { triwulan: 3, realisasi: 0 },
+      { triwulan: 4, realisasi: 0 },
+    ],
+    capaian: [
+      { triwulan: 1, capaian: 0 },
+      { triwulan: 2, capaian: 0 },
+      { triwulan: 3, capaian: 0 },
+      { triwulan: 4, capaian: 0 },
     ],
   };
+
   const [formData, setFormData] = useState<RealisasiForm>(initialFormData);
   // Clear form
   useEffect(() => {
@@ -95,160 +58,198 @@ const RealisasiTable = () => {
         setFormData(initialFormData);
       }, 200);
       return () => clearTimeout(timeout);
-    } else {
-      console.log('RealisasiTable.tsx', formData);
     }
   }, [openModal]);
+  //#region SKPD, Tahun ke dan Triwulan ke
+  const [triwulanKe, setTriwulanKe] = useState('');
+  const triwulanList = [
+    { label: 'Triwulan I', value: '1' },
+    { label: 'Triwulan II', value: '2' },
+    { label: 'Triwulan III', value: '3' },
+    { label: 'Triwulan IV', value: '4' },
+  ];
+  const [tahunKe, setTahunKe] = useState('');
+  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const { data: dataSKPDPeriode } = useQuery({
+    queryKey: ['list_skpd_periode'],
+    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+  });
+  const listSKPDPeriode =
+    dataSKPDPeriode?.map((item) => ({
+      label: `${item.skpd_name}`,
+      value: item.id?.toString(),
+    })) || [];
   //#endregion
 
-  //#region Mutasi
-  const [loadingMutation, setLoadingMutation] = useState(false);
-  // Add
-  const addMutation = useMutation({
-    mutationFn: async (payload: RealisasiForm) => {
-      setLoadingMutation(true);
-      return addRealisasi({
-        id_pagu: Number(payload.id_pagu),
-        realisasi: payload.realisasi?.slice(0, 4).map((t) => ({
-          realisasi: Number(t.realisasi),
-          triwulan: Number(t.triwulan),
-        })),
+  //#region Data
+  const { data, isFetching, refetch } = useQuery({
+    queryKey: ['list_renja', tahunKe, selectedSKPD],
+    queryFn: async () => {
+      const rawData = await getRealisasi({
+        skpd_periode_id: Number(selectedSKPD),
+        tahun_ke: Number(tahunKe),
       });
+      const flatData = await flatRealisasi(rawData, '');
+      console.log(flatData);
+      return flatData;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_realisasi'] });
-      setFormData(initialFormData);
-      setOpenModal(false);
-      toast.success('Data berhasil diperbarui');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
-      }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
+    enabled: !!(selectedSKPD && tahunKe),
   });
   //#endregion
 
   // #region Kolom Tabel
-  const columns: ColumnDef<RealisasiMaster>[] = [
+  const columns: ColumnDef<FlatRealisasi>[] = [
     {
-      id: 'kode',
-      columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
-        (label, index) => ({
-          id: `kode_${label}`,
-          meta: {
-            tdClassNames: 'w-[30px]',
-          },
-          accessorFn: (row) => row.kodeFull?.[index],
-          cell: ({ getValue }) => {
-            const value = getValue();
-            return value ?? '';
-          },
-        }),
-      ),
-    },
-    {
-      accessorKey: 'name',
-      cell: ({ getValue, row }) => {
-        const typeBold = ['urusan', 'bidang'];
-        const isBold = !!typeBold.find((item) => item === row.original.type);
-        return (
-          <>
-            <span className={isBold ? 'font-bold' : undefined}>
-              {getValue() as ReactNode}
-            </span>
-          </>
-        );
+      header: 'Kode',
+      accessorFn: (row) => {
+        const parts = [
+          row.kode_urusan,
+          row.kode_bidang,
+          row.kode_program,
+          row.kode_kegiatan,
+          row.kode_subKegiatan,
+        ].filter(Boolean);
+
+        return parts.join('.');
       },
     },
     {
-      accessorKey: 'pagu',
-      header: 'Pagu',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: ({ getValue }) =>
-        `${getValue() ? formatUang(Number(getValue())) : ''}`,
+      accessorKey: 'rekening',
     },
-    //
     {
-      header: 'Triwulan',
-      meta: { tdClassNames: 'text-center' },
-      columns: [1, 2, 3, 4].map((triwulan) => ({
-        id: `realisasi_per_triwulan${triwulan}`,
-        header: `Realisasi Per Triwulan ${triwulan}`,
-        meta: { tdClassNames: 'text-center' },
-        accessorFn: (row) => {
-          const item = row.realisasi_per_triwulan?.find(
-            (p) => p.triwulan === triwulan,
-          );
-          return item ? Number(item.realisasi) : 0;
-        },
-        cell: ({ row }) => {
+      accessorKey: 'indikator_kinerja',
+    },
+    {
+      accessorKey: 'satuan',
+    },
+    {
+      accessorKey: 'target',
+      cell: ({ row, getValue }) => {
+        if (row.original.type === 'urusan' || row.original.type === 'bidang') {
+          return '';
+        }
+        return <>{getValue() ?? '' + ' ' + row.original.satuan}</>;
+      },
+    },
+    {
+      accessorKey: 'target_anggaran',
+      cell: ({ row, getValue }) => {
+        if (row.original.type === 'urusan' || row.original.type === 'bidang') {
+          return '';
+        }
+        if (getValue()) {
+          return <>{formatUang(Number(getValue()))}</>;
+        }
+      },
+    },
+    {
+      accessorKey: 'total_capaian',
+    },
+    {
+      accessorKey: 'total_realisasi',
+      cell: ({ row, getValue }) => {
+        if (row.original.type === 'urusan' || row.original.type === 'bidang') {
+          return '';
+        }
+        if (getValue()) {
+          return <>{formatUang(Number(getValue()))}</>;
+        } else {
+          return '0';
+        }
+      },
+    },
+    {
+      accessorKey: 'persen_capaian',
+    },
+    {
+      accessorKey: 'persen_realisasi',
+      cell: ({ row, getValue }) => {
+        if (row.original.type === 'urusan' || row.original.type === 'bidang') {
+          return '';
+        }
+        if (getValue()) {
+          getValue() + ' %';
+        } else {
+          return '0 %';
+        }
+      },
+    },
+    {
+      header: 'Aksi',
+      cell: ({ row }) => {
+        if (row.original.level === 'sub_kegiatan') {
           const data = row.original;
-          const realisasiList = data.realisasi_per_triwulan ?? [];
-          const item = realisasiList.find((p) => p.triwulan === triwulan);
-          if (!item) return '\u00A0';
-
-          if (data.type !== 'subKegiatan') return Number(item.realisasi) ?? '-';
-
-          const [realisasi, setRealisasi] = useState(Number(item.realisasi));
-          const [disBtn, setDisBtn] = useState(true);
-
-          const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = e.target.value;
-            setRealisasi(Number(newValue));
-            setDisBtn(Number(newValue) === Number(item.realisasi));
-          };
-
-          const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            const updatedRealisasi = realisasiList.map((r) =>
-              r.triwulan === triwulan
-                ? { ...r, realisasi: Number(realisasi) }
-                : r,
-            );
-
-            addMutation.mutate({
-              id_pagu: data.id_pagu,
-              realisasi: updatedRealisasi,
-            });
-          };
-
           return (
-            <form onSubmit={handleSubmit}>
-              <InputText
-                id={`input_realisasi_${data.id_pagu}_${triwulan}`}
-                inputMode='numeric'
-                Iconlabel='Rp.'
-                type='text'
-                placeholder='0'
-                value={realisasi}
-                onChange={handleChange}
-                withButton={!disBtn}
-                buttonType='submit'
-                isRibu
-                tooltip={formatUang(realisasi).toString()}
+            <>
+              <AksiButton
+                Icon={MdInput}
+                onClick={() => {
+                  setFormData({
+                    rekening_kode: `${data.kode_urusan}.${data.kode_bidang}.${data.kode_program}.${data.kode_kegiatan}.${data.kode_subKegiatan}`,
+                    rekening_name: data.rekening,
+                    indikator_name: data.indikator_kinerja,
+                    id_pagu: data.id_pagu,
+                    id_rincian: data.id_rincian,
+                    capaian: [
+                      { triwulan: 1, capaian: data.capaian_triwulan_I },
+                      { triwulan: 2, capaian: data.capaian_triwulan_II },
+                      { triwulan: 3, capaian: data.capaian_triwulan_III },
+                      { triwulan: 4, capaian: data.capaian_triwulan_IV },
+                    ],
+                    realisasi: [
+                      { triwulan: 1, realisasi: data.realisasi_triwulan_I },
+                      { triwulan: 2, realisasi: data.realisasi_triwulan_II },
+                      { triwulan: 3, realisasi: data.realisasi_triwulan_III },
+                      { triwulan: 4, realisasi: data.realisasi_triwulan_IV },
+                    ],
+                  });
+                  setOpenModal(true);
+                }}
               />
-            </form>
+            </>
           );
-        },
-      })),
-    },
-    {
-      accessorKey: 'realisasi',
-      header: 'Total',
-      meta: {
-        tdClassNames: 'text-center font-bold',
+        }
       },
-      cell: ({ getValue }) =>
-        `${getValue() ? formatUang(Number(getValue())) : ''}`,
     },
   ];
   // #endregion
+
+  //#region Table Head
+  const tableHead = () => {
+    return (
+      <>
+        <tr>
+          <th rowSpan={2} className='w-[50px]'>
+            Kode
+          </th>
+          <th rowSpan={2} className='w-[20%]'>
+            Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
+          </th>
+          <th rowSpan={2} className='w-[25%]'>
+            Indikator
+          </th>
+          <th rowSpan={2} className='w-[150px]'>
+            Satuan
+          </th>
+          <th colSpan={2}>Target</th>
+          <th colSpan={2}>Total</th>
+          <th colSpan={2}>(%)</th>
+          <th rowSpan={2} className='w-[50px]'>
+            Aksi
+          </th>
+        </tr>
+        <tr>
+          <th className='w-[150px]'>K</th>
+          <th className='w-[150px]'>Rp</th>
+          <th className='w-[150px]'>K</th>
+          <th className='w-[150px]'>Rp</th>
+          <th className='w-[150px]'>K</th>
+          <th className='w-[150px]'>Rp</th>
+        </tr>
+      </>
+    );
+  };
+  //#endregion
 
   //#region List data periode
   const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
@@ -264,7 +265,7 @@ const RealisasiTable = () => {
 
   return (
     <div className='space-y-2'>
-      <div className='flex items-end justify-between'>
+      <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
           <div>
             <label htmlFor='skpd'>SKPD</label>
@@ -298,7 +299,7 @@ const RealisasiTable = () => {
             />
           </div>
         </div>
-        <div className='inline-flex gap-2'>
+        <div className='flex justify-end items-end gap-2'>
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -310,10 +311,10 @@ const RealisasiTable = () => {
         </div>
       </div>
       <Tabel
-        tblClassName='lg:min-w-[1500px]'
         data={data || []}
-        columns={columns}
+        columns={columns || []}
         renderHeader={tableHead}
+        tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
         pesanDataKosong={
           <PesanSKPDTabel
             selectedSKPD={selectedSKPD}
@@ -321,10 +322,10 @@ const RealisasiTable = () => {
             butuhTahun
           />
         }
-        
       />
       <DialogModal
-        title='Ubah data Realisasi'
+      widthLevel={7}
+        title='Realisasi'
         isOpen={openModal}
         onClose={() => {
           setFormData(initialFormData);
@@ -335,17 +336,19 @@ const RealisasiTable = () => {
           defaultValues={formData}
           onSubmit={(data: RealisasiForm) => {
             console.log('Data dari form modal:', data);
-            addMutation.mutate({
-              id_pagu: data.id_pagu,
-              realisasi: data.realisasi,
-            });
+            console.log(data);
+            // addMutation.mutate({
+            //   mulai: Number(data.mulai),
+            //   akhir: Number(data.akhir),
+            //   status: data.status,
+            // });
           }}
         >
           <div className='flex gap-2 justify-end'>
             <InputButton
               type='submit'
               className='btn btn-theme w-24'
-              isLoading={loadingMutation}
+              // isLoading={loadingMutation}
             >
               Simpan
             </InputButton>

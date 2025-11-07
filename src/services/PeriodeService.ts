@@ -11,10 +11,14 @@ export interface Periode {
 }
 export type PeriodeForm = Pick<Periode, 'id' | 'mulai' | 'akhir' | 'status' | 'skpds'>;
 
-export interface SKPDPeriode{
+export interface SKPDPeriode {
     id?: number;
+    periode_id?: number;
+    periode?: string;
     skpd_id?: number;
-    name?: string;
+    skpd_kode?: string;
+    skpd_name?: string;
+    status?: boolean;
 }
 
 /**
@@ -53,6 +57,6 @@ export const deletePeriode = async (id: number) => {
  * Ambil data SKPD by periode
  */
 export const getSKPDPeriode = async (id: number) => {
-    const response = await api.get<ApiResponse<SKPDPeriode[]>>(`/periode/skpd/${id}`);
+    const response = await api.get<ApiResponse<SKPDPeriode[]>>(`/rkpd/skpd-periode/list/${id}`);
     return response.data.data;
 };

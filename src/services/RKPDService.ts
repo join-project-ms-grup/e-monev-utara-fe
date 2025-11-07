@@ -1,6 +1,4 @@
 import api, { type ApiResponse } from "../lib/api";
-import type { CapaianTriwulan } from "./CapaianService";
-import type { RealisasiTriwulan } from "./RealisasiService";
 
 export interface IndikatorTarget {
     tahun_ke?: string | number;
@@ -13,7 +11,10 @@ export interface Indikator {
     satuan?: string;
     target_akhir_periode?: number;
     target_tahun_dievaluasi?: number;
-    triwulan?: CapaianTriwulan[];
+    triwulan?: {
+        triwulan?: string | number;
+        capaian?: string | number
+    }[];
     total_capaian?: number;
     persen_capaian?: string;
     total_capaian_periode?: number;
@@ -23,7 +24,10 @@ export interface Indikator {
 export interface RKPDPagu {
     paguPeriode?: number;
     paguTahunEval?: number;
-    triwulan?: RealisasiTriwulan[];
+    triwulan?: {
+        triwulan?: string | number;
+        realisasi?: string | number
+    }[];
     totalRealisasi?: number;
     persenRealisasi?: string;
     totalRealisasiPeriode?: number;

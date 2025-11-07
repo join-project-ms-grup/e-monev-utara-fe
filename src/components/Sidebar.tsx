@@ -98,17 +98,17 @@ const menuRKPD: MenuItem[] = [
     akses: 3,
   },
   {
-    label: 'Capaian Kinerja',
+    label: 'Realisasi',
     icon: <MdInsights />,
-    to: '/rkpd/capaian',
-    akses: 2,
-  },
-  {
-    label: 'Realisasi Anggaran',
-    icon: <MdAssignmentTurnedIn />,
     to: '/rkpd/realisasi',
     akses: 2,
   },
+  // {
+  //   label: 'Realisasi Anggaran',
+  //   icon: <MdAssignmentTurnedIn />,
+  //   to: '/rkpd/realisasi',
+  //   akses: 2,
+  // },
   {
     label: 'Indikator Kinerja Utama',
     icon: <MdShowChart />,

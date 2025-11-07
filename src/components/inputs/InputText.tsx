@@ -7,6 +7,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
   Icon?: IconType;
   Iconlabel?: string;
+  IconlabelPos?: 'left' | 'right';
   wrapperHeight?: string;
   wrapperClassname?: string;
   disabled?: boolean;
@@ -38,6 +39,7 @@ const InputText = ({
   onClear,
   tooltip,
   tooltipId = 'tooltip',
+  IconlabelPos = 'left',
   ...props
 }: InputProps) => {
   const handleBeforeInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -101,7 +103,7 @@ const InputText = ({
       }`}
     >
       {Icon && <Icon className='text-4xl h-full pl-2' />}
-      {Iconlabel && (
+      {Iconlabel && IconlabelPos === 'left' && (
         <div className='flex items-center pl-2'>
           <span className='cursor-default'>{Iconlabel}</span>
         </div>
@@ -145,6 +147,11 @@ const InputText = ({
           </button>
         )}
       </div>
+      {Iconlabel && IconlabelPos === 'right' && (
+        <div className='flex items-center pr-2'>
+          <span className='cursor-default'>{Iconlabel}</span>
+        </div>
+      )}
     </div>
   );
 };

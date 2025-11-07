@@ -34,7 +34,7 @@ const RKPDTable = () => {
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
-      label: `[${item.id}] ${item.name}`,
+      label: `${item.skpd_name}`,
       value: item.id?.toString(),
     })) || [];
   //#endregion
@@ -56,7 +56,7 @@ const RKPDTable = () => {
     queryFn: async () => {
       const rawData = await getRKPD(Number(selectedSKPD), Number(tahunKe));
       const skpdName =
-        dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))?.name ?? '';
+        dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))?.skpd_name ?? '';
       const flatData = await flatRKPD(rawData, skpdName);
       return flatData;
     },
