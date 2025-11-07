@@ -3,7 +3,7 @@ import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Table } from '@tanstack/react-table';
 import { exportRPJMD } from '../../../../services/Excel/ExcelRPJMD';
 import InputSearchBox, {
   type OptionItem,
@@ -14,7 +14,11 @@ import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import { flatRPJMD, getRPJMD } from '../../../../services/RPJMDService';
+import {
+  flatRPJMD,
+  getRPJMD,
+  type FlatRPJMDFull,
+} from '../../../../services/RPJMDService';
 import Spinner from '../../../inputs/Spinner';
 
 const tableHead = () => {
@@ -71,6 +75,44 @@ const RPJMDTable = () => {
   });
   //#endregion
 
+  const tableBody = (table: Table<FlatRPJMDFull>) => {
+    const rowModel = table.getRowModel();
+    const { pageIndex, pageSize } = table.getState().pagination ?? {
+      pageIndex: 0,
+      pageSize: 10,
+    };
+
+    let counter = pageIndex * pageSize + 1;
+
+    return (
+      <>
+        {rowModel.rows.map((row) => {
+          const item = row.original;
+
+          return (
+            <tr
+              key={`${item.rpjmd_kode}-${item.program_kode}-${item.outcome_name}`}
+              className='text-center'
+            >
+              <td>{counter++}</td>
+              <td className='text-left'>{item.outcome_name}</td>
+              <td className='text-left'>{item.program_name}</td>
+              <td className='text-left'>{item.indikator_name}</td>
+              <td>{item.target_1 ?? '-'}</td>{' '}
+              {/* Data Capaian Awal Tahun Perencanaan */}
+              <td>{item.target_5 ?? '-'}</td> {/* Target K */}
+              <td>{item.pagu_5 ?? '-'}</td> {/* Target Rp */}
+              <td>{item.capaian_5 ?? '-'}</td> {/* Capaian K */}
+              <td>{item.realisasi_5 ?? '-'}</td> {/* Capaian Rp */}
+              <td>{item.persen_5 ?? '-'}</td> {/* Rasio Capaian K */}
+              <td>{item.persen_pagu_5 ?? '-'}</td> {/* Rasio Capaian Rp */}
+            </tr>
+          );
+        })}
+      </>
+    );
+  };
+
   const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
     id: (i + 1).toString(),
   }));
@@ -126,17 +168,18 @@ const RPJMDTable = () => {
             <InputButton
               tooltip='Refresh'
               className='btn btn-theme w-9 h-9'
-                onClick={() => refetch()}
-                disabled={isFetching}
+              onClick={() => refetch()}
+              disabled={isFetching}
             >
               {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
             </InputButton>
           </div>
         </div>
         <Tabel
-          data={[]}
+          data={data || []}
           columns={columns}
           renderHeader={tableHead}
+          renderBody={(table) => tableBody(table)}
           pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
         />
       </div>

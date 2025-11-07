@@ -310,6 +310,31 @@ export const exportRenstra = async (
     }
   }
 
+  // Semua font default menggunakan Bookman Old Style
+  const defaultFont: Partial<ExcelJS.Font> = { name: 'Bookman Old Style' };
+
+  // Terapkan font ke seluruh sheet (semua baris yang ada)
+  worksheet.eachRow({ includeEmpty: true }, (row) => {
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      cell.font = { ...defaultFont, ...(cell.font ?? {}) };
+    });
+  });
+
+  // Baris 9-12, tambahkan background abu-abu dan center alignment
+  for (let row = 10; row <= 13; row++) {
+    const worksheetRow = worksheet.getRow(row);
+    worksheetRow.eachCell({ includeEmpty: true }, (cell) => {
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFD9D9D9' }, // abu-abu terang
+      };
+      cell.font = { ...defaultFont, bold: true };
+    });
+  }
+
+
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
