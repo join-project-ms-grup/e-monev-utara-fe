@@ -78,16 +78,6 @@ const RenjaTable = () => {
               />
             </div>
             <div>
-              <label htmlFor='jadwal'>Jadwal</label>
-              <InputSearchBox
-                id='jadwal'
-                className='w-42 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih Jadwal...'
-                options={[]}
-              />
-            </div>
-            <div>
               <label htmlFor='skpd'>SKPD</label>
               <InputSearchBox
                 id='skpd'

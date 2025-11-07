@@ -139,6 +139,9 @@ const SKPDTable = () => {
     }),
     columnHelper.accessor('status', {
       header: 'Status',
+      meta: {
+        tdClassNames: 'text-center'
+      },
       cell: (info) => (
         <>
           {Number(info.getValue()) === 1 ? (
