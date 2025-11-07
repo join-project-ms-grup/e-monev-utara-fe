@@ -14,6 +14,8 @@ import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
+import { flatRPJMD, getRPJMD } from '../../../../services/RPJMDService';
+import Spinner from '../../../inputs/Spinner';
 
 const tableHead = () => {
   return (
@@ -55,6 +57,18 @@ const RPJMDTable = () => {
       label: `${item.skpd_name}`,
       value: item.id?.toString(),
     })) || [];
+  //#endregion
+
+  //#region RKPD Data Flatten
+  const { data, isFetching, refetch } = useQuery({
+    queryKey: ['tabel_rkpd_5_tahunan', selectedSKPD],
+    queryFn: async () => {
+      const rawData = await getRPJMD(Number(selectedSKPD));
+      const flatten = flatRPJMD(rawData);
+      return flatten;
+    },
+    enabled: !!selectedSKPD,
+  });
   //#endregion
 
   const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
@@ -112,11 +126,10 @@ const RPJMDTable = () => {
             <InputButton
               tooltip='Refresh'
               className='btn btn-theme w-9 h-9'
-              //   onClick={() => refetch()}
-              //   disabled={isFetching}
+                onClick={() => refetch()}
+                disabled={isFetching}
             >
-              {/* {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />} */}
-              <MdRefresh />
+              {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
             </InputButton>
           </div>
         </div>

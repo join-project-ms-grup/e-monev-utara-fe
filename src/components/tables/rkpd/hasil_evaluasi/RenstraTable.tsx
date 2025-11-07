@@ -199,7 +199,9 @@ const RenstraTable = () => {
                                 .toString()
                                 .split(/\n+/)
                                 .filter((v) => v.trim() !== '')
-                                .map((v) => `${formatRibu(Number(v))} ${i.satuan}`)
+                                .map(
+                                  (v) => `${formatRibu(Number(v))} ${i.satuan}`,
+                                )
                                 .join('\n')}
                         </td>
                       </tr>
@@ -283,9 +285,10 @@ const RenstraTable = () => {
               .reduce((sum, r) => sum + (Number(r.realisasi) || 0), 0) ?? '-',
           cell: ({ row, getValue }) => {
             if (
-              ['urusan', 'bidang'].some((l) => row.original.level.includes(l))
+              row.original.level === 'urusan' ||
+              row.original.level === 'bidang'
             ) {
-              return;
+              return '';
             }
             return `${getValue() ? formatUang(getValue()) : '-'}`;
           },
@@ -354,9 +357,10 @@ const RenstraTable = () => {
               ?.pagu ?? '',
           cell: ({ row, getValue }) => {
             if (
-              ['urusan', 'bidang'].some((l) => row.original.level.includes(l))
+              row.original.level === 'urusan' ||
+              row.original.level === 'bidang'
             ) {
-              return;
+              return '';
             }
             return `${getValue() ? formatUang(getValue()) : '-'}`;
           },
@@ -429,7 +433,6 @@ const RenstraTable = () => {
           columns={columns}
           renderHeader={tableHead}
           pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
-          
         />
       </div>
       {isPreview &&
