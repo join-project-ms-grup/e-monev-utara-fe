@@ -109,12 +109,6 @@ const menuRKPD: MenuItem[] = [
     ],
   },
   {
-    label: 'Indikator',
-    icon: <MdSpeed />,
-    to: '/rkpd/indikator',
-    akses: [2, 3],
-  },
-  {
     type: 'separator',
     label: 'Hasil',
     akses: [2, 3],

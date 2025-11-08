@@ -3,7 +3,7 @@ import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
-import type { ColumnDef, Table } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { exportRPJMD } from '../../../../services/Excel/ExcelRPJMD';
 import InputSearchBox, {
   type OptionItem,
@@ -15,11 +15,9 @@ import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
-  flatRPJMD,
   flatRPJMD2,
   getRPJMD,
   type FlatRPJMD,
-  type FlatRPJMDFull,
 } from '../../../../services/RPJMDService';
 import Spinner from '../../../inputs/Spinner';
 import { getSKPDPerRENSTRA } from '../../../../services/PeriodeService';
@@ -72,7 +70,7 @@ const RPJMDTable = () => {
     queryFn: async () => {
       const rawData = await getRPJMD(Number(selectedSKPD));
       const flatten = flatRPJMD2(rawData);
-      console.log(flatten)
+      console.log(flatten);
       return flatten;
     },
     enabled: !!selectedSKPD,
@@ -86,77 +84,45 @@ const RPJMDTable = () => {
     },
     {
       header: 'Sasaran',
+      accessorFn: () => '', // tetap kosong
     },
     {
-      accessorKey: 'name',
+      header: 'Program Prioritas',
+      accessorFn: (row) => (row.type === 'program' ? row.name : ''),
     },
     {
-      accessorKey: 'indikator_o_name',
+      header: 'Indikator Kinerja',
+      accessorFn: (row) => row.indikator_o_name || '',
     },
     {
-      header: ' ',
+      header: 'Data Capaian Awal (K)',
+      accessorFn: (row) => row.target_io_capaian ?? 0,
     },
     {
-      header: ' ',
+      header: 'Target Akhir (K)',
+      accessorFn: (row) => row.target_io_target ?? 0,
     },
     {
-      header: ' ',
+      header: 'Target Akhir (Rp)',
+      accessorFn: (row) => row.pagu_pagu ?? 0,
     },
     {
-      header: ' ',
+      header: 'Capaian Akhir (K)',
+      accessorFn: (row) => row.target_io_capaian ?? 0,
     },
     {
-      header: ' ',
+      header: 'Capaian Akhir (Rp)',
+      accessorFn: (row) => row.pagu_realisasi ?? 0,
     },
     {
-      header: ' ',
+      header: 'Rasio Akhir (%) K',
+      accessorFn: (row) => row.target_io_persen ?? 0,
     },
     {
-      header: ' ',
+      header: 'Rasio Akhir (%) Rp',
+      accessorFn: (row) => row.pagu_persen ?? 0,
     },
   ];
-
-  // const tableBody = (table: Table<FlatRPJMDFull>) => {
-  //   const rowModel = table.getRowModel();
-  //   const { pageIndex, pageSize } = table.getState().pagination ?? {
-  //     pageIndex: 0,
-  //     pageSize: 10,
-  //   };
-
-  //   let counter = pageIndex * pageSize + 1;
-
-  //   return (
-  //     <>
-  //       {rowModel.rows.map((row) => {
-  //         const item = row.original;
-
-  //         return (
-  //           <tr
-  //             key={`${item.rpjmd_kode}-${item.program_kode}-${item.outcome_name}`}
-  //             className='text-center'
-  //           >
-  //             <td>{counter++}</td>
-  //             <td className='text-left'>{item.outcome_name}</td>
-  //             <td className='text-left'>{item.program_name}</td>
-  //             <td className='text-left'>{item.indikator_name}</td>
-  //             <td>{item.target_1 ?? '-'}</td>{' '}
-  //             {/* Data Capaian Awal Tahun Perencanaan */}
-  //             <td>{item.target_5 ?? '-'}</td> {/* Target K */}
-  //             <td>{item.pagu_5 ?? '-'}</td> {/* Target Rp */}
-  //             <td>{item.capaian_5 ?? '-'}</td> {/* Capaian K */}
-  //             <td>{item.realisasi_5 ?? '-'}</td> {/* Capaian Rp */}
-  //             <td>{item.persen_5 ?? '-'}</td> {/* Rasio Capaian K */}
-  //             <td>{item.persen_pagu_5 ?? '-'}</td> {/* Rasio Capaian Rp */}
-  //           </tr>
-  //         );
-  //       })}
-  //     </>
-  //   );
-  // };
-
-  // const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
-  //   id: (i + 1).toString(),
-  // }));
 
   const [isPreview, setIsPreview] = useState(false);
   useEffect(() => {
