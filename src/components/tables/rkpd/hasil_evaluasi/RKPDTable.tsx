@@ -23,6 +23,7 @@ import { createPortal } from 'react-dom';
 import RKPDPreviewTable from './RKPDPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import { formatUang } from '../../../../lib/helper';
+import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 
 const RKPDTable = () => {
   //#region SKPD dan Tahun ke
@@ -30,7 +31,7 @@ const RKPDTable = () => {
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+    queryFn: async () => getSKPDPerRKPD(Number(getPeriodeIDFromCookie())),
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({

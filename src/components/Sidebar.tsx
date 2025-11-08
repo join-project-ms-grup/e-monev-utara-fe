@@ -101,12 +101,6 @@ const menuRKPD: MenuItem[] = [
       { label: 'Realisasi', to: '/rkpd/renja_rkpd/realisasi' },
     ],
   },
-  {
-    label: 'Renja',
-    icon: <MdEventNote />,
-    to: '/rkpd/renja',
-    akses: 3,
-  },
   // {
   //   label: 'Pagu Indikatif',
   //   icon: <MdDragIndicator />,

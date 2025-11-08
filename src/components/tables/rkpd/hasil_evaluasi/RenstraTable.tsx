@@ -21,6 +21,7 @@ import { createPortal } from 'react-dom';
 import RenstraPreviewTable from './RenstraPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import { formatRibu, formatUang } from '../../../../lib/helper';
+import { getSKPDPerRENSTRA } from '../../../../services/PeriodeService';
 
 const tableHead = () => {
   return (
@@ -68,7 +69,7 @@ const RenstraTable = () => {
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+    queryFn: async () => getSKPDPerRENSTRA(Number(getPeriodeIDFromCookie())),
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
