@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react';
 import Tabel from '../../Tabel';
-import { MdRefresh } from 'react-icons/md';
+import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -13,12 +13,16 @@ import {
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
 import {
+  flatHasilIK,
   flatIK,
+  getHasilIK,
   getIKD,
   getIKSKPD,
   type FlatIK,
 } from '../../../../services/IKUIKDService';
 import Spinner from '../../../inputs/Spinner';
+import toast from 'react-hot-toast';
+import { exportIKU } from '../../../../services/Excel/ExcelIKU';
 
 const IndikatorIKDTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
@@ -206,6 +210,37 @@ const IndikatorIKDTable = () => {
           </div>
         </div>
         <div className='inline-flex gap-2'>
+          <InputButton
+            className='btn btn-theme w-9 h-9'
+            tooltip='Cetak Excel'
+            onClick={async () => {
+              try {
+                const rawhasilData = await getHasilIK({
+                  type: 'ikd',
+                  skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
+                  periodeId: idPeriode,
+                });
+                const hasilData = flatHasilIK(rawhasilData);
+
+                if (!hasilData) {
+                  toast.error('Data tidak ditemukan.');
+                  return;
+                }
+                toast.promise(exportIKU(hasilData, 'ikd'), {
+                  loading: 'Sedang mengunduh...',
+                  success: <b>Berhasil mengunduh.</b>,
+                  error: <b>Gagal mengunduh.</b>,
+                });
+
+                console.log(hasilData);
+              } catch (error) {
+                console.error(error);
+                toast.error('Terjadi kesalahan saat mengambil data.');
+              }
+            }}
+          >
+            <MdPrint />
+          </InputButton>
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'

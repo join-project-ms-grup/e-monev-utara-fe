@@ -109,7 +109,6 @@ export interface FlatIK {
     t_6_realisasi?: string | null;
 }
 
-
 export const flatIK = (data: ListIK[]): FlatIK[] => {
     const flat: FlatIK[] = [];
 
@@ -145,3 +144,119 @@ export const flatIK = (data: ListIK[]): FlatIK[] => {
     return flat;
 };
 
+export interface IKUIKDForm{
+    id_target: number;
+    realisasi: string;
+}
+
+export const addRealisasi = async (payload: IKUIKDForm): Promise<IKUIKDForm> => {
+    const response = await api.post<ApiResponse<IKUIKDForm>>("/ik/target-realisasi/realisasi", payload);
+    return response.data.data;
+};
+
+export interface FlatHasilIK {
+    skpdName: string;
+    urusan: string;
+    uraianId: number;
+    uraianName: string;
+    satuan: string;
+    base_line: string;
+
+    // Tahun ke-1
+    t_1_tahun: number;
+    t_1_tahun_ke: number;
+    t_1_target: number;
+    t_1_capaian?: number;
+    t_1_persetase?: number;
+
+    // Tahun ke-2
+    t_2_tahun: number;
+    t_2_tahun_ke: number;
+    t_2_target: string;
+    t_2_capaian?: number;
+    t_2_persetase?: number;
+
+    // Tahun ke-3
+    t_3_tahun: number;
+    t_3_tahun_ke: number;
+    t_3_target: string;
+    t_3_capaian?: number;
+    t_3_persetase?: number;
+
+    // Tahun ke-4
+    t_4_tahun: number;
+    t_4_tahun_ke: number;
+    t_4_target: string;
+    t_4_capaian?: number;
+    t_4_persetase?: number;
+
+    // Tahun ke-5
+    t_5_tahun: number;
+    t_5_tahun_ke: number;
+    t_5_target: string;
+    t_5_capaian?: number;
+    t_5_persetase?: number;
+
+    // Tahun ke-6
+    t_6_tahun: number;
+    t_6_tahun_ke: number;
+    t_6_target: string;
+    t_6_capaian?: number;
+    t_6_persetase?: number;
+}
+
+export interface ListHasilIK {
+    pd: string;
+    urusan: {
+        name: string;
+        kode?: string;
+        uraian: {
+            name: string;
+            satuan: string;
+            base_line: string;
+            target_realisasi: {
+                tahun: number;
+                tahun_ke: number;
+                target: string;
+                capaian?: string;
+                persentase?: string;
+            }[];
+        }[];
+    }[]
+}
+
+export const flatHasilIK = (data: ListHasilIK[]): FlatHasilIK[] => {
+    const flat: FlatHasilIK[] = [];
+
+    data.forEach((skpd) => {
+        skpd.urusan.forEach((wm) => {
+            wm.uraian.forEach((uraian) => {
+                const flatItem: any = {
+                    skpdName: skpd.pd,
+                    urusan: wm.name,
+                    uraianName: uraian.name,
+                    satuan: uraian.satuan,
+                    base_line: uraian.base_line,
+                };
+
+                uraian.target_realisasi.forEach((t) => {
+                    const prefix = `t_${t.tahun_ke}_`;
+                    flatItem[`${prefix}tahun`] = t.tahun;
+                    flatItem[`${prefix}tahun_ke`] = t.tahun_ke;
+                    flatItem[`${prefix}target`] = t.target;
+                    flatItem[`${prefix}capaian`] = t.capaian ?? null;
+                    flatItem[`${prefix}persentase`] = t.persentase ?? null;
+                });
+
+                flat.push(flatItem as FlatHasilIK);
+            });
+        });
+    });
+
+    return flat;
+};
+
+export const getHasilIK = async ({type, skpd_id, periodeId }: {type: string, skpd_id: number | string, periodeId: number }): Promise<any> => {
+    const response = await api.post<ApiResponse<any>>("/ik/target-realisasi/get-hasil", {type, skpd_id, periodeId });
+    return response.data.data;
+};

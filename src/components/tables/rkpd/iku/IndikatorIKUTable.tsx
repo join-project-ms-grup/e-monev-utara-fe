@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react';
 import Tabel from '../../Tabel';
-import { MdRefresh } from 'react-icons/md';
+import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -13,12 +13,16 @@ import {
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
 import {
+  flatHasilIK,
   flatIK,
+  getHasilIK,
   getIKSKPD,
   getIKU,
   type FlatIK,
 } from '../../../../services/IKUIKDService';
 import Spinner from '../../../inputs/Spinner';
+import toast from 'react-hot-toast';
+import { exportIKU } from '../../../../services/Excel/ExcelIKU';
 
 const IndikatorIKUTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
@@ -83,9 +87,6 @@ const IndikatorIKUTable = () => {
       header: `Target Tahun ${i + 1}`,
       accessorKey: `targetTahun${i + 1}`,
     })),
-    {
-      header: 'Aksi',
-    },
   ];
 
   const tableHead = () => {
@@ -98,7 +99,6 @@ const IndikatorIKUTable = () => {
           <th rowSpan={2}>Satuan</th>
           <th rowSpan={2}>Kondisi Awal {mulaiPeriode - 2}</th>
           <th colSpan={periode.length}>Target Tahun</th>
-          <th rowSpan={2}>Aksi</th>
         </tr>
         <tr>
           {periode.map((thn) => (
@@ -175,7 +175,6 @@ const IndikatorIKUTable = () => {
                   <td>{item.t_4_target}</td>
                   <td>{item.t_5_target}</td>
                   <td>{item.t_6_target}</td>
-                  <td>-</td>
                 </tr>
               ))}
             </Fragment>
@@ -206,6 +205,37 @@ const IndikatorIKUTable = () => {
           </div>
         </div>
         <div className='inline-flex gap-2'>
+          <InputButton
+            className='btn btn-theme w-9 h-9'
+            tooltip='Cetak Excel'
+            onClick={async () => {
+              try {
+                const rawhasilData = await getHasilIK({
+                  type: 'iku',
+                  skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
+                  periodeId: idPeriode,
+                });
+                const hasilData = flatHasilIK(rawhasilData)
+
+                if (!hasilData) {
+                  toast.error('Data tidak ditemukan.');
+                  return;
+                }
+                toast.promise(exportIKU(hasilData, 'iku'), {
+                  loading: 'Sedang mengunduh...',
+                  success: <b>Berhasil mengunduh.</b>,
+                  error: <b>Gagal mengunduh.</b>,
+                });
+
+                console.log(hasilData)
+              } catch (error) {
+                console.error(error);
+                toast.error('Terjadi kesalahan saat mengambil data.');
+              }
+            }}
+          >
+            <MdPrint />
+          </InputButton>
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
