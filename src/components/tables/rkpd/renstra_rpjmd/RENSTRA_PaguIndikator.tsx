@@ -12,6 +12,9 @@ import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
+  getUserSKPDID,
+  isAdmin,
+  isDev,
 } from '../../../../lib/usercookie';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
@@ -63,7 +66,8 @@ const RENSTRA_PaguIndikator = () => {
   );
   const idPeriodeCookie = Number(getPeriodeIDFromCookie());
   //#region SKPD
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_renstra_skpd_periode'],
     queryFn: async () => getSKPDPerRENSTRA(idPeriodeCookie),
@@ -228,21 +232,24 @@ const RENSTRA_PaguIndikator = () => {
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
-            <div>
-              <label htmlFor='skpd'>SKPD</label>
-              <InputSearchBox
-                id='skpd'
-                className='w-72 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih SKPD...'
-                value={selectedSKPD.toString()}
-                options={listSKPDPeriode as OptionItem[]}
-                onChange={(val) => setSelectedSKPD(val)}
-                onClear={() => setSelectedSKPD('')}
-                tooltip
-                withSearch
-              />
-            </div>
+            {isDev() ||
+              (isAdmin() && (
+                <div>
+                  <label htmlFor='skpd'>SKPD</label>
+                  <InputSearchBox
+                    id='skpd'
+                    className='w-72 h-9'
+                    btnclassName='bg-white'
+                    placeholder='Pilih SKPD...'
+                    value={selectedSKPD.toString()}
+                    options={listSKPDPeriode as OptionItem[]}
+                    onChange={(val) => setSelectedSKPD(val)}
+                    onClear={() => setSelectedSKPD('')}
+                    tooltip
+                    withSearch
+                  />
+                </div>
+              ))}
             <div>
               <label htmlFor='tahun_ke'>Tahun ke</label>
               <InputSearchBox
@@ -286,7 +293,7 @@ const RENSTRA_PaguIndikator = () => {
           renderBody={(table) => tableBody(table)}
           pesanDataKosong={
             <PesanSKPDTabel
-              selectedSKPD={selectedSKPD}
+              selectedSKPD={selectedSKPD.toString()}
               tahun={tahunKe}
               butuhTahun
             />

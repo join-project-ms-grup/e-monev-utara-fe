@@ -9,7 +9,12 @@ import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
 import { useQuery } from '@tanstack/react-query';
-import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
+import {
+  getPeriodeIDFromCookie,
+  getUserSKPDID,
+  isAdmin,
+  isDev,
+} from '../../../../lib/usercookie';
 
 import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
@@ -52,7 +57,8 @@ const tableHead = () => {
 
 const RPJMDTable = () => {
   //#region SKPD dan Tahun ke
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
     queryFn: async () => getSKPDPerRENSTRA(Number(getPeriodeIDFromCookie())),
@@ -88,7 +94,8 @@ const RPJMDTable = () => {
     },
     {
       header: 'Program Prioritas',
-      accessorFn: (row) => (row.type === 'program' ? row.name : ''),
+      // accessorFn: (row) => (row.type === 'program' ? row.name : ''),
+      accessorFn: (row) => row.name ?? '',
     },
     {
       header: 'Indikator Kinerja',
@@ -96,30 +103,51 @@ const RPJMDTable = () => {
     },
     {
       header: 'Data Capaian Awal (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
       accessorFn: (row) => row.target_io_capaian ?? 0,
     },
     {
       header: 'Target Akhir (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
       accessorFn: (row) => row.target_io_target ?? 0,
     },
     {
       header: 'Target Akhir (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
       accessorFn: (row) => row.pagu_pagu ?? 0,
     },
     {
       header: 'Capaian Akhir (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
       accessorFn: (row) => row.target_io_capaian ?? 0,
     },
     {
       header: 'Capaian Akhir (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
       accessorFn: (row) => row.pagu_realisasi ?? 0,
     },
     {
       header: 'Rasio Akhir (%) K',
+      meta: {
+        tdClassNames: 'text-center',
+      },
       accessorFn: (row) => row.target_io_persen ?? 0,
     },
     {
       header: 'Rasio Akhir (%) Rp',
+      meta: {
+        tdClassNames: 'text-center',
+      },
       accessorFn: (row) => row.pagu_persen ?? 0,
     },
   ];
@@ -142,20 +170,23 @@ const RPJMDTable = () => {
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
-            <div>
-              <label htmlFor='skpd'>SKPD</label>
-              <InputSearchBox
-                id='skpd'
-                className='w-72 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih SKPD...'
-                value={selectedSKPD.toString()}
-                options={listSKPDPeriode as OptionItem[]}
-                onChange={(val) => setSelectedSKPD(val)}
-                onClear={() => setSelectedSKPD('')}
-                withSearch
-              />
-            </div>
+            {isDev() ||
+              (isAdmin() && (
+                <div>
+                  <label htmlFor='skpd'>SKPD</label>
+                  <InputSearchBox
+                    id='skpd'
+                    className='w-72 h-9'
+                    btnclassName='bg-white'
+                    placeholder='Pilih SKPD...'
+                    value={selectedSKPD.toString()}
+                    options={listSKPDPeriode as OptionItem[]}
+                    onChange={(val) => setSelectedSKPD(val)}
+                    onClear={() => setSelectedSKPD('')}
+                    withSearch
+                  />
+                </div>
+              ))}
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
@@ -187,7 +218,9 @@ const RPJMDTable = () => {
           columns={columns}
           renderHeader={tableHead}
           // renderBody={(table) => tableBody(table)}
-          pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+          pesanDataKosong={
+            <PesanSKPDTabel selectedSKPD={selectedSKPD.toString()} />
+          }
         />
       </div>
 

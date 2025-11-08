@@ -1,10 +1,7 @@
 import { Fragment, useState, type JSX } from 'react';
 import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
-import {
-  MdRefresh,
-  MdSubdirectoryArrowRight,
-} from 'react-icons/md';
+import { MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
 import { FaInfo } from 'react-icons/fa';
 import type { ColumnDef, Table } from '@tanstack/react-table';
 import InputSearchBox, {
@@ -15,6 +12,9 @@ import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
+  getUserSKPDID,
+  isAdmin,
+  isDev,
 } from '../../../../lib/usercookie';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
@@ -66,7 +66,8 @@ const RKPD_RENJATable = () => {
   );
   //#region SKPD
   const idPeriodeCookie = Number(getPeriodeIDFromCookie());
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_rkpd_skpd_periode'],
     queryFn: async () => getSKPDPerRKPD(idPeriodeCookie),
@@ -232,21 +233,24 @@ const RKPD_RENJATable = () => {
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
-            <div>
-              <label htmlFor='skpd'>SKPD</label>
-              <InputSearchBox
-                id='skpd'
-                className='w-72 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih SKPD...'
-                value={selectedSKPD.toString()}
-                options={listSKPDPeriode as OptionItem[]}
-                onChange={(val) => setSelectedSKPD(val)}
-                onClear={() => setSelectedSKPD('')}
-                tooltip
-                withSearch
-              />
-            </div>
+            {isDev() ||
+              (isAdmin() && (
+                <div>
+                  <label htmlFor='skpd'>SKPD</label>
+                  <InputSearchBox
+                    id='skpd'
+                    className='w-72 h-9'
+                    btnclassName='bg-white'
+                    placeholder='Pilih SKPD...'
+                    value={selectedSKPD.toString()}
+                    options={listSKPDPeriode as OptionItem[]}
+                    onChange={(val) => setSelectedSKPD(val)}
+                    onClear={() => setSelectedSKPD('')}
+                    tooltip
+                    withSearch
+                  />
+                </div>
+              ))}
             <div>
               <label htmlFor='tahun_ke'>Tahun ke</label>
               <InputSearchBox
@@ -290,7 +294,7 @@ const RKPD_RENJATable = () => {
           renderBody={(table) => tableBody(table)}
           pesanDataKosong={
             <PesanSKPDTabel
-              selectedSKPD={selectedSKPD}
+              selectedSKPD={selectedSKPD.toString()}
               tahun={tahunKe}
               butuhTahun
             />

@@ -49,7 +49,7 @@ function RouteComponent() {
           nama: data.nama,
           roleId: data.roleId,
           roleName: data.roleName,
-          opdId: data.opdId,
+          userSKPDId: data.opdId,
           username: data.username,
         },
       });

@@ -11,7 +11,7 @@ export interface LoggedUserType {
   nama: string;
   roleId: string | null;
   roleName: string | null;
-  opdId: number | null;
+  userSKPDId: number | null;
   username: string;
 }
 

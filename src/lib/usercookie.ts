@@ -4,7 +4,7 @@ export interface UserCookie {
   nama: string;
   roleId: number;
   roleName: string;
-  opdId: number | null;
+  userSKPDId: number | null;
   username: string;
 }
 
@@ -29,6 +29,11 @@ export function getUserFromCookie(): UserCookie | null {
     console.error('Failed to parse cookie:', error);
     return null;
   }
+}
+
+export function getUserSKPDID(): |number | null {
+  const user = getUserFromCookie();
+  return user?.userSKPDId ?? null;
 }
 
 /**

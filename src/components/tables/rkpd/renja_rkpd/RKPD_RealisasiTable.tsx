@@ -7,9 +7,11 @@ import {
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
   getPeriodeAkhirFromCookie,
+  getUserSKPDID,
+  isDev,
+  isAdmin,
 } from '../../../../lib/usercookie';
 import {
-
   flatRealisasi,
   type FlatRealisasiRKPD,
   getRealisasiRKPD,
@@ -32,7 +34,7 @@ const RKPD_RealisasiTable = () => {
   const [openModal, setOpenModal] = useState(false);
 
   // Form Data
-  const initialFormData: RealisasiForm = {
+  const initialFormData: any = {
     rekening_kode: '',
     rekening_name: '',
     indikator_name: '',
@@ -52,7 +54,7 @@ const RKPD_RealisasiTable = () => {
     ],
   };
 
-  const [formData, setFormData] = useState<RealisasiForm>(initialFormData);
+  const [formData, setFormData] = useState<any>(initialFormData);
   // Clear form
   useEffect(() => {
     if (!openModal) {
@@ -74,7 +76,8 @@ const RKPD_RealisasiTable = () => {
   const [tahunKe, setTahunKe] = useState('');
 
   //#region SKPD
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_rkpd_skpd_periode'],
     queryFn: async () => getSKPDPerRKPD(idPeriodeCookie),
@@ -271,23 +274,26 @@ const RKPD_RealisasiTable = () => {
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
-          <div>
-            <label htmlFor='skpd'>SKPD</label>
-            <InputSearchBox
-              id='skpd'
-              className='w-72 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih SKPD...'
-              value={selectedSKPD.toString()}
-              options={listSKPDPeriode as OptionItem[]}
-              onChange={(val) => setSelectedSKPD(val)}
-              onClear={() => {
-                setSelectedSKPD('');
-                setTahunKe('');
-              }}
-              withSearch
-            />
-          </div>
+          {isDev() ||
+            (isAdmin() && (
+              <div>
+                <label htmlFor='skpd'>SKPD</label>
+                <InputSearchBox
+                  id='skpd'
+                  className='w-72 h-9'
+                  btnclassName='bg-white'
+                  placeholder='Pilih SKPD...'
+                  value={selectedSKPD.toString()}
+                  options={listSKPDPeriode as OptionItem[]}
+                  onChange={(val) => setSelectedSKPD(val)}
+                  onClear={() => {
+                    setSelectedSKPD('');
+                    setTahunKe('');
+                  }}
+                  withSearch
+                />
+              </div>
+            ))}
           <div>
             <label htmlFor='tahun_ke'>Tahun ke</label>
             <InputSearchBox
@@ -321,7 +327,7 @@ const RKPD_RealisasiTable = () => {
         tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
         pesanDataKosong={
           <PesanSKPDTabel
-            selectedSKPD={selectedSKPD}
+            selectedSKPD={selectedSKPD.toString()}
             tahun={tahunKe}
             butuhTahun
           />
@@ -338,9 +344,9 @@ const RKPD_RealisasiTable = () => {
       >
         <FormRealisasi
           defaultValues={formData}
-          onSubmit={(data: RealisasiForm) => {
-            console.log('Data dari form modal:', data);
-            console.log(data);
+          onSubmit={(data: any) => {
+            // console.log('Data dari form modal:', data);
+            // console.log(data);
             // addMutation.mutate({
             //   mulai: Number(data.mulai),
             //   akhir: Number(data.akhir),

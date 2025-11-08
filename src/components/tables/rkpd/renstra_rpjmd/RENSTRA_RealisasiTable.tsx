@@ -1,12 +1,15 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { MdInput, MdRefresh } from 'react-icons/md';
+import { useState } from 'react';
+import { MdRefresh } from 'react-icons/md';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { type ColumnDef, type Table } from '@tanstack/react-table';
+import { type ColumnDef } from '@tanstack/react-table';
 import { formatRibu, formatUang } from '../../../../lib/helper';
 import {
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
   getPeriodeAkhirFromCookie,
+  getUserSKPDID,
+  isDev,
+  isAdmin,
 } from '../../../../lib/usercookie';
 import {
   addAnggaranRENSTRA,
@@ -17,7 +20,6 @@ import {
   type CapaianRenstraForm,
   type FlatRealisasiRENSTRA,
 } from '../../../../services/RealisasiService';
-import AksiButton from '../../../inputs/AksiButton';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -37,7 +39,8 @@ const RENSTRA_RealisasiTable = () => {
   const [tahunKe, setTahunKe] = useState('');
 
   //#region SKPD
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_renstra_skpd_periode'],
     queryFn: async () => getSKPDPerRENSTRA(idPeriodeCookie),
@@ -306,23 +309,26 @@ const RENSTRA_RealisasiTable = () => {
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
-          <div>
-            <label htmlFor='skpd'>SKPD</label>
-            <InputSearchBox
-              id='skpd'
-              className='w-72 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih SKPD...'
-              value={selectedSKPD.toString()}
-              options={listSKPDPeriode as OptionItem[]}
-              onChange={(val) => setSelectedSKPD(val)}
-              onClear={() => {
-                setSelectedSKPD('');
-                setTahunKe('');
-              }}
-              withSearch
-            />
-          </div>
+          {isDev() ||
+            (isAdmin() && (
+              <div>
+                <label htmlFor='skpd'>SKPD</label>
+                <InputSearchBox
+                  id='skpd'
+                  className='w-72 h-9'
+                  btnclassName='bg-white'
+                  placeholder='Pilih SKPD...'
+                  value={selectedSKPD.toString()}
+                  options={listSKPDPeriode as OptionItem[]}
+                  onChange={(val) => setSelectedSKPD(val)}
+                  onClear={() => {
+                    setSelectedSKPD('');
+                    setTahunKe('');
+                  }}
+                  withSearch
+                />
+              </div>
+            ))}
           <div>
             <label htmlFor='tahun_ke'>Tahun ke</label>
             <InputSearchBox
@@ -356,7 +362,7 @@ const RENSTRA_RealisasiTable = () => {
         tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
         pesanDataKosong={
           <PesanSKPDTabel
-            selectedSKPD={selectedSKPD}
+            selectedSKPD={selectedSKPD.toString()}
             tahun={tahunKe}
             butuhTahun
           />

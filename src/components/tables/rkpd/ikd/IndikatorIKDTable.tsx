@@ -11,6 +11,9 @@ import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
+  getUserSKPDID,
+  isAdmin,
+  isDev,
 } from '../../../../lib/usercookie';
 import {
   flatHasilIK,
@@ -27,7 +30,8 @@ import { exportIKU } from '../../../../services/Excel/ExcelIKU';
 const IndikatorIKDTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
   //#region SKPD
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataIKSKPD } = useQuery({
     queryKey: ['list_ik_skpd', idPeriode],
     queryFn: async () => getIKSKPD(idPeriode),
@@ -193,21 +197,24 @@ const IndikatorIKDTable = () => {
     <div className='space-y-2'>
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
-          <div>
-            <label htmlFor='skpd'>SKPD</label>
-            <InputSearchBox
-              id='skpd'
-              className='w-64 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih SKPD...'
-              value={selectedSKPD.toString()}
-              options={listIKSKPD as OptionItem[]}
-              onChange={(val) => setSelectedSKPD(val)}
-              onClear={() => setSelectedSKPD('')}
-              tooltip
-              withSearch
-            />
-          </div>
+          {isDev() ||
+            (isAdmin() && (
+              <div>
+                <label htmlFor='skpd'>SKPD</label>
+                <InputSearchBox
+                  id='skpd'
+                  className='w-64 h-9'
+                  btnclassName='bg-white'
+                  placeholder='Pilih SKPD...'
+                  value={selectedSKPD.toString()}
+                  options={listIKSKPD as OptionItem[]}
+                  onChange={(val) => setSelectedSKPD(val)}
+                  onClear={() => setSelectedSKPD('')}
+                  tooltip
+                  withSearch
+                />
+              </div>
+            ))}
         </div>
         <div className='inline-flex gap-2'>
           <InputButton

@@ -1,17 +1,22 @@
 import { Fragment, useEffect, useState } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
-import {
-  exportRKPD,
-} from '../../../../services/Excel/ExcelRKPD';
+import { exportRKPD } from '../../../../services/Excel/ExcelRKPD';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
-import { flatRKPD, getRKPD, type FlatRKPD } from '../../../../services/RKPDService';
+import {
+  flatRKPD,
+  getRKPD,
+  type FlatRKPD,
+} from '../../../../services/RKPDService';
 
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
+  getUserSKPDID,
+  isAdmin,
+  isDev,
 } from '../../../../lib/usercookie';
 import InputSearchBox, {
   type OptionItem,
@@ -28,7 +33,8 @@ import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 const RKPDTable = () => {
   //#region SKPD dan Tahun ke
   const [tahunKe, setTahunKe] = useState('');
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
     queryFn: async () => getSKPDPerRKPD(Number(getPeriodeIDFromCookie())),
@@ -57,7 +63,8 @@ const RKPDTable = () => {
     queryFn: async () => {
       const rawData = await getRKPD(Number(selectedSKPD), Number(tahunKe));
       const skpdName =
-        dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))?.skpd_name ?? '';
+        dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+          ?.skpd_name ?? '';
       const flatData = await flatRKPD(rawData, skpdName);
       return flatData;
     },
@@ -329,23 +336,26 @@ const RKPDTable = () => {
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
-            <div>
-              <label htmlFor='skpd'>SKPD</label>
-              <InputSearchBox
-                id='skpd'
-                className='w-72 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih SKPD...'
-                value={selectedSKPD.toString()}
-                options={listSKPDPeriode as OptionItem[]}
-                onChange={(val) => setSelectedSKPD(val)}
-                onClear={() => {
-                  setSelectedSKPD('');
-                  setTahunKe('');
-                }}
-                withSearch
-              />
-            </div>
+            {isDev() ||
+              (isAdmin() && (
+                <div>
+                  <label htmlFor='skpd'>SKPD</label>
+                  <InputSearchBox
+                    id='skpd'
+                    className='w-72 h-9'
+                    btnclassName='bg-white'
+                    placeholder='Pilih SKPD...'
+                    value={selectedSKPD.toString()}
+                    options={listSKPDPeriode as OptionItem[]}
+                    onChange={(val) => setSelectedSKPD(val)}
+                    onClear={() => {
+                      setSelectedSKPD('');
+                      setTahunKe('');
+                    }}
+                    withSearch
+                  />
+                </div>
+              ))}
             <div>
               <label htmlFor='tahun_ke'>Tahun ke</label>
               <InputSearchBox
@@ -395,12 +405,11 @@ const RKPDTable = () => {
           renderBody={(table) => tableBody({ table })}
           pesanDataKosong={
             <PesanSKPDTabel
-              selectedSKPD={selectedSKPD}
+              selectedSKPD={selectedSKPD.toString()}
               tahun={tahunKe}
               butuhTahun
             />
           }
-          
         />
       </div>
       {isPreview &&

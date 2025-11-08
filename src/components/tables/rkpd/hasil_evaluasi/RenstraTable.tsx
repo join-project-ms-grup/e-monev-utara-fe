@@ -4,7 +4,12 @@ import toast from 'react-hot-toast';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 
-import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
+import {
+  getPeriodeIDFromCookie,
+  getUserSKPDID,
+  isAdmin,
+  isDev,
+} from '../../../../lib/usercookie';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
@@ -66,7 +71,8 @@ const tableHead = () => {
 
 const RenstraTable = () => {
   //#region SKPD dan Tahun ke
-  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const userSKPDID = getUserSKPDID();
+  const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
     queryFn: async () => getSKPDPerRENSTRA(Number(getPeriodeIDFromCookie())),
@@ -389,20 +395,23 @@ const RenstraTable = () => {
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
-            <div>
-              <label htmlFor='skpd'>SKPD</label>
-              <InputSearchBox
-                id='skpd'
-                className='w-72 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih SKPD...'
-                value={selectedSKPD.toString()}
-                options={listSKPDPeriode as OptionItem[]}
-                onChange={(val) => setSelectedSKPD(val)}
-                onClear={() => setSelectedSKPD('')}
-                withSearch
-              />
-            </div>
+            {isDev() ||
+              (isAdmin() && (
+                <div>
+                  <label htmlFor='skpd'>SKPD</label>
+                  <InputSearchBox
+                    id='skpd'
+                    className='w-72 h-9'
+                    btnclassName='bg-white'
+                    placeholder='Pilih SKPD...'
+                    value={selectedSKPD.toString()}
+                    options={listSKPDPeriode as OptionItem[]}
+                    onChange={(val) => setSelectedSKPD(val)}
+                    onClear={() => setSelectedSKPD('')}
+                    withSearch
+                  />
+                </div>
+              ))}
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
@@ -433,7 +442,9 @@ const RenstraTable = () => {
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
-          pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
+          pesanDataKosong={
+            <PesanSKPDTabel selectedSKPD={selectedSKPD.toString()} />
+          }
         />
       </div>
       {isPreview &&
