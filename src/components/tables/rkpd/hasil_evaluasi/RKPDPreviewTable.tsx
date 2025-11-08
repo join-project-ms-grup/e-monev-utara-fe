@@ -247,7 +247,7 @@ const RKPDPreviewTable = ({ data, listTahunKe, tahunKe }: MainTableProps) => {
                 </td>
                 <td className='border text-center px-2 py-1'>
                   {!isHeaderLevel
-                    ? `${row.original.tingkat_capaian_rpjmd_anggaran} %`
+                    ? <span className='text-nowrap'>{row.original.tingkat_capaian_rpjmd_anggaran} %</span>
                     : ''}
                 </td>
 

@@ -29,7 +29,7 @@ type MenuItem = {
   label: string;
   icon?: JSX.Element;
   to?: string;
-  akses?: number;
+  akses?: number | number[];
   submenu?: SubMenuItem[];
 };
 
@@ -37,7 +37,7 @@ type SubMenuItem = {
   label: string;
   to?: string;
   icon?: JSX.Element;
-  akses?: number;
+  akses?: number | number[];
   submenu?: SubMenuItem[];
 };
 
@@ -51,12 +51,12 @@ const menuUtama: MenuItem[] = [
   {
     label: 'Konfigurasi',
     icon: <MdSettings />,
-    akses: 1 && 2,
+    akses: [1, 2],
     submenu: [
-      { label: 'Role', to: '/konfigurasi/role', akses: 1 && 2 },
+      { label: 'Role', to: '/konfigurasi/role', akses: 1 },
       { label: 'User', to: '/konfigurasi/user' },
       { label: 'Periode', to: '/konfigurasi/periode' },
-      { label: 'SKPD', to: '/konfigurasi/skpd', akses: 1 && 2 },
+      { label: 'SKPD', to: '/konfigurasi/skpd', akses: [1, 2] },
     ],
   },
 ];
@@ -65,27 +65,34 @@ const menuUtama: MenuItem[] = [
 const menuRKPD: MenuItem[] = [
   {
     type: 'separator',
-    label: 'PERENCANAAN',
-    akses: 1,
+    label: '-',
+    akses: [2, 3],
   },
   {
     label: 'RENSTRA - RPJMD',
     icon: <MdEventNote />,
-    akses: 3,
+    akses: [2, 3],
     submenu: [
       { label: 'Rekening', to: '/rkpd/renstra_rpjmd/rekening' },
-      { label: 'Pagu Indikator', to: '/rkpd/renstra_rpjmd/pagu_indikator' },
+      { label: 'Perencanaan', to: '/rkpd/renstra_rpjmd/pagu_indikator' },
       { label: 'Realisasi', to: '/rkpd/renstra_rpjmd/realisasi' },
     ],
   },
   {
-    label: 'IKU - IKD',
+    label: 'IKU',
     icon: <MdShowChart />,
-    akses: 3,
+    akses: [2, 3],
     submenu: [
       { label: 'Indikator Kinerja Utama', to: '/rkpd/iku/iku_list' },
       { label: 'Tagging IKU', to: '/rkpd/iku/iku_tagging' },
       { label: 'Capaian IKU', to: '/rkpd/iku/iku_capaian' },
+    ],
+  },
+  {
+    label: 'IKD',
+    icon: <MdShowChart />,
+    akses: [2, 3],
+    submenu: [
       { label: 'Indikator Kinerja Daerah', to: '/rkpd/ikd/ikd_list' },
       { label: 'Tagging IKD', to: '/rkpd/ikd/ikd_tagging' },
       { label: 'Capaian IKD', to: '/rkpd/ikd/ikd_capaian' },
@@ -94,57 +101,24 @@ const menuRKPD: MenuItem[] = [
   {
     label: 'RENJA - RKPD',
     icon: <MdEventNote />,
-    akses: 3,
+    akses: [2, 3],
     submenu: [
       { label: 'Rekening', to: '/rkpd/renja_rkpd/rekening' },
-      { label: 'Renja', to: '/rkpd/renja_rkpd/renja' },
+      { label: 'Perencanaan', to: '/rkpd/renja_rkpd/renja' },
       { label: 'Realisasi', to: '/rkpd/renja_rkpd/realisasi' },
     ],
   },
-  // {
-  //   label: 'Pagu Indikatif',
-  //   icon: <MdDragIndicator />,
-  //   to: '/rkpd/pagu_indikatif',
-  //   akses: 3,
-  // },
-  { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
+  {
+    label: 'Indikator',
+    icon: <MdSpeed />,
+    to: '/rkpd/indikator',
+    akses: [2, 3],
+  },
   {
     type: 'separator',
-    label: 'Realisasi dan Hasil',
-    akses: 3,
+    label: 'Hasil',
+    akses: [2, 3],
   },
-  {
-    label: 'Realisasi',
-    icon: <MdInsights />,
-    to: '/rkpd/realisasi',
-    akses: 2,
-  },
-  // {
-  //   label: 'Realisasi Anggaran',
-  //   icon: <MdAssignmentTurnedIn />,
-  //   to: '/rkpd/realisasi',
-  //   akses: 2,
-  // },
-  // {
-  //   label: 'Indikator Kinerja Utama',
-  //   icon: <MdShowChart />,
-  //   submenu: [
-  //     { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
-  //     { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
-  //     { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
-  //   ],
-  //   akses: 3,
-  // },
-  // {
-  //   label: 'Indikator Kinerja Daerah',
-  //   icon: <MdLocationCity />,
-  //   submenu: [
-  //     { label: 'Tagging Indikator', to: '/rkpd/ikd/ikd_tagging' },
-  //     { label: 'Indikator IKD', to: '/rkpd/ikd/ikd_list' },
-  //     { label: 'Capaian Indikator IKD', to: '/rkpd/ikd/ikd_capaian' },
-  //   ],
-  //   akses: 3,
-  // },
   {
     label: 'Hasil Evaluasi',
     icon: <MdAssignment />,
@@ -154,7 +128,7 @@ const menuRKPD: MenuItem[] = [
       { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
       { label: 'RENJA', to: '/rkpd/hasil_evaluasi/renja' },
     ],
-    akses: 3,
+    akses: [2, 3],
   },
 ];
 
@@ -163,25 +137,25 @@ const menuDAK: MenuItem[] = [
   {
     type: 'separator',
     label: 'MENU DAK',
-    akses: 4,
+    akses: [2,4],
   },
   {
     label: 'Identifikasi DAK',
     icon: <MdAssessment />,
     to: '/dak/identifikasi',
-    akses: 4,
+    akses: [2,4],
   },
   {
     label: 'Monitoring DAK',
     icon: <MdMonitor />,
     to: '/dak/monitoring',
-    akses: 4,
+    akses: [2,4],
   },
   {
     label: 'Daftar dan Jenis DAK',
     icon: <MdViewList />,
     to: '/dak/daftardak',
-    akses: 4,
+    akses: [2,4],
   },
 ];
 const menus = [...menuUtama, ...menuRKPD, ...menuDAK];
@@ -231,19 +205,37 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     return false;
   };
 
-  const canAccess = (menu: MenuItem | SubMenuItem, roleId: number): boolean => {
-    if (roleId === 1 || roleId === 2) return true;
-    if (menu.akses && menu.akses !== roleId) {
-      return false;
-    }
-    if (menu.submenu) {
-      menu.submenu = menu.submenu
-        .map((sub) => ({ ...sub }))
-        .filter((sub) => canAccess(sub, roleId));
-      return menu.submenu.length > 0;
-    }
-    return true;
-  };
+  // Fungsi cek akses
+const canAccess = (menu: MenuItem | SubMenuItem, roleId: number): boolean => {
+  // Role 1 bisa akses semua
+  if (roleId === 1) return true;
+
+  // Jika akses tidak didefinisikan, semua role lain bisa mengakses
+  if (!menu.akses) return true;
+
+  // Normalisasi akses menjadi array
+  const aksesArray = Array.isArray(menu.akses) ? menu.akses : [menu.akses];
+
+  // Cek apakah roleId termasuk di aksesArray
+  const hasAccess = aksesArray.includes(roleId);
+
+  // Jika menu punya submenu, filter juga submenu-nya
+  if (menu.submenu) {
+    const filteredSubmenu = menu.submenu
+      .map((sub) => ({ ...sub }))
+      .filter((sub) => canAccess(sub, roleId));
+    if (filteredSubmenu.length === 0 && !hasAccess) return false;
+    menu.submenu = filteredSubmenu;
+  }
+
+  return hasAccess;
+};
+
+
+  // Filter menu sebelum render
+  const filteredMenus = menus
+    .map((menu) => ({ ...menu }))
+    .filter((menu) => canAccess(menu, getRoleId()!));
 
   const renderMenu = (menu: MenuItem) => {
     if (menu.type === 'separator') {
@@ -322,10 +314,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       </Link>
     );
   };
-
-  const filteredMenus = menus
-    .map((menu) => ({ ...menu }))
-    .filter((menu) => canAccess(menu, getRoleId()!));
 
   return (
     <aside

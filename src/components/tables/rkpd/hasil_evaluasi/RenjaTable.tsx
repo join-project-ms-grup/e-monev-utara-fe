@@ -1,58 +1,47 @@
-import { Fragment, useState, type JSX } from 'react';
-import Tabel from '../../Tabel';
+import { Fragment, useEffect, useState } from 'react';
 import InputButton from '../../../inputs/InputButton';
-import { MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
-import { FaInfo } from 'react-icons/fa';
-import type { ColumnDef, Table } from '@tanstack/react-table';
-import InputSearchBox, {
-  type OptionItem,
-} from '../../../inputs/InputSearchBox';
+import toast from 'react-hot-toast';
+import {
+  exportRKPD,
+} from '../../../../services/Excel/ExcelRKPD';
+import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
+import { flatRKPD, getRKPD, type FlatRKPD } from '../../../../services/RKPDService';
+
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
-import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import {
-  flatRenja,
-  getRenjaDetailRKPD,
-  getRenjaRKPD,
-  type FlatRenja,
-  type RenjaDetail,
-} from '../../../../services/RenjaService';
+import InputSearchBox, {
+  type OptionItem,
+} from '../../../inputs/InputSearchBox';
+import Tabel from '../../Tabel';
 import Spinner from '../../../inputs/Spinner';
+import { type ColumnDef, type Table } from '@tanstack/react-table';
+import { createPortal } from 'react-dom';
+import RKPDPreviewTable from './RKPDPreviewTable';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import { formatUang } from '../../../../lib/helper';
-import AksiButton from '../../../inputs/AksiButton';
-import DialogModal from '../../../inputs/DialogModal';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
-import React from 'react';
+import { exportRenja } from '../../../../services/Excel/ExcelRenja';
+import RenjaPreviewTable from './RenjaPreviewTable';
 
 const RenjaTable = () => {
-  //#region Form Data dan Modal
-  const [openModal, setOpenModal] = useState(false);
-  const initialFormData: RenjaDetail = {
-    skpd: '',
-    urusan: '',
-    bidang: '',
-    program: '',
-    kegiatan: '',
-    subKegiatan: '',
-    waktu: '',
-    pagu: '',
-    lokasi: '',
-    indikator: [
-      {
-        name: '',
-        target: '',
-      },
-    ],
-  };
-  const [formData, setFormData] = useState<RenjaDetail>(initialFormData);
-  //#endregion
-
-  //#region SKPD, Tahun ke, Bidang
+  //#region SKPD dan Tahun ke
   const [tahunKe, setTahunKe] = useState('');
+  const [selectedSKPD, setSelectedSKPD] = useState('');
+  const { data: dataSKPDPeriode } = useQuery({
+    queryKey: ['list_skpd_periode'],
+    queryFn: async () => getSKPDPerRKPD(Number(getPeriodeIDFromCookie())),
+  });
+  const listSKPDPeriode =
+    dataSKPDPeriode?.map((item) => ({
+      label: `${item.skpd_name}`,
+      value: item.id?.toString(),
+    })) || [];
+  //#endregion
+  //#region List data periode
   const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
   const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
   const listTahunKe = Array.from(
@@ -62,218 +51,280 @@ const RenjaTable = () => {
       value: `${i + 1}`,
     }),
   );
-  //#region SKPD
-  const idPeriodeCookie = Number(getPeriodeIDFromCookie());
-  const [selectedSKPD, setSelectedSKPD] = useState('');
-  const { data: dataSKPDPeriode } = useQuery({
-    queryKey: ['list_rkpd_skpd_periode'],
-    queryFn: async () => getSKPDPerRKPD(idPeriodeCookie),
-  });
-  const listSKPDPeriode =
-    dataSKPDPeriode?.map((item) => ({
-      label: `${item.skpd_name}`,
-      value: item.id?.toString(),
-    })) || [];
   //#endregion
-  const [selectedBidang, setSelectedBidang] = useState('');
 
+  //#region RKPD Data Flatten
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['list_renja', tahunKe, selectedSKPD],
+    queryKey: ['tabel_rkpd_tahunan', selectedSKPD, tahunKe],
     queryFn: async () => {
-      const rawData = await getRenjaRKPD({
-        skpd_periode_id: Number(selectedSKPD),
-        tahun_ke: Number(tahunKe),
-        bidang: null,
-      });
-      const flatData = await flatRenja(rawData);
+      const rawData = await getRKPD(Number(selectedSKPD), Number(tahunKe));
+      const skpdName =
+        dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))?.skpd_name ?? '';
+      const flatData = await flatRKPD(rawData, skpdName);
       return flatData;
     },
     enabled: !!(selectedSKPD && tahunKe),
   });
+  //#endregion
 
-  const columns: ColumnDef<FlatRenja>[] = [
-    {
-      header: 'No',
-    },
-    {
-      accessorKey: 'kode',
-    },
-    {
-      accessorKey: 'rekening',
-    },
-    {
-      accessorKey: 'pagu',
-    },
-    {
-      header: 'Waktu Pelaksanaan',
-    },
-    {
-      header: 'Detail',
-    },
-  ];
-
+  //#region Head Tabel
   const tableHead = () => {
     return (
       <>
         <tr>
           <th rowSpan={2}>No</th>
           <th rowSpan={2}>Sasaran</th>
-          <th rowSpan={2}> Program/ Kegiatan</th>
-          <th rowSpan={2}>
-            Indikator Kinerja Program (outcome)/ Kegiatan (output)
+          <th rowSpan={2} className='w-[50px]'>
+            Kode
           </th>
-          <th colSpan={2}>
-            Target Renstra Perangkat Daerah pada Tahun{' '}
-            {getPeriodeAkhirFromCookie()}
+          <th rowSpan={2} className='w-[20%]'>
+            Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
           </th>
-          <th colSpan={2}>
-            Realisasi Capaian Kinerja Renstra Perangkat Daerah sampai dengan
-            Renja Perangkat Daerah Tahun Lalu
-            <br />
+          <th rowSpan={2} className='w-[25%]'>
+            Indikator Kinerja Program (Outcome)/ Kegiatan (output)
+          </th>
+          <th rowSpan={1} colSpan={2}>
+            Target RPJMD Kabupaten/kota pada Tahun{' '}
+            {listTahunKe.find((item) => item.value === tahunKe)?.label ??
+              '........'}
+          </th>
+          <th rowSpan={1} colSpan={2}>
+            Realisasi Capaian Kinerja RPJMD Kabupaten/kota sampai dengan RKPD
+            Kabupaten/kota Tahun Lalu <br />
             (n-2)
           </th>
-          <th colSpan={2}>
-            Target Kinerja dan Anggaran Renja Perangkat Daerah Tahun berjalan
-            (Tahun n-1) yang dievaluasi
-          </th>
-          <th colSpan={2}>
-            Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang
-            dievaluasi
-          </th>
-          <th colSpan={2}>
-            Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun
-            {` `}
-            {getPeriodeAkhirFromCookie()}
-          </th>
-          <th colSpan={2}>
-            Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat
-            Daerah s/d tahun
-            {` `}
-            {getPeriodeAkhirFromCookie()}
-            <br />
-            (%)
+          <th rowSpan={1} colSpan={2}>
+            Target Kinerja dan Anggaran RKPD Kabupaten/kota Tahun Berjalan
+            (Tahun n-1) yang Dievaluasi
           </th>
         </tr>
         <tr>
-          <th>(1)</th>
-          <th>(2)</th>
-          <th>(3)</th>
-          <th>(4)</th>
-          {[...Array(5)].map((_, i) => (
-            <th key={i} colSpan={2}>
-              ({i + 5})
-            </th>
-          ))}
-        </tr>
-        <tr>
-          {[...Array(10)].map((_, i) => (
-            <React.Fragment key={i}>
-              <th>K</th>
-              <th>Rp.</th>
-            </React.Fragment>
+          {Array.from({ length: 3 }, (_, i) => (
+            <Fragment key={i}>
+              <th className='w-[200px]'>Fisik</th>
+              <th className='w-[200px]'>Rp.</th>
+            </Fragment>
           ))}
         </tr>
       </>
     );
   };
+  //#endregion
 
-  const tableBody = (table: Table<FlatRenja & { group?: string }>) => {
+  const tableBody = ({ table }: { table: Table<FlatRKPD> }) => {
     const rows = table.getRowModel().rows;
-    if (!rows.length)
-      return (
-        <tr>
-          <td colSpan={12}>TIDAK ADA DATA</td>
-        </tr>
-      );
-    const { pageIndex, pageSize } = table.getState().pagination ?? {
-      pageIndex: 0,
-      pageSize: rows.length,
-    };
 
-    const allRows = table.getPrePaginationRowModel().rows;
-    let subKegiatanOffset = 0;
-    for (let i = 0; i < pageIndex * pageSize; i++) {
-      if (allRows[i].original.kode_subKegiatan) subKegiatanOffset++;
-    }
-
-    let subkegiatanIdx = subKegiatanOffset + 1;
-    const renderedHeaderKeys = new Set<string>();
+    // Kelompokkan berdasarkan rekening
+    const grouped = rows.reduce<Record<string, typeof rows>>((acc, row) => {
+      const key = row.original.rekening;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(row);
+      return acc;
+    }, {});
 
     return (
       <>
-        {rows.map((row) => {
-          const item = row.original;
-          const codes = [
-            item.kode_urusan,
-            item.kode_bidang,
-            item.kode_program,
-            item.kode_kegiatan,
-            item.kode_subKegiatan,
-          ].filter(Boolean);
+        {Object.entries(grouped).map(([rekening, group]) =>
+          group.map((row, i) => (
+            <tr key={row.id}>
+              {/* Kolom No */}
+              <td>{row.index + 1}</td>
 
-          const headerRows: JSX.Element[] = [];
+              {/* Kolom Sasaran */}
+              <td>{row.original.sasaran ?? ''}</td>
 
-          codes.forEach((code, i) => {
-            if (i === codes.length - 1) return;
-            const key = codes.slice(0, i + 1).join('.');
-            if (!renderedHeaderKeys.has(key)) {
-              renderedHeaderKeys.add(key);
-              headerRows.push(
-                <tr key={`header-${key}`} className='bg-gray-200 font-bold'>
-                  <td colSpan={12}>
-                    <div
-                      style={{ paddingLeft: `${i * 16}px` }}
-                      className='inline-flex items-center gap-1'
-                    >
-                      {i > 0 && <MdSubdirectoryArrowRight />}
-                      <span>
-                        [{codes.slice(0, i + 1).join('.')}] {item.rekening}
-                      </span>
-                    </div>
-                  </td>
-                </tr>,
-              );
-            }
-          });
-
-          const rowElement = (
-            <Fragment key={row.id}>
-              {headerRows}
-              {item.kode_subKegiatan && (
-                <tr>
-                  <td>{subkegiatanIdx++}</td>
-                  <td>{codes.join('.')}</td>
-                  <td>{item.rekening}</td>
-                  <td className='text-center'>
-                    {formatUang(Number(item.pagu))}
-                  </td>
-                  <td className='text-center'>-</td>
-                  <td>
-                    <AksiButton
-                      Icon={FaInfo}
-                      iconClassName='scale-75'
-                      tooltip='Informasi Data'
-                      onClick={async () => {
-                        const detailR = await getRenjaDetailRKPD({
-                          skpd_periode_id: Number(selectedSKPD),
-                          tahun_ke: Number(tahunKe),
-                          sub_id: item.id,
-                        });
-                        setFormData(detailR);
-                        setOpenModal(true);
-                      }}
-                    />
-                  </td>
-                </tr>
+              {/* Kolom Kode dengan rowspan */}
+              {i === 0 && (
+                <td
+                  rowSpan={group.length}
+                  className='whitespace-nowrap align-top'
+                >
+                  {`${row.original.kode_urusan} ${row.original.kode_bidang} ${row.original.kode_program} ${row.original.kode_kegiatan} ${row.original.kode_subKegiatan}`}
+                </td>
               )}
-            </Fragment>
-          );
 
-          return rowElement;
-        })}
+              {/* Kolom Rekening dengan rowspan */}
+              {i === 0 && (
+                <td
+                  rowSpan={group.length}
+                  className={`align-top ${
+                    ['urusan', 'bidang'].some((l) =>
+                      row.original.level.includes(l),
+                    )
+                      ? 'font-bold'
+                      : ''
+                  }`}
+                >
+                  {rekening}
+                </td>
+              )}
+
+              {/* Kolom Indikator Kinerja */}
+              <td className=''>{row.original.indikator_kinerja ?? ''}</td>
+
+              {/* Target RPJMD Kinerja */}
+              <td className='text-center'>
+                {row.original.target_rpjmd_kinerja
+                  ? `${row.original.target_rpjmd_kinerja} ${row.original.satuan ?? ''}`
+                  : ''}
+              </td>
+
+              {/* Target RPJMD Anggaran */}
+              <td className='text-center'>
+                {['urusan', 'bidang'].some((l) =>
+                  row.original.level.includes(l),
+                )
+                  ? ''
+                  : formatUang(Number(row.original.target_rpjmd_anggaran))}
+              </td>
+
+              {/* Realisasi RPJMD Kinerja */}
+              <td className='text-center'>
+                {row.original.realisasi_rpjmd_kinerja
+                  ? `${row.original.realisasi_rpjmd_kinerja} ${row.original.satuan ?? ''}`
+                  : ''}
+              </td>
+
+              {/* Realisasi RPJMD Anggaran */}
+              <td className='text-center'>
+                {['urusan', 'bidang'].some((l) =>
+                  row.original.level.includes(l),
+                )
+                  ? ''
+                  : formatUang(Number(row.original.realisasi_rpjmd_anggaran))}
+              </td>
+
+              {/* Target RKPD Kinerja */}
+              <td className='text-center'>
+                {row.original.target_rkpd_kinerja
+                  ? `${row.original.target_rkpd_kinerja} ${row.original.satuan ?? ''}`
+                  : ''}
+              </td>
+
+              {/* Target RKPD Anggaran */}
+              <td className='text-center'>
+                {['urusan', 'bidang'].some((l) =>
+                  row.original.level.includes(l),
+                )
+                  ? ''
+                  : formatUang(Number(row.original.target_rkpd_anggaran))}
+              </td>
+            </tr>
+          )),
+        )}
       </>
     );
   };
+
+  // #region Kolom Tabel
+  const columns: ColumnDef<FlatRKPD>[] = [
+    {
+      header: 'No',
+      meta: { tdClassNames: 'text-center' },
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      header: 'Sasaran',
+      meta: { tdClassNames: 'text-center' },
+    },
+    {
+      header: 'Kode',
+      accessorFn: (row) =>
+        `${row.kode_urusan} ${row.kode_bidang} ${row.kode_program} ${row.kode_kegiatan} ${row.kode_subKegiatan}`,
+      meta: { tdClassNames: 'whitespace-nowrap' },
+    },
+    {
+      accessorKey: 'rekening',
+      cell: ({ row, getValue, table }) => {
+        const current = getValue() as string;
+        const previousRow = table.getRowModel().rows[row.index - 1];
+        const previous = previousRow?.original.rekening;
+        const isSameAsPrevious = current === previous;
+
+        if (isSameAsPrevious) return null;
+
+        return (
+          <span
+            className={`${['urusan', 'bidang'].some((l) => row.original.level.includes(l)) ? 'font-bold' : ''}`}
+          >
+            {current}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: 'indikator_kinerja',
+    },
+    {
+      accessorKey: 'target_rpjmd_kinerja',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: ({ row, getValue }) => getValue() + ' ' + row.original.satuan,
+    },
+    {
+      accessorKey: 'target_rpjmd_anggaran',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: ({ row, getValue }) => {
+        if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
+          return;
+        }
+        return `${formatUang(Number(getValue()))}`;
+      },
+    },
+    {
+      accessorKey: 'realisasi_rpjmd_kinerja',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+    },
+    {
+      accessorKey: 'realisasi_rpjmd_anggaran',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: ({ row, getValue }) => {
+        if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
+          return;
+        }
+        return `${formatUang(Number(getValue()))}`;
+      },
+    },
+    {
+      accessorKey: 'target_rkpd_kinerja',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+    },
+    {
+      accessorKey: 'target_rkpd_anggaran',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: ({ row, getValue }) => {
+        if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
+          return;
+        }
+        return `${formatUang(Number(getValue()))}`;
+      },
+    },
+  ];
+  // #endregion
+
+  const [isPreview, setIsPreview] = useState(false);
+  useEffect(() => {
+    if (isPreview) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isPreview]);
 
   return (
     <>
@@ -290,8 +341,10 @@ const RenjaTable = () => {
                 value={selectedSKPD.toString()}
                 options={listSKPDPeriode as OptionItem[]}
                 onChange={(val) => setSelectedSKPD(val)}
-                onClear={() => setSelectedSKPD('')}
-                tooltip
+                onClear={() => {
+                  setSelectedSKPD('');
+                  setTahunKe('');
+                }}
                 withSearch
               />
             </div>
@@ -306,21 +359,26 @@ const RenjaTable = () => {
                 options={listTahunKe}
                 onChange={(val) => setTahunKe(val)}
                 onClear={() => setTahunKe('')}
-              />
-            </div>
-            <div>
-              <label htmlFor='urusan'>Bidang Urusan</label>
-              <InputSearchBox
-                id='urusan'
-                className='w-72 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih Bidang Urusan...'
-                options={[]}
-                tooltip
+                disabled={!selectedSKPD}
               />
             </div>
           </div>
           <div className='inline-flex gap-2'>
+            <InputButton
+              tooltip='Lihat tabel penuh'
+              className='btn btn-theme w-9 h-9'
+              onClick={() => {
+                if (data) {
+                  setIsPreview(true);
+                } else {
+                  toast.error(
+                    `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
+                  );
+                }
+              }}
+            >
+              <MdPreview />
+            </InputButton>
             <InputButton
               tooltip='Refresh'
               className='btn btn-theme w-9 h-9'
@@ -332,10 +390,11 @@ const RenjaTable = () => {
           </div>
         </div>
         <Tabel
+          tblClassName={`${selectedSKPD && data && 'lg:min-w-[2500px]'}`}
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
-          renderBody={(table) => tableBody(table)}
+          renderBody={(table) => tableBody({ table })}
           pesanDataKosong={
             <PesanSKPDTabel
               selectedSKPD={selectedSKPD}
@@ -343,156 +402,59 @@ const RenjaTable = () => {
               butuhTahun
             />
           }
+          
         />
-        <DialogModal
-          widthLevel={10}
-          title='Informasi Data'
-          isOpen={openModal}
-          onClose={() => {
-            setTimeout(() => {
-              setFormData(initialFormData);
-            }, 300);
-            setOpenModal(false);
-          }}
-        >
-          <DetailRenja
-            formData={formData}
-            tahun={listTahunKe.find((item) => item.value === tahunKe)?.label}
-          />
-        </DialogModal>
       </div>
+      {isPreview &&
+        createPortal(
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
+            <div className='border-b'>
+              <div className='flex flex-row justify-between p-2'>
+                <button
+                  onClick={() => setIsPreview(false)}
+                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+                  aria-label='Tutup preview'
+                >
+                  <MdClose />
+                </button>
+                <InputButton
+                  className='h-9'
+                  onClick={() => {
+                    if (data) {
+                      const tahunLabel =
+                        listTahunKe.find((t) => t.value === tahunKe)?.label ??
+                        '';
+                      toast.promise(exportRenja(data, tahunLabel), {
+                        loading: 'Sedang mengunduh...',
+                        success: <b>Berhasil mengunduh.</b>,
+                        error: <b>Gagal mengunduh.</b>,
+                      });
+                    } else {
+                      toast.error(
+                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
+                      );
+                    }
+                  }}
+                >
+                  <span className='inline-flex items-center gap-2 px-2'>
+                    <MdPrint />
+                    Cetak Excel
+                  </span>
+                </InputButton>
+              </div>
+            </div>
+            <div className='p-2 overflow-auto'>
+              <RenjaPreviewTable data={data || []} skpd={listSKPDPeriode.find(item => item.value === selectedSKPD)?.label ?? ''} />
+              {/* <RKPDPreviewTable
+                data={data || []}
+                listTahunKe={listTahunKe}
+                tahunKe={tahunKe}
+              /> */}
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
-  );
-};
-
-const DetailRenja = ({
-  formData,
-  tahun,
-}: {
-  formData: RenjaDetail;
-  tahun?: string;
-}) => {
-  return (
-    <div className='grid grid-cols-2 grid-rows-2 gap-2'>
-      <div className='col-start-1 row-span-2'>
-        <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
-          <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
-            Detail Program Kegiatan
-          </div>
-          <div className='p-4 table-excel'>
-            <table>
-              <tbody>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Tahun</td>
-                  <td>{tahun}</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Jadwal</td>
-                  <td>-</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>SKPD</td>
-                  <td>{formData.skpd}</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Urusan</td>
-                  <td>{formData.urusan}</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Bidang</td>
-                  <td>{formData.bidang}</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Program</td>
-                  <td>{formData.program}</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Kegiatan</td>
-                  <td>{formData.kegiatan}</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Sub Kegiatan</td>
-                  <td>{formData.subKegiatan}</td>
-                </tr>
-                <tr>
-                  <td className='text-right pr-4 font-bold'>Waktu</td>
-                  <td>{formData.waktu}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      {/*  */}
-      <div>
-        <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
-          <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
-            Anggaran & Lokasi
-          </div>
-          <div className='p-4 table-excel space-y-4'>
-            <table>
-              <thead>
-                <tr>
-                  <th colSpan={3}>Pagu</th>
-                </tr>
-                <tr>
-                  <th>{Number(tahun) - 1}</th>
-                  <th>{tahun}</th>
-                  <th>{Number(tahun) - 1}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className='text-center'>
-                  <td>0</td>
-                  <td>{formatUang(Number(formData.pagu))}</td>
-                  <td>0</td>
-                </tr>
-              </tbody>
-            </table>
-            <table>
-              <thead>
-                <tr>
-                  <th>Lokasi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className='text-center'>
-                  <td>{formData.lokasi}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      {/*  */}
-      <div>
-        <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
-          <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
-            Indikator Sub Kegiatan
-          </div>
-          <div className='p-4 table-excel'>
-            <table>
-              <thead>
-                <tr>
-                  <th>Narasi</th>
-                  <th>Target</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formData.indikator.map((item, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{item.name}</td>
-                      <td className='text-center'>{item.target}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 };
 

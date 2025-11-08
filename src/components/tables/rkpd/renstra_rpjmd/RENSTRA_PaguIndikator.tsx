@@ -256,7 +256,7 @@ const RENSTRA_PaguIndikator = () => {
                 onClear={() => setTahunKe('')}
               />
             </div>
-            <div>
+            {/* <div>
               <label htmlFor='urusan'>Bidang Urusan</label>
               <InputSearchBox
                 id='urusan'
@@ -266,7 +266,7 @@ const RENSTRA_PaguIndikator = () => {
                 options={[]}
                 tooltip
               />
-            </div>
+            </div> */}
           </div>
           <div className='inline-flex gap-2'>
             <InputButton

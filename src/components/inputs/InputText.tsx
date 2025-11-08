@@ -134,9 +134,7 @@ const InputText = ({
           <button
             type='button'
             className='bg-white pr-2 text-gray-600 hover:text-gray-800'
-            onMouseDown={() => setShowPassword(true)}
-            onMouseUp={() => setShowPassword(false)}
-            onMouseLeave={() => setShowPassword(false)}
+            onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
           </button>

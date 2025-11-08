@@ -16,10 +16,13 @@ import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
   flatRPJMD,
+  flatRPJMD2,
   getRPJMD,
+  type FlatRPJMD,
   type FlatRPJMDFull,
 } from '../../../../services/RPJMDService';
 import Spinner from '../../../inputs/Spinner';
+import { getSKPDPerRENSTRA } from '../../../../services/PeriodeService';
 
 const tableHead = () => {
   return (
@@ -54,7 +57,7 @@ const RPJMDTable = () => {
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+    queryFn: async () => getSKPDPerRENSTRA(Number(getPeriodeIDFromCookie())),
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
@@ -68,54 +71,92 @@ const RPJMDTable = () => {
     queryKey: ['tabel_rkpd_5_tahunan', selectedSKPD],
     queryFn: async () => {
       const rawData = await getRPJMD(Number(selectedSKPD));
-      const flatten = flatRPJMD(rawData);
+      const flatten = flatRPJMD2(rawData);
+      console.log(flatten)
       return flatten;
     },
     enabled: !!selectedSKPD,
   });
   //#endregion
 
-  const tableBody = (table: Table<FlatRPJMDFull>) => {
-    const rowModel = table.getRowModel();
-    const { pageIndex, pageSize } = table.getState().pagination ?? {
-      pageIndex: 0,
-      pageSize: 10,
-    };
+  const columns: ColumnDef<FlatRPJMD>[] = [
+    {
+      header: 'No',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      header: 'Sasaran',
+    },
+    {
+      accessorKey: 'name',
+    },
+    {
+      accessorKey: 'indikator_o_name',
+    },
+    {
+      header: ' ',
+    },
+    {
+      header: ' ',
+    },
+    {
+      header: ' ',
+    },
+    {
+      header: ' ',
+    },
+    {
+      header: ' ',
+    },
+    {
+      header: ' ',
+    },
+    {
+      header: ' ',
+    },
+  ];
 
-    let counter = pageIndex * pageSize + 1;
+  // const tableBody = (table: Table<FlatRPJMDFull>) => {
+  //   const rowModel = table.getRowModel();
+  //   const { pageIndex, pageSize } = table.getState().pagination ?? {
+  //     pageIndex: 0,
+  //     pageSize: 10,
+  //   };
 
-    return (
-      <>
-        {rowModel.rows.map((row) => {
-          const item = row.original;
+  //   let counter = pageIndex * pageSize + 1;
 
-          return (
-            <tr
-              key={`${item.rpjmd_kode}-${item.program_kode}-${item.outcome_name}`}
-              className='text-center'
-            >
-              <td>{counter++}</td>
-              <td className='text-left'>{item.outcome_name}</td>
-              <td className='text-left'>{item.program_name}</td>
-              <td className='text-left'>{item.indikator_name}</td>
-              <td>{item.target_1 ?? '-'}</td>{' '}
-              {/* Data Capaian Awal Tahun Perencanaan */}
-              <td>{item.target_5 ?? '-'}</td> {/* Target K */}
-              <td>{item.pagu_5 ?? '-'}</td> {/* Target Rp */}
-              <td>{item.capaian_5 ?? '-'}</td> {/* Capaian K */}
-              <td>{item.realisasi_5 ?? '-'}</td> {/* Capaian Rp */}
-              <td>{item.persen_5 ?? '-'}</td> {/* Rasio Capaian K */}
-              <td>{item.persen_pagu_5 ?? '-'}</td> {/* Rasio Capaian Rp */}
-            </tr>
-          );
-        })}
-      </>
-    );
-  };
+  //   return (
+  //     <>
+  //       {rowModel.rows.map((row) => {
+  //         const item = row.original;
 
-  const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
-    id: (i + 1).toString(),
-  }));
+  //         return (
+  //           <tr
+  //             key={`${item.rpjmd_kode}-${item.program_kode}-${item.outcome_name}`}
+  //             className='text-center'
+  //           >
+  //             <td>{counter++}</td>
+  //             <td className='text-left'>{item.outcome_name}</td>
+  //             <td className='text-left'>{item.program_name}</td>
+  //             <td className='text-left'>{item.indikator_name}</td>
+  //             <td>{item.target_1 ?? '-'}</td>{' '}
+  //             {/* Data Capaian Awal Tahun Perencanaan */}
+  //             <td>{item.target_5 ?? '-'}</td> {/* Target K */}
+  //             <td>{item.pagu_5 ?? '-'}</td> {/* Target Rp */}
+  //             <td>{item.capaian_5 ?? '-'}</td> {/* Capaian K */}
+  //             <td>{item.realisasi_5 ?? '-'}</td> {/* Capaian Rp */}
+  //             <td>{item.persen_5 ?? '-'}</td> {/* Rasio Capaian K */}
+  //             <td>{item.persen_pagu_5 ?? '-'}</td> {/* Rasio Capaian Rp */}
+  //           </tr>
+  //         );
+  //       })}
+  //     </>
+  //   );
+  // };
+
+  // const columns: ColumnDef<any>[] = Array.from({ length: 11 }, (_, i) => ({
+  //   id: (i + 1).toString(),
+  // }));
 
   const [isPreview, setIsPreview] = useState(false);
   useEffect(() => {
@@ -179,7 +220,7 @@ const RPJMDTable = () => {
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
-          renderBody={(table) => tableBody(table)}
+          // renderBody={(table) => tableBody(table)}
           pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} />}
         />
       </div>

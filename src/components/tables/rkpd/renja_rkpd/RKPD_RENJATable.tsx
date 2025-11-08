@@ -260,7 +260,7 @@ const RKPD_RENJATable = () => {
                 onClear={() => setTahunKe('')}
               />
             </div>
-            <div>
+            {/* <div>
               <label htmlFor='urusan'>Bidang Urusan</label>
               <InputSearchBox
                 id='urusan'
@@ -270,7 +270,7 @@ const RKPD_RENJATable = () => {
                 options={[]}
                 tooltip
               />
-            </div>
+            </div> */}
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
