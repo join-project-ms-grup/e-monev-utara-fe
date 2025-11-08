@@ -53,36 +53,33 @@ export interface RealisasiMasterSubKegiatan extends RealisasiMaster {
 }
 export type RealisasiMasterTree = RealisasiMasterUrusan & RealisasiMasterBidang & RealisasiMasterProgram & RealisasiMasterKegiatan & RealisasiMasterSubKegiatan;
 
-export interface RealisasiForm {
-    rekening_kode?: string;
-    rekening_name?: string;
-    indikator_name?: string;
-    id_pagu?: number;
-    id_rincian?: number;
-    realisasi?: {
-        triwulan?: string | number;
-        realisasi?: string | number
-    }[];
-    capaian?: {
-        triwulan?: string | number;
-        capaian?: string | number
-    }[];
-}
+// export interface RealisasiForm {
+//     rekening_kode?: string;
+//     rekening_name?: string;
+//     indikator_name?: string;
+//     id_pagu?: number;
+//     id_rincian?: number;
+//     realisasi?: {
+//         triwulan?: string | number;
+//         realisasi?: string | number
+//     }[];
+//     capaian?: {
+//         triwulan?: string | number;
+//         capaian?: string | number
+//     }[];
+// }
 
 export interface RealisasiGetForm {
     skpd_periode_id: number;
     tahun_ke: number;
 }
 
-/**
- * Ambil semua data realisasi
- */
-export const getRealisasi = async (payload: RealisasiGetForm): Promise<RealisasiMasterTree[]> => {
+export const getRealisasiRKPD = async (payload: RealisasiGetForm): Promise<RealisasiMasterTree[]> => {
     const response = await api.post<ApiResponse<RealisasiMasterTree[]>>(`/rkpd/realisasi/list`, payload);
     return response.data.data;
 };
 
-export interface FlatRealisasi {
+export interface FlatRealisasiRKPD {
     level: string;
     id_master: number;
     type: string;
@@ -123,8 +120,8 @@ export interface FlatRealisasi {
 export async function flatRealisasi(
     dataRespons: RealisasiMasterUrusan[],
     skpd: string
-): Promise<FlatRealisasi[]> {
-    const dataExcel: FlatRealisasi[] = [];
+): Promise<FlatRealisasiRKPD[]> {
+    const dataExcel: FlatRealisasiRKPD[] = [];
 
     const pushRow = (
         level: string,
@@ -227,3 +224,236 @@ export async function flatRealisasi(
     return dataExcel;
 }
 
+export interface RealisasiRenstraMaster {
+    id: number;
+    kode: string;
+    name: string;
+    type: string;
+    bidang: {
+        id: number;
+        parent: number;
+        kode: string;
+        name: string;
+        type: string;
+        program: {
+            id: number;
+            parent: number;
+            kode: string;
+            name: string;
+            type: string;
+            pagu: {
+                id_pagu: number;
+                target: number;
+                realisasi: number;
+                persen_realisasi: number;
+            };
+            outcome: {
+                outcome: string;
+                indikator: {
+                    id: number;
+                    name: string;
+                    satuan: string;
+                    target_capaian: {
+                        id: number;
+                        target: number;
+                        capaian: number;
+                        persen: number;
+                    }
+                }
+            }[];
+            kegiatan: {
+                id: number;
+                parent: number;
+                kode: string;
+                name: string;
+                type: string;
+                pagu: {
+                    id_pagu: number;
+                    target: number;
+                    realisasi: number;
+                    persen_realisasi: number;
+                };
+                subKegiatan: {
+                    id: number;
+                    parent: number;
+                    kode: string;
+                    name: string;
+                    indikator: {
+                        id: number;
+                        name: string;
+                        satuan: string;
+                        target_capaian: {
+                            id_rincian: number;
+                            tahun_ke: number;
+                            target: number;
+                            capaian: number;
+                            persen: number;
+                        }
+                    }[];
+                    pagu: {
+                        id_pagu: number;
+                        target: number;
+                        realisasi: number;
+                        persen_realisasi: number;
+                    };
+                }[]
+            }[]
+        }[]
+    }[]
+}
+
+export const getRealisasiRENSTRA = async (payload: RealisasiGetForm): Promise<RealisasiRenstraMaster[]> => {
+    const response = await api.post<ApiResponse<RealisasiRenstraMaster[]>>(`/renstra/realisasi/list`, payload);
+    return response.data.data;
+};
+
+export interface FlatRealisasiRENSTRA {
+    id?: number;
+    kode?: string;
+    nama?: string;
+    type?: string;
+    id_parent?: number;
+
+    pagu_id?: number;
+    pagu_target?: number;
+    pagu_realisasi?: number;
+    pagu_persen_realisasi?: number;
+
+    outcome_name?: string;
+
+    indikator_id?: number;
+    indikator_name?: string;
+    indikator_satuan?: string;
+
+    target_capaian_o_id?: number;
+    target_capaian_o_target?: number;
+    target_capaian_o_capaian?: number;
+    target_capaian_o_persen?: number;
+
+    target_capaian_i_id?: number;
+    target_capaian_i_tahun_ke?: number;
+    target_capaian_i_target?: number;
+    target_capaian_i_capaian?: number;
+    target_capaian_i_persen?: number;
+}
+
+export function flatRealisasiRENSTRA(data: RealisasiRenstraMaster[]): FlatRealisasiRENSTRA[] {
+    const result: FlatRealisasiRENSTRA[] = [];
+
+    for (const urusan of data) {
+        result.push({
+            id: urusan.id,
+            kode: urusan.kode,
+            nama: urusan.name,
+            type: urusan.type,
+        });
+
+        for (const bidang of urusan.bidang) {
+            result.push({
+                id: bidang.id,
+                id_parent: bidang.parent,
+                kode: urusan.kode + '.' + bidang.kode,
+                nama: bidang.name,
+                type: bidang.type,
+            });
+
+            for (const program of bidang.program) {
+                for (const outcome of program.outcome) {
+                    for (const indikator of outcome.indikator ? [outcome.indikator] : []) {
+                        result.push({
+                            id: program.id,
+                            id_parent: program.parent,
+                            kode: urusan.kode + '.' + bidang.kode + '.' + program.kode,
+                            nama: program.name,
+                            type: program.type,
+                            pagu_id: program.pagu?.id_pagu,
+                            pagu_target: program.pagu?.target,
+                            pagu_realisasi: program.pagu?.realisasi,
+                            pagu_persen_realisasi: program.pagu?.persen_realisasi,
+                            //  
+                            outcome_name: outcome.outcome,
+                            indikator_id: indikator.id,
+                            indikator_name: indikator.name,
+                            indikator_satuan: indikator.satuan,
+                            target_capaian_o_id: indikator.target_capaian.id,
+                            target_capaian_o_capaian: indikator.target_capaian.capaian,
+                            target_capaian_o_target: indikator.target_capaian.target,
+                            target_capaian_o_persen: indikator.target_capaian.persen,
+                        });
+                    }
+                }
+
+                for (const kegiatan of program.kegiatan) {
+                    result.push({
+                        id: kegiatan.id,
+                        id_parent: kegiatan.parent,
+                        kode: urusan.kode + '.' + bidang.kode + '.' + program.kode + '.' + kegiatan.kode,
+                        nama: kegiatan.name,
+                        type: kegiatan.type,
+                        pagu_id: kegiatan.pagu.id_pagu,
+                        pagu_target: kegiatan.pagu.target,
+                        pagu_realisasi: kegiatan.pagu.realisasi,
+                        pagu_persen_realisasi: kegiatan.pagu.persen_realisasi,
+                    });
+
+                    for (const sub of kegiatan.subKegiatan) {
+                        for (const indikator of sub.indikator) {
+                            result.push({
+                                id: sub.id,
+                                id_parent: sub.parent,
+                                kode: urusan.kode + '.' + bidang.kode + '.' + program.kode + '.' + kegiatan.kode + '.' + sub.kode,
+                                nama: sub.name,
+                                pagu_id: sub.pagu.id_pagu,
+                                pagu_target: sub.pagu.target,
+                                pagu_realisasi: sub.pagu.realisasi,
+                                pagu_persen_realisasi: sub.pagu.persen_realisasi,
+                                type: 'subkegiatan',
+                                // 
+                                indikator_id: indikator.id,
+                                indikator_name: indikator.name,
+                                indikator_satuan: indikator.satuan,
+                                target_capaian_i_id: indikator.target_capaian.id_rincian,
+                                target_capaian_i_capaian: indikator.target_capaian.capaian,
+                                target_capaian_i_tahun_ke: indikator.target_capaian.tahun_ke,
+                                target_capaian_i_target: indikator.target_capaian.target,
+                                target_capaian_i_persen: indikator.target_capaian.persen,
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+export interface AnggaranRenstraForm {
+    id_pagu: number;
+    realisasi: number;
+}
+
+export const addAnggaranRENSTRA = async (payload: AnggaranRenstraForm): Promise<AnggaranRenstraForm> => {
+    const response = await api.post<ApiResponse<AnggaranRenstraForm>>("/renstra/realisasi/anggaran", payload);
+    return response.data.data;
+};
+
+export interface OutcomeCapRenstraForm {
+    id_target: number;
+    capaian: number;
+}
+
+export const addOutcomeCapRENSTRA = async (payload: OutcomeCapRenstraForm): Promise<OutcomeCapRenstraForm> => {
+    const response = await api.post<ApiResponse<OutcomeCapRenstraForm>>("/renstra/realisasi/capaian-outcome", payload);
+    return response.data.data;
+};
+
+export interface CapaianRenstraForm {
+    id_rincian: number;
+    capaian: number;
+}
+
+export const addCapaianRENSTRA = async (payload: CapaianRenstraForm): Promise<CapaianRenstraForm> => {
+    const response = await api.post<ApiResponse<CapaianRenstraForm>>("/renstra/realisasi/capaian", payload);
+    return response.data.data;
+};

@@ -10,7 +10,7 @@ import InputSearchBox, {
 } from '../../../inputs/InputSearchBox';
 import { useQuery } from '@tanstack/react-query';
 import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
-import { getSKPDPeriode } from '../../../../services/PeriodeService';
+
 import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';

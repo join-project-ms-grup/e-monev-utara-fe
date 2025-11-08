@@ -2,8 +2,6 @@ import { Fragment, useState, type JSX } from 'react';
 import Tabel from '../../Tabel';
 import InputButton from '../../../inputs/InputButton';
 import {
-  MdDetails,
-  MdInfo,
   MdRefresh,
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
@@ -18,12 +16,11 @@ import {
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
-import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
   flatRenja,
-  getRenja,
-  getRenjaDetail,
+  getRenjaDetailRKPD,
+  getRenjaRKPD,
   type FlatRenja,
   type RenjaDetail,
 } from '../../../../services/RenjaService';
@@ -31,8 +28,9 @@ import Spinner from '../../../inputs/Spinner';
 import { formatUang } from '../../../../lib/helper';
 import AksiButton from '../../../inputs/AksiButton';
 import DialogModal from '../../../inputs/DialogModal';
+import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 
-const RenjaTable = () => {
+const RKPD_RENJATable = () => {
   //#region Form Data dan Modal
   const [openModal, setOpenModal] = useState(false);
   const initialFormData: RenjaDetail = {
@@ -66,23 +64,25 @@ const RenjaTable = () => {
       value: `${i + 1}`,
     }),
   );
+  //#region SKPD
+  const idPeriodeCookie = Number(getPeriodeIDFromCookie());
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
-    queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())) || [],
+    queryKey: ['list_rkpd_skpd_periode'],
+    queryFn: async () => getSKPDPerRKPD(idPeriodeCookie),
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
       label: `${item.skpd_name}`,
       value: item.id?.toString(),
     })) || [];
-  const [selectedBidang, setSelectedBidang] = useState('');
   //#endregion
+  const [selectedBidang, setSelectedBidang] = useState('');
 
   const { data, isFetching, refetch } = useQuery({
     queryKey: ['list_renja', tahunKe, selectedSKPD],
     queryFn: async () => {
-      const rawData = await getRenja({
+      const rawData = await getRenjaRKPD({
         skpd_periode_id: Number(selectedSKPD),
         tahun_ke: Number(tahunKe),
         bidang: null,
@@ -206,7 +206,7 @@ const RenjaTable = () => {
                       iconClassName='scale-75'
                       tooltip='Informasi Data'
                       onClick={async () => {
-                        const detailR = await getRenjaDetail({
+                        const detailR = await getRenjaDetailRKPD({
                           skpd_periode_id: Number(selectedSKPD),
                           tahun_ke: Number(tahunKe),
                           sub_id: item.id,
@@ -448,4 +448,4 @@ const DetailRenja = ({
   );
 };
 
-export default RenjaTable;
+export default RKPD_RENJATable;

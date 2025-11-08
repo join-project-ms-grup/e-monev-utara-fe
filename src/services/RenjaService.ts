@@ -65,16 +65,25 @@ export interface RenjaDetail {
   ],
 }
 
-export const getRenja = async (payload: RenjaGetForm): Promise<Renja> => {
+export const getRenjaRENSTRA = async (payload: RenjaGetForm): Promise<Renja> => {
+  const response = await api.post<ApiResponse<Renja>>("/renstra/renja/list-sub", payload);
+  return response.data.data;
+};
+
+export const getRenjaDetailRENSTRA = async (payload: RenjaDetailGetForm): Promise<RenjaDetail> => {
+  const response = await api.post<ApiResponse<RenjaDetail>>("/renstra/renja/detail-sub", payload);
+  return response.data.data;
+};
+
+export const getRenjaRKPD = async (payload: RenjaGetForm): Promise<Renja> => {
   const response = await api.post<ApiResponse<Renja>>("/rkpd/renja/list-sub", payload);
   return response.data.data;
 };
 
-export const getRenjaDetail = async (payload: RenjaDetailGetForm): Promise<RenjaDetail> => {
+export const getRenjaDetailRKPD = async (payload: RenjaDetailGetForm): Promise<RenjaDetail> => {
   const response = await api.post<ApiResponse<RenjaDetail>>("/rkpd/renja/detail-sub", payload);
   return response.data.data;
 };
-
 
 
 export interface FlatRenja {

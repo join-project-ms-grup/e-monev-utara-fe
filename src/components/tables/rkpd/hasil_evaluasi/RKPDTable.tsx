@@ -7,7 +7,7 @@ import {
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import { flatRKPD, getRKPD, type FlatRKPD } from '../../../../services/RKPDService';
-import { getSKPDPeriode } from '../../../../services/PeriodeService';
+
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,

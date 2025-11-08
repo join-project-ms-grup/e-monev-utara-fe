@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { getChildren, getUrusan } from '../../../services/MasterService';
+import { getChildren, getUrusan } from '../../../services/RekeningService';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import InputText from '../../inputs/InputText';
 

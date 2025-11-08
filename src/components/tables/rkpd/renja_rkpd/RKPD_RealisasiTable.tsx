@@ -1,30 +1,32 @@
-import { useEffect, useState, type JSX } from 'react';
-import { MdEdit, MdInput, MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
-import InputButton from '../../inputs/InputButton';
-import Tabel from '../Tabel';
+import { useEffect, useState } from 'react';
+import { MdInput, MdRefresh } from 'react-icons/md';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { ColumnDef } from '@tanstack/react-table';
+import { formatUang } from '../../../../lib/helper';
 import {
-  getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
-} from '../../../lib/usercookie';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getSKPDPeriode } from '../../../services/PeriodeService';
-import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
-import type { ColumnDef } from '@tanstack/react-table';
-import Spinner from '../../inputs/Spinner';
-import PesanSKPDTabel from '../../PesanSKPDTabel';
+  getPeriodeAkhirFromCookie,
+} from '../../../../lib/usercookie';
 import {
-  flatRealisasi,
-  getRealisasi,
-  type FlatRealisasi,
   type RealisasiForm,
-} from '../../../services/RealisasiService';
-import AksiButton from '../../inputs/AksiButton';
-import { formatUang } from '../../../lib/helper';
-import DialogModal from '../../inputs/DialogModal';
-import FormRealisasi from '../../forms/FormRealisasi';
+  flatRealisasi,
+  type FlatRealisasiRKPD,
+  getRealisasiRKPD,
+} from '../../../../services/RealisasiService';
+import FormRealisasi from '../../../forms/FormRealisasi';
+import AksiButton from '../../../inputs/AksiButton';
+import DialogModal from '../../../inputs/DialogModal';
+import InputButton from '../../../inputs/InputButton';
+import InputSearchBox, {
+  type OptionItem,
+} from '../../../inputs/InputSearchBox';
+import Spinner from '../../../inputs/Spinner';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
+import Tabel from '../../Tabel';
+import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 
-const RealisasiTable = () => {
+const RKPD_RealisasiTable = () => {
   const queryClient = useQueryClient();
   // Modal
   const [openModal, setOpenModal] = useState(false);
@@ -60,7 +62,7 @@ const RealisasiTable = () => {
       return () => clearTimeout(timeout);
     }
   }, [openModal]);
-  //#region SKPD, Tahun ke dan Triwulan ke
+
   const [triwulanKe, setTriwulanKe] = useState('');
   const triwulanList = [
     { label: 'Triwulan I', value: '1' },
@@ -68,11 +70,14 @@ const RealisasiTable = () => {
     { label: 'Triwulan III', value: '3' },
     { label: 'Triwulan IV', value: '4' },
   ];
+  const idPeriodeCookie = Number(getPeriodeIDFromCookie());
   const [tahunKe, setTahunKe] = useState('');
+
+  //#region SKPD
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
-    queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+    queryKey: ['list_rkpd_skpd_periode'],
+    queryFn: async () => getSKPDPerRKPD(idPeriodeCookie),
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
@@ -83,14 +88,13 @@ const RealisasiTable = () => {
 
   //#region Data
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['list_renja', tahunKe, selectedSKPD],
+    queryKey: ['rkpd_list_renja', tahunKe, selectedSKPD],
     queryFn: async () => {
-      const rawData = await getRealisasi({
+      const rawData = await getRealisasiRKPD({
         skpd_periode_id: Number(selectedSKPD),
         tahun_ke: Number(tahunKe),
       });
       const flatData = await flatRealisasi(rawData, '');
-      console.log(flatData);
       return flatData;
     },
     enabled: !!(selectedSKPD && tahunKe),
@@ -98,7 +102,7 @@ const RealisasiTable = () => {
   //#endregion
 
   // #region Kolom Tabel
-  const columns: ColumnDef<FlatRealisasi>[] = [
+  const columns: ColumnDef<FlatRealisasiRKPD>[] = [
     {
       header: 'Kode',
       accessorFn: (row) => {
@@ -324,7 +328,7 @@ const RealisasiTable = () => {
         }
       />
       <DialogModal
-      widthLevel={7}
+        widthLevel={7}
         title='Realisasi'
         isOpen={openModal}
         onClose={() => {
@@ -359,4 +363,4 @@ const RealisasiTable = () => {
   );
 };
 
-export default RealisasiTable;
+export default RKPD_RealisasiTable;

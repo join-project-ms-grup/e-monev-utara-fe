@@ -12,8 +12,8 @@ import {
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
-import { getSKPDPeriode } from '../../../../services/PeriodeService';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
+import { getIKSKPD } from '../../../../services/IKUIKDService';
 
 const tableHead = () => {
   return (
@@ -52,15 +52,16 @@ const CapaianIKUTable = () => {
   );
   //#endregion
   //#region SKPD dan Tahun ke
+  const idPeriode = Number(getPeriodeIDFromCookie());
   const [tahunKe, setTahunKe] = useState('');
   const [selectedSKPD, setSelectedSKPD] = useState('');
-  const { data: dataSKPDPeriode } = useQuery({
-    queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(Number(getPeriodeIDFromCookie())),
+  const { data: dataIKSKPD } = useQuery({
+    queryKey: ['list_ik_skpd', idPeriode],
+    queryFn: async () => getIKSKPD(idPeriode),
   });
-  const listSKPDPeriode =
-    dataSKPDPeriode?.map((item) => ({
-      label: `${item.skpd_name}`,
+  const listIKSKPD =
+    dataIKSKPD?.map((item) => ({
+      label: `${item.name}`,
       value: item.id?.toString(),
     })) || [];
   //#endregion
@@ -77,7 +78,7 @@ const CapaianIKUTable = () => {
               btnclassName='bg-white'
               placeholder='Pilih SKPD...'
               value={selectedSKPD.toString()}
-              options={listSKPDPeriode as OptionItem[]}
+              options={listIKSKPD as OptionItem[]}
               onChange={(val) => setSelectedSKPD(val)}
               onClear={() => {
                 setSelectedSKPD('');
@@ -117,7 +118,13 @@ const CapaianIKUTable = () => {
         data={[]}
         columns={columns}
         renderHeader={tableHead}
-        pesanDataKosong={<PesanSKPDTabel selectedSKPD={selectedSKPD} tahun={tahunKe} butuhTahun />}
+        pesanDataKosong={
+          <PesanSKPDTabel
+            selectedSKPD={selectedSKPD}
+            tahun={tahunKe}
+            butuhTahun
+          />
+        }
       />
     </div>
   );

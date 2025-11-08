@@ -39,7 +39,11 @@ export interface PaguForm {
 /**
  * Ambil semua data pagu
  */
-export const getPagu = async (id: number): Promise<PaguMasterTree[]> => {
+export const getPaguRENSTRA = async (id: number): Promise<PaguMasterTree[]> => {
+  const response = await api.get<ApiResponse<PaguMasterTree[]>>(`/renstra/pagu/list/${id}`);
+  return response.data.data;
+};
+export const getPaguRKPD = async (id: number): Promise<PaguMasterTree[]> => {
   const response = await api.get<ApiResponse<PaguMasterTree[]>>(`/rkpd/pagu/list/${id}`);
   return response.data.data;
 };
@@ -50,9 +54,8 @@ type ChildKey = 'bidang' | 'program' | 'kegiatan' | 'subKegiatan';
  * Ambil semua flat data pagu
  */
 export const getPaguFlat = async (
-  id: number
+  treeData: PaguMaster[]
 ): Promise<(PaguMaster & { parentId?: number | string; depth: number; })[]> => {
-  const treeData = await getPagu(id);
   const flatData: (PaguMaster & { parentId?: number | string; depth: number; })[] = [];
 
   const childKeys: ChildKey[] = ['bidang', 'program', 'kegiatan', 'subKegiatan'];

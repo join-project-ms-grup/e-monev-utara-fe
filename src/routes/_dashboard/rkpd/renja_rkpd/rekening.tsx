@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import RekeningTable from '../../../components/tables/master/RekeningTable';
-import { SITE_NAME } from '../../../lib/config';
+import { SITE_NAME } from '../../../../lib/config';
+import RKPD_RekeningTable from '../../../../components/tables/rkpd/renja_rkpd/RKPD_RekeningTable';
 
-export const Route = createFileRoute('/_dashboard/master/rekening')({
+export const Route = createFileRoute('/_dashboard/rkpd/renja_rkpd/rekening')({
   head: () => ({
     meta: [
       {
@@ -17,9 +17,5 @@ export const Route = createFileRoute('/_dashboard/master/rekening')({
 });
 
 function RouteComponent() {
-  return (
-    <>
-      <RekeningTable />
-    </>
-  );
+  return <RKPD_RekeningTable />;
 }

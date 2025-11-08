@@ -12,7 +12,6 @@ import {
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
-import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
   flatIK,
   getIKD,

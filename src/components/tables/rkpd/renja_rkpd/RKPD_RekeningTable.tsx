@@ -1,24 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  getRekeningFlat,
-  updateMaster,
-  type Master,
-  type MasterUrusan,
-} from '../../../services/MasterService';
 import { type ColumnDef, type Table } from '@tanstack/react-table';
 import { MdAdd, MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
-import Tabel from '../Tabel';
-import Spinner from '../../inputs/Spinner';
-import InputButton from '../../inputs/InputButton';
-import InputSearchBox from '../../inputs/InputSearchBox';
 import { useEffect, useState, type JSX } from 'react';
-import InputText from '../../inputs/InputText';
-import { isDev } from '../../../lib/usercookie';
-import DialogModal from '../../inputs/DialogModal';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
-import type { ApiResponse } from '../../../lib/api';
-import FormRekening from '../../forms/FormRekening';
+import type { ApiResponse } from '../../../../lib/api';
+import { isDev } from '../../../../lib/usercookie';
+import {
+  type Master,
+  getRekeningFlat,
+  type MasterUrusan,
+  updateMaster,
+  getRekeningRKPD,
+} from '../../../../services/RekeningService';
+import FormRekening from '../../../forms/FormRekening';
+import DialogModal from '../../../inputs/DialogModal';
+import InputButton from '../../../inputs/InputButton';
+import InputSearchBox from '../../../inputs/InputSearchBox';
+import InputText from '../../../inputs/InputText';
+import Spinner from '../../../inputs/Spinner';
+import Tabel from '../../Tabel';
 
 const tableHead = () => {
   return (
@@ -30,7 +31,7 @@ const tableHead = () => {
   );
 };
 
-const RekeningTable = () => {
+const RKPD_RekeningTable = () => {
   const queryClient = useQueryClient();
   // Modal
   const [modalState, setModalState] = useState<'Add' | 'Edit' | 'Delete'>(
@@ -63,8 +64,11 @@ const RekeningTable = () => {
   // Data fetching
   const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['list_rekening'],
-    queryFn: getRekeningFlat,
+    queryKey: ['renja_rkpd_rekening'],
+    queryFn: async () => {
+      const renstra = await getRekeningRKPD();
+      return getRekeningFlat(renstra);
+    },
   });
 
   const tableBody = ({
@@ -179,7 +183,7 @@ const RekeningTable = () => {
       // return addMaster(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list_rekening'] });
+      queryClient.invalidateQueries({ queryKey: ['renja_rkpd_rekening'] });
       setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
@@ -200,7 +204,7 @@ const RekeningTable = () => {
       return updateMaster(id, payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list_rekening'] });
+      queryClient.invalidateQueries({ queryKey: ['renja_rkpd_rekening'] });
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
@@ -382,7 +386,6 @@ const RekeningTable = () => {
         renderBody={(table) =>
           tableBody({ table, selectedRekening: searchFields.rekening })
         }
-        
       />
       {modalState === 'Add' && (
         <DialogModal
@@ -456,4 +459,4 @@ const RekeningTable = () => {
   );
 };
 
-export default RekeningTable;
+export default RKPD_RekeningTable;

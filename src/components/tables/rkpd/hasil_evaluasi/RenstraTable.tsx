@@ -3,7 +3,7 @@ import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
-import { getSKPDPeriode } from '../../../../services/PeriodeService';
+
 import { getPeriodeIDFromCookie } from '../../../../lib/usercookie';
 import InputSearchBox, {
   type OptionItem,

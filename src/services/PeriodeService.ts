@@ -56,7 +56,11 @@ export const deletePeriode = async (id: number) => {
 /**
  * Ambil data SKPD by periode
  */
-export const getSKPDPeriode = async (id: number) => {
+export const getSKPDPerRENSTRA = async (id: number) => {
+    const response = await api.get<ApiResponse<SKPDPeriode[]>>(`/renstra/skpd-periode/list/${id}`);
+    return response.data.data;
+};
+export const getSKPDPerRKPD = async (id: number) => {
     const response = await api.get<ApiResponse<SKPDPeriode[]>>(`/rkpd/skpd-periode/list/${id}`);
     return response.data.data;
 };

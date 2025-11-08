@@ -3,7 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
 import { MdRefresh } from 'react-icons/md';
 import { getPeriodeAkhirFromCookie, getPeriodeIDFromCookie, getPeriodeMulaiFromCookie } from '../../../lib/usercookie';
-import { getSKPDPeriode } from '../../../services/PeriodeService';
+
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import Tabel from '../Tabel';

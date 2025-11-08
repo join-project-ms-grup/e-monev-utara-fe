@@ -7,7 +7,6 @@ import {
   MdKeyboardArrowDown,
   MdInsights,
   MdInventory,
-  MdAssignmentTurnedIn,
   MdFiberManualRecord,
   MdDragIndicator,
   MdSpeed,
@@ -18,9 +17,7 @@ import {
   MdAssessment,
   MdMonitor,
 } from 'react-icons/md';
-import { BiSolidBook } from 'react-icons/bi';
 import { getRoleId } from '../lib/usercookie';
-import InputButton from './inputs/InputButton';
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -52,22 +49,14 @@ const menuUtama: MenuItem[] = [
     label: 'MENU',
   },
   {
-    label: 'Master',
-    icon: <MdInventory />,
-    submenu: [
-      { label: 'Jadwal', to: '/master/jadwal' },
-      { label: 'Rekening', to: '/master/rekening' },
-      { label: 'Periode', to: '/master/periode' },
-      { label: 'SKPD', to: '/master/skpd', akses: 1 && 2 },
-    ],
-  },
-  {
     label: 'Konfigurasi',
     icon: <MdSettings />,
     akses: 1 && 2,
     submenu: [
       { label: 'Role', to: '/konfigurasi/role', akses: 1 && 2 },
       { label: 'User', to: '/konfigurasi/user' },
+      { label: 'Periode', to: '/konfigurasi/periode' },
+      { label: 'SKPD', to: '/konfigurasi/skpd', akses: 1 && 2 },
     ],
   },
 ];
@@ -80,17 +69,50 @@ const menuRKPD: MenuItem[] = [
     akses: 1,
   },
   {
+    label: 'RENSTRA - RPJMD',
+    icon: <MdEventNote />,
+    akses: 3,
+    submenu: [
+      { label: 'Rekening', to: '/rkpd/renstra_rpjmd/rekening' },
+      { label: 'Pagu Indikator', to: '/rkpd/renstra_rpjmd/pagu_indikator' },
+      { label: 'Realisasi', to: '/rkpd/renstra_rpjmd/realisasi' },
+    ],
+  },
+  {
+    label: 'IKU - IKD',
+    icon: <MdShowChart />,
+    akses: 3,
+    submenu: [
+      { label: 'Indikator Kinerja Utama', to: '/rkpd/iku/iku_list' },
+      { label: 'Tagging IKU', to: '/rkpd/iku/iku_tagging' },
+      { label: 'Capaian IKU', to: '/rkpd/iku/iku_capaian' },
+      { label: 'Indikator Kinerja Daerah', to: '/rkpd/ikd/ikd_list' },
+      { label: 'Tagging IKD', to: '/rkpd/ikd/ikd_tagging' },
+      { label: 'Capaian IKD', to: '/rkpd/ikd/ikd_capaian' },
+    ],
+  },
+  {
+    label: 'RENJA - RKPD',
+    icon: <MdEventNote />,
+    akses: 3,
+    submenu: [
+      { label: 'Rekening', to: '/rkpd/renja_rkpd/rekening' },
+      { label: 'Renja', to: '/rkpd/renja_rkpd/renja' },
+      { label: 'Realisasi', to: '/rkpd/renja_rkpd/realisasi' },
+    ],
+  },
+  {
     label: 'Renja',
     icon: <MdEventNote />,
     to: '/rkpd/renja',
     akses: 3,
   },
-  {
-    label: 'Pagu Indikatif',
-    icon: <MdDragIndicator />,
-    to: '/rkpd/pagu_indikatif',
-    akses: 3,
-  },
+  // {
+  //   label: 'Pagu Indikatif',
+  //   icon: <MdDragIndicator />,
+  //   to: '/rkpd/pagu_indikatif',
+  //   akses: 3,
+  // },
   { label: 'Indikator', icon: <MdSpeed />, to: '/rkpd/indikator', akses: 3 },
   {
     type: 'separator',
@@ -109,26 +131,26 @@ const menuRKPD: MenuItem[] = [
   //   to: '/rkpd/realisasi',
   //   akses: 2,
   // },
-  {
-    label: 'Indikator Kinerja Utama',
-    icon: <MdShowChart />,
-    submenu: [
-      { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
-      { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
-      { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
-    ],
-    akses: 3,
-  },
-  {
-    label: 'Indikator Kinerja Daerah',
-    icon: <MdLocationCity />,
-    submenu: [
-      { label: 'Tagging Indikator', to: '/rkpd/ikd/ikd_tagging' },
-      { label: 'Indikator IKD', to: '/rkpd/ikd/ikd_list' },
-      { label: 'Capaian Indikator IKD', to: '/rkpd/ikd/ikd_capaian' },
-    ],
-    akses: 3,
-  },
+  // {
+  //   label: 'Indikator Kinerja Utama',
+  //   icon: <MdShowChart />,
+  //   submenu: [
+  //     { label: 'Tagging Indikator', to: '/rkpd/iku/iku_tagging' },
+  //     { label: 'Indikator IKU', to: '/rkpd/iku/iku_list' },
+  //     { label: 'Capaian Indikator IKU', to: '/rkpd/iku/iku_capaian' },
+  //   ],
+  //   akses: 3,
+  // },
+  // {
+  //   label: 'Indikator Kinerja Daerah',
+  //   icon: <MdLocationCity />,
+  //   submenu: [
+  //     { label: 'Tagging Indikator', to: '/rkpd/ikd/ikd_tagging' },
+  //     { label: 'Indikator IKD', to: '/rkpd/ikd/ikd_list' },
+  //     { label: 'Capaian Indikator IKD', to: '/rkpd/ikd/ikd_capaian' },
+  //   ],
+  //   akses: 3,
+  // },
   {
     label: 'Hasil Evaluasi',
     icon: <MdAssignment />,
@@ -136,6 +158,7 @@ const menuRKPD: MenuItem[] = [
       { label: 'RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
       { label: 'Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
       { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
+      { label: 'RENJA', to: '/rkpd/hasil_evaluasi/renja' },
     ],
     akses: 3,
   },

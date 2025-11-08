@@ -22,7 +22,7 @@ import {
   type IndikatorMaster,
   type IndikatorTarget,
 } from '../../../services/IndikatorService';
-import { getSKPDPeriode } from '../../../services/PeriodeService';
+
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import InputText from '../../inputs/InputText';
 import PesanSKPDTabel from '../../PesanSKPDTabel';

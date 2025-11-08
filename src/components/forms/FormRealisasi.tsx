@@ -95,7 +95,7 @@ const FormRealisasi: React.FC<FormProps> = ({
                 </span>
               </div>
             </div>
-            <InputText Iconlabel='Rp' id='triRea1' />
+            <InputText Iconlabel='Rp.' id='triRea1' />
             <div className='w-full bg-gray-300 rounded-full h-4 overflow-hidden'>
               <div
                 className='bg-[var(--color-2)] h-4 rounded-full flex items-center px-2'
@@ -124,7 +124,7 @@ const FormRealisasi: React.FC<FormProps> = ({
                 </span>
               </div>
             </div>
-            <InputText Iconlabel='Rp' id='triRea2' />
+            <InputText Iconlabel='Rp.' id='triRea2' />
             <div className='w-full bg-gray-300 rounded-full h-4 overflow-hidden'>
               <div
                 className='bg-[var(--color-2)] h-4 rounded-full flex items-center px-2'
@@ -153,7 +153,7 @@ const FormRealisasi: React.FC<FormProps> = ({
                 </span>
               </div>
             </div>
-            <InputText Iconlabel='Rp' id='triRea3' />
+            <InputText Iconlabel='Rp.' id='triRea3' />
             <div className='w-full bg-gray-300 rounded-full h-4 overflow-hidden'>
               <div
                 className='bg-[var(--color-2)] h-4 rounded-full flex items-center px-2'
@@ -182,7 +182,7 @@ const FormRealisasi: React.FC<FormProps> = ({
                 </span>
               </div>
             </div>
-            <InputText Iconlabel='Rp' id='triRea4' />
+            <InputText Iconlabel='Rp.' id='triRea4' />
             <div className='w-full bg-gray-300 rounded-full h-4 overflow-hidden'>
               <div
                 className='bg-[var(--color-2)] h-4 rounded-full flex items-center px-2'
@@ -211,7 +211,7 @@ const FormRealisasi: React.FC<FormProps> = ({
                 </span>
               </div>
             </div>
-            <InputText Iconlabel='Rp' id='tahunanRea' />
+            <InputText Iconlabel='Rp.' id='tahunanRea' />
             <div className='w-full bg-gray-300 rounded-full h-4 overflow-hidden'>
               <div
                 className='bg-green-600 h-4 rounded-full flex items-center px-2'
@@ -240,7 +240,7 @@ const FormRealisasi: React.FC<FormProps> = ({
                 </span>
               </div>
             </div>
-            <InputText Iconlabel='Rp' id='sdRea' />
+            <InputText Iconlabel='Rp.' id='sdRea' />
             <div className='w-full bg-gray-300 rounded-full h-4 overflow-hidden'>
               <div
                 className='bg-blue-400 h-4 rounded-full flex items-center px-2'

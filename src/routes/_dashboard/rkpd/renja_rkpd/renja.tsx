@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { SITE_NAME } from '../../../lib/config';
-import RenjaTable from '../../../components/tables/rkpd/hasil_evaluasi/RenjaTable';
+import { SITE_NAME } from '../../../../lib/config';
+import RKPD_RENJATable from '../../../../components/tables/rkpd/renja_rkpd/RKPD_RENJATable';
 
-export const Route = createFileRoute('/_dashboard/rkpd/renja')({
+export const Route = createFileRoute('/_dashboard/rkpd/renja_rkpd/renja')({
   head: () => ({
     meta: [
       {
@@ -17,5 +17,5 @@ export const Route = createFileRoute('/_dashboard/rkpd/renja')({
 });
 
 function RouteComponent() {
-  return <RenjaTable />;
+  return <RKPD_RENJATable />;
 }

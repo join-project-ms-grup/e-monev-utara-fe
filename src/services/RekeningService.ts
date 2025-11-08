@@ -25,11 +25,40 @@ export interface MasterSubKegiatan extends Master {
 }
 export type MasterTree = MasterUrusan & MasterBidang & MasterProgram & MasterKegiatan & MasterSubKegiatan;
 
-/**
- * Ambil semua data
- */
-export const getRekening = async (): Promise<MasterUrusan[]> => {
+
+export const getRekeningRKPD = async (): Promise<MasterUrusan[]> => {
   const response = await api.get<ApiResponse<MasterUrusan[]>>("/rkpd/master/list/all");
+
+  const rawData = response.data.data;
+  const cleanData = rawData.map((urusan) => ({
+    rekening: 'urusan',
+    ...urusan,
+    bidang: urusan.bidang?.map((bid) => ({
+      rekening: 'bidang',
+      parent: urusan.id,
+      ...bid,
+      program: bid.program?.map((prog) => ({
+        rekening: 'program',
+        parent: bid.id,
+        ...prog,
+        kegiatan: prog.kegiatan?.map((keg) => ({
+          rekening: 'kegiatan',
+          parent: prog.id,
+          ...keg,
+          subKegiatan: keg.subKegiatan?.map((subkeg) => ({
+            rekening: 'subKegiatan',
+            parent: keg.id,
+            ...subkeg,
+          })),
+        })),
+      })),
+    })),
+  }));
+  return cleanData;
+};
+
+export const getRekeningRENSTRA = async (): Promise<MasterUrusan[]> => {
+  const response = await api.get<ApiResponse<MasterUrusan[]>>("/renstra/master/list/all");
 
   const rawData = response.data.data;
   const cleanData = rawData.map((urusan) => ({
@@ -61,8 +90,8 @@ export const getRekening = async (): Promise<MasterUrusan[]> => {
 
 type ChildKey = 'bidang' | 'program' | 'kegiatan' | 'subKegiatan';
 export const getRekeningFlat = async (
-): Promise<(Master & { depth: number; })[]> => {
-  const treeData = await getRekening();
+  treeData: Master[]
+): Promise<(Master & { depth: number })[]> => {
   const flatData: (Master & { depth: number; })[] = [];
 
   const childKeys: ChildKey[] = ['bidang', 'program', 'kegiatan', 'subKegiatan'];
@@ -90,7 +119,6 @@ export const getRekeningFlat = async (
     });
   }
   treeData.forEach((item) => flattenNode(item));
-  console.log('MASTER', flatData)
   return flatData;
 };
 

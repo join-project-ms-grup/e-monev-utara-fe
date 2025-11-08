@@ -1,42 +1,45 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import { MdAdd, MdRefresh } from 'react-icons/md';
-import InputButton from '../../inputs/InputButton';
-import Tabel from '../Tabel';
-import {
-  addPagu,
-  getPaguFlat,
-  updatePagu,
-  type PaguForm,
-  type PaguMaster,
-} from '../../../services/PaguService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState, type ReactNode } from 'react';
+import type { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
   getPeriodeMulaiFromCookie,
   isDev,
-} from '../../../lib/usercookie';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import Spinner from '../../inputs/Spinner';
-import { useEffect, useState, type ReactNode } from 'react';
-import DialogModal from '../../inputs/DialogModal';
-import FormPagu from '../../forms/FormPagu';
-import type { AxiosError } from 'axios';
-import toast from 'react-hot-toast';
-import type { ApiResponse } from '../../../lib/api';
-import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
+} from '../../../../lib/usercookie';
+import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
+import {
+  addPagu,
+  getPaguFlat,
+  getPaguRKPD,
+  updatePagu,
+  type PaguForm,
+  type PaguMaster,
+} from '../../../../services/PaguService';
+import type { ApiResponse } from '../../../../lib/api';
+import { formatUang } from '../../../../lib/helper';
+import FormPagu from '../../../forms/FormPagu';
+import DialogModal from '../../../inputs/DialogModal';
+import InputButton from '../../../inputs/InputButton';
+import InputSearchBox, {
+  type OptionItem,
+} from '../../../inputs/InputSearchBox';
+import InputText from '../../../inputs/InputText';
+import Spinner from '../../../inputs/Spinner';
+import PesanSKPDTabel from '../../../PesanSKPDTabel';
+import Tabel from '../../Tabel';
 
-import InputText from '../../inputs/InputText';
-import PesanSKPDTabel from '../../PesanSKPDTabel';
-import { formatUang } from '../../../lib/helper';
-
-const PaguIndikatifTable = () => {
+const RKPD_PaguTable = () => {
   const queryClient = useQueryClient();
   const idPeriodeCookie = Number(getPeriodeIDFromCookie());
   //#region SKPD
   const [selectedSKPD, setSelectedSKPD] = useState('');
   const { data: dataSKPDPeriode } = useQuery({
-    queryKey: ['list_skpd_periode'],
-    queryFn: async () => getSKPDPeriode(idPeriodeCookie),
+    queryKey: ['list_rkpd_skpd_periode'],
+    queryFn: async () => getSKPDPerRKPD(idPeriodeCookie),
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
@@ -47,8 +50,11 @@ const PaguIndikatifTable = () => {
 
   //#region Modal, FormData & Tabel Data
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_pagu', selectedSKPD],
-    queryFn: () => getPaguFlat(Number(selectedSKPD)),
+    queryKey: ['rkpd_tabel_pagu', selectedSKPD],
+    queryFn: async () => {
+      const pagu = await getPaguRKPD(Number(selectedSKPD));
+      return getPaguFlat(pagu);
+    },
     enabled: !!selectedSKPD,
   });
   // Modal
@@ -75,7 +81,7 @@ const PaguIndikatifTable = () => {
       }, 200);
       return () => clearTimeout(timeout);
     } else {
-      console.log('PaguIndikatifTable.tsx', formData);
+      console.log('RKPD_PaguTable.tsx', formData);
     }
   }, [openModal]);
   //#endregion
@@ -382,4 +388,4 @@ const PaguIndikatifTable = () => {
   );
 };
 
-export default PaguIndikatifTable;
+export default RKPD_PaguTable;
