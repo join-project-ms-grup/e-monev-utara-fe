@@ -1,17 +1,20 @@
-import React, {  } from 'react';
+import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { FlatRenstraRow } from '../../../../services/RenstraService';
 import { MdClose, MdPrint } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
-import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../../../lib/usercookie';
+import {
+  getPeriodeAkhirFromCookie,
+  getPeriodeMulaiFromCookie,
+} from '../../../../lib/usercookie';
+import type { FlatRPJMD } from '../../../../services/RPJMDService';
 
 interface MainTableProps {
-  data: FlatRenstraRow[];
+  data: FlatRPJMD[];
 }
 
-const RPJMDPreviewTable = ({ data}: MainTableProps) => {
-  console.log('data renstra', data);
+const RPJMDPreviewTable = ({ data }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -115,9 +118,83 @@ const RPJMDPreviewTable = ({ data}: MainTableProps) => {
     );
   };
 
-  const columns: ColumnDef<any>[] = Array.from({ length: 39 }, (_, i) => ({
-    id: (i + 1).toString(),
-  }));
+  // const columns: ColumnDef<any>[] = Array.from({ length: 39 }, (_, i) => ({
+  //   id: (i + 1).toString(),
+  // }));
+
+  const columns: ColumnDef<FlatRPJMD>[] = [
+    { header: 'No', cell: ({ row }) => row.index + 1 },
+    { header: 'Sasaran', accessorFn: () => '' }, // kosong
+    { header: 'Program Prioritas', accessorFn: (row) => row.name || '' },
+    {
+      header: 'Indikator Kinerja',
+      accessorFn: (row) => row.indikator_o_name || '',
+    },
+    {
+      header: 'Data Capaian Awal (K)',
+      accessorFn: (row) => row.target_io_capaian ?? 0,
+    },
+    {
+      header: 'Data Capaian Awal (Rp)',
+      accessorFn: (row) => row.pagu_realisasi ?? 0,
+    },
+  ];
+
+  // Target, Capaian, Rasio per tahun ke 1–5
+  for (let tahunKe = 1; tahunKe <= 5; tahunKe++) {
+    columns.push(
+      {
+        header: `Target K Tahun ${tahunKe}`,
+        accessorFn: (row) =>
+          row.target_io_tahun_ke === tahunKe ? (row.target_io_target ?? 0) : '',
+      },
+      {
+        header: `Target Rp Tahun ${tahunKe}`,
+        accessorFn: (row) =>
+          row.pagu_tahun_ke === tahunKe ? (row.pagu_pagu ?? 0) : '',
+      },
+    );
+  }
+  for (let tahunKe = 1; tahunKe <= 5; tahunKe++) {
+    columns.push(
+      {
+        header: `Capaian K Tahun ${tahunKe}`,
+        accessorFn: (row) =>
+          row.target_io_tahun_ke === tahunKe
+            ? (row.target_io_capaian ?? 0)
+            : '',
+      },
+      {
+        header: `Capaian Rp Tahun ${tahunKe}`,
+        accessorFn: (row) =>
+          row.pagu_tahun_ke === tahunKe ? (row.pagu_realisasi ?? 0) : '',
+      },
+    );
+  }
+  for (let tahunKe = 1; tahunKe <= 5; tahunKe++) {
+    columns.push(
+      {
+        header: `Rasio K Tahun ${tahunKe}`,
+        accessorFn: (row) =>
+          row.target_io_tahun_ke === tahunKe ? (row.target_io_persen ?? 0) : '',
+      },
+      {
+        header: `Rasio Rp Tahun ${tahunKe}`,
+        accessorFn: (row) =>
+          row.pagu_tahun_ke === tahunKe ? (row.pagu_persen ?? 0) : '',
+      },
+    );
+  }
+
+  // Kolom terakhir
+  columns.push({
+    header: 'Capaian Pada Akhir Tahun Perencanaan',
+    accessorFn: () => '',
+  });
+  columns.push({
+    header: 'Perangkat Daerah Penanggung Jawab',
+    accessorFn: () => '',
+  });
 
   return (
     <div className='flex flex-col p-4'>
@@ -126,7 +203,10 @@ const RPJMDPreviewTable = ({ data}: MainTableProps) => {
           <div className='flex flex-col items-center justify-center text-xl'>
             <p>Evaluasi Terhadap Hasil RPJMD</p>
             <p>Kabupaten Bengkulu Utara</p>
-            <p>Periode Pelaksanaan: {getPeriodeMulaiFromCookie()} - {getPeriodeAkhirFromCookie()}</p>
+            <p>
+              Periode Pelaksanaan: {getPeriodeMulaiFromCookie()} -{' '}
+              {getPeriodeAkhirFromCookie()}
+            </p>
           </div>
           <br />
           <div className='text-xl'>
@@ -150,12 +230,8 @@ const RPJMDPreviewTable = ({ data}: MainTableProps) => {
                   ......................., tanggal ...................
                 </span>
                 <br />
-                <span>
-                  KEPALA SKPD
-                </span>
-                <span>
-                  KABUPATEN/KOTA....................................{' '}
-                </span>
+                <span>KEPALA SKPD</span>
+                <span>KABUPATEN/KOTA.................................... </span>
                 <br />
                 <br />
                 <br />

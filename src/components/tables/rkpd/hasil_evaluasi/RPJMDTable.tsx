@@ -228,7 +228,7 @@ const RPJMDTable = () => {
               </div>
             </div>
             <div className='p-2'>
-              <RPJMDPreviewTable data={[]} />
+              <RPJMDPreviewTable data={data || []} />
             </div>
           </div>,
           document.body,
