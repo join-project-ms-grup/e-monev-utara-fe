@@ -124,10 +124,14 @@ const menuDAK: MenuItem[] = [
     akses: [2, 4],
   },
   {
-    label: 'Rekening DAK',
-    icon: <MdAssessment />,
-    to: '/dak/rekening',
+    label: 'Master DAK',
+    icon: <MdEventNote />,
     akses: [2, 4],
+    submenu: [
+      { label: 'Rekening', to: '/dak/rekening' },
+      { label: 'OPD', to: '/dak/opd' },
+      { label: 'Tahun', to: '/dak/tahun' },
+    ],
   },
   {
     label: 'Identifikasi DAK',

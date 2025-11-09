@@ -36,28 +36,28 @@ const tableHead = () => {
 
 const DashRKPDTable = () => {
   //#region SKPD dan Tahun ke
-  const [tahunKe, setTahunKe] = useState('');
+  // const [tahunKe, setTahunKe] = useState('');
   const {
     data: dataSKPD,
-    isFetching,
-    refetch,
+    // isFetching,
+    // refetch,
   } = useQuery({
     queryKey: ['list_skpd'],
     queryFn: async () => getSKPD(),
   });
   //#endregion
   //#region List data periode
-  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
-  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
-  const listTahunKe = Array.from(
-    { length: tahunAkhir - tahunMulai + 1 },
-    (_, i) => ({
-      label: `${tahunMulai + i}`,
-      value: `${i + 1}`,
-    }),
-  );
+  // const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  // const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  // const listTahunKe = Array.from(
+  //   { length: tahunAkhir - tahunMulai + 1 },
+  //   (_, i) => ({
+  //     label: `${tahunMulai + i}`,
+  //     value: `${i + 1}`,
+  //   }),
+  // );
   //#endregion
-  const [triwulan, setTriwulan] = useState('');
+  // const [triwulan, setTriwulan] = useState('');
 
   const columns: ColumnDef<any>[] = [
     {
@@ -126,7 +126,7 @@ const DashRKPDTable = () => {
     <>
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
-          <div>
+          {/* <div>
             <label htmlFor='tahun_ke'>Tahun</label>
             <InputSearchBox
               id='tahun_ke'
@@ -141,8 +141,8 @@ const DashRKPDTable = () => {
                 setTriwulan('');
               }}
             />
-          </div>
-          <div>
+          </div> */}
+          {/* <div>
             <label htmlFor='triwulan'>s.d Triwulan</label>
             <InputSearchBox
               id='triwulan'
@@ -160,9 +160,9 @@ const DashRKPDTable = () => {
               onClear={() => setTriwulan('')}
               disabled={!tahunKe}
             />
-          </div>
+          </div> */}
         </div>
-        <div className='inline-flex gap-2'>
+        {/* <div className='inline-flex gap-2'>
           <InputButton
             tooltip='Print'
             className='btn btn-theme w-9 h-9'
@@ -181,7 +181,7 @@ const DashRKPDTable = () => {
           >
             {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
-        </div>
+        </div> */}
       </div>
       <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead} />
       <div>

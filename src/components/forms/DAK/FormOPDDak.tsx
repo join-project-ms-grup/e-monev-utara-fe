@@ -1,35 +1,34 @@
 import React from 'react';
-import InputButton from '../inputs/InputButton';
-import type { SKPDForm } from '../../services/SKPDService';
+import type { OPDDAKForm } from '../../../services/DAK/DAKOPDService';
 import { useForm } from '@tanstack/react-form';
+import InputText from '../../inputs/InputText';
+import ErrorField from '../ErrorField';
+import InputToggle from '../../inputs/InputToggle';
 import {
   mapErrors,
   mapToInput,
-  skpdSchema,
-  skpdSchemaSubmit,
-} from './schemas/SchemaSKPD';
-import InputText from '../inputs/InputText';
-import ErrorField from './ErrorField';
-import InputToggle from '../inputs/InputToggle';
+  opddakSchema,
+  opddakSchemaSubmit,
+} from '../schemas/DAK/SchemaOPDDak';
+import InputButton from '../../inputs/InputButton';
 
 interface BaseFormProps {
   children?: React.ReactElement;
-  defaultValues: SKPDForm;
+  defaultValues: OPDDAKForm;
+  onSubmit: (data: OPDDAKForm) => void;
 }
 
 interface FormAddProps extends BaseFormProps {
   type: 'Add';
-  onSubmit: (data: SKPDForm) => void;
 }
 
 interface FormEditProps extends BaseFormProps {
   type: 'Edit';
-  onSubmit: (data: { id: number; payload: SKPDForm }) => void;
 }
 
 type FormProps = FormAddProps | FormEditProps;
 
-const FormSKPD: React.FC<FormProps> = ({
+const FormOPDDak: React.FC<FormProps> = ({
   type,
   children,
   onSubmit,
@@ -46,19 +45,20 @@ const FormSKPD: React.FC<FormProps> = ({
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      if (type === 'Add') {
-        onSubmit(value);
-      } else {
-        if (value.id == null) {
-          return;
-        }
-        const { id, ...payload } = value;
-        onSubmit({ id, payload });
-      }
+      onSubmit(value);
+      //   if (type === 'Add') {
+      //     onSubmit(value);
+      //   } else {
+      //     if (value.id == null) {
+      //       return;
+      //     }
+      //     const { id, ...payload } = value;
+      //     onSubmit({ id, payload });
+      //   }
     },
     validators: {
-      onChange: ({ value }) => validateWith(skpdSchema, value),
-      onSubmit: ({ value }) => validateWith(skpdSchemaSubmit, value),
+      onChange: ({ value }) => validateWith(opddakSchema, value),
+      onSubmit: ({ value }) => validateWith(opddakSchemaSubmit, value),
     },
   });
 
@@ -83,7 +83,7 @@ const FormSKPD: React.FC<FormProps> = ({
                     inputMode='numeric'
                     type='text'
                     maxLength={4}
-                    placeholder='Kode skpd...'
+                    placeholder='Kode opd...'
                     id='kode'
                     value={field.state.value!}
                     onChange={(e) => field.handleChange(e.target.value)}
@@ -119,15 +119,15 @@ const FormSKPD: React.FC<FormProps> = ({
             </form.Field>
           )}
           {/* Field Nama */}
-          <form.Field name='name'>
+          <form.Field name='fullname'>
             {(field) => (
               <div className='flex-1'>
-                <label htmlFor='name'>Nama</label>
+                <label htmlFor='fullname'>Nama</label>
                 <InputText
                   // Icon={MdCalendarMonth}
                   type='text'
-                  placeholder='Nama skpd...'
-                  id='name'
+                  placeholder='Nama opd...'
+                  id='fullname'
                   value={field.state.value!}
                   onChange={(e) => field.handleChange(e.target.value)}
                   invalid={!field.state.meta.isValid}
@@ -144,7 +144,7 @@ const FormSKPD: React.FC<FormProps> = ({
                 <InputText
                   // Icon={MdCalendarMonth}
                   type='text'
-                  placeholder='Singkatan skpd...'
+                  placeholder='Singkatan opd...'
                   id='shortname'
                   value={field.state.value!}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -168,4 +168,4 @@ const FormSKPD: React.FC<FormProps> = ({
   );
 };
 
-export default FormSKPD;
+export default FormOPDDak;
