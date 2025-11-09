@@ -1,25 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { type ColumnDef, type Table } from '@tanstack/react-table';
-import { MdAdd, MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
+import { MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
 import { useEffect, useState, type JSX } from 'react';
-import type { AxiosError } from 'axios';
-import toast from 'react-hot-toast';
-import type { ApiResponse } from '../../../../lib/api';
-import { isDev } from '../../../../lib/usercookie';
 import {
-  type Master,
-  getRekeningFlat,
-  type MasterUrusan,
-  updateMaster,
-  getRekeningRENSTRA,
-} from '../../../../services/RekeningService';
-import FormRekening from '../../../forms/FormRekening';
-import DialogModal from '../../../inputs/DialogModal';
-import InputButton from '../../../inputs/InputButton';
-import InputSearchBox from '../../../inputs/InputSearchBox';
-import InputText from '../../../inputs/InputText';
-import Spinner from '../../../inputs/Spinner';
-import Tabel from '../../Tabel';
+  getRekeningDAK,
+  getRekeningDAKFlat,
+  type DAKMasterUrusan,
+} from '../../../services/DAK/DAKRekeningService';
+import InputText from '../../inputs/InputText';
+import InputSearchBox from '../../inputs/InputSearchBox';
+import InputButton from '../../inputs/InputButton';
+import Spinner from '../../inputs/Spinner';
+import Tabel from '../Tabel';
 
 const tableHead = () => {
   return (
@@ -31,45 +23,15 @@ const tableHead = () => {
   );
 };
 
-const RENSTRA_RekeningTable = () => {
-  const queryClient = useQueryClient();
-  // Modal
-  const [modalState, setModalState] = useState<'Add' | 'Edit' | 'Delete'>(
-    'Add',
-  );
-  const [openModal, setOpenModal] = useState(false);
-
-  // Form Data
-  const initialFormData: Master = {
-    id: Number(''),
-    kode: '',
-    name: '',
-    parent: '',
-    rekening: '',
-  };
-
-  const [formData, setFormData] = useState<Master>(initialFormData);
-  // Clear form
-  useEffect(() => {
-    if (!openModal) {
-      const timeout = setTimeout(() => {
-        setFormData(initialFormData);
-      }, 200);
-      return () => clearTimeout(timeout);
-    } else {
-      console.log(formData);
-    }
-  }, [openModal]);
-
+const RekeningDakTable = () => {
   // Data fetching
-  const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['renstra_rpjmd_rekening'],
+    queryKey: ['dak_rekening'],
     queryFn: async () => {
-      const renstra = await getRekeningRENSTRA();
-      const renstraflat = await getRekeningFlat(renstra)
-      console.log(renstraflat)
-      return renstraflat;
+      const dak = await getRekeningDAK();
+      const dakflat = await getRekeningDAKFlat(dak);
+      console.log(dakflat);
+      return dakflat;
     },
   });
 
@@ -77,7 +39,7 @@ const RENSTRA_RekeningTable = () => {
     table,
     selectedRekening,
   }: {
-    table: Table<MasterUrusan & { depth: number }>;
+    table: Table<DAKMasterUrusan & { depth: number }>;
     selectedRekening: string;
   }) => {
     if (!data)
@@ -121,7 +83,7 @@ const RENSTRA_RekeningTable = () => {
     );
 
     // Mapping kodeFull ke item untuk header parent
-    const parentMap: Record<string, MasterUrusan> = {};
+    const parentMap: Record<string, DAKMasterUrusan> = {};
     data.forEach((item) => {
       const key = item.kodeFull?.join('.') || '-';
       parentMap[key] = item;
@@ -177,49 +139,6 @@ const RENSTRA_RekeningTable = () => {
     return <>{rows}</>;
   };
 
-  // Add
-  const addMutation = useMutation({
-    mutationFn: async (payload: Master) => {
-      setLoadingMutation(true);
-      console.log(payload);
-      // return addMaster(payload);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['renstra_rpjmd_rekening'] });
-      setFormData(initialFormData);
-      setOpenModal(false);
-      toast.success('Data berhasil ditambahkan');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
-      }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
-  });
-  // Update
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, payload }: { id: number; payload: Master }) => {
-      setLoadingMutation(true);
-      return updateMaster(id, payload);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['renstra_rpjmd_rekening'] });
-      setOpenModal(false);
-      toast.success('Data berhasil diperbarui');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
-      }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
-  });
-
   const [searchFields, setSearchFields] = useState({
     name: '',
     kode: '',
@@ -236,7 +155,7 @@ const RENSTRA_RekeningTable = () => {
     setFilters(newFilters);
   }, [searchFields]);
 
-  const columns: ColumnDef<MasterUrusan & { depth: number }>[] = [
+  const columns: ColumnDef<DAKMasterUrusan & { depth: number }>[] = [
     {
       header: 'No',
       cell: ({ row }) => `${row.index + 1}`,
@@ -260,9 +179,6 @@ const RENSTRA_RekeningTable = () => {
       columns: ['Urusan', 'Bidang', 'Program', 'Kegiatan', 'Sub Kegiatan'].map(
         (label, index) => ({
           id: `kode_${label}`,
-          // meta: {
-          //   tdClassNames: 'w-[30px]',
-          // },
           accessorFn: (row) => row.kodeFull?.[index],
           cell: ({ getValue }) => {
             const value = getValue();
@@ -270,7 +186,7 @@ const RENSTRA_RekeningTable = () => {
           },
         }),
       ),
-      filterFn: (row, columnId, filterValue) => {
+      filterFn: (row, filterValue) => {
         const kodeArray = row.original.kodeFull || [];
         const joined = kodeArray.join('.');
         const search = String(filterValue).trim();
@@ -281,24 +197,6 @@ const RENSTRA_RekeningTable = () => {
       accessorKey: 'name',
       header: 'Nama',
     },
-    // {
-    //   header: 'Aksi',
-    //   cell: ({ row }) => (
-    //     <>
-    //       <AksiButton
-    //         Icon={MdEdit}
-    //         onClick={() => {
-    //           setModalState('Edit');
-    //           setFormData(row.original);
-    //           setOpenModal(true);
-    //         }}
-    //       />
-    //     </>
-    //   ),
-    //   meta: {
-    //     tdClassNames: 'text-center',
-    //   },
-    // },
   ];
 
   return (
@@ -358,18 +256,6 @@ const RENSTRA_RekeningTable = () => {
           </div>
         </div>
         <div className='flex justify-end items-end gap-2'>
-          {isDev() && (
-            <InputButton
-              tooltip='Tambah data'
-              className='btn btn-theme w-9 h-9'
-              onClick={() => {
-                setModalState('Add');
-                setOpenModal(true);
-              }}
-            >
-              <MdAdd />
-            </InputButton>
-          )}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -389,76 +275,8 @@ const RENSTRA_RekeningTable = () => {
           tableBody({ table, selectedRekening: searchFields.rekening })
         }
       />
-      {modalState === 'Add' && (
-        <DialogModal
-          title='Tambah data Rekening'
-          isOpen={openModal}
-          onClose={() => {
-            setFormData(initialFormData);
-            setOpenModal(false);
-          }}
-        >
-          <FormRekening
-            type='Add'
-            defaultValues={formData}
-            onSubmit={(data) => {
-              console.log('Data dari form modal:', data);
-              // addMutation.mutate({
-              //   kode: data.kode,
-              //   name: data.name,
-              //   type: data.rekening,
-              //   parent: data.parent
-              // });
-            }}
-          >
-            <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-                isLoading={loadingMutation}
-              >
-                Simpan
-              </InputButton>
-            </div>
-          </FormRekening>
-        </DialogModal>
-      )}
-      {modalState === 'Edit' && (
-        <DialogModal
-          title='Ubah data Rekening'
-          isOpen={openModal}
-          onClose={() => setOpenModal(false)}
-        >
-          <FormRekening
-            type='Edit'
-            defaultValues={formData as any}
-            onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', payload);
-              updateMutation.mutate({
-                id,
-                payload: {
-                  kode: payload.kode,
-                  name: payload.name,
-                  type: payload.rekening,
-                  parent: payload.parent! ?? null,
-                },
-              });
-            }}
-          >
-            <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-                isLoading={loadingMutation}
-              >
-                Simpan
-              </InputButton>
-            </div>
-          </FormRekening>
-        </DialogModal>
-      )}
     </div>
   );
 };
 
-export default RENSTRA_RekeningTable;
+export default RekeningDakTable;

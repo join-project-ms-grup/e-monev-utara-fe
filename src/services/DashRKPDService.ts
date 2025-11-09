@@ -11,6 +11,6 @@ export interface DashboardInfo {
  * Ambil semua info dashboard
  */
 export const getDashInfo = async (): Promise<DashboardInfo> => {
-    const response = await api.get<ApiResponse<DashboardInfo>>("info/dashboard-card-data");
+    const response = await api.get<ApiResponse<DashboardInfo>>("renstra/info/dashboard-card-data");
     return response.data.data;
 };

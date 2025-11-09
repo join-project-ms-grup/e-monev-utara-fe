@@ -124,6 +124,12 @@ const menuDAK: MenuItem[] = [
     akses: [2, 4],
   },
   {
+    label: 'Rekening DAK',
+    icon: <MdAssessment />,
+    to: '/dak/rekening',
+    akses: [2, 4],
+  },
+  {
     label: 'Identifikasi DAK',
     icon: <MdAssessment />,
     to: '/dak/identifikasi',
