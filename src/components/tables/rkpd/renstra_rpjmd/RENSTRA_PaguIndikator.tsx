@@ -70,7 +70,11 @@ const RENSTRA_PaguIndikator = () => {
   const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
     queryKey: ['list_renstra_skpd_periode'],
-    queryFn: async () => getSKPDPerRENSTRA(idPeriodeCookie),
+    queryFn: async () => {
+      const data = await getSKPDPerRENSTRA(idPeriodeCookie);
+      console.log(data)
+      return data;
+    },
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({

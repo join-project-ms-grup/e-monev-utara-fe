@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import Tabel from '../../Tabel';
 import toast from 'react-hot-toast';
-import { MdRefresh, MdTag } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -18,13 +18,12 @@ import {
 } from '../../../../lib/usercookie';
 import {
   flatIK,
-  getIKD,
+  getIK,
   getIKSKPD,
   toggleTagIKU,
   type FlatIK,
 } from '../../../../services/IKUIKDService';
 import Spinner from '../../../inputs/Spinner';
-import AksiButton from '../../../inputs/AksiButton';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../../lib/api';
 import InputToggle from '../../../inputs/InputToggle';
@@ -52,7 +51,7 @@ const TaggingIndikatorIKDTable = () => {
       idPeriode,
     ],
     queryFn: async () => {
-      const rawData = await getIKD({
+      const rawData = await getIK({
         skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
         periodeId: idPeriode,
       });

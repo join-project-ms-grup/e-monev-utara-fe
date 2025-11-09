@@ -35,6 +35,10 @@ export interface ListIK {
 /**
  * Menambahkan data IKU
  */
+export const getIK = async ({ skpd_id, periodeId }: { skpd_id: number | string, periodeId: number }): Promise<any> => {
+    const response = await api.post<ApiResponse<any>>("/ik/target-realisasi/list-target", { skpd_id, periodeId });
+    return response.data.data;
+};
 export const getIKU = async ({ skpd_id, periodeId }: { skpd_id: number | string, periodeId: number }): Promise<any> => {
     const response = await api.post<ApiResponse<any>>("/ik/target-realisasi/list-target-iku", { skpd_id, periodeId });
     return response.data.data;
