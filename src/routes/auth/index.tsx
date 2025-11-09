@@ -139,52 +139,40 @@ function RouteComponent() {
           </div>
         </div>
       </div>
-      <div className='fixed top-1/12 left-1/12 rounded-l-full bg-gradient-to-l from-red-600/0 to-red-600 h-[100px] w-[30%]'>
-        <div className='absolute -top-2 -left-7'>
-          <img src='/bengkulu-utara-logo.webp' width={80} alt='' />
-        </div>
-        <div className='mt-1 absolute left-20 top-1/6 text-white whitespace-nowrap'>
-          <h4>Pemerintah Daerah</h4>
-          <h4>Kabupaten Bengkulu Utara</h4>
-        </div>
-      </div>
-      <div className='absolute text-black top-1/3 left-1/12 flex flex-col items-center justify-center'>
+      <div className='absolute text-black top-1/12 left-1/12 flex flex-col items-center'>
         <div>
-          <img src='/mahabbah.png' width={500} alt='E-MAHABBAH LOGO' />
+          <img src='/mahabbah.png' width={300} alt='E-MAHABBAH LOGO' />
         </div>
-        <p className='uppercase font-bold text-center mb-6 text-white font-sm'>
-          <span className='text-2xl'>M</span>onitoring,{' '}
-          <span className='text-2xl'>A</span>nalisis{' '}
-          <span className='text-2xl'>Ha</span>sil Pem
-          <span className='text-2xl'>b</span>angunan Daer
-          <span className='text-2xl'>ah</span>
+        <p className='uppercase font-bold text-center mb-6 text-white text-[0.7rem]'>
+          <span className='text-[0.9rem]'>M</span>onitoring,{' '}
+          <span className='text-[0.9rem]'>A</span>nalisis{' '}
+          <span className='text-[0.9rem]'>Ha</span>sil Pem
+          <span className='text-[0.9rem]'>b</span>angunan Daer
+          <span className='text-[0.9rem]'>ah</span>
         </p>
+      </div>
+      <div className='absolute top-1/3 left-1/12'>
+      <div className='text-white max-w-4xl'>
+        <p className='italic text-5xl font-light'>Sistem Informasi</p>
+        <p className='text-7xl font-bold '>Monitoring, Analisis</p>
+        <p className='text-7xl font-bold '>Hasil Pembangunan Daerah</p>
+        <p className='italic text-5xl font-light'>Kabupaten Bengkulu Utara</p>
+      </div>
         <button
-          className={`float-start z-10 h-[40px] shadow bg-white text-red-600 font-bold active:scale-80
-              px-6 py-2 rounded-md hover:bg-red-400 hover:text-[var(--text-3)] transition-all duration-300`}
+          className={`float-start mt-10 shadow bg-red-700 text-gray-100 font-bold active:scale-80
+              px-12 py-2 text-2xl rounded-xl hover:bg-red-600 hover:text-[var(--text-3)] transition-all duration-300`}
           onClick={() => setShowLogin(!showLogin)}
         >
           Login
         </button>
-      </div>
-      <div className='absolute bottom-12 left-24 text-white'>
-        <span className='inline-flex items-center gap-2 text-xl'>
-          <TfiWorld />
-          e-mahabbah.bengkuluutarakab.go.id
-        </span>
       </div>
       <div className='absolute bottom-12 right-0 '>
         <div className='md:mr-0 xl:mr-20 sm:mb-10 xl:mb-20'>
           <img
             src='/auth/bupati-wa.png'
             alt='Bupati dan wakil bupati'
-            className='sm:max-w-[200px] md:max-w-[600px] xl:max-w-[600px] w-full h-auto'
+            className='sm:max-w-[200px] md:max-w-[500px] xl:max-w-[500px] w-full h-auto'
           />
-        </div>
-        <div className='text-red-600 bg-white rounded-l-3xl p-4 w-[80%] float-end'>
-          <span className='inline-flex items-center gap-2 text-2xl ms-4 font-bold'>
-            BAPPERIDA BENGKULU UTARA
-          </span>
         </div>
       </div>
     </div>
