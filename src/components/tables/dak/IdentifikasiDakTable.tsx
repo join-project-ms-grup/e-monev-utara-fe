@@ -304,9 +304,11 @@ const DetailDak = ({ id_ident }: { id_ident: number }) => {
             </div>
             <div className='p-4 table-excel'>
               <table>
-                <tbody>
+                <tbody className='capitalize'>
                   <tr>
-                    <td className='text-right pr-4 font-bold w-[150px]'>Jenis DAK</td>
+                    <td className='text-right pr-4 font-bold capitalize w-[150px]'>
+                      Jenis DAK
+                    </td>
                     <td>{data?.jenis_dak}</td>
                   </tr>
                   <tr>
@@ -374,9 +376,11 @@ const DetailDak = ({ id_ident }: { id_ident: number }) => {
             </div>
             <div className='p-4 table-excel space-y-4'>
               <table>
-                <tbody>
+                <tbody className='capitalize'>
                   <tr>
-                    <td className='text-right pr-4 font-bold w-[150px]'>Nama Paket</td>
+                    <td className='text-right pr-4 font-bold w-[150px]'>
+                      Nama Paket
+                    </td>
                     <td>{data?.nama_paket}</td>
                   </tr>
                   <tr>
@@ -385,7 +389,9 @@ const DetailDak = ({ id_ident }: { id_ident: number }) => {
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Volume</td>
-                    <td>{data?.volume}</td>
+                    <td>
+                      {data?.volume} {data?.satuan}
+                    </td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>
@@ -401,7 +407,7 @@ const DetailDak = ({ id_ident }: { id_ident: number }) => {
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Anggaran DAK</td>
-                    <td>{data?.anggaran_dak}</td>
+                    <td>{formatUang(Number(data?.anggaran_dak))}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Alamat</td>
@@ -439,18 +445,22 @@ const DetailDak = ({ id_ident }: { id_ident: number }) => {
             </div>
             <div className='p-4 table-excel'>
               <table>
-                <tbody>
+                <tbody className='capitalize'>
                   <tr>
-                    <td className='text-right pr-4 font-bold w-[150px]'>Mekanisme</td>
+                    <td className='text-right pr-4 font-bold w-[150px]'>
+                      Mekanisme
+                    </td>
                     <td>{data?.mekanisme}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Volume</td>
-                    <td>{data?.mekanisme_volume}</td>
+                    <td>
+                      {data?.mekanisme_volume} {data?.satuan}
+                    </td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Uang</td>
-                    <td>{data?.mekanisme_uang}</td>
+                    <td>{formatUang(Number(data?.mekanisme_uang))}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>
