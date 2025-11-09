@@ -49,13 +49,13 @@ export const exportRPJMD = async (
     });
 
     const widthMap: Record<string, number> = {
-        A: 5, B: 20, C: 40, D: 40, E: 20, F: 20, G: 20,
-        H: 20, I: 20, J: 20, K: 20, L: 20, M: 20,
-        N: 20, O: 20, P: 20, Q: 20, R: 20, S: 20,
-        T: 20, U: 20, V: 20, W: 20, X: 20, Y: 20,
-        Z: 20, AA: 20, AB: 20, AC: 20, AD: 20, AE: 20,
-        AF: 20, AG: 20, AH: 20, AI: 20, AJ: 20, AK: 20,
-        AL: 20, AM: 20, AN: 20, AO: 20
+        A: 5, B: 20, C: 50, D: 50, E: 30, F: 30, G: 30,
+        H: 30, I: 30, J: 30, K: 30, L: 30, M: 30,
+        N: 30, O: 30, P: 30, Q: 30, R: 30, S: 30,
+        T: 30, U: 30, V: 30, W: 30, X: 30, Y: 30,
+        Z: 30, AA: 30, AB: 30, AC: 30, AD: 30, AE: 30,
+        AF: 30, AG: 30, AH: 30, AI: 30, AJ: 30, AK: 30,
+        AL: 30, AM: 30, AN: 30, AO: 30
     };
     const colLetters = Object.keys(widthMap);
     colLetters.forEach((col, idx) => {

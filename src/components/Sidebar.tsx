@@ -76,6 +76,8 @@ const menuRKPD: MenuItem[] = [
       { label: 'Rekening', to: '/rkpd/renstra_rpjmd/rekening' },
       { label: 'Perencanaan', to: '/rkpd/renstra_rpjmd/pagu_indikator' },
       { label: 'Realisasi', to: '/rkpd/renstra_rpjmd/realisasi' },
+      { label: 'Evaluasi RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
+      { label: 'Evaluasi Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
     ],
   },
   {
@@ -106,23 +108,9 @@ const menuRKPD: MenuItem[] = [
       { label: 'Rekening', to: '/rkpd/renja_rkpd/rekening' },
       { label: 'Perencanaan', to: '/rkpd/renja_rkpd/renja' },
       { label: 'Realisasi', to: '/rkpd/renja_rkpd/realisasi' },
+      { label: 'Evaluasi RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
+      { label: 'Evaulasi RENJA', to: '/rkpd/hasil_evaluasi/renja' },
     ],
-  },
-  {
-    type: 'separator',
-    label: 'Hasil',
-    akses: [2, 3],
-  },
-  {
-    label: 'Hasil Evaluasi',
-    icon: <MdAssignment />,
-    submenu: [
-      { label: 'RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
-      { label: 'Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
-      { label: 'RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
-      { label: 'RENJA', to: '/rkpd/hasil_evaluasi/renja' },
-    ],
-    akses: [2, 3],
   },
 ];
 
@@ -131,25 +119,25 @@ const menuDAK: MenuItem[] = [
   {
     type: 'separator',
     label: 'MENU DAK',
-    akses: [2,4],
+    akses: [2, 4],
   },
   {
     label: 'Identifikasi DAK',
     icon: <MdAssessment />,
     to: '/dak/identifikasi',
-    akses: [2,4],
+    akses: [2, 4],
   },
   {
     label: 'Monitoring DAK',
     icon: <MdMonitor />,
     to: '/dak/monitoring',
-    akses: [2,4],
+    akses: [2, 4],
   },
   {
     label: 'Daftar dan Jenis DAK',
     icon: <MdViewList />,
     to: '/dak/daftardak',
-    akses: [2,4],
+    akses: [2, 4],
   },
 ];
 const menus = [...menuUtama, ...menuRKPD, ...menuDAK];
@@ -200,31 +188,30 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   };
 
   // Fungsi cek akses
-const canAccess = (menu: MenuItem | SubMenuItem, roleId: number): boolean => {
-  // Role 1 bisa akses semua
-  if (roleId === 1) return true;
+  const canAccess = (menu: MenuItem | SubMenuItem, roleId: number): boolean => {
+    // Role 1 bisa akses semua
+    if (roleId === 1) return true;
 
-  // Jika akses tidak didefinisikan, semua role lain bisa mengakses
-  if (!menu.akses) return true;
+    // Jika akses tidak didefinisikan, semua role lain bisa mengakses
+    if (!menu.akses) return true;
 
-  // Normalisasi akses menjadi array
-  const aksesArray = Array.isArray(menu.akses) ? menu.akses : [menu.akses];
+    // Normalisasi akses menjadi array
+    const aksesArray = Array.isArray(menu.akses) ? menu.akses : [menu.akses];
 
-  // Cek apakah roleId termasuk di aksesArray
-  const hasAccess = aksesArray.includes(roleId);
+    // Cek apakah roleId termasuk di aksesArray
+    const hasAccess = aksesArray.includes(roleId);
 
-  // Jika menu punya submenu, filter juga submenu-nya
-  if (menu.submenu) {
-    const filteredSubmenu = menu.submenu
-      .map((sub) => ({ ...sub }))
-      .filter((sub) => canAccess(sub, roleId));
-    if (filteredSubmenu.length === 0 && !hasAccess) return false;
-    menu.submenu = filteredSubmenu;
-  }
+    // Jika menu punya submenu, filter juga submenu-nya
+    if (menu.submenu) {
+      const filteredSubmenu = menu.submenu
+        .map((sub) => ({ ...sub }))
+        .filter((sub) => canAccess(sub, roleId));
+      if (filteredSubmenu.length === 0 && !hasAccess) return false;
+      menu.submenu = filteredSubmenu;
+    }
 
-  return hasAccess;
-};
-
+    return hasAccess;
+  };
 
   // Filter menu sebelum render
   const filteredMenus = menus
