@@ -11,25 +11,25 @@ import {
 
 const data = [
   {
-    skpd: 'Contoh 1',
-    fisikDAK: 80,
-    keuanganDAK: 70,
-    fisikNonDAK: 60,
-    keuanganNonDAK: 50,
+    skpd: 'Dinas Pendidikan',
+    fisikDAK: 0,
+    keuanganDAK: 0,
+    fisikNonDAK: 0,
+    keuanganNonDAK: 0,
   },
   {
-    skpd: 'Contoh 2',
-    fisikDAK: 90,
-    keuanganDAK: 85,
-    fisikNonDAK: 70,
-    keuanganNonDAK: 65,
+    skpd: 'Dinas Kesehatan',
+    fisikDAK: 0,
+    keuanganDAK: 0,
+    fisikNonDAK: 0,
+    keuanganNonDAK: 0,
   },
   {
-    skpd: 'Contoh 3',
-    fisikDAK: 75,
-    keuanganDAK: 60,
-    fisikNonDAK: 55,
-    keuanganNonDAK: 50,
+    skpd: 'Dinas Sosial',
+    fisikDAK: 0,
+    keuanganDAK: 0,
+    fisikNonDAK: 0,
+    keuanganNonDAK: 0,
   },
 ];
 

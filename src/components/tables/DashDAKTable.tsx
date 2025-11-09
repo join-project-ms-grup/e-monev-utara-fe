@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query';
+import { getOPDDAK } from '../../services/DAK/DAKOPDService';
 import Tabel from './Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -65,9 +67,72 @@ const tableHead = () => {
 };
 
 const DashDAKTable = () => {
-  const columns: ColumnDef<any>[] = Array.from({ length: 9 }, (_, i) => ({
-    id: (i + 1).toString(),
-  }));
+  const { data } = useQuery({
+    queryKey: ['list_opd_dak'],
+    queryFn: getOPDDAK,
+  });
+
+  const columns: ColumnDef<any>[] = [
+    {
+      header: 'Ranking',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+    {
+      accessorKey: 'fullname',
+    },
+    {
+      header: 'Paket',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+    {
+      header: 'Jumlah Anggaran',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+    {
+      header: 'DAK Fisik Fisik',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+    {
+      header: 'Dak Fisik Keuangan',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+    {
+      header: 'DAK Non Fisik Fisik',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+    {
+      header: 'Dak Non Fisik Keuangan',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+    {
+      header: 'Persentase',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: () => `-`,
+    },
+  ];
 
   return (
     <div className='space-y-2'>
@@ -138,7 +203,7 @@ const DashDAKTable = () => {
           </InputButton>
         </div> */}
       </div>
-      <Tabel data={[]} columns={columns} renderHeader={tableHead} />
+      <Tabel data={data || []} columns={columns} renderHeader={tableHead} />
     </div>
   );
 };

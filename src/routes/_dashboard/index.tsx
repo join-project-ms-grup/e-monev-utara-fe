@@ -155,7 +155,7 @@ const DashRKPD = () => {
 const DashDAK = () => {
   return (
     <div className='space-y-2'>
-      <div className='inline-flex gap-2'>
+      {/* <div className='inline-flex gap-2'>
         <div>
           <label htmlFor='tahun_ke'>Tahun</label>
           <InputSearchBox
@@ -196,7 +196,7 @@ const DashDAK = () => {
             />
           </div>
         </div>
-      </div>
+      </div> */}
       <br />
       <br />
       <DashDAKChart />
