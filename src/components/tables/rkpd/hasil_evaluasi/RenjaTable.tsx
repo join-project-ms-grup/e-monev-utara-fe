@@ -338,26 +338,25 @@ const RenjaTable = () => {
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
-            {isDev() ||
-              (isAdmin() && (
-                <div>
-                  <label htmlFor='skpd'>SKPD</label>
-                  <InputSearchBox
-                    id='skpd'
-                    className='w-72 h-9'
-                    btnclassName='bg-white'
-                    placeholder='Pilih SKPD...'
-                    value={selectedSKPD.toString()}
-                    options={listSKPDPeriode as OptionItem[]}
-                    onChange={(val) => setSelectedSKPD(val)}
-                    onClear={() => {
-                      setSelectedSKPD('');
-                      setTahunKe('');
-                    }}
-                    withSearch
-                  />
-                </div>
-              ))}
+            {(isDev() || isAdmin()) && (
+              <div>
+                <label htmlFor='skpd'>SKPD</label>
+                <InputSearchBox
+                  id='skpd'
+                  className='w-72 h-9'
+                  btnclassName='bg-white'
+                  placeholder='Pilih SKPD...'
+                  value={selectedSKPD.toString()}
+                  options={listSKPDPeriode as OptionItem[]}
+                  onChange={(val) => setSelectedSKPD(val)}
+                  onClear={() => {
+                    setSelectedSKPD('');
+                    setTahunKe('');
+                  }}
+                  withSearch
+                />
+              </div>
+            )}
             <div>
               <label htmlFor='tahun_ke'>Tahun ke</label>
               <InputSearchBox
