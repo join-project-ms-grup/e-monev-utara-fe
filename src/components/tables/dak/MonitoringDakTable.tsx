@@ -9,11 +9,18 @@ import {
   MdSave,
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
-import InputSearchBox from '../../inputs/InputSearchBox';
+import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import {
   getPeriodeMulaiFromCookie,
   getPeriodeAkhirFromCookie,
 } from '../../../lib/usercookie';
+import { useQuery } from '@tanstack/react-query';
+import { getTahunDAK } from '../../../services/DAK/DAKTahunService';
+import { getOPDDAK } from '../../../services/DAK/DAKOPDService';
+import {
+  getJenisDAK,
+  getSubJenisDAK,
+} from '../../../services/DAK/DAKJenisService';
 
 type DataRowKeys =
   | 'name'
@@ -262,18 +269,40 @@ const IdentifikasiDakTable = () => {
   // };
   // const [formTable, setFormTable] = useState(valTable);
 
-  //#region List data periode
-  const [tahunKe, setTahunKe] = useState('');
-  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
-  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
-  const listTahunKe = Array.from(
-    { length: tahunAkhir - tahunMulai + 1 },
-    (_, i) => ({
-      label: `${tahunMulai + i}`,
-      value: `${i + 1}`,
-    }),
-  );
-  //#endregion
+  const [tahunDAK, setTahunDAK] = useState('');
+  const { data: dataTahunDAK } = useQuery({
+    queryKey: ['list_tahun_dak'],
+    queryFn: getTahunDAK,
+  });
+  const listTahunDAK =
+    dataTahunDAK?.map((item) => ({
+      label: `${item.tahun}`,
+      value: item.id?.toString(),
+    })) || [];
+
+  const [opdDAK, setOPDDAK] = useState('');
+  const { data: dataOPD } = useQuery({
+    queryKey: ['list_opd_dak'],
+    queryFn: getOPDDAK,
+  });
+  const listOPD =
+    dataOPD?.map((item) => ({
+      label: `${item.fullname}`,
+      value: item.id?.toString(),
+    })) || [];
+
+  const [triwulanDAK, setTriwulanDAK] = useState('');
+
+  const [subJenisDAK, setSubJenisDAK] = useState('');
+  const { data: dataSubJenisDAK } = useQuery({
+    queryKey: ['list_sub_jenis_dak'],
+    queryFn: () => getSubJenisDAK(1),
+  });
+  const listSubJenisDAK =
+    dataSubJenisDAK?.map((item) => ({
+      label: `${item.nama}`,
+      value: item.id?.toString(),
+    })) || [];
 
   return (
     <div className='space-y-2'>
@@ -286,20 +315,25 @@ const IdentifikasiDakTable = () => {
               className='w-42 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Tahun ke...'
-              value={tahunKe}
-              options={listTahunKe}
-              onChange={(val) => setTahunKe(val)}
-              onClear={() => setTahunKe('')}
+              value={tahunDAK}
+              options={listTahunDAK as OptionItem[]}
+              onChange={(val) => setTahunDAK(val)}
+              onClear={() => setTahunDAK('')}
             />
           </div>
           <div>
             <label htmlFor='opd'>OPD</label>
             <InputSearchBox
               id='opd'
-              className='w-44 h-9'
+              className='w-72 h-9'
               btnclassName='bg-white'
               placeholder='Pilih OPD'
-              options={[]}
+              value={opdDAK}
+              options={listOPD as OptionItem[]}
+              onChange={(val) => setOPDDAK(val)}
+              onClear={() => setOPDDAK('')}
+              withSearch
+              tooltip
             />
           </div>
           <div>
@@ -309,7 +343,10 @@ const IdentifikasiDakTable = () => {
               className='w-44 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
-              options={[]}
+              options={listSubJenisDAK as OptionItem[]}
+              value={subJenisDAK}
+              onChange={(val) => setSubJenisDAK(val)}
+              onClear={() => setSubJenisDAK('')}
             />
           </div>
           <div>
@@ -325,6 +362,9 @@ const IdentifikasiDakTable = () => {
                 { label: 'III', value: 'III' },
                 { label: 'IV', value: 'IV' },
               ]}
+              value={triwulanDAK}
+              onChange={(val) => setTriwulanDAK(val)}
+              onClear={() => setTriwulanDAK('')}
             />
           </div>
         </div>

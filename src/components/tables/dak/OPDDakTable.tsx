@@ -53,7 +53,7 @@ const OPDDakTable = () => {
   // Data fetching
   const [loadingMutation, setLoadingMutation] = useState(false);
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ['tabel_opd_dak'],
+    queryKey: ['list_opd_dak'],
     queryFn: getOPDDAK,
   });
 
@@ -64,7 +64,7 @@ const OPDDakTable = () => {
       return addOPDDAK(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_opd_dak'] });
+      queryClient.invalidateQueries({ queryKey: ['list_opd_dak'] });
       setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
@@ -85,7 +85,7 @@ const OPDDakTable = () => {
       return updateOPDDAK(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tabel_opd_dak'] });
+      queryClient.invalidateQueries({ queryKey: ['list_opd_dak'] });
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },

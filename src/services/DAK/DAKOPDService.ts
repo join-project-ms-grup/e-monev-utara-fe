@@ -4,7 +4,7 @@ import api, { type ApiResponse } from "../../lib/api";
 export interface OPDDAK {
     id?: number;
     kode?: string | number;
-    name?: string;
+    fullname?: string;
     shortname?: string;
     status?: boolean;
     created_at?: string;
