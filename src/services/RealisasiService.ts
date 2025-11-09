@@ -53,31 +53,59 @@ export interface RealisasiMasterSubKegiatan extends RealisasiMaster {
 }
 export type RealisasiMasterTree = RealisasiMasterUrusan & RealisasiMasterBidang & RealisasiMasterProgram & RealisasiMasterKegiatan & RealisasiMasterSubKegiatan;
 
-// export interface RealisasiForm {
-//     rekening_kode?: string;
-//     rekening_name?: string;
-//     indikator_name?: string;
-//     id_pagu?: number;
-//     id_rincian?: number;
-//     realisasi?: {
-//         triwulan?: string | number;
-//         realisasi?: string | number
-//     }[];
-//     capaian?: {
-//         triwulan?: string | number;
-//         capaian?: string | number
-//     }[];
-// }
+export interface RealisasiFormRKPD {
+    rekening_kode?: string;
+    rekening_name?: string;
+    indikator_name?: string;
+    satuan?: string;
+    id_pagu?: number;
+    id_rincian?: number;
+    target?: number;
+    target_anggaran?: number;
+    total_capaian?: number;
+    total_anggaran?: number;
+    persen_capaian?: number;
+    persen_anggaran?: number;
+    realisasi_1?: string | number;
+    realisasi_2?: string | number;
+    realisasi_3?: string | number;
+    realisasi_4?: string | number;
+    capaian_1?: string | number
+    capaian_2?: string | number
+    capaian_3?: string | number
+    capaian_4?: string | number
+}
 
 export interface RealisasiGetForm {
     skpd_periode_id: number;
     tahun_ke: number;
 }
 
+export interface AddCapaianRKPDForm {
+    id_rincian: number;
+    capaian: { triwulan: number; capaian: number }[];
+}
+
+export interface AddAnggaranRKPDForm {
+    id_pagu: number;
+    realisasi: { triwulan: number; realisasi: number }[];
+}
+
 export const getRealisasiRKPD = async (payload: RealisasiGetForm): Promise<RealisasiMasterTree[]> => {
     const response = await api.post<ApiResponse<RealisasiMasterTree[]>>(`/rkpd/realisasi/list`, payload);
     return response.data.data;
 };
+
+export const addCapaianRKPD = async (payload: AddCapaianRKPDForm): Promise<AddCapaianRKPDForm> => {
+    const response = await api.post<ApiResponse<AddCapaianRKPDForm>>("/rkpd/realisasi/kinerja", payload);
+    return response.data.data;
+};
+
+export const addAnggaranRKPD = async (payload: AddAnggaranRKPDForm): Promise<AddAnggaranRKPDForm> => {
+    const response = await api.post<ApiResponse<AddAnggaranRKPDForm>>("/rkpd/realisasi/anggaran", payload);
+    return response.data.data;
+};
+
 
 export interface FlatRealisasiRKPD {
     level: string;

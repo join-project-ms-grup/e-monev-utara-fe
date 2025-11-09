@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MdInput, MdRefresh } from 'react-icons/md';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ColumnDef } from '@tanstack/react-table';
 import { formatUang } from '../../../../lib/helper';
 import {
@@ -12,9 +12,14 @@ import {
   isAdmin,
 } from '../../../../lib/usercookie';
 import {
+  addAnggaranRKPD,
+  type AddAnggaranRKPDForm,
+  addCapaianRKPD,
+  type AddCapaianRKPDForm,
   flatRealisasi,
   type FlatRealisasiRKPD,
   getRealisasiRKPD,
+  type RealisasiFormRKPD,
 } from '../../../../services/RealisasiService';
 import FormRealisasi from '../../../forms/FormRealisasi';
 import AksiButton from '../../../inputs/AksiButton';
@@ -27,6 +32,9 @@ import Spinner from '../../../inputs/Spinner';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import Tabel from '../../Tabel';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
+import toast from 'react-hot-toast';
+import type { AxiosError } from 'axios';
+import type { ApiResponse } from '../../../../lib/api';
 
 const RKPD_RealisasiTable = () => {
   const queryClient = useQueryClient();
@@ -34,27 +42,29 @@ const RKPD_RealisasiTable = () => {
   const [openModal, setOpenModal] = useState(false);
 
   // Form Data
-  const initialFormData: any = {
+  const initialFormData: RealisasiFormRKPD = {
     rekening_kode: '',
     rekening_name: '',
     indikator_name: '',
     id_pagu: 0,
     id_rincian: 0,
-    realisasi: [
-      { triwulan: 1, realisasi: 0 },
-      { triwulan: 2, realisasi: 0 },
-      { triwulan: 3, realisasi: 0 },
-      { triwulan: 4, realisasi: 0 },
-    ],
-    capaian: [
-      { triwulan: 1, capaian: 0 },
-      { triwulan: 2, capaian: 0 },
-      { triwulan: 3, capaian: 0 },
-      { triwulan: 4, capaian: 0 },
-    ],
+    target: 0,
+    target_anggaran: 0,
+    total_capaian: 0,
+    total_anggaran: 0,
+    persen_capaian: 0,
+    persen_anggaran: 0,
+    realisasi_1: 0,
+    realisasi_2: 0,
+    realisasi_3: 0,
+    realisasi_4: 0,
+    capaian_1: 0,
+    capaian_2: 0,
+    capaian_3: 0,
+    capaian_4: 0,
   };
 
-  const [formData, setFormData] = useState<any>(initialFormData);
+  const [formData, setFormData] = useState<RealisasiFormRKPD>(initialFormData);
   // Clear form
   useEffect(() => {
     if (!openModal) {
@@ -65,13 +75,6 @@ const RKPD_RealisasiTable = () => {
     }
   }, [openModal]);
 
-  const [triwulanKe, setTriwulanKe] = useState('');
-  const triwulanList = [
-    { label: 'Triwulan I', value: '1' },
-    { label: 'Triwulan II', value: '2' },
-    { label: 'Triwulan III', value: '3' },
-    { label: 'Triwulan IV', value: '4' },
-  ];
   const idPeriodeCookie = Number(getPeriodeIDFromCookie());
   const [tahunKe, setTahunKe] = useState('');
 
@@ -127,6 +130,46 @@ const RKPD_RealisasiTable = () => {
       accessorKey: 'indikator_kinerja',
     },
     {
+      header: 'Input',
+      cell: ({ row }) => {
+        if (row.original.level === 'sub_kegiatan') {
+          const data = row.original;
+          return (
+            <>
+              <AksiButton
+                Icon={MdInput}
+                onClick={() => {
+                  setFormData({
+                    rekening_kode: `${data.kode_urusan}.${data.kode_bidang}.${data.kode_program}.${data.kode_kegiatan}.${data.kode_subKegiatan}`,
+                    rekening_name: data.rekening,
+                    indikator_name: data.indikator_kinerja,
+                    id_pagu: data.id_pagu,
+                    id_rincian: data.id_rincian,
+                    satuan: data.satuan,
+                    target: data.target as number,
+                    target_anggaran: data.target_anggaran as number,
+                    persen_capaian: data.persen_capaian as number,
+                    persen_anggaran: data.persen_realisasi as number,
+                    total_capaian: data.total_capaian as number,
+                    total_anggaran: data.total_realisasi as number,
+                    realisasi_1: data.realisasi_triwulan_I as number,
+                    realisasi_2: data.realisasi_triwulan_II as number,
+                    realisasi_3: data.realisasi_triwulan_III as number,
+                    realisasi_4: data.realisasi_triwulan_IV as number,
+                    capaian_1: data.capaian_triwulan_I as number,
+                    capaian_2: data.capaian_triwulan_II as number,
+                    capaian_3: data.capaian_triwulan_III as number,
+                    capaian_4: data.capaian_triwulan_IV as number,
+                  });
+                  setOpenModal(true);
+                }}
+              />
+            </>
+          );
+        }
+      },
+    },
+    {
       accessorKey: 'satuan',
     },
     {
@@ -135,7 +178,7 @@ const RKPD_RealisasiTable = () => {
         if (row.original.type === 'urusan' || row.original.type === 'bidang') {
           return '';
         }
-        return <>{getValue() ?? '' + ' ' + row.original.satuan}</>;
+        return <>{getValue() ?? '0'}</>;
       },
     },
     {
@@ -181,43 +224,6 @@ const RKPD_RealisasiTable = () => {
         }
       },
     },
-    {
-      header: 'Aksi',
-      cell: ({ row }) => {
-        if (row.original.level === 'sub_kegiatan') {
-          const data = row.original;
-          return (
-            <>
-              <AksiButton
-                Icon={MdInput}
-                onClick={() => {
-                  setFormData({
-                    rekening_kode: `${data.kode_urusan}.${data.kode_bidang}.${data.kode_program}.${data.kode_kegiatan}.${data.kode_subKegiatan}`,
-                    rekening_name: data.rekening,
-                    indikator_name: data.indikator_kinerja,
-                    id_pagu: data.id_pagu,
-                    id_rincian: data.id_rincian,
-                    capaian: [
-                      { triwulan: 1, capaian: data.capaian_triwulan_I },
-                      { triwulan: 2, capaian: data.capaian_triwulan_II },
-                      { triwulan: 3, capaian: data.capaian_triwulan_III },
-                      { triwulan: 4, capaian: data.capaian_triwulan_IV },
-                    ],
-                    realisasi: [
-                      { triwulan: 1, realisasi: data.realisasi_triwulan_I },
-                      { triwulan: 2, realisasi: data.realisasi_triwulan_II },
-                      { triwulan: 3, realisasi: data.realisasi_triwulan_III },
-                      { triwulan: 4, realisasi: data.realisasi_triwulan_IV },
-                    ],
-                  });
-                  setOpenModal(true);
-                }}
-              />
-            </>
-          );
-        }
-      },
-    },
   ];
   // #endregion
 
@@ -235,15 +241,15 @@ const RKPD_RealisasiTable = () => {
           <th rowSpan={2} className='w-[25%]'>
             Indikator
           </th>
+          <th rowSpan={2} className='w-[50px]'>
+            Realisasi
+          </th>
           <th rowSpan={2} className='w-[150px]'>
             Satuan
           </th>
           <th colSpan={2}>Target</th>
           <th colSpan={2}>Total</th>
           <th colSpan={2}>(%)</th>
-          <th rowSpan={2} className='w-[50px]'>
-            Aksi
-          </th>
         </tr>
         <tr>
           <th className='w-[150px]'>K</th>
@@ -268,6 +274,46 @@ const RKPD_RealisasiTable = () => {
       value: `${i + 1}`,
     }),
   );
+  //#endregion
+
+  //#region MUTASI
+  const [loadingMutation, setLoadingMutation] = useState(false);
+  const addCapaian = useMutation({
+    mutationFn: async (payload: AddCapaianRKPDForm) => {
+      setLoadingMutation(true);
+      return addCapaianRKPD(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rkpd_list_renja'] });
+      refetch();
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      console.error('Gagal menambahkan capaian:', error);
+    },
+    onSettled: () => {
+      setOpenModal(false);
+      setLoadingMutation(false);
+    },
+  });
+
+  const addAnggaran = useMutation({
+    mutationFn: async (payload: AddAnggaranRKPDForm) => {
+      setLoadingMutation(true);
+      return addAnggaranRKPD(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rkpd_list_renja'] });
+      refetch();
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      console.error('Gagal menambahkan anggaran:', error);
+    },
+    onSettled: () => {
+      setOpenModal(false);
+      setLoadingMutation(false);
+    },
+  });
+
   //#endregion
 
   return (
@@ -337,27 +383,71 @@ const RKPD_RealisasiTable = () => {
         title='Realisasi'
         isOpen={openModal}
         onClose={() => {
-          setFormData(initialFormData);
           setOpenModal(false);
+          const timeout = setTimeout(() => {
+            setFormData(initialFormData);
+          }, 200);
+          return () => {
+            clearTimeout(timeout);
+          };
         }}
       >
         <FormRealisasi
           defaultValues={formData}
-          onSubmit={(data: any) => {
-            // console.log('Data dari form modal:', data);
-            // console.log(data);
-            // addMutation.mutate({
-            //   mulai: Number(data.mulai),
-            //   akhir: Number(data.akhir),
-            //   status: data.status,
-            // });
+          onSubmit={async (data: RealisasiFormRKPD) => {
+            console.log('Data dari form modal:', data);
+
+            try {
+              let hasMutation = false;
+              setLoadingMutation(true)
+
+              if (data.id_pagu) {
+                hasMutation = true;
+                await addAnggaran.mutateAsync({
+                  id_pagu: Number(data.id_pagu),
+                  realisasi: [
+                    { triwulan: 1, realisasi: Number(data.realisasi_1) },
+                    { triwulan: 2, realisasi: Number(data.realisasi_2) },
+                    { triwulan: 3, realisasi: Number(data.realisasi_3) },
+                    { triwulan: 4, realisasi: Number(data.realisasi_4) },
+                  ],
+                });
+              }
+
+              if (data.id_rincian) {
+                hasMutation = true;
+                await addCapaian.mutateAsync({
+                  id_rincian: Number(data.id_rincian),
+                  capaian: [
+                    { triwulan: 1, capaian: Number(data.capaian_1) },
+                    { triwulan: 2, capaian: Number(data.capaian_2) },
+                    { triwulan: 3, capaian: Number(data.capaian_3) },
+                    { triwulan: 4, capaian: Number(data.capaian_4) },
+                  ],
+                });
+              }
+
+              if (hasMutation) toast.success('Data berhasil ditambahkan');
+            } catch (err) {
+              const error = err as AxiosError<ApiResponse<unknown>>;
+              if (error.status === 400) {
+                toast.error(
+                  `Gagal menambahkan data\n${error.response?.data.message}`,
+                );
+              } else {
+                toast.error('Terjadi kesalahan saat menyimpan data');
+              }
+            } finally {
+              setOpenModal(false);
+              setLoadingMutation(false);
+            }
           }}
         >
           <div className='flex gap-2 justify-end'>
             <InputButton
               type='submit'
               className='btn btn-theme w-24'
-              // isLoading={loadingMutation}
+              isLoading={loadingMutation}
             >
               Simpan
             </InputButton>
