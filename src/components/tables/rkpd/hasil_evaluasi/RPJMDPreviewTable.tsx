@@ -1,20 +1,19 @@
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { FlatRenstraRow } from '../../../../services/RenstraService';
-import { MdClose, MdPrint } from 'react-icons/md';
-import InputButton from '../../../inputs/InputButton';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeMulaiFromCookie,
 } from '../../../../lib/usercookie';
 import type { FlatRPJMD } from '../../../../services/RPJMDService';
+import { formatUang } from '../../../../lib/helper';
 
 interface MainTableProps {
   data: FlatRPJMD[];
+  skpd: string;
 }
 
-const RPJMDPreviewTable = ({ data }: MainTableProps) => {
+const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -123,78 +122,308 @@ const RPJMDPreviewTable = ({ data }: MainTableProps) => {
   // }));
 
   const columns: ColumnDef<FlatRPJMD>[] = [
-    { header: 'No', cell: ({ row }) => row.index + 1 },
-    { header: 'Sasaran', accessorFn: () => '' }, // kosong
-    { header: 'Program Prioritas', accessorFn: (row) => row.name || '' },
+    {
+      header: 'No',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      header: 'Sasaran',
+      accessorFn: () => '', // tetap kosong
+    },
+    {
+      header: 'Program Prioritas',
+      // accessorFn: (row) => (row.type === 'program' ? row.name : ''),
+      accessorFn: (row) => row.name ?? '',
+    },
     {
       header: 'Indikator Kinerja',
       accessorFn: (row) => row.indikator_o_name || '',
     },
     {
-      header: 'Data Capaian Awal (K)',
-      accessorFn: (row) => row.target_io_capaian ?? 0,
+      header: 'Data Capaian pada Awal Tahun Perencanaan',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_1 ?? 0,
     },
     {
-      header: 'Data Capaian Awal (Rp)',
-      accessorFn: (row) => row.pagu_realisasi ?? 0,
+      header: 'Target pada Akhir Tahun Perencanaan (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
+    },
+    {
+      header: 'Target pada Akhir Tahun Perencanaan (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) =>
+        row.target_io_target_5 ? formatUang(row.target_io_target_5) : 0,
+    },
+    //#region Target
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-1 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_target_1 ?? 0,
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-1 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => (row.pagu_pagu_1 ? formatUang(row.pagu_pagu_1) : 0),
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-2 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_target_2 ?? 0,
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-2 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => (row.pagu_pagu_2 ? formatUang(row.pagu_pagu_2) : 0),
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-3 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_target_3 ?? 0,
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-3 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => (row.pagu_pagu_3 ? formatUang(row.pagu_pagu_3) : 0),
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-4 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_target_4 ?? 0,
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-4 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => (row.pagu_pagu_4 ? formatUang(row.pagu_pagu_4) : 0),
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-5 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_target_5 ?? 0,
+    },
+    {
+      header:
+        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-5 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => (row.pagu_pagu_5 ? formatUang(row.pagu_pagu_5) : 0),
+    },
+    //#endregion
+    //#region Capaian
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-1 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_1 ?? 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-1 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) =>
+        row.pagu_realisasi_1 ? formatUang(row.pagu_realisasi_1) : 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-2 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_2 ?? 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-2 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) =>
+        row.pagu_realisasi_2 ? formatUang(row.pagu_realisasi_2) : 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-3 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_3 ?? 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-3 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) =>
+        row.pagu_realisasi_3 ? formatUang(row.pagu_realisasi_3) : 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-4 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_4 ?? 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-4 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) =>
+        row.pagu_realisasi_4 ? formatUang(row.pagu_realisasi_4) : 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-5 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
+    },
+    {
+      header:
+        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-5 (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) =>
+        row.pagu_realisasi_5 ? formatUang(row.pagu_realisasi_5) : 0,
+    },
+    //#endregion
+    //#region Tingkat
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-1 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_persen_1 ?? 0,
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-1 (Rp)',
+      meta: {
+        tdClassNames: 'text-center whitespace-nowrap',
+      },
+      accessorFn: (row) => (row.pagu_persen_1 ? row.pagu_persen_1 : 0) + ' %',
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-2 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_persen_2 ?? 0,
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-2 (Rp)',
+      meta: {
+        tdClassNames: 'text-center whitespace-nowrap',
+      },
+      accessorFn: (row) => (row.pagu_persen_2 ? row.pagu_persen_2 : 0) + ' %',
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-3 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_persen_3 ?? 0,
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-3 (Rp)',
+      meta: {
+        tdClassNames: 'text-center whitespace-nowrap',
+      },
+      accessorFn: (row) => (row.pagu_persen_3 ? row.pagu_persen_3 : 0) + ' %',
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-4 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_persen_4 ?? 0,
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-4 (Rp)',
+      meta: {
+        tdClassNames: 'text-center whitespace-nowrap',
+      },
+      accessorFn: (row) => (row.pagu_persen_4 ? row.pagu_persen_4 : 0) + ' %',
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-5 (K)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_persen_5 ?? 0,
+    },
+    {
+      header:
+        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-5 (Rp)',
+      meta: {
+        tdClassNames: 'text-center whitespace-nowrap',
+      },
+      accessorFn: (row) => (row.pagu_persen_5 ? row.pagu_persen_5 : 0) + ' %',
+    },
+    //#endregion
+    {
+      header: 'Capaian Pada Akhir Tahun Perencanaan',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
+    },
+    {
+      header: 'Perangkat Daerah',
+      cell: skpd,
     },
   ];
-
-  // Target, Capaian, Rasio per tahun ke 1–5
-  for (let tahunKe = 1; tahunKe <= 5; tahunKe++) {
-    columns.push(
-      {
-        header: `Target K Tahun ${tahunKe}`,
-        accessorFn: (row) =>
-          row.target_io_tahun_ke === tahunKe ? (row.target_io_target ?? 0) : '',
-      },
-      {
-        header: `Target Rp Tahun ${tahunKe}`,
-        accessorFn: (row) =>
-          row.pagu_tahun_ke === tahunKe ? (row.pagu_pagu ?? 0) : '',
-      },
-    );
-  }
-  for (let tahunKe = 1; tahunKe <= 5; tahunKe++) {
-    columns.push(
-      {
-        header: `Capaian K Tahun ${tahunKe}`,
-        accessorFn: (row) =>
-          row.target_io_tahun_ke === tahunKe
-            ? (row.target_io_capaian ?? 0)
-            : '',
-      },
-      {
-        header: `Capaian Rp Tahun ${tahunKe}`,
-        accessorFn: (row) =>
-          row.pagu_tahun_ke === tahunKe ? (row.pagu_realisasi ?? 0) : '',
-      },
-    );
-  }
-  for (let tahunKe = 1; tahunKe <= 5; tahunKe++) {
-    columns.push(
-      {
-        header: `Rasio K Tahun ${tahunKe}`,
-        accessorFn: (row) =>
-          row.target_io_tahun_ke === tahunKe ? (row.target_io_persen ?? 0) : '',
-      },
-      {
-        header: `Rasio Rp Tahun ${tahunKe}`,
-        accessorFn: (row) =>
-          row.pagu_tahun_ke === tahunKe ? (row.pagu_persen ?? 0) : '',
-      },
-    );
-  }
-
-  // Kolom terakhir
-  columns.push({
-    header: 'Capaian Pada Akhir Tahun Perencanaan',
-    accessorFn: () => '',
-  });
-  columns.push({
-    header: 'Perangkat Daerah Penanggung Jawab',
-    accessorFn: () => '',
-  });
 
   return (
     <div className='flex flex-col p-4'>

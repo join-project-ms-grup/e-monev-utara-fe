@@ -102,53 +102,53 @@ const RPJMDTable = () => {
       accessorFn: (row) => row.indikator_o_name || '',
     },
     {
-      header: 'Data Capaian Awal (K)',
+      header: 'Data Capaian Awal',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_capaian ?? 0,
+      accessorFn: (row) => row.target_io_capaian_1 ?? 0,
     },
     {
       header: 'Target Akhir (K)',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_target ?? 0,
+      accessorFn: (row) => row.target_io_target_5 ?? 0,
     },
     {
       header: 'Target Akhir (Rp)',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.pagu_pagu ?? 0,
+      accessorFn: (row) => row.pagu_pagu_5 ?? 0,
     },
     {
       header: 'Capaian Akhir (K)',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_capaian ?? 0,
+      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
     },
     {
       header: 'Capaian Akhir (Rp)',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.pagu_realisasi ?? 0,
+      accessorFn: (row) => row.pagu_realisasi_5 ?? 0,
     },
     {
       header: 'Rasio Akhir (%) K',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_persen ?? 0,
+      accessorFn: (row) => row.target_io_persen_5 ?? 0,
     },
     {
       header: 'Rasio Akhir (%) Rp',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.pagu_persen ?? 0,
+      accessorFn: (row) => row.pagu_persen_5 ?? 0,
     },
   ];
 
@@ -260,7 +260,7 @@ const RPJMDTable = () => {
               </div>
             </div>
             <div className='p-2'>
-              <RPJMDPreviewTable data={data || []} />
+              <RPJMDPreviewTable data={data || []} skpd={listSKPDPeriode.find(item => item.value === selectedSKPD)?.label ?? ''} />
             </div>
           </div>,
           document.body,

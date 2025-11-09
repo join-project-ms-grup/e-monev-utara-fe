@@ -204,17 +204,65 @@ export interface FlatRPJMD {
     indikator_o_name?: string;
     indikator_o_satuan?: string;
 
-    target_io_tahun?: number;
-    target_io_tahun_ke?: number;
-    target_io_target?: number;
-    target_io_capaian?: number;
-    target_io_persen?: number;
+    target_io_tahun_1?: number;
+    target_io_tahun_ke_1?: number;
+    target_io_target_1?: number;
+    target_io_capaian_1?: number;
+    target_io_persen_1?: number;
 
-    pagu_tahun?: number;
-    pagu_tahun_ke?: number;
-    pagu_pagu?: number;
-    pagu_realisasi?: number;
-    pagu_persen?: number;
+    target_io_tahun_2?: number;
+    target_io_tahun_ke_2?: number;
+    target_io_target_2?: number;
+    target_io_capaian_2?: number;
+    target_io_persen_2?: number;
+
+    target_io_tahun_3?: number;
+    target_io_tahun_ke_3?: number;
+    target_io_target_3?: number;
+    target_io_capaian_3?: number;
+    target_io_persen_3?: number;
+
+    target_io_tahun_4?: number;
+    target_io_tahun_ke_4?: number;
+    target_io_target_4?: number;
+    target_io_capaian_4?: number;
+    target_io_persen_4?: number;
+
+    target_io_tahun_5?: number;
+    target_io_tahun_ke_5?: number;
+    target_io_target_5?: number;
+    target_io_capaian_5?: number;
+    target_io_persen_5?: number;
+
+    pagu_tahun_1?: number;
+    pagu_tahun_ke_1?: number;
+    pagu_pagu_1?: number;
+    pagu_realisasi_1?: number;
+    pagu_persen_1?: number;
+
+    pagu_tahun_2?: number;
+    pagu_tahun_ke_2?: number;
+    pagu_pagu_2?: number;
+    pagu_realisasi_2?: number;
+    pagu_persen_2?: number;
+
+    pagu_tahun_3?: number;
+    pagu_tahun_ke_3?: number;
+    pagu_pagu_3?: number;
+    pagu_realisasi_3?: number;
+    pagu_persen_3?: number;
+
+    pagu_tahun_4?: number;
+    pagu_tahun_ke_4?: number;
+    pagu_pagu_4?: number;
+    pagu_realisasi_4?: number;
+    pagu_persen_4?: number;
+
+    pagu_tahun_5?: number;
+    pagu_tahun_ke_5?: number;
+    pagu_pagu_5?: number;
+    pagu_realisasi_5?: number;
+    pagu_persen_5?: number;
 }
 
 export function flatRPJMD2(data: RPJMDMaster[]): FlatRPJMD[] {
@@ -242,34 +290,41 @@ export function flatRPJMD2(data: RPJMDMaster[]): FlatRPJMD[] {
                 });
 
                 for (const outcome of program.outcome) {
-                    const indikator = outcome.indikatorOutcome; // ini objek, bukan array
+                    const indikator = outcome.indikatorOutcome;
                     if (indikator) {
-                        for (const target of indikator.targetIndikatorOutcome ?? []) {
-                            result.push({
-                                kode: `${urusan.kode}.${bidang.kode}.${program.kode}`,
-                                name: program.name,
-                                type: 'program',
-                                outcome_name: outcome.outcome,
-                                indikator_o_name: indikator.nama,
-                                indikator_o_satuan: indikator.satuan ?? '',
-                                target_io_tahun: target.tahun,
-                                target_io_tahun_ke: target.tahun_ke,
-                                target_io_target: target.target,
-                                target_io_capaian: target.capaian,
-                                target_io_persen: target.persen,
-                            });
-                        }
-                    }
-                }
+                        const target = indikator.targetIndikatorOutcome;
+                        const targets = [1, 2, 3, 4, 5].map(tahun => target.find(item => item.tahun_ke === tahun));
+                        const pagu = program.pagu?.pagu;
+                        const pagus = [1, 2, 3, 4, 5].map(tahun => pagu.find(item => item.tahun_ke === tahun));
+                        const data = {
+                            kode: `${urusan.kode}.${bidang.kode}.${program.kode}`,
+                            name: outcome.outcome,
+                            // outcome_name: outcome.outcome,
+                            indikator_o_name: indikator.nama,
+                            indikator_o_satuan: indikator.satuan ?? ''
+                        };
 
-                for (const paguItem of program.pagu?.pagu ?? []) {
-                    result.push({
-                        pagu_tahun: paguItem.tahun,
-                        pagu_tahun_ke: paguItem.tahun_ke,
-                        pagu_pagu: Number(paguItem.pagu),
-                        pagu_realisasi: Number(paguItem.realisasi),
-                        pagu_persen: paguItem.persen,
-                    });
+                        targets.forEach((t, i) => {
+                            const idx = i + 1;
+                            (data as any)[`target_io_tahun_${idx}`] = t?.tahun_ke;
+                            (data as any)[`target_io_tahun_ke_${idx}`] = t?.tahun_ke;
+                            (data as any)[`target_io_target_${idx}`] = t?.target;
+                            (data as any)[`target_io_capaian_${idx}`] = t?.capaian;
+                            (data as any)[`target_io_persen_${idx}`] = t?.persen;
+                        });
+
+                        pagus.forEach((p, i) => {
+                            const idx = i + 1;
+                            (data as any)[`pagu_tahun_${idx}`] = p?.tahun;
+                            (data as any)[`pagu_tahun_ke_${idx}`] = p?.tahun_ke;
+                            (data as any)[`pagu_pagu_${idx}`] = Number(p?.pagu);
+                            (data as any)[`pagu_realisasi_${idx}`] = Number(p?.realisasi);
+                            (data as any)[`pagu_persen_${idx}`] = p?.persen;
+                        });
+
+                        result.push(data);
+
+                    }
                 }
             }
         }
