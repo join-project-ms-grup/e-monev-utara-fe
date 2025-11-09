@@ -12,7 +12,7 @@ import { waktuNowGabung } from '../../lib/helper';
  * @param data array data
  * @param opts.startRow (optional) baris mulai data (default 16)
  */
-export const exportDAKFisik = async (
+export const exportDAK = async (
     data: any[],
     tahun: string,
     periodeLaporan: string,
@@ -39,7 +39,7 @@ export const exportDAKFisik = async (
         'B10:S10',
         'A12:A15',
         'B12:E14', 'B15:E15',
-        'F12:J12', 'F13:F14', 'G13:G14', 'H13:I14',
+        'F12:J12', 'F13:F14', 'G13:G14', 'H13:H14','I13:I14',
         'K12:M12',
         'M13:M14',
         'N12:Q12', 'N13:O13', 'P13:Q13',

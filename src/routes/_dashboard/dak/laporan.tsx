@@ -8,7 +8,8 @@ import {
 } from '../../../lib/usercookie';
 import InputButton from '../../../components/inputs/InputButton';
 import { MdPreview } from 'react-icons/md';
-import { exportDAKFisik } from '../../../services/Excel/ExcelDAKFisik';
+import { exportDAK } from '../../../services/Excel/ExcelDAK';
+import { exportDAKSD } from '../../../services/Excel/ExcelDAKSD';
 
 export const Route = createFileRoute('/_dashboard/dak/laporan')({
   head: () => ({
@@ -198,7 +199,7 @@ function RouteComponent() {
                       ?.label;
             const jdak = jenisDAK === 'fisik' ? 'DAK Fisik' : 'DAK Non-Fisik';
 
-            exportDAKFisik(
+            exportDAK(
               [],
               listTahunKe
                 .find((item) => item.value === tahunKe)
@@ -216,7 +217,37 @@ function RouteComponent() {
         </InputButton>
       </div>
       <div className='w-full'>
-        <InputButton className='px-2 w-full bg-cyan-700'>
+        <InputButton
+          className='px-2 w-full bg-cyan-700'
+          onClick={() => {
+            const perla = listPerLaporan.find(
+              (item) => item.value === perLaporan,
+            )?.label;
+            const perwala =
+              perLaporan === 'bulan'
+                ? listBulan.find((item) => item.value === perWaktuLaporan)
+                    ?.label
+                : perLaporan === 'triwulan'
+                  ? listTriwulan
+                      .find((item) => item.value === perWaktuLaporan)
+                      ?.label.replace('Triwulan ', '')
+                  : listSemester.find((item) => item.value === perWaktuLaporan)
+                      ?.label;
+            const jdak = jenisDAK === 'fisik' ? 'DAK Fisik' : 'DAK Non-Fisik';
+
+            exportDAKSD(
+              [],
+              listTahunKe
+                .find((item) => item.value === tahunKe)
+                ?.label.toUpperCase() ?? '',
+              perla?.toUpperCase() ?? '',
+              perwala?.toUpperCase() ?? '',
+              '',
+              '',
+              jdak.toUpperCase(),
+            );
+          }}
+        >
           <MdPreview />
           Laporan Kemajuan Pelaksanaan Kegiatan DAK (sampai dengan)
         </InputButton>
