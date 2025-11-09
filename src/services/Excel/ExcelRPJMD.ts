@@ -2,6 +2,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { waktuNowGabung } from '../../lib/helper';
 import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
+import type { FlatRPJMD } from '../RPJMDService';
 
 /**
  * Export RKPD mimic dari file sumber.
@@ -15,7 +16,7 @@ import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/
  * @param opts.startRow (optional) baris mulai data (default 13)
  */
 export const exportRPJMD = async (
-    data: any[],
+    data: FlatRPJMD[],
     opts?: { startRow?: number },
 ) => {
     const awalPeriode = getPeriodeMulaiFromCookie();
@@ -48,7 +49,7 @@ export const exportRPJMD = async (
     });
 
     const widthMap: Record<string, number> = {
-        A: 5, B: 20, C: 20, D: 20, E: 20, F: 20, G: 20,
+        A: 5, B: 20, C: 40, D: 40, E: 20, F: 20, G: 20,
         H: 20, I: 20, J: 20, K: 20, L: 20, M: 20,
         N: 20, O: 20, P: 20, Q: 20, R: 20, S: 20,
         T: 20, U: 20, V: 20, W: 20, X: 20, Y: 20,
@@ -94,7 +95,7 @@ export const exportRPJMD = async (
         { addr: 'X10', value: '4' }, { addr: 'X11', value: '(15)' }, { addr: 'X12', value: 'K' }, { addr: 'Y12', value: 'Rp' },
         { addr: 'Z10', value: '5' }, { addr: 'Z11', value: '(16)' }, { addr: 'Z12', value: 'K' }, { addr: 'AA12', value: 'Rp' },
 
-        { addr: 'AB9', value: 'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke- \n(%)' },
+        { addr: 'AB9', value: 'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke- (%)' },
         { addr: 'AB10', value: '1' }, { addr: 'AB11', value: '(17)' }, { addr: 'AB12', value: 'K' }, { addr: 'AC12', value: 'Rp' },
         { addr: 'AD10', value: '2' }, { addr: 'AD11', value: '(18)' }, { addr: 'AD12', value: 'K' }, { addr: 'AE12', value: 'Rp' },
         { addr: 'AF10', value: '3' }, { addr: 'AF11', value: '(19)' }, { addr: 'AF12', value: 'K' }, { addr: 'AG12', value: 'Rp' },
@@ -132,6 +133,106 @@ export const exportRPJMD = async (
 
     //#region Mapping Data
     let rowIndex = startRow;
+    let no = 1;
+
+    data.forEach((item) => {
+        if (item.type === 'urusan') {
+            const row = worksheet.getRow(rowIndex++);
+            row.getCell('A').value = no++;
+            row.getCell('C').value = item.name;
+        }
+        if (item.type === 'bidang') {
+            const row = worksheet.getRow(rowIndex++);
+            row.getCell('A').value = no++;
+            row.getCell('C').value = item.name;
+        }
+        if (item.type === 'program') {
+            const row = worksheet.getRow(rowIndex++);
+            row.getCell('A').value = no++;
+            row.getCell('C').value = item.name;
+        }
+        if (item.indikator_o_name) {
+            const row = worksheet.getRow(rowIndex++);
+            row.getCell('A').value = no++;
+            row.getCell('C').value = item.name;
+            row.getCell('D').value = item.indikator_o_name;
+
+            // Target
+            row.getCell('H').value = item.target_io_target_1;
+            row.getCell('I').value = item.pagu_pagu_1;
+
+            row.getCell('J').value = item.target_io_target_2;
+            row.getCell('K').value = item.pagu_pagu_2;
+
+            row.getCell('L').value = item.target_io_target_3;
+            row.getCell('M').value = item.pagu_pagu_3;
+
+            row.getCell('N').value = item.target_io_target_4;
+            row.getCell('O').value = item.pagu_pagu_4;
+
+            row.getCell('P').value = item.target_io_target_5;
+            row.getCell('Q').value = item.pagu_pagu_5;
+
+            // Capaian
+            row.getCell('R').value = item.target_io_capaian_1;
+            row.getCell('S').value = item.pagu_realisasi_1;
+
+            row.getCell('T').value = item.target_io_capaian_2;
+            row.getCell('U').value = item.pagu_realisasi_2;
+
+            row.getCell('V').value = item.target_io_capaian_3;
+            row.getCell('W').value = item.pagu_realisasi_3;
+
+            row.getCell('X').value = item.target_io_capaian_4;
+            row.getCell('Y').value = item.pagu_realisasi_4;
+
+            row.getCell('Z').value = item.target_io_capaian_5;
+            row.getCell('AA').value = item.pagu_realisasi_5;
+
+            // Tingkat Capaian RKPD
+            row.getCell('AB').value = item.target_io_persen_1;
+            row.getCell('AC').value = item.pagu_persen_1;
+
+            row.getCell('AD').value = item.target_io_persen_2;
+            row.getCell('AE').value = item.pagu_persen_2;
+
+            row.getCell('AF').value = item.target_io_persen_3;
+            row.getCell('AG').value = item.pagu_persen_3;
+
+            row.getCell('AH').value = item.target_io_persen_4;
+            row.getCell('AI').value = item.pagu_persen_4;
+
+            row.getCell('AJ').value = item.target_io_persen_5;
+            row.getCell('AK').value = item.pagu_persen_5;
+
+            // Rasio capaian akhir
+            const totalTarget = (item.target_io_target_1 ?? 0) + (item.target_io_target_2 ?? 0) + (item.target_io_target_3 ?? 0) + (item.target_io_target_4 ?? 0) + (item.target_io_target_5 ?? 0);
+            const totalCapaian = (item.target_io_capaian_1 ?? 0) + (item.target_io_capaian_2 ?? 0) + (item.target_io_capaian_3 ?? 0) + (item.target_io_capaian_4 ?? 0) + (item.target_io_capaian_5 ?? 0);
+            row.getCell('AL').value = totalCapaian;
+            row.getCell('AN').value = totalTarget > 0 ? (totalCapaian / totalTarget) * 100 : 0;
+
+            const totalTargetPagu = (item.pagu_pagu_1 ?? 0) + (item.pagu_pagu_2 ?? 0) + (item.pagu_pagu_3 ?? 0) + (item.pagu_pagu_4 ?? 0) + (item.pagu_pagu_5 ?? 0);
+            const totalCapaianPagu = (item.pagu_realisasi_1 ?? 0) + (item.pagu_realisasi_2 ?? 0) + (item.pagu_realisasi_3 ?? 0) + (item.pagu_realisasi_4 ?? 0) + (item.pagu_realisasi_5 ?? 0);
+            row.getCell('AM').value = totalCapaianPagu;
+            row.getCell('AO').value = totalTargetPagu > 0 ? (totalCapaianPagu / totalTargetPagu) * 100 : 0;
+
+            const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+            ['G', 'I', 'K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA'].forEach((col) => {
+                row.getCell(col).numFmt = fmtRupiah;
+            });
+
+            row.getCell('AC').numFmt = '0.00%';
+            row.getCell('AE').numFmt = '0.00%';
+            row.getCell('AG').numFmt = '0.00%';
+            row.getCell('AI').numFmt = '0.00%';
+            row.getCell('AK').numFmt = '0.00%';
+
+            row.getCell('AN').numFmt = '0.00%';
+            row.getCell('AO').numFmt = '0.00%';
+        }
+    });
+
+
 
     const lastRow = rowIndex;
     const startCol = 1;
@@ -148,6 +249,12 @@ export const exportRPJMD = async (
                 right: { style: 'thin' },
             };
         }
+        const cellC = row.getCell('C');
+        cellC.alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
+
+        // Kolom D
+        const cellD = row.getCell('D');
+        cellD.alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
     }
 
     const rowsConfig = [

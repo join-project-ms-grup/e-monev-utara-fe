@@ -20,7 +20,7 @@ import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
-  flatRPJMD2,
+  flatRPJMD,
   getRPJMD,
   type FlatRPJMD,
 } from '../../../../services/RPJMDService';
@@ -75,7 +75,7 @@ const RPJMDTable = () => {
     queryKey: ['tabel_rkpd_5_tahunan', selectedSKPD],
     queryFn: async () => {
       const rawData = await getRPJMD(Number(selectedSKPD));
-      const flatten = flatRPJMD2(rawData);
+      const flatten = flatRPJMD(rawData);
       console.log(flatten);
       return flatten;
     },
@@ -94,7 +94,6 @@ const RPJMDTable = () => {
     },
     {
       header: 'Program Prioritas',
-      // accessorFn: (row) => (row.type === 'program' ? row.name : ''),
       accessorFn: (row) => row.name ?? '',
     },
     {
@@ -107,6 +106,17 @@ const RPJMDTable = () => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_1 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Target Akhir (K)',
@@ -114,6 +124,17 @@ const RPJMDTable = () => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_target_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Target Akhir (Rp)',
@@ -121,6 +142,17 @@ const RPJMDTable = () => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.pagu_pagu_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Capaian Akhir (K)',
@@ -128,6 +160,17 @@ const RPJMDTable = () => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Capaian Akhir (Rp)',
@@ -135,6 +178,17 @@ const RPJMDTable = () => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.pagu_realisasi_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Rasio Akhir (%) K',
@@ -142,6 +196,17 @@ const RPJMDTable = () => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_persen_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Rasio Akhir (%) Rp',
@@ -149,6 +214,17 @@ const RPJMDTable = () => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.pagu_persen_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
   ];
 
@@ -238,9 +314,8 @@ const RPJMDTable = () => {
                 <InputButton
                   className='h-9'
                   onClick={() => {
-                    const data = true;
                     if (data) {
-                      toast.promise(exportRPJMD([]), {
+                      toast.promise(exportRPJMD(data), {
                         loading: 'Sedang mengunduh...',
                         success: <b>Berhasil mengunduh.</b>,
                         error: <b>Gagal mengunduh.</b>,
@@ -260,7 +335,13 @@ const RPJMDTable = () => {
               </div>
             </div>
             <div className='p-2'>
-              <RPJMDPreviewTable data={data || []} skpd={listSKPDPeriode.find(item => item.value === selectedSKPD)?.label ?? ''} />
+              <RPJMDPreviewTable
+                data={data || []}
+                skpd={
+                  listSKPDPeriode.find((item) => item.value === selectedSKPD)
+                    ?.label ?? ''
+                }
+              />
             </div>
           </div>,
           document.body,

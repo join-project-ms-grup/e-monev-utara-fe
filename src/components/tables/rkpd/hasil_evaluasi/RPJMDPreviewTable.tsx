@@ -40,8 +40,9 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
             <br />
             (%)
           </th>
-          <th rowSpan={2}>Capaian Pada Akhir Tahun Perencanaan</th>
-          <th rowSpan={2}>Perangkat Daerah Penanggung Jawab</th>
+          <th rowSpan={2} colSpan={2}>
+            Rasio Capaian Akhir (%)
+          </th>
         </tr>
         <tr>
           {[...Array(3)].map((_, i) => (
@@ -132,7 +133,6 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
     },
     {
       header: 'Program Prioritas',
-      // accessorFn: (row) => (row.type === 'program' ? row.name : ''),
       accessorFn: (row) => row.name ?? '',
     },
     {
@@ -145,6 +145,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_1 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Target pada Akhir Tahun Perencanaan (K)',
@@ -152,6 +163,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header: 'Target pada Akhir Tahun Perencanaan (Rp)',
@@ -160,6 +182,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
       },
       accessorFn: (row) =>
         row.target_io_target_5 ? formatUang(row.target_io_target_5) : 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     //#region Target
     {
@@ -169,6 +202,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_target_1 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -177,6 +221,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => (row.pagu_pagu_1 ? formatUang(row.pagu_pagu_1) : 0),
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -185,6 +240,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_target_2 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -193,6 +259,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => (row.pagu_pagu_2 ? formatUang(row.pagu_pagu_2) : 0),
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -201,6 +278,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_target_3 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -209,6 +297,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => (row.pagu_pagu_3 ? formatUang(row.pagu_pagu_3) : 0),
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -217,6 +316,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_target_4 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -225,6 +335,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => (row.pagu_pagu_4 ? formatUang(row.pagu_pagu_4) : 0),
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -233,6 +354,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_target_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -241,6 +373,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => (row.pagu_pagu_5 ? formatUang(row.pagu_pagu_5) : 0),
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     //#endregion
     //#region Capaian
@@ -251,6 +394,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_1 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -260,6 +414,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
       },
       accessorFn: (row) =>
         row.pagu_realisasi_1 ? formatUang(row.pagu_realisasi_1) : 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -268,6 +433,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_2 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -277,6 +453,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
       },
       accessorFn: (row) =>
         row.pagu_realisasi_2 ? formatUang(row.pagu_realisasi_2) : 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -285,6 +472,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_3 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -294,6 +492,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
       },
       accessorFn: (row) =>
         row.pagu_realisasi_3 ? formatUang(row.pagu_realisasi_3) : 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -302,6 +511,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_4 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -311,6 +531,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
       },
       accessorFn: (row) =>
         row.pagu_realisasi_4 ? formatUang(row.pagu_realisasi_4) : 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -319,6 +550,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_capaian_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -328,6 +570,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
       },
       accessorFn: (row) =>
         row.pagu_realisasi_5 ? formatUang(row.pagu_realisasi_5) : 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     //#endregion
     //#region Tingkat
@@ -338,6 +591,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_persen_1 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -346,6 +610,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center whitespace-nowrap',
       },
       accessorFn: (row) => (row.pagu_persen_1 ? row.pagu_persen_1 : 0) + ' %',
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -354,6 +629,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_persen_2 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -362,6 +648,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center whitespace-nowrap',
       },
       accessorFn: (row) => (row.pagu_persen_2 ? row.pagu_persen_2 : 0) + ' %',
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -370,6 +667,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_persen_3 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -378,6 +686,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center whitespace-nowrap',
       },
       accessorFn: (row) => (row.pagu_persen_3 ? row.pagu_persen_3 : 0) + ' %',
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -386,6 +705,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_persen_4 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -394,6 +724,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center whitespace-nowrap',
       },
       accessorFn: (row) => (row.pagu_persen_4 ? row.pagu_persen_4 : 0) + ' %',
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -402,6 +743,17 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center',
       },
       accessorFn: (row) => row.target_io_persen_5 ?? 0,
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
       header:
@@ -410,18 +762,88 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         tdClassNames: 'text-center whitespace-nowrap',
       },
       accessorFn: (row) => (row.pagu_persen_5 ? row.pagu_persen_5 : 0) + ' %',
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     //#endregion
     {
-      header: 'Capaian Pada Akhir Tahun Perencanaan',
+      header: 'Rasio Capaian Akhir  (K)',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
+      accessorFn: (row) => {
+        const totalTarget =
+          (row.target_io_target_1 ?? 0) +
+          (row.target_io_target_2 ?? 0) +
+          (row.target_io_target_3 ?? 0) +
+          (row.target_io_target_4 ?? 0) +
+          (row.target_io_target_5 ?? 0);
+
+        const totalCapaian =
+          (row.target_io_capaian_1 ?? 0) +
+          (row.target_io_capaian_2 ?? 0) +
+          (row.target_io_capaian_3 ?? 0) +
+          (row.target_io_capaian_4 ?? 0) +
+          (row.target_io_capaian_5 ?? 0);
+
+        return (totalTarget > 0 ? (totalCapaian / totalTarget) * 100 : 0)+ ' %';
+      },
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
     {
-      header: 'Perangkat Daerah',
-      cell: skpd,
+      header: 'Rasio Capaian Akhir (Rp)',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      accessorFn: (row) => {
+        const totalTargetPagu =
+          (row.pagu_pagu_1 ?? 0) +
+          (row.pagu_pagu_2 ?? 0) +
+          (row.pagu_pagu_3 ?? 0) +
+          (row.pagu_pagu_4 ?? 0) +
+          (row.pagu_pagu_5 ?? 0);
+
+        const totalCapaianPagu =
+          (row.pagu_realisasi_1 ?? 0) +
+          (row.pagu_realisasi_2 ?? 0) +
+          (row.pagu_realisasi_3 ?? 0) +
+          (row.pagu_realisasi_4 ?? 0) +
+          (row.pagu_realisasi_5 ?? 0);
+
+        return (totalTargetPagu > 0
+          ? (totalCapaianPagu / totalTargetPagu) * 100
+          : 0)+ ' %';
+      },
+      cell: ({ row, getValue }) => {
+        if (
+          row.original.type === 'urusan' ||
+          row.original.type === 'bidang' ||
+          row.original.type === 'program'
+        ) {
+          return null;
+        } else {
+          return getValue();
+        }
+      },
     },
   ];
 
@@ -471,13 +893,6 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
         </div>
       </div>
     </div>
-    // <Tabel
-    //   customTableClass='table-excel'
-    //   data={data}
-    //   columns={columns}
-    //   renderHeader={tableHead}
-    //   disablePagination
-    // />
   );
 };
 
