@@ -30,6 +30,7 @@ import { Route as DashboardKonfigurasiRoleRouteImport } from './routes/_dashboar
 import { Route as DashboardKonfigurasiPeriodeRouteImport } from './routes/_dashboard/konfigurasi/periode'
 import { Route as DashboardKonfigurasiJadwalRouteImport } from './routes/_dashboard/konfigurasi/jadwal'
 import { Route as DashboardDakMonitoringRouteImport } from './routes/_dashboard/dak/monitoring'
+import { Route as DashboardDakLaporanRouteImport } from './routes/_dashboard/dak/laporan'
 import { Route as DashboardDakIdentifikasiRouteImport } from './routes/_dashboard/dak/identifikasi'
 import { Route as DashboardDakDaftardakRouteImport } from './routes/_dashboard/dak/daftardak'
 import { Route as DashboardRkpdRenstra_rpjmdRouteRouteImport } from './routes/_dashboard/rkpd/renstra_rpjmd/route'
@@ -177,6 +178,11 @@ const DashboardKonfigurasiJadwalRoute =
 const DashboardDakMonitoringRoute = DashboardDakMonitoringRouteImport.update({
   id: '/monitoring',
   path: '/monitoring',
+  getParentRoute: () => DashboardDakRouteRoute,
+} as any)
+const DashboardDakLaporanRoute = DashboardDakLaporanRouteImport.update({
+  id: '/laporan',
+  path: '/laporan',
   getParentRoute: () => DashboardDakRouteRoute,
 } as any)
 const DashboardDakIdentifikasiRoute =
@@ -399,6 +405,7 @@ export interface FileRoutesByFullPath {
   '/rkpd/renstra_rpjmd': typeof DashboardRkpdRenstra_rpjmdRouteRouteWithChildren
   '/dak/daftardak': typeof DashboardDakDaftardakRoute
   '/dak/identifikasi': typeof DashboardDakIdentifikasiRoute
+  '/dak/laporan': typeof DashboardDakLaporanRoute
   '/dak/monitoring': typeof DashboardDakMonitoringRoute
   '/konfigurasi/jadwal': typeof DashboardKonfigurasiJadwalRoute
   '/konfigurasi/periode': typeof DashboardKonfigurasiPeriodeRoute
@@ -446,6 +453,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/dak/daftardak': typeof DashboardDakDaftardakRoute
   '/dak/identifikasi': typeof DashboardDakIdentifikasiRoute
+  '/dak/laporan': typeof DashboardDakLaporanRoute
   '/dak/monitoring': typeof DashboardDakMonitoringRoute
   '/konfigurasi/jadwal': typeof DashboardKonfigurasiJadwalRoute
   '/konfigurasi/periode': typeof DashboardKonfigurasiPeriodeRoute
@@ -505,6 +513,7 @@ export interface FileRoutesById {
   '/_dashboard/rkpd/renstra_rpjmd': typeof DashboardRkpdRenstra_rpjmdRouteRouteWithChildren
   '/_dashboard/dak/daftardak': typeof DashboardDakDaftardakRoute
   '/_dashboard/dak/identifikasi': typeof DashboardDakIdentifikasiRoute
+  '/_dashboard/dak/laporan': typeof DashboardDakLaporanRoute
   '/_dashboard/dak/monitoring': typeof DashboardDakMonitoringRoute
   '/_dashboard/konfigurasi/jadwal': typeof DashboardKonfigurasiJadwalRoute
   '/_dashboard/konfigurasi/periode': typeof DashboardKonfigurasiPeriodeRoute
@@ -564,6 +573,7 @@ export interface FileRouteTypes {
     | '/rkpd/renstra_rpjmd'
     | '/dak/daftardak'
     | '/dak/identifikasi'
+    | '/dak/laporan'
     | '/dak/monitoring'
     | '/konfigurasi/jadwal'
     | '/konfigurasi/periode'
@@ -611,6 +621,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dak/daftardak'
     | '/dak/identifikasi'
+    | '/dak/laporan'
     | '/dak/monitoring'
     | '/konfigurasi/jadwal'
     | '/konfigurasi/periode'
@@ -669,6 +680,7 @@ export interface FileRouteTypes {
     | '/_dashboard/rkpd/renstra_rpjmd'
     | '/_dashboard/dak/daftardak'
     | '/_dashboard/dak/identifikasi'
+    | '/_dashboard/dak/laporan'
     | '/_dashboard/dak/monitoring'
     | '/_dashboard/konfigurasi/jadwal'
     | '/_dashboard/konfigurasi/periode'
@@ -863,6 +875,13 @@ declare module '@tanstack/react-router' {
       path: '/monitoring'
       fullPath: '/dak/monitoring'
       preLoaderRoute: typeof DashboardDakMonitoringRouteImport
+      parentRoute: typeof DashboardDakRouteRoute
+    }
+    '/_dashboard/dak/laporan': {
+      id: '/_dashboard/dak/laporan'
+      path: '/laporan'
+      fullPath: '/dak/laporan'
+      preLoaderRoute: typeof DashboardDakLaporanRouteImport
       parentRoute: typeof DashboardDakRouteRoute
     }
     '/_dashboard/dak/identifikasi': {
@@ -1116,6 +1135,7 @@ declare module '@tanstack/react-router' {
 interface DashboardDakRouteRouteChildren {
   DashboardDakDaftardakRoute: typeof DashboardDakDaftardakRoute
   DashboardDakIdentifikasiRoute: typeof DashboardDakIdentifikasiRoute
+  DashboardDakLaporanRoute: typeof DashboardDakLaporanRoute
   DashboardDakMonitoringRoute: typeof DashboardDakMonitoringRoute
   DashboardDakIndexRoute: typeof DashboardDakIndexRoute
 }
@@ -1123,6 +1143,7 @@ interface DashboardDakRouteRouteChildren {
 const DashboardDakRouteRouteChildren: DashboardDakRouteRouteChildren = {
   DashboardDakDaftardakRoute: DashboardDakDaftardakRoute,
   DashboardDakIdentifikasiRoute: DashboardDakIdentifikasiRoute,
+  DashboardDakLaporanRoute: DashboardDakLaporanRoute,
   DashboardDakMonitoringRoute: DashboardDakMonitoringRoute,
   DashboardDakIndexRoute: DashboardDakIndexRoute,
 }

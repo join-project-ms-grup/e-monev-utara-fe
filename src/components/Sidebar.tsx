@@ -16,6 +16,8 @@ import {
   MdEventNote,
   MdAssessment,
   MdMonitor,
+  MdReport,
+  MdContentPaste,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
 
@@ -134,9 +136,9 @@ const menuDAK: MenuItem[] = [
     akses: [2, 4],
   },
   {
-    label: 'Daftar dan Jenis DAK',
-    icon: <MdViewList />,
-    to: '/dak/daftardak',
+    label: 'Laporan',
+    icon: <MdContentPaste />,
+    to: '/dak/laporan',
     akses: [2, 4],
   },
 ];
