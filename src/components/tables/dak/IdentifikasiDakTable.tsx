@@ -296,7 +296,7 @@ const DetailDak = ({ id_ident }: { id_ident: number }) => {
   return (
     <>
       {' '}
-      <div className='grid grid-cols-2 grid-rows-2 gap-2'>
+      <div className='grid grid-cols-2 gap-2'>
         <div className='col-start-1 row-span-2'>
           <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
             <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
@@ -471,6 +471,217 @@ const DetailDak = ({ id_ident }: { id_ident: number }) => {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+        <div className='col-span-2'>
+          <div className='table-responsive'>
+            <table className='w-full'>
+              <thead>
+                <tr>
+                  <th>Kode Berkas</th>
+                  <th>Checklist</th>
+                  <th>Berkas</th>
+                  <th>Kesesuaian</th>
+                  <th>Waktu</th>
+                  <th>Keterangan</th>
+                  <th>Pesan Verifikasi</th>
+                  <th>Tanggal & Jam Upload</th>
+                </tr>
+              </thead>
+
+              <tbody className='text-center'>
+                <tr>
+                  <td>-</td>
+                  <td colSpan={7} className='text-left'>
+                    <b>PERENCANAAN</b>
+                  </td>
+                </tr>
+                {/* 1 */}
+                <tr>
+                  <td>1</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      PMK (Alokasi dan Pedoman Umum)
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 2 */}
+                <tr>
+                  <td>2</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Petunjuk Teknis (Juknis)
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 3 */}
+                <tr>
+                  <td>3</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Penyusunan Rencana Kerja dan Anggaran SKPD
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 4 */}
+                <tr>
+                  <td>4</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>Penetapan DPA - SKPD</span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                <tr>
+                  <td>-</td>
+                  <td colSpan={7} className='text-left'>
+                    <b>PELAKSANAAN</b>
+                  </td>
+                </tr>
+                {/* 5 */}
+                <tr>
+                  <td>5</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      SK Penetapan Pelaksanaan Kegiatan
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 6 */}
+                <tr>
+                  <td>6</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Pelaksanaan Tender Pekerjaan Kontrak
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 7 */}
+                <tr>
+                  <td>7</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Persiapan Pekerjaan Swakelola
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 8 */}
+                <tr>
+                  <td>8</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Pelaksanaan Pekerjaan Kontrak
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 9 */}
+                <tr>
+                  <td>9</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Pelaksanaan Pekerjaan Swakelola
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 10 */}
+                <tr>
+                  <td>10</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Penerbitan Surat Permintaan Pembayaran (SPP)
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 11 */}
+                <tr>
+                  <td>11</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Penerbitan Surat Perintah Membayar (SPM)
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+                {/* 12 */}
+                <tr>
+                  <td>12</td>
+                  <td className='text-left'>
+                    <span className='text-red-500'>
+                      Penerbitan Surat Perintah Pencairan Dana (SP2D)
+                    </span>
+                  </td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
