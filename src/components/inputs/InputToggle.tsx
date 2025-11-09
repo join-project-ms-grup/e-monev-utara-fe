@@ -10,6 +10,8 @@ interface InputProps {
   name?: string;
   onLabel?: string;
   offLabel?: string;
+  tooltip?: string;
+  tooltipId?: string;
 }
 
 const InputToggle = ({
@@ -21,6 +23,8 @@ const InputToggle = ({
   name,
   onLabel = 'On',
   offLabel = 'Off',
+  tooltip,
+  tooltipId = 'tooltip',
 }: InputProps) => {
   const isControlled = checked !== undefined;
 
@@ -32,6 +36,8 @@ const InputToggle = ({
 
   return (
     <label
+      {...(tooltip ? { 'data-tooltip-id': tooltipId } : {})}
+      {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
       htmlFor={id}
       className={`h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm ${checked ? 'bg-green-500' : 'bg-red-500'} font-bold select-none overflow-hidden transition-all duration-300 ${
         disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
@@ -59,7 +65,7 @@ const InputToggle = ({
         {offLabel}
       </div>
       <div
-        className={`py-1.5 px-4 text-center z-0 transition-all duration-300 text-[var(--text-3)] opacity-0 peer-checked:opacity-100`}
+        className={`py-1.5 text-center z-0 transition-all duration-300 text-[var(--text-3)] opacity-0 peer-checked:opacity-100`}
       >
         <span>{onLabel}</span>
       </div>

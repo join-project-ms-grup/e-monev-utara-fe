@@ -34,7 +34,7 @@ export const Route = createFileRoute('/auth/')({
 function RouteComponent() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [showLogin, setShowLogin] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 

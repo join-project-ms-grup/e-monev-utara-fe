@@ -131,6 +131,9 @@ const RKPD_RealisasiTable = () => {
     },
     {
       header: 'Input',
+      meta:{
+        tdClassNames: 'text-center'
+      },
       cell: ({ row }) => {
         if (row.original.level === 'sub_kegiatan') {
           const data = row.original;
@@ -138,6 +141,8 @@ const RKPD_RealisasiTable = () => {
             <>
               <AksiButton
                 Icon={MdInput}
+                className='hover:bg-[var(--color-2)]!'
+                tooltip='Input Realisasi'
                 onClick={() => {
                   setFormData({
                     rekening_kode: `${data.kode_urusan}.${data.kode_bidang}.${data.kode_program}.${data.kode_kegiatan}.${data.kode_subKegiatan}`,

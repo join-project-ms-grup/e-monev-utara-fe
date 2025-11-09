@@ -27,6 +27,7 @@ import Spinner from '../../../inputs/Spinner';
 import AksiButton from '../../../inputs/AksiButton';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../../lib/api';
+import InputToggle from '../../../inputs/InputToggle';
 
 const TaggingIndikatorIKDTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
@@ -177,19 +178,22 @@ const TaggingIndikatorIKDTable = () => {
                 <td>{firstItem.t_4_target}</td>
                 <td>{firstItem.t_5_target}</td>
                 <td>{firstItem.t_6_target}</td>
-                <td>
-                  <AksiButton
-                    Icon={MdTag}
-                    className='text-green-500 hover:text-white hover:bg-green-500!'
-                    tooltip='Tag Sebagai IKD ?'
-                    onClick={() => {
-                      toggleIKUMutation.mutate({
-                        id: firstItem.uraianId,
-                        skpd_id: Number(selectedSKPD),
-                        periodeId: idPeriode,
-                      });
-                    }}
-                  />
+                <td className='w-[120px]'>
+                  <div className='h-9'>
+                    <InputToggle
+                      tooltip='Tag sebagai IKU'
+                      onLabel='IKU'
+                      offLabel='IKD'
+                      checked={firstItem.is_iku}
+                      onToggle={() => {
+                        toggleIKUMutation.mutate({
+                          id: firstItem.uraianId,
+                          skpd_id: Number(selectedSKPD),
+                          periodeId: idPeriode,
+                        });
+                      }}
+                    />
+                  </div>
                 </td>
               </tr>
             </Fragment>
@@ -216,7 +220,7 @@ const TaggingIndikatorIKDTable = () => {
       return toggleTagIKU({ id, skpd_id, periodeId });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list_iku'] });
+      queryClient.invalidateQueries({ queryKey: ['list_ikd'] });
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
@@ -233,24 +237,23 @@ const TaggingIndikatorIKDTable = () => {
     <div className='space-y-2'>
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
-          {isDev() ||
-            (isAdmin() && (
-              <div>
-                <label htmlFor='skpd'>SKPD</label>
-                <InputSearchBox
-                  id='skpd'
-                  className='w-64 h-9'
-                  btnclassName='bg-white'
-                  placeholder='Pilih SKPD...'
-                  value={selectedSKPD.toString()}
-                  options={listIKSKPD as OptionItem[]}
-                  onChange={(val) => setSelectedSKPD(val)}
-                  onClear={() => setSelectedSKPD('')}
-                  tooltip
-                  withSearch
-                />
-              </div>
-            ))}
+          {(isDev() || isAdmin()) && (
+            <div>
+              <label htmlFor='skpd'>SKPD</label>
+              <InputSearchBox
+                id='skpd'
+                className='w-64 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih SKPD...'
+                value={selectedSKPD.toString()}
+                options={listIKSKPD as OptionItem[]}
+                onChange={(val) => setSelectedSKPD(val)}
+                onClear={() => setSelectedSKPD('')}
+                tooltip
+                withSearch
+              />
+            </div>
+          )}
         </div>
         <div className='inline-flex gap-2'>
           <InputButton
