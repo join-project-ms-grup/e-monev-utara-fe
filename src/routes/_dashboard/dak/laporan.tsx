@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
-import InputSearchBox from '../../../components/inputs/InputSearchBox';
+import InputSearchBox, {
+  type OptionItem,
+} from '../../../components/inputs/InputSearchBox';
 import { useState } from 'react';
 import {
   getPeriodeMulaiFromCookie,
@@ -10,6 +12,8 @@ import InputButton from '../../../components/inputs/InputButton';
 import { MdPreview } from 'react-icons/md';
 import { exportDAK } from '../../../services/Excel/ExcelDAK';
 import { exportDAKSD } from '../../../services/Excel/ExcelDAKSD';
+import { useQuery } from '@tanstack/react-query';
+import { getOPDDAK } from '../../../services/DAK/DAKOPDService';
 
 export const Route = createFileRoute('/_dashboard/dak/laporan')({
   head: () => ({
@@ -72,13 +76,24 @@ function RouteComponent() {
     { label: 'Semester II', value: '2' },
   ];
 
-  const [perLaporan, setPerLaporan] = useState('bulan');
+  const [perLaporan, setPerLaporan] = useState('triwulan');
   const [perWaktuLaporan, setPerWaktuLaporan] = useState('1');
   const [jenisDAK, setJenisDAK] = useState('fisik');
 
+  const [opdDAK, setOPDDAK] = useState('');
+  const { data: dataOPD } = useQuery({
+    queryKey: ['list_opd_dak'],
+    queryFn: getOPDDAK,
+  });
+  const listOPD =
+    dataOPD?.map((item) => ({
+      label: `${item.fullname}`,
+      value: item.id?.toString(),
+    })) || [];
+
   return (
     <div className='max-w-xl mx-auto flex flex-col space-y-2'>
-      <div className='grid grid-cols-[1fr_2fr] gap-2'>
+      <div className='grid grid-cols-[1fr_1fr] gap-2'>
         <div>
           <label htmlFor='tahun_ke'>Tahun Anggaran</label>
           <InputSearchBox
@@ -92,6 +107,17 @@ function RouteComponent() {
           />
         </div>
         <div>
+          <label htmlFor='perTriwulan'>Triwulan</label>
+          <InputSearchBox
+            id='perTriwulan'
+            className='h-9'
+            placeholder='Pilih Triwulan...'
+            options={listTriwulan}
+            value={perWaktuLaporan}
+            onChange={(val) => setPerWaktuLaporan(val)}
+          />
+        </div>
+        {/* <div>
           <label htmlFor='jadwal'>Jadwal</label>
           <InputSearchBox
             id='jadwal'
@@ -99,9 +125,9 @@ function RouteComponent() {
             placeholder='Pilih Jadwal...'
             options={[]}
           />
-        </div>
+        </div> */}
       </div>
-      <div className='grid grid-cols-[1fr_2fr] gap-2'>
+      {/* <div className='grid grid-cols-[1fr_2fr] gap-2'>
         <div>
           <label htmlFor='perLaporan'>Periode Laporan</label>
           <InputSearchBox
@@ -154,15 +180,21 @@ function RouteComponent() {
             </>
           )}
         </div>
-      </div>
+      </div> */}
       <div className='grid grid-cols-[2fr_1fr] gap-2'>
         <div>
-          <label htmlFor='skpd'>SKPD</label>
+          <label htmlFor='opd'>OPD</label>
           <InputSearchBox
-            id='skpd'
+            id='opd'
             className='h-9'
-            placeholder='Pilih SKPD...'
-            options={[]}
+            btnclassName='bg-white'
+            placeholder='Pilih OPD'
+            value={opdDAK}
+            options={listOPD as OptionItem[]}
+            onChange={(val) => setOPDDAK(val)}
+            onClear={() => setOPDDAK('')}
+            withSearch
+            tooltip
           />
         </div>
         <div>
@@ -206,8 +238,7 @@ function RouteComponent() {
                 ?.label.toUpperCase() ?? '',
               perla?.toUpperCase() ?? '',
               perwala?.toUpperCase() ?? '',
-              '',
-              '',
+              listOPD.find((item) => item.value === opdDAK)?.label ?? '',
               jdak.toUpperCase(),
             );
           }}
@@ -242,8 +273,7 @@ function RouteComponent() {
                 ?.label.toUpperCase() ?? '',
               perla?.toUpperCase() ?? '',
               perwala?.toUpperCase() ?? '',
-              '',
-              '',
+              listOPD.find((item) => item.value === opdDAK)?.label ?? '',
               jdak.toUpperCase(),
             );
           }}

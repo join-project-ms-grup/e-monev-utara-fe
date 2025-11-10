@@ -163,6 +163,15 @@ a:hover {
 }
 
 /* Tabel */
+.table-spacing td {
+  padding: 8px 12px; /* spasi vertikal dan horizontal */
+  vertical-align: top; /* biar isi sel sejajar ke atas */
+}
+
+.table-spacing tr + tr td {
+  border-top: 8px solid transparent; /* jarak antar baris */
+}
+
 .table-responsive {
   width: 100%;
   overflow-x: auto;
@@ -271,7 +280,6 @@ a:hover {
   padding: 4px 6px;
   background-clip: padding-box;
 }
-
 
 /* Paginasi Tabel */
 .table-button {

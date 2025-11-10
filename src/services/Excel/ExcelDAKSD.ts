@@ -17,7 +17,7 @@ export const exportDAKSD = async (
     tahun: string,
     periodeLaporan: string,
     periodeWaktuLaporan: string,
-    jadwal: string,
+    // jadwal: string,
     skpd: string,
     jenis: string,
     opts?: { startRow?: number },
@@ -71,9 +71,9 @@ export const exportDAKSD = async (
         { addr: 'A5', value: `TAHUN ANGGARAN ${tahun}` },
 
         { addr: 'A7', value: `${periodeLaporan}` }, { addr: 'B7', value: `${periodeWaktuLaporan}` },
-        { addr: 'A8', value: `JADWAL` }, { addr: 'B8', value: `${jadwal}` },
-        { addr: 'A9', value: `SKPD` }, { addr: 'B9', value: `${skpd}` },
-        { addr: 'A10', value: `JENIS` }, { addr: 'B10', value: `${jenis}` },
+        // { addr: 'A8', value: `JADWAL` }, { addr: 'B8', value: `${jadwal}` },
+        { addr: 'A8', value: `SKPD` }, { addr: 'B8', value: `${skpd}` },
+        { addr: 'A9', value: `JENIS` }, { addr: 'B9', value: `${jenis}` },
 
         { addr: 'A12', value: 'NO' }, { addr: 'A16', value: '1' },
 

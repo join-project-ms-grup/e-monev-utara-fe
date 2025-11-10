@@ -127,3 +127,29 @@ export function flatMonitoringDAK(data: DAKMonitoring[]): FlatMonitoringDAK[] {
 
     return result;
 }
+
+export interface MasalahDAK {
+    id: number;
+    name: string;
+    keterangan: string;
+    status: boolean;
+}
+
+export const getMasalahDAK = async (kode_jenis: number): Promise<MasalahDAK[]> => {
+    const response = await api.post<ApiResponse<MasalahDAK[]>>("/dak/masalah/list", { kode_jenis });
+    return response.data.data;
+};
+
+export interface RealisasiMonitoringDAKForm {
+    id_realisasi: number;
+    fisik: number;
+    anggaran: number;
+    sasaran_lokasi?: boolean | null
+    kesesuaian_juknis?: boolean | null
+    catatan?: string | null
+}
+
+export const realisasiMonitoringDAK = async (payload: RealisasiMonitoringDAKForm): Promise<RealisasiMonitoringDAKForm> => {
+    const response = await api.post<ApiResponse<RealisasiMonitoringDAKForm>>("/dak/fisik/realisasi", payload);
+    return response.data.data;
+};
