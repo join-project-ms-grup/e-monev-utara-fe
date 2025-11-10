@@ -276,7 +276,7 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
       />
       <DialogModal
         widthLevel={10}
-        title='Ubah data User'
+        title='Detail Identifikasi DAK'
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
       >
