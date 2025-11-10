@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import Tabel from '../Tabel';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, Table } from '@tanstack/react-table';
 import AksiButton from '../../inputs/AksiButton';
 import {
   MdAssignmentTurnedIn,
+  MdCheckBox,
   MdContentPasteSearch,
+  MdFindReplace,
+  MdLock,
+  MdLockOpen,
   MdRefresh,
   MdSave,
+  MdSubdirectoryArrowRight,
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
@@ -21,6 +26,15 @@ import {
   getJenisDAK,
   getSubJenisDAK,
 } from '../../../services/DAK/DAKJenisService';
+import {
+  flatMonitoringDAK,
+  getMonitoringDAK,
+  type FlatMonitoringDAK,
+} from '../../../services/DAK/DAKMonitoringService';
+import Spinner from '../../inputs/Spinner';
+import { formatUang } from '../../../lib/helper';
+import InputText from '../../inputs/InputText';
+import InputTextArea from '../../inputs/InputTextArea';
 
 type DataRowKeys =
   | 'name'
@@ -68,15 +82,13 @@ const data: DataRow[] = [
   },
 ];
 
-const columns: ColumnDef<DataRow>[] = [
+const columns: ColumnDef<FlatMonitoringDAK>[] = [
   {
-    id: 'no',
     header: 'No',
     cell: ({ row }) => `${row.index + 1}`,
   },
   {
-    id: 'name',
-    accessorKey: 'name',
+    accessorKey: 'nama',
     header: 'Jenis DAK / Bidang DAK / Nama Paket',
   },
   {
@@ -84,7 +96,7 @@ const columns: ColumnDef<DataRow>[] = [
     columns: [
       {
         id: 'skppkVolumed',
-        accessorKey: 'pkVolume',
+        accessorKey: 'perencanaan.volume',
         header: 'Volume',
       },
       {
@@ -259,16 +271,126 @@ const tableHead = () => {
   );
 };
 
-const IdentifikasiDakTable = () => {
-  // const valTable = {
-  //   tahun: '2025',
-  //   tempat: 'Tempat 1',
-  //   opd: 'OPD 1',
-  //   subJenis: 'Sub-Jenis DAK 1',
-  //   triwulan: 'IV',
-  // };
-  // const [formTable, setFormTable] = useState(valTable);
+const tableBody = (table: Table<FlatMonitoringDAK & { level?: string }>) => {
+  const rows = table.getRowModel().rows;
+  let nomor = 1;
+  return (
+    <>
+      {rows.map((row, i) => {
+        const item = row.original;
 
+        if (item.level === 'sub_jenis_dak') {
+          return (
+            <tr key={i}>
+              <td colSpan={21} className='font-bold'>
+                Sub-Jenis DAK: {item.nama}
+              </td>
+            </tr>
+          );
+        }
+        if (item.level === 'bidang') {
+          return (
+            <tr key={i}>
+              <td colSpan={21}>
+                <span className='inline-flex gap-2 font-bold'>
+                  <MdSubdirectoryArrowRight />
+                  Bidang DAK: {item.nama}
+                </span>
+              </td>
+            </tr>
+          );
+        }
+
+        if (item.level === 'sub_bidang') {
+          return (
+            <tr key={i}>
+              <td colSpan={21}>
+                <span className='inline-flex gap-2 ps-3 font-bold'>
+                  <MdSubdirectoryArrowRight />
+                  Sub-Bidang DAK: {item.nama}
+                </span>
+              </td>
+            </tr>
+          );
+        }
+
+        // Baris Detail Row
+        return (
+          <tr key={i}>
+            <td className='text-center'>{nomor++}</td>
+            <td>{item.nama_paket}</td>
+            <td>{item.perencanaan?.volume}</td>
+            <td>{item.perencanaan?.jumlah_penerima}</td>
+            <td>{formatUang(Number(item.perencanaan?.anggaran))}</td>
+            <td>{item.mekanisme?.kegiatan}</td>
+            <td>{item.mekanisme?.volume}</td>
+            <td>{formatUang(Number(item.mekanisme?.uang))}</td>
+            {/* <td>{item.realisasi?.fisik?.capaian}</td> */}
+            <td>
+              <InputText
+                id='rea_fisik_cap'
+                value={item.realisasi?.fisik?.capaian}
+                inputMode='numeric'
+                Iconlabel='%'
+                IconlabelPos='right'
+              />
+            </td>
+            <td>{item.realisasi?.fisik?.totalSd}</td>
+            <td>
+              <InputText
+                id='rea_keuang_cap'
+                value={item.realisasi?.fisik?.capaian}
+                inputMode='numeric'
+                Iconlabel='Rp.'
+              />
+            </td>
+            {/* <td>{item.realisasi?.keuangan?.capaian}</td> */}
+            <td>{item.realisasi?.keuangan?.persen}</td>
+            <td>{formatUang(Number(item.sisa_anggaran))}</td>
+            <td>
+              <InputSearchBox
+                id='kese_sasaran'
+                placeholder='Pilih...'
+                options={[
+                  { label: 'Ya', value: 'true' },
+                  { label: 'Tidak', value: 'false' },
+                ]}
+              ></InputSearchBox>
+            </td>
+            <td>
+              <InputSearchBox
+                id='kese_dpaskpd'
+                placeholder='Pilih...'
+                options={[
+                  { label: 'Ya', value: 'true' },
+                  { label: 'Tidak', value: 'false' },
+                ]}
+              ></InputSearchBox>
+            </td>
+            <td>-</td>
+            <td>-</td>
+            <td>
+              <InputTextArea id='catatan' placeholder='Catatan...' />
+            </td>
+            <td>-</td>
+            <td>
+              <AksiButton Icon={MdLockOpen} className='bg-green-500 text-white hover:bg-green-700!' tooltip='Terbuka' />
+            </td>
+            <td>
+              <div className='inline-flex gap-1'>
+                <AksiButton Icon={MdFindReplace} className='bg-red-500 text-white hover:bg-red-700!' tooltip='Identifikasi Masalah' />
+                <AksiButton Icon={MdSave} className='bg-blue-500 text-white hover:bg-blue-700!' tooltip='Simpan Data' />
+                <AksiButton Icon={MdCheckBox} className='bg-amber-500 text-white hover:bg-amber-700!' tooltip='Data Ditindak' />
+              </div>
+            </td>
+          </tr>
+        );
+      })}
+    </>
+  );
+};
+
+const IdentifikasiDakTable = () => {
   const [tahunDAK, setTahunDAK] = useState('');
   const { data: dataTahunDAK } = useQuery({
     queryKey: ['list_tahun_dak'],
@@ -303,6 +425,30 @@ const IdentifikasiDakTable = () => {
       label: `${item.nama}`,
       value: item.id?.toString(),
     })) || [];
+
+  const { data, isFetching, refetch } = useQuery({
+    queryKey: [
+      'list_monitoring_dak',
+      tahunDAK,
+      opdDAK,
+      subJenisDAK,
+      triwulanDAK,
+    ],
+    queryFn: async () => {
+      const data = await getMonitoringDAK({
+        tahun: Number(
+          listTahunDAK.find((item) => item.value === tahunDAK)?.label,
+        ),
+        opd_id: Number(opdDAK) ?? null,
+        sub_jenis: Number(subJenisDAK) ?? null,
+        triwulan: Number(triwulanDAK),
+      });
+      const flatData = flatMonitoringDAK(data);
+      console.log('IDEN DAK', flatData);
+      return flatData;
+    },
+    enabled: !!(tahunDAK && opdDAK && subJenisDAK && triwulanDAK),
+  });
 
   return (
     <div className='space-y-2'>
@@ -357,10 +503,10 @@ const IdentifikasiDakTable = () => {
               btnclassName='bg-white'
               placeholder='Pilih Triwulan'
               options={[
-                { label: 'I', value: 'I' },
-                { label: 'II', value: 'II' },
-                { label: 'III', value: 'III' },
-                { label: 'IV', value: 'IV' },
+                { label: 'I', value: '1' },
+                { label: 'II', value: '2' },
+                { label: 'III', value: '3' },
+                { label: 'IV', value: '4' },
               ]}
               value={triwulanDAK}
               onChange={(val) => setTriwulanDAK(val)}
@@ -372,19 +518,19 @@ const IdentifikasiDakTable = () => {
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
-            // onClick={() => refetch()}
-            // disabled={isFetching}
+            onClick={() => refetch()}
+            disabled={isFetching}
           >
-            {/* {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />} */}
-            <MdRefresh />
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
         </div>
       </div>
       <Tabel
-        // tblClassName='md:min-w-[2800px]'
-        data={[]}
+        tblClassName='min-w-[2800px]'
+        data={data || []}
         columns={columns}
         renderHeader={tableHead}
+        renderBody={(table) => tableBody(table)}
       />
     </div>
   );
