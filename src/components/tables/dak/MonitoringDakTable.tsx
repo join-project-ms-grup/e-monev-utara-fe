@@ -305,7 +305,7 @@ const IdentifikasiDakTable = () => {
         {rows.map((row, i) => {
           const item = row.original;
           const currentRowValues = formValues[item.id_realisasi ?? 0] || {};
-          console.log(currentRowValues.uang)
+          console.log(currentRowValues.uang);
           if (item.level === 'sub_jenis_dak') {
             return (
               <tr key={i}>
@@ -553,7 +553,8 @@ const IdentifikasiDakTable = () => {
                         }));
                       }}
                     />
-                    {(currentRowValues.catatan ?? '') !==
+
+                    {(currentRowValues.catatan ?? item.catatan ?? '') !==
                       (item.catatan ?? '') && (
                       <button
                         type='submit'
