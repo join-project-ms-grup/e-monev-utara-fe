@@ -5,27 +5,22 @@ import {
   MdAdd,
   MdEdit,
   MdRefresh,
-  MdSubdirectoryArrowLeft,
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
-import { getOPDDAK } from '../../../services/DAK/DAKOPDService';
 import { useQuery } from '@tanstack/react-query';
-import { getSubJenisDAK } from '../../../services/DAK/DAKJenisService';
-import { getTahunDAK } from '../../../services/DAK/DAKTahunService';
 import { useState } from 'react';
 import {
   flatIdentifikasiDAK,
   getIdentifikasiDAK,
-  getIdentifikasiDetailDAK,
   type FlatIdentifikasiDAK,
 } from '../../../services/DAK/DAKIdentifikasiService';
 import { formatUang } from '../../../lib/helper';
 import { FaInfo } from 'react-icons/fa';
-import toast from 'react-hot-toast';
 import DialogModal from '../../inputs/DialogModal';
 import DetailIdentifikasiDak from '../../forms/IdentifikasiDak/DetailIdentifikasiDak';
+import { ListOPDDAK, ListSubJenisDAK, ListTahunDAK } from '../../../services/ListData/ListDataDAK';
 
 interface IdentifikasiDakTable {
   onAdd: () => void;
@@ -70,44 +65,15 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
   ];
 
   const [tahunDAK, setTahunDAK] = useState('');
-  const { data: dataTahunDAK } = useQuery({
-    queryKey: ['list_tahun_dak'],
-    queryFn: getTahunDAK,
-  });
-  const listTahunDAK =
-    dataTahunDAK?.map((item) => ({
-      label: `${item.tahun}`,
-      value: item.id?.toString(),
-    })) || [];
-
   const [opdDAK, setOPDDAK] = useState('');
-  const { data: dataOPD } = useQuery({
-    queryKey: ['list_opd_dak'],
-    queryFn: getOPDDAK,
-  });
-  const listOPD =
-    dataOPD?.map((item) => ({
-      label: `${item.fullname}`,
-      value: item.id?.toString(),
-    })) || [];
-
   const [subJenisDAK, setSubJenisDAK] = useState('');
-  const { data: dataSubJenisDAK } = useQuery({
-    queryKey: ['list_sub_jenis_dak'],
-    queryFn: () => getSubJenisDAK(1),
-  });
-  const listSubJenisDAK =
-    dataSubJenisDAK?.map((item) => ({
-      label: `${item.nama}`,
-      value: item.id?.toString(),
-    })) || [];
 
   const { data } = useQuery({
     queryKey: ['list_identifikasi_dak', tahunDAK, opdDAK, subJenisDAK],
     queryFn: async () => {
       const data = await getIdentifikasiDAK({
         tahun: Number(
-          listTahunDAK.find((item) => item.value === tahunDAK)?.label,
+          ListTahunDAK().find((item) => item.value === tahunDAK)?.label,
         ),
         opd_id: Number(opdDAK) ?? null,
         sub_jenis: Number(subJenisDAK) ?? null,
@@ -217,7 +183,7 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               btnclassName='bg-white'
               placeholder='Pilih Tahun ke...'
               value={tahunDAK}
-              options={listTahunDAK as OptionItem[]}
+              options={ListTahunDAK() as OptionItem[]}
               onChange={(val) => setTahunDAK(val)}
               onClear={() => setTahunDAK('')}
             />
@@ -230,7 +196,7 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               btnclassName='bg-white'
               placeholder='Pilih OPD'
               value={opdDAK}
-              options={listOPD as OptionItem[]}
+              options={ListOPDDAK() as OptionItem[]}
               onChange={(val) => setOPDDAK(val)}
               onClear={() => setOPDDAK('')}
               withSearch
@@ -244,7 +210,7 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               className='w-44 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
-              options={listSubJenisDAK as OptionItem[]}
+              options={ListSubJenisDAK(1) as OptionItem[]}
               value={subJenisDAK}
               onChange={(val) => setSubJenisDAK(val)}
               onClear={() => setSubJenisDAK('')}

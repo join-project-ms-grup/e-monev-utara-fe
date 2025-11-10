@@ -1,8 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { getChildren, getUrusan } from '../../../services/RekeningService';
-import InputSearchBox from '../../inputs/InputSearchBox';
+import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
 import InputText from '../../inputs/InputText';
+import type { IdentifikasiDAKForm } from '../../../services/DAK/DAKIdentifikasiService';
+import {
+  ListBidangDAK,
+  ListOPDDAK,
+  ListSubBidangDAK,
+  ListSubJenisDAK,
+  ListTahunDAK,
+} from '../../../services/ListData/ListDataDAK';
 
 interface PilihanParent {
   urusan?: string;
@@ -12,7 +20,12 @@ interface PilihanParent {
   subkegiatan?: string;
 }
 
-const JenisBidangProgramKegiatanDAK = () => {
+interface Props {
+  formData: IdentifikasiDAKForm;
+  setFormData: React.Dispatch<React.SetStateAction<IdentifikasiDAKForm>>;
+}
+
+const JenisBidangProgramKegiatanDAK = ({ formData, setFormData }: Props) => {
   const initPilihanParent: PilihanParent = {
     urusan: '',
     bidang: '',
@@ -57,7 +70,7 @@ const JenisBidangProgramKegiatanDAK = () => {
   const listKegiatan = mapList(dataKegiatan);
   const listSubKegiatan = mapList(dataSubKegiatan);
 
-  // const [selectedRek, setSelectedRek] = useState('');
+  const [selectedRek, setSelectedRek] = useState('');
 
   const levelKeys = [
     'urusan',
@@ -83,9 +96,9 @@ const JenisBidangProgramKegiatanDAK = () => {
       setPilihanParent(updatedPilihan);
     }
 
-    // handleParentChange(updatedPilihan);
-  // }, [pilihanParent, selectedRek]);
-  }, [pilihanParent]);
+    handleParentChange(updatedPilihan);
+  }, [pilihanParent, selectedRek]);
+  // }, [pilihanParent]);
 
   const handleChangeLevel = (level: keyof PilihanParent, value: string) => {
     const levelIndex = levelKeys.indexOf(level);
@@ -100,33 +113,41 @@ const JenisBidangProgramKegiatanDAK = () => {
     setPilihanParent(updated);
   };
 
-  // const handleParentChange = ({
-  //   urusan,
-  //   bidang,
-  //   program,
-  //   kegiatan,
-  //   subkegiatan,
-  // }: PilihanParent) => {
-  //   let parentValue = '';
+  const handleParentChange = ({
+    urusan,
+    bidang,
+    program,
+    kegiatan,
+    subkegiatan,
+  }: PilihanParent) => {
+    let parentValue = '';
 
-  //   switch (selectedRek) {
-  //     case 'program':
-  //       if (urusan && bidang && program) parentValue = program;
-  //       break;
+    switch (selectedRek) {
+      case 'program':
+        if (urusan && bidang && program) parentValue = program;
+        break;
 
-  //     case 'kegiatan':
-  //       if (urusan && bidang && program && kegiatan) parentValue = kegiatan;
-  //       break;
+      case 'kegiatan':
+        if (urusan && bidang && program && kegiatan) parentValue = kegiatan;
+        break;
 
-  //     case 'subKegiatan':
-  //       if (urusan && bidang && program && kegiatan && subkegiatan)
-  //         parentValue = subkegiatan;
-  //       break;
+      case 'subKegiatan':
+        if (urusan && bidang && program && kegiatan && subkegiatan)
+          parentValue = subkegiatan;
+        break;
 
-  //     default:
-  //       parentValue = '';
-  //   }
-  // };
+      default:
+        parentValue = '';
+    }
+  };
+
+  //#region LIST DROPDOWN
+  const [tahunDAK, setTahunDAK] = useState('');
+  const [opdDAK, setOPDDAK] = useState('');
+  const [bidangDAK, setBidangDAK] = useState('');
+  const [subBidangDAK, setSubBidangDAK] = useState('');
+  const [subJenisDAK, setSubJenisDAK] = useState('');
+  //#endregion
 
   return (
     <div>
@@ -146,7 +167,10 @@ const JenisBidangProgramKegiatanDAK = () => {
               id='subJenisDak'
               className='h-9'
               btnclassName='bg-white'
-              options={[]}
+              options={ListSubJenisDAK(1) as OptionItem[]}
+              value={subJenisDAK}
+              onChange={(e) => setSubJenisDAK(e)}
+              onClear={() => setSubJenisDAK('')}
               placeholder='Pilih Sub-Jenis DAK'
             />
           </div>
@@ -156,8 +180,15 @@ const JenisBidangProgramKegiatanDAK = () => {
               id='bidangDak'
               className='h-9'
               btnclassName='bg-white'
-              options={[]}
+              options={ListBidangDAK()}
+              value={bidangDAK}
+              onChange={(e) => setBidangDAK(e)}
+              onClear={() => {
+                setBidangDAK('');
+                setSubBidangDAK('');
+              }}
               placeholder='Pilih Bidang DAK'
+              withSearch
             />
           </div>
           <div>
@@ -166,7 +197,10 @@ const JenisBidangProgramKegiatanDAK = () => {
               id='subBidangDak'
               className='h-9'
               btnclassName='bg-white'
-              options={[]}
+              options={ListSubBidangDAK(Number(bidangDAK)) as OptionItem[]}
+              value={subBidangDAK}
+              onChange={(e) => setSubBidangDAK(e)}
+              onClear={() => setSubBidangDAK('')}
               placeholder='Pilih Sub-Bidang DAK'
             />
           </div>
@@ -179,7 +213,10 @@ const JenisBidangProgramKegiatanDAK = () => {
               id='tahun'
               className='h-9'
               btnclassName='bg-white'
-              options={[]}
+              options={ListTahunDAK() as OptionItem[]}
+              value={tahunDAK}
+              onChange={(e) => setTahunDAK(e)}
+              onClear={() => setTahunDAK('')}
               placeholder='Pilih Tahun'
             />
           </div>
@@ -189,7 +226,10 @@ const JenisBidangProgramKegiatanDAK = () => {
               id='iskpd'
               className='h-9'
               btnclassName='bg-white'
-              options={[]}
+              options={ListOPDDAK() as OptionItem[]}
+              value={opdDAK}
+              onChange={(e) => setOPDDAK(e)}
+              onClear={() => setOPDDAK('')}
               placeholder='Pilih OPD'
             />
           </div>
@@ -266,7 +306,13 @@ const JenisBidangProgramKegiatanDAK = () => {
               btnclassName='bg-white'
               options={listSubKegiatan}
               value={pilihanParent.subkegiatan}
-              onChange={(e) => handleChangeLevel('subkegiatan', e)}
+              onChange={(e) => {
+                handleChangeLevel('subkegiatan', e);
+                setFormData((prev) => ({
+                  ...prev,
+                  sub_kegiatan_id: Number(e),
+                }));
+              }}
               onClear={() => handleChangeLevel('subkegiatan', '')}
               withSearch
               placeholder='Pilih Sub Kegiatan'

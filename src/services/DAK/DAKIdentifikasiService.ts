@@ -130,3 +130,41 @@ export const getIdentifikasiDetailDAK = async (id: number): Promise<Identifikasi
     const response = await api.get<ApiResponse<IdentifikasiDetailDAK>>(`dak/fisik/${id}/detail-ident`);
     return response.data.data;
 };
+
+export interface IdentifikasiDAKForm {
+    sub_jenis_id: number;
+    sub_bidang_id: number;
+    tahun: number;
+    opd_id: number;
+    bidang_opd: string;
+    sub_kegiatan_id: number;
+    catatan: string | null;
+    nama_paket: string;
+    detail_paket: string;
+    volume: number;
+    satuan: string;
+    estimasi: string;
+    jumlah_penerima: string;
+    anggaran: number;
+    des_kel: string;
+    kec: string;
+    bujur: number[];
+    lintang: number[];
+    foto: string | null;
+    mekanisme: "swakelola" | "kontrak" | "ekatalog";
+    metode: string;
+    volume_mekanisme: number;
+    uang_mekanisme: number;
+    dokumen: {
+        id_berkas: number;
+        file: string | null;
+        Waktu: string | null;
+        Keterangan: string | null;
+    }[];
+}
+
+
+export const addIdentifikasiDAK = async (payload: IdentifikasiDAKForm): Promise<IdentifikasiDAKForm> => {
+    const response = await api.post<ApiResponse<IdentifikasiDAKForm>>("/dak/fisik/add-ident", payload);
+    return response.data.data;
+};

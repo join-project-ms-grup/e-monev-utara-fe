@@ -22,7 +22,7 @@ export interface SubJenisDAK {
     updated_at?: string,
 }
 
-export const getSubJenisDAK = async (id: number): Promise<SubJenisDAK[]> => {
-    const response = await api.post<ApiResponse<SubJenisDAK[]>>("/dak/jenis/list-sub", { kode_jenis: id });
+export const getSubJenisDAK = async (kode_jenis: number): Promise<SubJenisDAK[]> => {
+    const response = await api.post<ApiResponse<SubJenisDAK[]>>("/dak/jenis/list-sub", { kode_jenis });
     return response.data.data;
 };
