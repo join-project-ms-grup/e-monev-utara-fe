@@ -4,6 +4,7 @@ import type { ColumnDef, Table } from '@tanstack/react-table';
 import AksiButton from '../../inputs/AksiButton';
 import {
   MdAssignmentTurnedIn,
+  MdCheck,
   MdCheckBox,
   MdContentPasteSearch,
   MdFindReplace,
@@ -303,11 +304,8 @@ const IdentifikasiDakTable = () => {
       <>
         {rows.map((row, i) => {
           const item = row.original;
-          const currentFisik = formValues[item.id_realisasi ?? 0] || {};
-          const currentUang = formValues[item.id_realisasi ?? 0] || {};
-          const currentSasaran = formValues[item.id_realisasi ?? 0] || {};
-          const currentJukni = formValues[item.id_realisasi ?? 0] || {};
-
+          const currentRowValues = formValues[item.id_realisasi ?? 0] || {};
+          console.log(currentRowValues.uang)
           if (item.level === 'sub_jenis_dak') {
             return (
               <tr key={i}>
@@ -357,20 +355,34 @@ const IdentifikasiDakTable = () => {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    realisasiMutation.mutate({
-                      id_realisasi: item.id_realisasi ?? 0,
-                      fisik: Number(currentFisik.fisik),
-                      anggaran: Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                      kesesuaian_juknis: null,
-                      sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
-                      catatan: null,
-                    });
+                    realisasiMutation.mutate(
+                      {
+                        id_realisasi: item.id_realisasi ?? 0,
+                        fisik: Number(currentRowValues.fisik),
+                        anggaran:
+                          Number(item.realisasi?.keuangan?.capaian) ?? 0,
+                        kesesuaian_juknis: null,
+                        sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
+                        catatan: null,
+                      },
+                      {
+                        onSuccess: () => {
+                          setFormValues((prev) => {
+                            const updated = { ...prev };
+                            delete updated[item.id_realisasi ?? 0];
+                            return updated;
+                          });
+                        },
+                      },
+                    );
                   }}
                 >
                   <InputText
                     id='rea_fisik_cap'
                     value={
-                      currentFisik.fisik ?? item.realisasi?.fisik?.capaian ?? ''
+                      currentRowValues.fisik ??
+                      item.realisasi?.fisik?.capaian ??
+                      ''
                     }
                     inputMode='numeric'
                     Iconlabel='%'
@@ -386,7 +398,7 @@ const IdentifikasiDakTable = () => {
                       }));
                     }}
                     withButton={
-                      (currentFisik.fisik ??
+                      (currentRowValues.fisik ??
                         item.realisasi?.fisik?.capaian ??
                         '') !== (item.realisasi?.fisik?.capaian ?? '')
                     }
@@ -400,20 +412,31 @@ const IdentifikasiDakTable = () => {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    realisasiMutation.mutate({
-                      id_realisasi: item.id_realisasi ?? 0,
-                      fisik: Number(item.realisasi?.fisik?.capaian),
-                      anggaran: Number(currentUang.uang) ?? 0,
-                      kesesuaian_juknis: null,
-                      sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
-                      catatan: null,
-                    });
+                    realisasiMutation.mutate(
+                      {
+                        id_realisasi: item.id_realisasi ?? 0,
+                        fisik: Number(item.realisasi?.fisik?.capaian),
+                        anggaran: Number(currentRowValues.uang) ?? 0,
+                        kesesuaian_juknis: null,
+                        sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
+                        catatan: null,
+                      },
+                      {
+                        onSuccess: () => {
+                          setFormValues((prev) => {
+                            const updated = { ...prev };
+                            delete updated[item.id_realisasi ?? 0];
+                            return updated;
+                          });
+                        },
+                      },
+                    );
                   }}
                 >
                   <InputText
                     id='rea_keuang_cap'
                     value={
-                      currentUang.uang ??
+                      currentRowValues.uang ??
                       item.realisasi?.keuangan?.capaian ??
                       ''
                     }
@@ -431,7 +454,7 @@ const IdentifikasiDakTable = () => {
                       }));
                     }}
                     withButton={
-                      (currentUang.uang ??
+                      (currentRowValues.uang ??
                         item.realisasi?.keuangan?.capaian ??
                         '') !== (item.realisasi?.keuangan?.capaian ?? '')
                     }
@@ -449,7 +472,7 @@ const IdentifikasiDakTable = () => {
                   id='kese_sasaran'
                   placeholder='Pilih...'
                   value={
-                    currentSasaran.sasaran ??
+                    currentRowValues.sasaran ??
                     item.sasaran_lokasi?.toString() ??
                     ''
                   }
@@ -458,7 +481,6 @@ const IdentifikasiDakTable = () => {
                     { label: 'Tidak', value: 'false' },
                   ]}
                   onChange={(value) => {
-                    // Update state lokal
                     setFormValues((prev) => ({
                       ...prev,
                       [item.id_realisasi ?? 0]: {
@@ -466,45 +488,82 @@ const IdentifikasiDakTable = () => {
                         sasaran: value,
                       },
                     }));
-
-                    // Langsung mutasi ke backend
-                    realisasiMutation.mutate({
-                      id_realisasi: item.id_realisasi ?? 0,
-                      fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
-                      anggaran: Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                      kesesuaian_juknis: null,
-                      sasaran_lokasi: value === 'true',
-                      catatan: null,
-                    });
+                    realisasiMutation.mutate(
+                      {
+                        id_realisasi: item.id_realisasi ?? 0,
+                        fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
+                        anggaran:
+                          Number(item.realisasi?.keuangan?.capaian) ?? 0,
+                        kesesuaian_juknis: null,
+                        sasaran_lokasi: value === 'true',
+                        catatan: item.catatan,
+                      },
+                      {
+                        onSuccess: () => {
+                          setFormValues((prev) => {
+                            const updated = { ...prev };
+                            delete updated[item.id_realisasi ?? 0];
+                            return updated;
+                          });
+                        },
+                      },
+                    );
                   }}
                 />
-                {/* <InputSearchBox
-                  id='kese_sasaran'
-                  placeholder='Pilih...'
-                  value={currentSasaran}
-                  options={[
-                    { label: 'Ya', value: 'true' },
-                    { label: 'Tidak', value: 'false' },
-                  ]}
-                  onChange={}
-                ></InputSearchBox> */}
               </td>
               <td>
                 <InputSearchBox
                   id='kese_dpaskpd'
                   placeholder='Pilih...'
-                  // value={currentJukni}
                   options={[
                     { label: 'Ya', value: 'true' },
                     { label: 'Tidak', value: 'false' },
                   ]}
-                  // onChange={}
                 ></InputSearchBox>
               </td>
               <td>-</td>
               <td>-</td>
               <td>
-                <InputTextArea id='catatan' placeholder='Catatan...' />
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    realisasiMutation.mutate({
+                      id_realisasi: item.id_realisasi ?? 0,
+                      fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
+                      anggaran: Number(item.realisasi?.keuangan?.capaian) ?? 0,
+                      kesesuaian_juknis: null,
+                      sasaran_lokasi: Boolean(item.sasaran_lokasi),
+                      catatan: currentRowValues.catatan ?? '',
+                    });
+                  }}
+                >
+                  <div className='flex flex-col items-center'>
+                    <InputTextArea
+                      id='catatan'
+                      placeholder='Catatan...'
+                      value={currentRowValues.catatan ?? item.catatan ?? ''}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        setFormValues((prev) => ({
+                          ...prev,
+                          [item.id_realisasi ?? 0]: {
+                            ...prev[item.id_realisasi ?? 0],
+                            catatan: newValue,
+                          },
+                        }));
+                      }}
+                    />
+                    {(currentRowValues.catatan ?? '') !==
+                      (item.catatan ?? '') && (
+                      <button
+                        type='submit'
+                        className='text-green-500 hover:text-green-700 transition-colors mt-1'
+                      >
+                        <MdCheck />
+                      </button>
+                    )}
+                  </div>
+                </form>
               </td>
               <td>-</td>
               <td>
