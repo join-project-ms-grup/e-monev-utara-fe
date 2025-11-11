@@ -23,7 +23,7 @@ const FormIdentJenisBidangDak = ({
 }) => {
   //#region JENIS BIDANG PROGRAM KEGIATAN DAK
   const listSubJenisDAK = useListSubJenisDAK(Number(formValues.n_jenisDAK));
-  const listBidangDAK = useListBidangDAK();
+  const listBidangDAK = useListBidangDAK(1);
   const listSubBidangDAK = useListSubBidangDAK(Number(formValues.n_bidangDAK));
   const listTahunDAK = useListTahunDAK();
   const listOPDDAK = useListOPDDAK();

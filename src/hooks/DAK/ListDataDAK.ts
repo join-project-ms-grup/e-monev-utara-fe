@@ -7,10 +7,12 @@ import { getRekBidangDAK, getRekKegiatanDAK, getRekProgramDAK, getRekSubKegiatan
 import type { OptionItem } from "../../components/inputs/InputSearchBox";
 import { getIdentifikasiDetailDAK } from "../../services/DAK/DAKIdentifikasiService";
 
-export const useListBidangDAK = () => {
+//#region LIST BIDANG
+export const useListBidangDAK = (jenis_dak: number) => {
     const { data } = useQuery({
-        queryKey: ['list_bidang_dak'],
-        queryFn: () => getBidangDAK(1),
+        queryKey: ['list_bidang_dak', jenis_dak],
+        queryFn: () => getBidangDAK(jenis_dak),
+        enabled: !!(jenis_dak)
     });
     return (
         data?.map((item) => ({
@@ -19,6 +21,7 @@ export const useListBidangDAK = () => {
         })) as OptionItem[] || []
     )
 }
+//#endregion
 
 export const useListSubBidangDAK = (dak_bidangId: number) => {
     const { data } = useQuery({
@@ -144,7 +147,7 @@ export const useListRekSubKegiatanDAK = (id_urusan: number, id_bidang: number, i
     )
 }
 
-// Mark: Get Detail DAK
+//#region GET DETAIL DAK
 export const useGetIdentDetailDAK = (id_ident: number | null) => {
     const { data } = useQuery({
         queryKey: ['detail_identifikasi_dak', id_ident],
@@ -153,3 +156,4 @@ export const useGetIdentDetailDAK = (id_ident: number | null) => {
     });
     return data
 }
+//#endregion

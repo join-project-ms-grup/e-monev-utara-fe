@@ -180,7 +180,9 @@ const JenisDakTable = () => {
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-start'>
           <div>
+            <label htmlFor='jenisDAK'>Jenis DAK</label>
             <InputSearchBox
+              id='jenisDAK'
               placeholder='Pilih Jenis DAK'
               className='h-9 w-32'
               value={jenisDak}
