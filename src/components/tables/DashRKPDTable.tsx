@@ -1,18 +1,14 @@
 import Tabel from './Tabel';
 import { type ColumnDef } from '@tanstack/react-table';
-import toast from 'react-hot-toast';
-import { MdPrint, MdRefresh } from 'react-icons/md';
-import InputButton from '../inputs/InputButton';
-import { exportRankingRKPD } from '../../services/ExcelService';
 import InputSearchBox from '../inputs/InputSearchBox';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import {
   getPeriodeMulaiFromCookie,
   getPeriodeAkhirFromCookie,
+  getPeriodeIDFromCookie,
 } from '../../lib/usercookie';
-import { getSKPD } from '../../services/SKPDService';
-import Spinner from '../inputs/Spinner';
+import { useGetDashRankRKPD } from '../../hooks/RKPD/TabelDataRkpd';
+import type { DashboardRankingResult } from '../../services/DashRKPDService';
 
 const tableHead = () => {
   return (
@@ -20,15 +16,17 @@ const tableHead = () => {
       <tr>
         <th rowSpan={2}>Ranking</th>
         <th rowSpan={2}>Perangkat Daerah</th>
-        <th colSpan={2}>Rata - Rata Capaian Kinerja</th>
-        <th colSpan={2}>Rata - Rata Capaian Anggaran</th>
-        <th rowSpan={2}>Realisasi Anggaran</th>
+        <th colSpan={2}>Rata - Rata Triwulan</th>
+        <th colSpan={2}>Rata - Rata Kumulatif</th>
+        <th colSpan={2}>Total Realisasi</th>
       </tr>
       <tr>
-        <th>(%)</th>
-        <th>Predikat</th>
-        <th>(%)</th>
-        <th>Predikat</th>
+        <th>Capaian</th>
+        <th>Realisasi</th>
+        <th>Capaian</th>
+        <th>Realisasi</th>
+        <th>Triwulan</th>
+        <th>Kumulatif</th>
       </tr>
     </>
   );
@@ -36,89 +34,130 @@ const tableHead = () => {
 
 const DashRKPDTable = () => {
   //#region SKPD dan Tahun ke
-  // const [tahunKe, setTahunKe] = useState('');
-  const {
-    data: dataSKPD,
-    // isFetching,
-    // refetch,
-  } = useQuery({
-    queryKey: ['list_skpd'],
-    queryFn: async () => getSKPD(),
+  const periodeId = getPeriodeIDFromCookie();
+  const [triwulan, setTriwulan] = useState('1');
+  const [tahunKe, setTahunKe] = useState('1');
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+  const { data } = useGetDashRankRKPD({
+    periode_id: Number(periodeId),
+    tahun_ke: Number(tahunKe),
+    triwulan: Number(triwulan),
   });
   //#endregion
-  //#region List data periode
-  // const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
-  // const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
-  // const listTahunKe = Array.from(
-  //   { length: tahunAkhir - tahunMulai + 1 },
-  //   (_, i) => ({
-  //     label: `${tahunMulai + i}`,
-  //     value: `${i + 1}`,
-  //   }),
-  // );
-  //#endregion
-  // const [triwulan, setTriwulan] = useState('');
+  console.log(Number(tahunKe),Number(triwulan))
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<DashboardRankingResult>[] = [
     {
       header: 'Ranking',
+      accessorKey: 'rangking',
       meta: {
         tdClassNames: 'text-center',
       },
-      cell: () => '-',
     },
     {
       header: 'Perangkat Daerah',
       accessorKey: 'name',
     },
     {
-      header: 'Rata - Rata Capaian Kinerja',
+      header: 'rata_rata_triwulan',
       columns: [
         {
-          id: 'rCKPersen',
-          header: '(%)',
+          header: 'rata_rata_triwulan_1',
+          accessorFn: (row) => row.rata_rata_triwulan,
+          cell: ({ getValue }) => {
+            const { c_predikat, capaian } = getValue();
+            return (
+              <div className='text-center'>
+                <code className='italic font-bold'>({c_predikat})</code>{' '}
+                <span>{capaian}</span>
+              </div>
+            );
+          },
           meta: {
             tdClassNames: 'text-center',
           },
-          cell: () => '-',
         },
         {
-          id: 'rCKPredikat',
-          header: 'Predikat',
+          header: 'rata_rata_triwulan_2',
+          accessorFn: (row) => row.rata_rata_triwulan,
+          cell: ({ getValue }) => {
+            const { r_predikat, realisasi } = getValue();
+            return (
+              <div className='text-center'>
+                <code className='italic font-bold'>({r_predikat})</code>{' '}
+                <span>{realisasi}</span>
+              </div>
+            );
+          },
           meta: {
             tdClassNames: 'text-center',
           },
-          cell: () => '-',
         },
       ],
     },
     {
-      header: 'Rata - Rata Capaian Anggaran',
+      header: 'rata_rata_kumulatif',
       columns: [
         {
-          id: 'rCAPersen',
-          header: '(%)',
+          header: 'rata_rata_kumulatif_1',
+          accessorFn: (row) => row.rata_rata_kumulatif,
+          cell: ({ getValue }) => {
+            const { c_predikat, capaian } = getValue();
+            return (
+              <div className='text-center'>
+                <code className='italic font-bold'>({c_predikat})</code>{' '}
+                <span>{capaian}</span>
+              </div>
+            );
+          },
           meta: {
             tdClassNames: 'text-center',
           },
-          cell: () => '-',
         },
         {
-          id: 'rCAPredikat',
-          header: 'Predikat',
+          header: 'rata_rata_kumulatif_2',
+          accessorFn: (row) => row.rata_rata_kumulatif,
+          cell: ({ getValue }) => {
+            const { r_predikat, realisasi } = getValue();
+            return (
+              <div className='text-center'>
+                <code className='italic font-bold'>({r_predikat})</code>{' '}
+                <span>{realisasi}</span>
+              </div>
+            );
+          },
           meta: {
             tdClassNames: 'text-center',
           },
-          cell: () => '-',
         },
       ],
     },
     {
-      header: 'Realisasi Anggaran',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: () => '-',
+      header: 'total_realisasi',
+      columns: [
+        {
+          header: 'total_realisasi.triwulan',
+          accessorFn: (row) => row.total_realisasi.triwulan,
+          meta: {
+            tdClassNames: 'text-center',
+          },
+        },
+        {
+          header: 'total_realisasi.kumulatif',
+          accessorFn: (row) => row.total_realisasi.kumulatif,
+          meta: {
+            tdClassNames: 'text-center',
+          },
+        },
+      ],
     },
   ];
 
@@ -126,7 +165,7 @@ const DashRKPDTable = () => {
     <>
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
-          {/* <div>
+          <div>
             <label htmlFor='tahun_ke'>Tahun</label>
             <InputSearchBox
               id='tahun_ke'
@@ -141,8 +180,8 @@ const DashRKPDTable = () => {
                 setTriwulan('');
               }}
             />
-          </div> */}
-          {/* <div>
+          </div>
+          <div>
             <label htmlFor='triwulan'>s.d Triwulan</label>
             <InputSearchBox
               id='triwulan'
@@ -152,15 +191,15 @@ const DashRKPDTable = () => {
               value={triwulan}
               onChange={(e) => setTriwulan(e)}
               options={[
-                { label: 'I', value: 'I' },
-                { label: 'II', value: 'II' },
-                { label: 'III', value: 'III' },
-                { label: 'IV', value: 'IV' },
+                { label: 'I', value: '1' },
+                { label: 'II', value: '2' },
+                { label: 'III', value: '3' },
+                { label: 'IV', value: '4' },
               ]}
               onClear={() => setTriwulan('')}
               disabled={!tahunKe}
             />
-          </div> */}
+          </div>
         </div>
         {/* <div className='inline-flex gap-2'>
           <InputButton
@@ -183,7 +222,11 @@ const DashRKPDTable = () => {
           </InputButton>
         </div> */}
       </div>
-      <Tabel data={dataSKPD || []} columns={columns} renderHeader={tableHead} />
+      <Tabel
+        data={data?.result || []}
+        columns={columns}
+        renderHeader={tableHead}
+      />
       <div>
         <span>Keterangan Predikat:</span>
         <div className='grid grid-cols-[auto_1fr] space-x-2'>
