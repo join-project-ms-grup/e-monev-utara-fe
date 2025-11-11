@@ -1,74 +1,91 @@
 import { useState } from 'react';
-import AksiButton from '../../inputs/AksiButton';
 import { MdArrowBack } from 'react-icons/md';
-import InputButton from '../../inputs/InputButton';
-import {
-  addIdentifikasiDAK,
-  type IdentifikasiDAKForm,
-  type IdentifikasiDAKFormSubmit,
-} from '../../../services/DAK/DAKIdentifikasiService';
 import { useForm, useStore } from '@tanstack/react-form';
-import {
-  identifikasidakSchema,
-  identifikasidakSchemaSubmit,
-  mapErrors,
-  mapToInput,
-} from '../schemas/DAK/SchemaIdentifikasiDak';
 import toast from 'react-hot-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
-import type { ApiResponse } from '../../../lib/api';
 import { debounce } from 'lodash';
-import JenisBidangDak from './FormIdentJenisBidangDak';
+import {
+  editIdentifikasiDAK,
+  type IdentifikasiDAKForm,
+  type IdentifikasiDAKFormEdit,
+} from '../../../services/DAK/DAKIdentifikasiService';
+import {
+  useGetIdentDetailDAK,
+  useListSubJenisDAK,
+} from '../../../hooks/DAK/ListDataDAK';
+import type { ApiResponse } from '../../../lib/api';
+import AksiButton from '../../inputs/AksiButton';
+import InputButton from '../../inputs/InputButton';
+import {
+  identifikasidakSchema,
+  identifikasidakSchemaSubmit,
+} from '../schemas/DAK/SchemaIdentifikasiDak';
+import { mapToInput, mapErrors } from '../schemas/SchemaPagu';
+import FormIdentJenisBidangDak from './FormIdentJenisBidangDak';
 import FormIdentDetailDak from './FormIdentDetailDak';
 import FormIdentMekanismeDak from './FormIdentMekanismeDak';
-import FormIdentDokumenDak from './FormIdentDokumenDak';
+
+type DakData = {
+  tahun: string;
+  opd: string;
+  jenis: string;
+  subJenis: string;
+  id_ident?: string;
+};
 
 interface Props {
   onBack: () => void;
+  dataDak: DakData;
 }
 
-const FormIdentifikasiDak = ({ onBack }: Props) => {
-  // const editInitialFormData = useGetIdentDetailDAK(Number(dataDak.id_ident));
+const FormEditIdentDak = ({ onBack, dataDak }: Props) => {
+  const editData = useGetIdentDetailDAK(Number(dataDak.id_ident));
+  console.log('jenis', useListSubJenisDAK(Number(editData?.sub_jenis_dak_id)));
 
-  const initialFormData: IdentifikasiDAKForm = {
+  const initialFormData: Omit<IdentifikasiDAKForm, 'dokumen'> & {
+    id_ident: number;
+  } = {
     // non payload
-    n_jenisDAK: '',
+    n_jenisDAK: editData?.jenis_dak_id.toString() ?? '',
     n_bidangDAK: '',
-    n_idUrusan: '',
-    n_idBidang: '',
-    n_idProgram: '',
-    n_idKegiatan: '',
+    n_idUrusan: editData?.urusan_id.toString() ?? '',
+    n_idBidang: editData?.bidang_id.toString() ?? '',
+    n_idProgram: editData?.program_id.toString() ?? '',
+    n_idKegiatan: editData?.kegiatan_id.toString() ?? '',
     // payload
-    sub_jenis_id: 0,
+    id_ident: Number(dataDak.id_ident),
+    sub_jenis_id: editData?.sub_jenis_dak_id ?? 0,
     sub_bidang_id: 0,
-    tahun: 0,
-    opd_id: 0,
-    bidang_opd: '',
-    sub_kegiatan_id: 0,
-    catatan: '',
-    nama_paket: '',
-    detail_paket: '',
-    volume: 0,
-    satuan: '',
-    estimasi: '',
-    jumlah_penerima: '',
-    anggaran: 0,
-    des_kel: '',
-    kec: '',
-    bujur: ['0', '0', '0'],
-    lintang: ['0', '0', '0'],
-    foto: null,
-    mekanisme: 'swakelola',
-    metode: '',
-    volume_mekanisme: 0,
-    uang_mekanisme: 0,
-    dokumen: Array.from({ length: 12 }, (_, i) => ({
-      id_berkas: i + 1,
-      file: null,
-      Waktu: null,
-      Keterangan: null,
-    })),
+    tahun: editData?.tahun ?? 0,
+    opd_id: editData?.opd_id ?? 0,
+    bidang_opd: editData?.bidang_opd ?? '',
+    sub_kegiatan_id: editData?.subKegiatan_id ?? 0,
+    catatan: editData?.catatan ?? '',
+    nama_paket: editData?.nama_paket ?? '',
+    detail_paket: editData?.detail_paket ?? '',
+    volume: editData?.volume ?? 0,
+    satuan: editData?.satuan ?? '',
+    estimasi: editData?.estimasi_waktu ?? '',
+    jumlah_penerima: editData?.jumlah_penerima_manfaat ?? '',
+    anggaran: Number(editData?.anggaran_dak) ?? 0,
+    des_kel: editData?.desa_kel ?? '',
+    kec: editData?.kec ?? '',
+    bujur: [
+      editData?.bujur[0].toString() ?? '',
+      editData?.bujur[1].toString() ?? '',
+      editData?.bujur[2].toString() ?? '',
+    ],
+    lintang: [
+      editData?.lintang[0].toString() ?? '',
+      editData?.lintang[1].toString() ?? '',
+      editData?.lintang[2].toString() ?? '',
+    ],
+    foto: editData?.foto_kegiatan ?? null,
+    mekanisme: editData?.mekanisme ?? 'swakelola',
+    metode: editData?.metode_pembayaran ?? '',
+    volume_mekanisme: editData?.mekanisme_volume ?? 0,
+    uang_mekanisme: Number(editData?.mekanisme_uang) ?? 0,
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -89,7 +106,8 @@ const FormIdentifikasiDak = ({ onBack }: Props) => {
   const form = useForm({
     defaultValues: formData,
     onSubmit: async ({ value }) => {
-      addMutation.mutate({
+      editMutation.mutate({
+        id_ident: Number(dataDak.id_ident),
         sub_jenis_id: value.sub_jenis_id,
         sub_bidang_id: value.sub_bidang_id,
         tahun: value.tahun,
@@ -113,9 +131,7 @@ const FormIdentifikasiDak = ({ onBack }: Props) => {
         metode: value.metode,
         volume_mekanisme: value.volume_mekanisme,
         uang_mekanisme: value.uang_mekanisme,
-        dokumen: value.dokumen,
       });
-      console.log('IDENTIFIKASI FORM', value);
     },
     onSubmitInvalid: () => {
       window.scrollTo({
@@ -125,6 +141,7 @@ const FormIdentifikasiDak = ({ onBack }: Props) => {
       toast.error('Validasi gagal\nMohon lengkapi form');
     },
     validators: {
+      // onChange: ({ value }) => validateWith(identifikasidakSchema, value),
       onChange: ({ value }) => debouncedValidate(value),
       onSubmit: ({ value }) => validateWith(identifikasidakSchemaSubmit, value),
     },
@@ -135,11 +152,11 @@ const FormIdentifikasiDak = ({ onBack }: Props) => {
   //#region MUTASI
   const queryClient = useQueryClient();
   const [loadingMutation, setLoadingMutation] = useState(false);
-  const addMutation = useMutation({
-    mutationFn: async (payload: IdentifikasiDAKFormSubmit) => {
+  const editMutation = useMutation({
+    mutationFn: async (payload: IdentifikasiDAKFormEdit) => {
       setLoadingMutation(true);
       // return console.log(payload);
-      return addIdentifikasiDAK(payload);
+      return editIdentifikasiDAK(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['list_identifikasi_dak'] });
@@ -181,10 +198,9 @@ const FormIdentifikasiDak = ({ onBack }: Props) => {
         className='space-y-2'
       >
         <div className='space-y-8'>
-          <JenisBidangDak form={form} formValues={formValues} />
+          <FormIdentJenisBidangDak form={form} formValues={formValues} />
           <FormIdentDetailDak form={form} />
           <FormIdentMekanismeDak form={form} />
-          <FormIdentDokumenDak form={form} />
         </div>
         <InputButton className='float-end px-2' isLoading={loadingMutation}>
           Simpan
@@ -194,4 +210,4 @@ const FormIdentifikasiDak = ({ onBack }: Props) => {
   );
 };
 
-export default FormIdentifikasiDak;
+export default FormEditIdentDak;

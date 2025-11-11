@@ -5,6 +5,7 @@ import { getOPDDAK } from "../../services/DAK/DAKOPDService";
 import { getSubJenisDAK } from "../../services/DAK/DAKJenisService";
 import { getRekBidangDAK, getRekKegiatanDAK, getRekProgramDAK, getRekSubKegiatanDAK, getRekUrusanDAK } from "../../services/DAK/DAKRekeningService";
 import type { OptionItem } from "../../components/inputs/InputSearchBox";
+import { getIdentifikasiDetailDAK } from "../../services/DAK/DAKIdentifikasiService";
 
 export const useListBidangDAK = () => {
     const { data } = useQuery({
@@ -141,4 +142,14 @@ export const useListRekSubKegiatanDAK = (id_urusan: number, id_bidang: number, i
             value: item.id?.toString(),
         })) as OptionItem[] || []
     )
+}
+
+// Mark: Get Detail DAK
+export const useGetIdentDetailDAK = (id_ident: number | null) => {
+    const { data } = useQuery({
+        queryKey: ['detail_identifikasi_dak', id_ident],
+        queryFn: () => getIdentifikasiDetailDAK(Number(id_ident)),
+        enabled: !!(id_ident)
+    });
+    return data
 }

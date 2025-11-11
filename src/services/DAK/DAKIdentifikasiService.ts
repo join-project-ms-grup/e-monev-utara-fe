@@ -94,8 +94,8 @@ export interface IdentifikasiDetailDAK {
     anggaran_dak: string,
     desa_kel: string,
     kec: string,
-    bujur: number[],
-    lintang: number[],
+    bujur: string[],
+    lintang: string[],
     foto_kegiatan: string | null,
     mekanisme: string,
     mekanisme_volume: number,
@@ -205,5 +205,14 @@ export interface IdentifikasiDAKFormSubmit {
 
 export const addIdentifikasiDAK = async (payload: IdentifikasiDAKFormSubmit): Promise<IdentifikasiDAKFormSubmit> => {
     const response = await api.post<ApiResponse<IdentifikasiDAKFormSubmit>>("/dak/fisik/add-ident", payload);
+    return response.data.data;
+};
+
+export type IdentifikasiDAKFormEdit = Omit<IdentifikasiDAKFormSubmit, 'dokumen'> & {
+    id_ident: number;
+};
+
+export const editIdentifikasiDAK = async (payload: IdentifikasiDAKFormEdit): Promise<IdentifikasiDAKFormEdit> => {
+    const response = await api.put<ApiResponse<IdentifikasiDAKFormEdit>>("/dak/fisik/update-ident", payload);
     return response.data.data;
 };

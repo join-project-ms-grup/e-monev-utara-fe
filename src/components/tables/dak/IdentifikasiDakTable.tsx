@@ -8,7 +8,7 @@ import {
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
-import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
+import InputSearchBox from '../../inputs/InputSearchBox';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -25,12 +25,29 @@ import {
   useListSubJenisDAK,
   useListTahunDAK,
 } from '../../../hooks/DAK/ListDataDAK';
+import Spinner from '../../inputs/Spinner';
+
+interface DakData {
+  tahun: string;
+  opd: string;
+  jenis: string;
+  subJenis: string;
+  id_ident?: string;
+}
 
 interface IdentifikasiDakTable {
   onAdd: () => void;
+  onEdit: () => void;
+  dakData: DakData;
+  changeDakData: (field: keyof DakData, value: string) => void;
 }
 
-const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
+const IdentifikasiDakTable = ({
+  onAdd,
+  onEdit,
+  dakData,
+  changeDakData,
+}: IdentifikasiDakTable) => {
   const columns: ColumnDef<FlatIdentifikasiDAK>[] = [
     {
       id: 'no',
@@ -68,31 +85,29 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
     },
   ];
 
-  const [tahunDAK, setTahunDAK] = useState('');
-  const [opdDAK, setOPDDAK] = useState('');
-  const [jenisDAK, setJenisDAK] = useState('');
-  const [subJenisDAK, setSubJenisDAK] = useState('');
+  const listTahunDAK = useListTahunDAK();
+  const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
+  const listOPDDAK = useListOPDDAK();
 
-  const listTahunDAK = useListTahunDAK() as OptionItem[];
-  const listSubJenisDAK = useListSubJenisDAK(Number(jenisDAK)) as OptionItem[];
-  const listOPDDAK = useListOPDDAK() as OptionItem[];
-
-  const { data } = useQuery({
-    queryKey: ['list_identifikasi_dak', tahunDAK, opdDAK, subJenisDAK],
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: [
+      'list_identifikasi_dak',
+      dakData.tahun,
+      dakData.opd,
+      dakData.subJenis,
+    ],
     queryFn: async () => {
-      console.log(tahunDAK);
       const data = await getIdentifikasiDAK({
         tahun: Number(
-          listTahunDAK.find((item) => item.value === tahunDAK)?.value,
+          listTahunDAK.find((item) => item.value === dakData.tahun)?.value,
         ),
-        opd_id: Number(opdDAK) ?? null,
-        sub_jenis: Number(subJenisDAK) ?? null,
+        opd_id: Number(dakData.opd) ?? null,
+        sub_jenis: Number(dakData.subJenis) ?? null,
       });
       const flatData = flatIdentifikasiDAK(data);
-      console.log('IDEN DAK', flatData);
       return flatData;
     },
-    enabled: !!tahunDAK,
+    enabled: !!dakData.tahun,
   });
 
   const tableBody = (
@@ -152,7 +167,10 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
                     tooltip='Ubah Data'
                     className='hover:bg-green-500!'
                     Icon={MdEdit}
-                    onClick={() => {}}
+                    onClick={() => {
+                      onEdit();
+                      changeDakData('id_ident', item.id_ident as any);
+                    }}
                   />
                 </div>
               </td>
@@ -169,17 +187,6 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
     id_ident: 0,
   };
   const [formData, setFormData] = useState<any>(initialFormData);
-  // // Clear form
-  // useEffect(() => {
-  //   if (!openModal) {
-  //     const timeout = setTimeout(() => {
-  //       setFormData(initialFormData);
-  //     }, 200);
-  //     return () => clearTimeout(timeout);
-  //   } else {
-  //     console.log(formData);
-  //   }
-  // }, [openModal]);
 
   return (
     <div className='space-y-2'>
@@ -192,13 +199,12 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               className='w-42 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Tahun ke...'
-              value={tahunDAK}
+              value={dakData.tahun}
               options={listTahunDAK}
               onChange={(val) => {
-                console.log('change', val);
-                setTahunDAK(val);
+                changeDakData('tahun', val);
               }}
-              onClear={() => setTahunDAK('')}
+              onClear={() => changeDakData('tahun', '')}
             />
           </div>
           <div>
@@ -208,10 +214,10 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               className='w-72 h-9'
               btnclassName='bg-white'
               placeholder='Pilih OPD'
-              value={opdDAK}
+              value={dakData.opd}
               options={listOPDDAK}
-              onChange={(val) => setOPDDAK(val)}
-              onClear={() => setOPDDAK('')}
+              onChange={(val) => changeDakData('opd', val)}
+              onClear={() => changeDakData('opd', '')}
               withSearch
               tooltip
             />
@@ -227,14 +233,14 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
                 { label: 'Fisik', value: '1' },
                 { label: 'Non-Fisik', value: '2' },
               ]}
-              value={jenisDAK}
+              value={dakData.jenis}
               onChange={(val) => {
-                setJenisDAK(val);
-                setSubJenisDAK('');
+                changeDakData('jenis', val);
+                changeDakData('subJenis', '');
               }}
               onClear={() => {
-                setJenisDAK('');
-                setSubJenisDAK('');
+                changeDakData('jenis', '');
+                changeDakData('subJenis', '');
               }}
             />
           </div>
@@ -246,9 +252,9 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
               options={listSubJenisDAK}
-              value={subJenisDAK}
-              onChange={(val) => setSubJenisDAK(val)}
-              onClear={() => setSubJenisDAK('')}
+              value={dakData.subJenis}
+              onChange={(val) => changeDakData('subJenis', val)}
+              onClear={() => changeDakData('subJenis', '')}
             />
           </div>
         </div>
@@ -263,11 +269,10 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
-            // onClick={() => refetch()}
-            // disabled={isFetching}
+            onClick={() => refetch()}
+            disabled={isFetching}
           >
-            {/* {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />} */}
-            <MdRefresh />
+            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
           </InputButton>
         </div>
       </div>
