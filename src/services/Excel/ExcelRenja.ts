@@ -63,7 +63,7 @@ export const exportRenja = async (
     const fixedCells: Array<{ addr: string; value: string; style?: Partial<ExcelJS.Style> }> = [
         { addr: 'A2', value: 'Evaluasi Terhadap Hasil Renja Perangkat Daerah Lingkup Kabupaten/kota' },
         { addr: 'A3', value: `Renja Perangkat Daerah ${skpd} Kabupaten Bengkulu Utara` },
-        { addr: 'A4', value: `Periode Pelaksanaan: ${awalPeriode} - ${akhirPeriode}` },
+        { addr: 'A4', value: `` },
         { addr: 'A7', value: 'Indikator dan target kinerja Perangkat Daerah Kabupaten/Kota yang mengacu pada sasaran RKPD:' },
         { addr: 'A8', value: '................................................................................................' },
 

@@ -65,7 +65,7 @@ export const exportRPJMD = async (
     const fixedCells: Array<{ addr: string; value: string; style?: Partial<ExcelJS.Style> }> = [
         { addr: 'A2', value: 'Evaluasi Terhadap Hasil RPJMD' },
         { addr: 'A3', value: 'Kabupaten Bengkulu Utara' },
-        { addr: 'A4', value: `Periode Pelaksanaan: ${awalPeriode} - ${akhirPeriode}` },
+        { addr: 'A4', value: `` },
         { addr: 'A7', value: 'Sasaran Pembangunan Jangka Menengah:' },
         { addr: 'A8', value: '................................................................................................' },
 

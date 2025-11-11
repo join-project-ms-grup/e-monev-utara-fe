@@ -302,10 +302,6 @@ const RenjaPreviewTable = ({ data, skpd }: MainTableProps) => {
               Kabupaten/kota
             </p>
             <p>Renja Perangkat Daerah {skpd} Kabupaten Bengkulu Utara</p>
-            <p>
-              Periode Pelaksanaan: {getPeriodeMulaiFromCookie()} -{' '}
-              {getPeriodeAkhirFromCookie()}
-            </p>
           </div>
           <br />
           <div className='text-xl'>

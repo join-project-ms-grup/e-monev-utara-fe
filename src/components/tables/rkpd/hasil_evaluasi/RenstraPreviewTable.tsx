@@ -468,7 +468,6 @@ const RenstraPreviewTable = ({
           <div className='flex flex-col items-center justify-center text-xl'>
             <p>Evaluasi Terhadap Hasil Renstra Perangkat Daerah Lingkup Kabupaten/kota</p>
             <p>Renstra Perangkat Daerah {skpd} Kabupaten Bengkulu Utara</p>
-            <p>Periode Pelaksanaan: {getPeriodeMulaiFromCookie()} - {getPeriodeAkhirFromCookie()}</p>
           </div>
           <br />
           <div className='text-xl'>

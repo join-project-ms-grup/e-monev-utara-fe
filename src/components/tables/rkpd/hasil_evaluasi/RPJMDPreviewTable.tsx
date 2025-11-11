@@ -854,10 +854,6 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
           <div className='flex flex-col items-center justify-center text-xl'>
             <p>Evaluasi Terhadap Hasil RPJMD</p>
             <p>Kabupaten Bengkulu Utara</p>
-            <p>
-              Periode Pelaksanaan: {getPeriodeMulaiFromCookie()} -{' '}
-              {getPeriodeAkhirFromCookie()}
-            </p>
           </div>
           <br />
           <div className='text-xl'>
