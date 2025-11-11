@@ -1,5 +1,6 @@
 import api, { type ApiResponse } from "../lib/api";
 
+//#region RKPD
 export interface RealisasiIndikator {
     id: number;
     name: string;
@@ -106,6 +107,10 @@ export const addAnggaranRKPD = async (payload: AddAnggaranRKPDForm): Promise<Add
     return response.data.data;
 };
 
+export const addPerhitunganRKPD = async (payload: PerhitunganRenstraRKPDForm): Promise<PerhitunganRenstraRKPDForm> => {
+    const response = await api.post<ApiResponse<PerhitunganRenstraRKPDForm>>("/rkpd/realisasi/perhitungan", payload);
+    return response.data.data;
+};
 
 export interface FlatRealisasiRKPD {
     level: string;
@@ -251,6 +256,7 @@ export async function flatRealisasi(
 
     return dataExcel;
 }
+//#endregion
 
 export interface RealisasiRenstraMaster {
     id: number;
@@ -483,5 +489,16 @@ export interface CapaianRenstraForm {
 
 export const addCapaianRENSTRA = async (payload: CapaianRenstraForm): Promise<CapaianRenstraForm> => {
     const response = await api.post<ApiResponse<CapaianRenstraForm>>("/renstra/realisasi/capaian", payload);
+    return response.data.data;
+};
+
+export interface PerhitunganRenstraRKPDForm {
+    id_indikator: number;
+    type: string | null;
+    perhitungan: string;
+}
+
+export const addPerhitunganRENSTRA = async (payload: PerhitunganRenstraRKPDForm): Promise<PerhitunganRenstraRKPDForm> => {
+    const response = await api.post<ApiResponse<PerhitunganRenstraRKPDForm>>("/renstra/realisasi/perhitungan", payload);
     return response.data.data;
 };
