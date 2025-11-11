@@ -16,9 +16,11 @@ import {
   type AddAnggaranRKPDForm,
   addCapaianRKPD,
   type AddCapaianRKPDForm,
+  addPerhitunganRKPD,
   flatRealisasi,
   type FlatRealisasiRKPD,
   getRealisasiRKPD,
+  type PerhitunganRenstraRKPDForm,
   type RealisasiFormRKPD,
 } from '../../../../services/RealisasiService';
 import FormRealisasi from '../../../forms/FormRealisasi';
@@ -131,8 +133,8 @@ const RKPD_RealisasiTable = () => {
     },
     {
       header: 'Input',
-      meta:{
-        tdClassNames: 'text-center'
+      meta: {
+        tdClassNames: 'text-center',
       },
       cell: ({ row }) => {
         if (row.original.level === 'sub_kegiatan') {
@@ -170,6 +172,62 @@ const RKPD_RealisasiTable = () => {
                 }}
               />
             </>
+          );
+        }
+      },
+    },
+    {
+      header: 'perhitungan',
+      cell: ({ row }) => {
+        const [localOut, setLocalOut] = useState('');
+        const [localPer, setLocalPer] = useState('');
+
+        if (!row.original.type) {
+          return (
+            <form
+              id={`${row.index}`}
+              onSubmit={(e) => {
+                e.preventDefault();
+
+                if (localPer) {
+                  perhitunganMutation.mutate({
+                    id_indikator: Number(row.original.id_indikator),
+                    perhitungan: localPer,
+                    type: localOut ?? null,
+                  });
+                } else {
+                  toast.error('Perhitungan belum dipilih');
+                }
+              }}
+            >
+              <div className='space-y-2'>
+                <label className='select-none'>
+                  <input
+                    type='checkbox'
+                    name='outcome'
+                    value='outcome'
+                    onChange={(e) => setLocalOut(e.target.value)}
+                  />
+                  {` `}Outcome
+                </label>
+                <InputSearchBox
+                  id='perhitungan'
+                  placeholder='Perhitungan'
+                  className='w-[150px]'
+                  value={localPer}
+                  options={[
+                    { label: 'Akumulatif', value: 'akumulatif' },
+                    { label: 'Negatif', value: 'negatif' },
+                    { label: 'Tetap', value: 'tetap' },
+                  ]}
+                  onChange={(val) => setLocalPer(val)}
+                  onClear={() => setLocalPer('')}
+                />
+                <InputButton className='w-[150px] h-9' disabled={!localPer}>
+                  Konfirmasi
+                </InputButton>
+              </div>
+            </form>
           );
         }
       },
@@ -249,6 +307,9 @@ const RKPD_RealisasiTable = () => {
           <th rowSpan={2} className='w-[50px]'>
             Realisasi
           </th>
+          <th rowSpan={2} className='w-[50px]'>
+            Perhitungan
+          </th>
           <th rowSpan={2} className='w-[150px]'>
             Satuan
           </th>
@@ -318,7 +379,25 @@ const RKPD_RealisasiTable = () => {
       setLoadingMutation(false);
     },
   });
-
+  
+  const perhitunganMutation = useMutation({
+    mutationFn: async (payload: PerhitunganRenstraRKPDForm) => {
+      setLoadingMutation(true);
+      return addPerhitunganRKPD(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rkpd_list_renja'] });
+      toast.success('Data berhasil diperbarui');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+    },
+  });
   //#endregion
 
   return (
@@ -404,7 +483,7 @@ const RKPD_RealisasiTable = () => {
 
             try {
               let hasMutation = false;
-              setLoadingMutation(true)
+              setLoadingMutation(true);
 
               if (data.id_pagu) {
                 hasMutation = true;

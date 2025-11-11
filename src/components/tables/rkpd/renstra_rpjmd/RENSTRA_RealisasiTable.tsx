@@ -14,11 +14,13 @@ import {
 import {
   addAnggaranRENSTRA,
   addCapaianRENSTRA,
+  addPerhitunganRENSTRA,
   flatRealisasiRENSTRA,
   getRealisasiRENSTRA,
   type AnggaranRenstraForm,
   type CapaianRenstraForm,
   type FlatRealisasiRENSTRA,
+  type PerhitunganRenstraRKPDForm,
 } from '../../../../services/RealisasiService';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
@@ -118,6 +120,24 @@ const RENSTRA_RealisasiTable = () => {
       setLoadingMutation(false);
     },
   });
+  const perhitunganMutation = useMutation({
+    mutationFn: async (payload: PerhitunganRenstraRKPDForm) => {
+      setLoadingMutation(true);
+      return addPerhitunganRENSTRA(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['renstra_list_renja'] });
+      toast.success('Data berhasil diperbarui');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+    },
+  });
   //#endregion
 
   // #region Kolom Tabel
@@ -139,7 +159,66 @@ const RENSTRA_RealisasiTable = () => {
       accessorKey: 'indikator_name',
     },
     {
+      header: 'perhitungan',
+      cell: ({ row }) => {
+        const [localOut, setLocalOut] = useState('');
+        const [localPer, setLocalPer] = useState('');
+
+        if (row.original.type === 'subkegiatan') {
+          return (
+            <form
+              id={`${row.index}`}
+              onSubmit={(e) => {
+                e.preventDefault();
+
+                if (localPer) {
+                  perhitunganMutation.mutate({
+                    id_indikator: Number(row.original.indikator_id),
+                    perhitungan: localPer,
+                    type: localOut ?? null,
+                  });
+                } else {
+                  toast.error('Perhitungan belum dipilih');
+                }
+              }}
+            >
+              <div className='space-y-2'>
+                <label className='select-none'>
+                  <input
+                    type='checkbox'
+                    name='outcome'
+                    value='outcome'
+                    onChange={(e) => setLocalOut(e.target.value)}
+                  />
+                  {` `}Outcome
+                </label>
+                <InputSearchBox
+                  id='perhitungan'
+                  placeholder='Perhitungan'
+                  className='w-[150px]'
+                  value={localPer}
+                  options={[
+                    { label: 'Akumulatif', value: 'akumulatif' },
+                    { label: 'Negatif', value: 'negatif' },
+                    { label: 'Tetap', value: 'tetap' },
+                  ]}
+                  onChange={(val) => setLocalPer(val)}
+                  onClear={() => setLocalPer('')}
+                />
+                <InputButton className='w-[150px] h-9' disabled={!localPer}>
+                  Konfirmasi
+                </InputButton>
+              </div>
+            </form>
+          );
+        }
+      },
+    },
+    {
       accessorKey: 'indikator_satuan',
+      meta: {
+        tdClassNames: 'text-center',
+      },
     },
     {
       header: 'Target_K',
@@ -276,6 +355,9 @@ const RENSTRA_RealisasiTable = () => {
           </th>
           <th rowSpan={2} className='w-[25%]'>
             Indikator
+          </th>
+          <th rowSpan={2} className='w-[150px]'>
+            Perhitungan
           </th>
           <th rowSpan={2} className='w-[150px]'>
             Satuan
