@@ -287,7 +287,7 @@ const IdentifikasiDakTable = () => {
         triwulan: Number(triwulanDAK),
       });
       const flatData = flatMonitoringDAK(data);
-      console.log('IDEN DAK', flatData);
+      console.log('MONITORING DAK', flatData);
       return flatData;
     },
     enabled: !!(tahunDAK && opdDAK && subJenisDAK && triwulanDAK),

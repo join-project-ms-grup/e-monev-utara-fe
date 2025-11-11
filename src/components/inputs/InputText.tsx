@@ -100,7 +100,7 @@ const InputText = ({
       {Icon && <Icon className='text-4xl h-full pl-2' />}
       {Iconlabel && IconlabelPos === 'left' && (
         <div className='flex items-center pl-2'>
-          <span className='cursor-default'>{Iconlabel}</span>
+          <span className='cursor-default font-bold'>{Iconlabel}</span>
         </div>
       )}
       <input
@@ -121,7 +121,7 @@ const InputText = ({
             invalid ? 'block opacity-100' : 'hidden opacity-0'
           }`}
         />
-        {onClear && formattedValue && (
+        {onClear && formattedValue && formattedValue !== '0' && (
           <button
             type='button'
             className='bg-white transition-all text-red-500 hover:text-red-400 px-1'
@@ -153,7 +153,7 @@ const InputText = ({
       </div>
       {Iconlabel && IconlabelPos === 'right' && (
         <div className='flex items-center pr-2'>
-          <span className='cursor-default'>{Iconlabel}</span>
+          <span className='cursor-default font-bold'>{Iconlabel}</span>
         </div>
       )}
     </div>

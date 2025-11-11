@@ -47,14 +47,14 @@ const InputTextArea = ({
         disabled ? 'opacity-60' : ''
       }`}
     >
-      <div className='flex items-center'>
+      <div className='absolute top-1 right-1 flex items-center'>
         {Icon && <Icon className='text-4xl pl-2' />}
         {Iconlabel && (
           <div className='flex items-center pl-2'>
             <span className='cursor-default'>{Iconlabel}</span>
           </div>
         )}
-        <div className='ml-auto inline-flex items-center pr-2'>
+        <div className='ml-auto inline-flex items-center mt-0 -mr-1'>
           <PiWarningCircle
             className={`transition-opacity text-red-500 text-lg mr-1 ${
               invalid ? 'block opacity-100' : 'hidden opacity-0'

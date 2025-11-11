@@ -58,7 +58,6 @@ export const getRekeningDAK = async (): Promise<DAKMasterUrusan[]> => {
     return cleanData;
 };
 
-
 type ChildKey = 'bidang' | 'program' | 'kegiatan' | 'subKegiatan';
 export const getRekeningDAKFlat = async (
     treeData: DAKMaster[]
@@ -92,3 +91,150 @@ export const getRekeningDAKFlat = async (
     treeData.forEach((item) => flattenNode(item));
     return flatData;
 };
+
+export const getRekUrusanDAK = async (): Promise<DAKMaster[]> => {
+    const response = await api.post<ApiResponse<DAKMaster[]>>("/dak/rek/list-urusan");
+    return response.data.data;
+};
+
+export const getRekBidangDAK = async (
+    id_urusan: number | null
+): Promise<DAKMasterBidang[]> => {
+    const response = await api.post<ApiResponse<DAKMasterUrusan[]>>(
+        "/dak/rek/list-bidang",
+        { urusan: id_urusan }
+    );
+
+    const rawData = response.data.data;
+
+    const bidangList: DAKMasterBidang[] = rawData.flatMap((urusan) =>
+        urusan.children?.map((bidang) => ({
+            id: bidang.id,
+            kode: bidang.kode,
+            name: bidang.name,
+            rekening: bidang.rekening,
+            parent: urusan.id,
+            type: bidang.type,
+        })) ?? []
+    );
+
+    return bidangList;
+};
+
+export const getRekProgramDAK = async (
+    id_urusan: number,
+    id_bidang: number | null
+): Promise<DAKMasterProgram[]> => {
+    const response = await api.post<ApiResponse<DAKMasterUrusan[]>>(
+        "/dak/rek/list-program",
+        { urusan: id_urusan, bidang: id_bidang }
+    );
+
+    const rawData = response.data.data;
+
+    const programList: DAKMasterProgram[] = rawData.flatMap((urusan) => (
+        urusan.children?.flatMap((bidang) =>
+            bidang.children?.map((program) => ({
+                id: program.id,
+                kode: program.kode,
+                name: program.name,
+                parent: bidang.id,
+                type: program.type,
+            })) ?? []
+        ) ?? []));
+    return programList;
+};
+
+export const getRekKegiatanDAK = async (
+    id_urusan: number,
+    id_bidang: number,
+    id_program: number | null
+): Promise<DAKMasterKegiatan[]> => {
+    const response = await api.post<ApiResponse<DAKMasterUrusan[]>>(
+        "/dak/rek/list-kegiatan",
+        { urusan: id_urusan, bidang: id_bidang, program: id_program }
+    );
+
+    const rawData = response.data.data;
+
+    const kegiatanList: DAKMasterKegiatan[] = rawData.flatMap((urusan) =>
+        urusan.children?.flatMap((bidang) =>
+            bidang.children?.flatMap((program) =>
+                program.children?.map((kegiatan) => ({
+                    id: kegiatan.id,
+                    kode: kegiatan.kode,
+                    name: kegiatan.name,
+                    rekening: kegiatan.rekening,
+                    parent: id_program ?? program.id, // parent bisa id_program atau program.id
+                    type: kegiatan.type,
+                })) ?? []
+            ) ?? []
+        ) ?? []
+    );
+
+    return kegiatanList;
+};
+
+export const getRekSubKegiatanDAK = async (
+    id_urusan: number,
+    id_bidang: number,
+    id_program: number,
+    id_kegiatan: number | null
+): Promise<DAKMasterSubKegiatan[]> => {
+    const response = await api.post<ApiResponse<DAKMasterUrusan[]>>(
+        "/dak/rek/list-sub",
+        { urusan: id_urusan, bidang: id_bidang, program: id_program, kegiatan: id_kegiatan }
+    );
+
+    const rawData = response.data.data;
+
+    const subList: DAKMasterSubKegiatan[] = rawData.flatMap((urusan) =>
+        urusan.children?.flatMap((bidang) =>
+            bidang.children?.flatMap((program) =>
+                program.children?.flatMap((kegiatan) =>
+                    kegiatan.children?.map((sub) => ({
+                        id: sub.id,
+                        kode: sub.kode,
+                        name: sub.name,
+                        rekening: sub.rekening,
+                        parent: id_kegiatan ?? kegiatan.id,
+                        type: sub.type,
+                    })) ?? []
+                ) ?? []
+            ) ?? []
+        ) ?? []
+    );
+
+    return subList
+};
+
+
+// export const getRekBidangDAK = async (id_urusan: number | null): Promise<DAKMasterUrusan[]> => {
+//     const response = await api.post<ApiResponse<DAKMasterUrusan[]>>("/dak/rek/list-bidang", { urusan: id_urusan });
+
+//     const rawData = response.data.data;
+//     const bidangList: DAKMasterBidang[] = rawData.flatMap((urusan) =>
+//         urusan.children?.map((bidang) => ({
+//             id: bidang.id,
+//             kode: bidang.kode,
+//             name: bidang.name,
+//             rekening: bidang.rekening,
+//             parent: urusan.id,
+//             type: bidang.type,
+//         })) ?? []
+//     );
+//     return bidangList;
+// };
+
+// export const getRekProgramDAK = async (id_urusan: number, id_bidang: number | null): Promise<DAKMaster[]> => {
+//     const response = await api.post<ApiResponse<DAKMaster[]>>("/dak/rek/list-program", { urusan: id_urusan, bidang: id_bidang });
+//     return response.data.data;
+// };
+// export const getRekKegiatanDAK = async (id_urusan: number, id_bidang: number, id_program: number | null): Promise<DAKMaster[]> => {
+//     const response = await api.post<ApiResponse<DAKMaster[]>>("/dak/rek/list-kegiatan", { urusan: id_urusan, bidang: id_bidang, program: id_program });
+//     return response.data.data;
+// };
+// export const getRekSubKegiatanDAK = async (id_urusan: number, id_bidang: number, id_program: number, id_kegiatan: number | null): Promise<DAKMaster[]> => {
+//     const response = await api.post<ApiResponse<DAKMaster[]>>("/dak/rek/list-sub", { urusan: id_urusan, bidang: id_bidang, program: id_program, kegiatan: id_kegiatan });
+//     return response.data.data;
+// };

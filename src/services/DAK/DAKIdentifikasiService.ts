@@ -132,6 +132,14 @@ export const getIdentifikasiDetailDAK = async (id: number): Promise<Identifikasi
 };
 
 export interface IdentifikasiDAKForm {
+    // non payload
+    n_jenisDAK: string;
+    n_bidangDAK: string;
+    n_idUrusan: string;
+    n_idBidang: string;
+    n_idProgram: string;
+    n_idKegiatan: string;
+    // payload
     sub_jenis_id: number;
     sub_bidang_id: number;
     tahun: number;
@@ -148,23 +156,54 @@ export interface IdentifikasiDAKForm {
     anggaran: number;
     des_kel: string;
     kec: string;
-    bujur: number[];
-    lintang: number[];
-    foto: string | null;
-    mekanisme: "swakelola" | "kontrak" | "ekatalog";
+    bujur: string[];
+    lintang: string[];
+    foto: File | string | null;
+    mekanisme: string;
     metode: string;
     volume_mekanisme: number;
     uang_mekanisme: number;
     dokumen: {
         id_berkas: number;
-        file: string | null;
+        file: File | string | null;
         Waktu: string | null;
         Keterangan: string | null;
     }[];
 }
 
+export interface IdentifikasiDAKFormSubmit {
+    sub_jenis_id: number;
+    sub_bidang_id: number;
+    tahun: number;
+    opd_id: number;
+    bidang_opd: string;
+    sub_kegiatan_id: number;
+    catatan: string | null;
+    nama_paket: string;
+    detail_paket: string;
+    volume: number;
+    satuan: string;
+    estimasi: string;
+    jumlah_penerima: string;
+    anggaran: number;
+    des_kel: string;
+    kec: string;
+    bujur: string;
+    lintang: string;
+    foto: File | string | null;
+    mekanisme: string;
+    metode: string;
+    volume_mekanisme: number;
+    uang_mekanisme: number;
+    dokumen: {
+        id_berkas: number;
+        file: File | string | null;
+        Waktu: string | null;
+        Keterangan: string | null;
+    }[];
+}
 
-export const addIdentifikasiDAK = async (payload: IdentifikasiDAKForm): Promise<IdentifikasiDAKForm> => {
-    const response = await api.post<ApiResponse<IdentifikasiDAKForm>>("/dak/fisik/add-ident", payload);
+export const addIdentifikasiDAK = async (payload: IdentifikasiDAKFormSubmit): Promise<IdentifikasiDAKFormSubmit> => {
+    const response = await api.post<ApiResponse<IdentifikasiDAKFormSubmit>>("/dak/fisik/add-ident", payload);
     return response.data.data;
 };

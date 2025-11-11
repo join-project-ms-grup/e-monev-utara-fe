@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import type { IconType } from 'react-icons/lib';
-import { MdCheck, MdUploadFile } from 'react-icons/md';
+import { MdCheck, MdClear, MdUploadFile } from 'react-icons/md';
 import { PiWarningCircle } from 'react-icons/pi';
 
 interface InputFileProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -14,6 +14,8 @@ interface InputFileProps extends React.InputHTMLAttributes<HTMLInputElement> {
   disableButton?: boolean;
   buttonType?: 'button' | 'reset' | 'submit';
   showFileName?: boolean;
+  onClear?: () => void;
+  tooltip?: boolean;
 }
 
 const InputFile = ({
@@ -28,6 +30,8 @@ const InputFile = ({
   wrapperClassname,
   disabled = false,
   showFileName = true,
+  tooltip = false,
+  onClear,
   ...props
 }: InputFileProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,31 +49,44 @@ const InputFile = ({
     }
   };
 
+  const handleClear = () => {
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+    setFileName('');
+    onClear?.();
+  };
+
   return (
     <div
+      {...(tooltip &&
+        fileName && {
+          'data-tooltip-id': 'tooltip',
+          'data-tooltip-content': fileName,
+        })}
       className={`${wrapperClassname} bg-white shadow input-wrapper h-9 inline-flex items-center ${
         disabled ? 'opacity-60' : ''
       }`}
     >
-      {Icon && <Icon className="text-2xl h-full pl-2 text-gray-500" />}
+      {Icon && <Icon className='text-2xl h-full pl-2 text-gray-500' />}
       {Iconlabel && (
-        <div className="flex items-center pl-2">
-          <span className="cursor-default">{Iconlabel}</span>
+        <div className='flex items-center pl-2'>
+          <span className='cursor-default'>{Iconlabel}</span>
         </div>
       )}
 
       <input
         ref={inputRef}
-        type="file"
+        type='file'
         {...props}
         disabled={disabled}
         onChange={handleFileChange}
-        className="hidden"
+        className='hidden'
       />
 
       <div
         onClick={handleClick}
-        className={`flex-1 h-full px-3 flex items-center cursor-pointer ${
+        className={`flex-1 h-full px-3 flex items-center cursor-pointer overflow-hidden ${
           disabled ? 'cursor-not-allowed' : ''
         }`}
       >
@@ -84,12 +101,21 @@ const InputFile = ({
         ) : null}
       </div>
 
-      <div className="inline-flex items-center pr-2">
+      <div className='inline-flex items-center pr-2'>
         <PiWarningCircle
           className={`transition-opacity text-red-500 text-lg mr-1 ${
             invalid ? 'block opacity-100' : 'hidden opacity-0'
           }`}
         />
+        {fileName && (
+          <button
+            type='button'
+            className='bg-white transition-all text-red-500 hover:text-red-400 px-1'
+            onClick={handleClear}
+          >
+            <MdClear className='transition-all active:scale-90' />
+          </button>
+        )}
         {withButton && (
           <button
             disabled={disableButton}

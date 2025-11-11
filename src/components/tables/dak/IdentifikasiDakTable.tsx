@@ -20,7 +20,11 @@ import { formatUang } from '../../../lib/helper';
 import { FaInfo } from 'react-icons/fa';
 import DialogModal from '../../inputs/DialogModal';
 import DetailIdentifikasiDak from '../../forms/IdentifikasiDak/DetailIdentifikasiDak';
-import { ListOPDDAK, ListSubJenisDAK, ListTahunDAK } from '../../../services/ListData/ListDataDAK';
+import {
+  useListOPDDAK,
+  useListSubJenisDAK,
+  useListTahunDAK,
+} from '../../../hooks/DAK/ListDataDAK';
 
 interface IdentifikasiDakTable {
   onAdd: () => void;
@@ -66,14 +70,20 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
 
   const [tahunDAK, setTahunDAK] = useState('');
   const [opdDAK, setOPDDAK] = useState('');
+  const [jenisDAK, setJenisDAK] = useState('');
   const [subJenisDAK, setSubJenisDAK] = useState('');
+
+  const listTahunDAK = useListTahunDAK() as OptionItem[];
+  const listSubJenisDAK = useListSubJenisDAK(Number(jenisDAK)) as OptionItem[];
+  const listOPDDAK = useListOPDDAK() as OptionItem[];
 
   const { data } = useQuery({
     queryKey: ['list_identifikasi_dak', tahunDAK, opdDAK, subJenisDAK],
     queryFn: async () => {
+      console.log(tahunDAK);
       const data = await getIdentifikasiDAK({
         tahun: Number(
-          ListTahunDAK().find((item) => item.value === tahunDAK)?.label,
+          listTahunDAK.find((item) => item.value === tahunDAK)?.value,
         ),
         opd_id: Number(opdDAK) ?? null,
         sub_jenis: Number(subJenisDAK) ?? null,
@@ -183,8 +193,11 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               btnclassName='bg-white'
               placeholder='Pilih Tahun ke...'
               value={tahunDAK}
-              options={ListTahunDAK() as OptionItem[]}
-              onChange={(val) => setTahunDAK(val)}
+              options={listTahunDAK}
+              onChange={(val) => {
+                console.log('change', val);
+                setTahunDAK(val);
+              }}
               onClear={() => setTahunDAK('')}
             />
           </div>
@@ -196,11 +209,33 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               btnclassName='bg-white'
               placeholder='Pilih OPD'
               value={opdDAK}
-              options={ListOPDDAK() as OptionItem[]}
+              options={listOPDDAK}
               onChange={(val) => setOPDDAK(val)}
               onClear={() => setOPDDAK('')}
               withSearch
               tooltip
+            />
+          </div>
+          <div>
+            <label htmlFor='subJenis'>Jenis DAK</label>
+            <InputSearchBox
+              id='subJenis'
+              className='w-44 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Jenis DAK'
+              options={[
+                { label: 'Fisik', value: '1' },
+                { label: 'Non-Fisik', value: '2' },
+              ]}
+              value={jenisDAK}
+              onChange={(val) => {
+                setJenisDAK(val);
+                setSubJenisDAK('');
+              }}
+              onClear={() => {
+                setJenisDAK('');
+                setSubJenisDAK('');
+              }}
             />
           </div>
           <div>
@@ -210,7 +245,7 @@ const IdentifikasiDakTable = ({ onAdd }: IdentifikasiDakTable) => {
               className='w-44 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
-              options={ListSubJenisDAK(1) as OptionItem[]}
+              options={listSubJenisDAK}
               value={subJenisDAK}
               onChange={(val) => setSubJenisDAK(val)}
               onClear={() => setSubJenisDAK('')}

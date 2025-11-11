@@ -2,21 +2,13 @@ import { useEffect, useRef, useState, type JSX } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
 import {
   MdDashboard,
-  MdViewList,
   MdSettings,
   MdKeyboardArrowDown,
-  // MdInsights,
-  // MdInventory,
   MdFiberManualRecord,
-  // MdDragIndicator,
-  // MdSpeed,
-  // MdAssignment,
-  // MdLocationCity,
   MdShowChart,
   MdEventNote,
   MdAssessment,
   MdMonitor,
-  MdReport,
   MdContentPaste,
 } from 'react-icons/md';
 import { getRoleId } from '../lib/usercookie';
