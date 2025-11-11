@@ -14,19 +14,31 @@ const tableHead = () => {
   return (
     <>
       <tr>
-        <th rowSpan={2}>Ranking</th>
-        <th rowSpan={2}>Perangkat Daerah</th>
-        <th colSpan={2}>Rata - Rata Triwulan</th>
-        <th colSpan={2}>Rata - Rata Kumulatif</th>
-        <th colSpan={2}>Total Realisasi</th>
+        <th rowSpan={3}>Ranking</th>
+        <th rowSpan={3}>Perangkat Daerah</th>
+        <th colSpan={4}>Rata - Rata Capaian Kinerja</th>
+        <th colSpan={4}>Rata - Rata Capaian Anggaran</th>
+        <th colSpan={2}>Realisasi Anggaran</th>
       </tr>
       <tr>
-        <th>Capaian</th>
-        <th>Realisasi</th>
-        <th>Capaian</th>
-        <th>Realisasi</th>
+        <th colSpan={2}>Triwulan</th>
+        <th colSpan={2}>s/d Triwulan</th>
+        <th colSpan={2}>Triwulan</th>
+        <th colSpan={2}>s/d Triwulan</th>
         <th>Triwulan</th>
-        <th>Kumulatif</th>
+        <th>s/d Triwulan</th>
+      </tr>
+      <tr>
+        <th>(%)</th>
+        <th>P</th>
+        <th>(%)</th>
+        <th>P</th>
+        <th>(%)</th>
+        <th>P</th>
+        <th>(%)</th>
+        <th>P</th>
+        <th>Rp</th>
+        <th>Rp</th>
       </tr>
     </>
   );
@@ -52,14 +64,14 @@ const DashRKPDTable = () => {
     triwulan: Number(triwulan),
   });
   //#endregion
-  console.log(Number(tahunKe),Number(triwulan))
+  console.log(Number(tahunKe), Number(triwulan))
 
   const columns: ColumnDef<DashboardRankingResult>[] = [
     {
       header: 'Ranking',
       accessorKey: 'rangking',
       meta: {
-        tdClassNames: 'text-center',
+        tdClassNames: 'text-center border-x',
       },
     },
     {
@@ -73,32 +85,92 @@ const DashRKPDTable = () => {
           header: 'rata_rata_triwulan_1',
           accessorFn: (row) => row.rata_rata_triwulan,
           cell: ({ getValue }) => {
-            const { c_predikat, capaian } = getValue();
+            const { capaian } = getValue();
             return (
               <div className='text-center'>
-                <code className='italic font-bold'>({c_predikat})</code>{' '}
                 <span>{capaian}</span>
               </div>
             );
           },
           meta: {
-            tdClassNames: 'text-center',
+            tdClassNames: 'text-center border-l',
+          },
+        },
+        {
+          header: 'rata_rata_triwulan_1',
+          accessorFn: (row) => row.rata_rata_triwulan,
+          cell: ({ getValue }) => {
+            const { c_predikat } = getValue();
+            return (
+              <div className='text-center'>
+                <code className='font-bold'>{c_predikat}</code>{' '}
+              </div>
+            );
+          },
+          meta: {
+            tdClassNames: 'text-center border-r',
+          },
+        },
+        {
+          header: 'rata_rata_kumulatif_1',
+          accessorFn: (row) => row.rata_rata_kumulatif,
+          cell: ({ getValue }) => {
+            const { capaian } = getValue();
+            return (
+              <div className='text-center'>
+                {/* <code className='italic font-bold'>({c_predikat})</code>{' '} */}
+                <span>{capaian}</span>
+              </div>
+            );
+          },
+          meta: {
+            tdClassNames: 'text-center border-l',
+          },
+        },
+        {
+          header: 'rata_rata_kumulatif_1',
+          accessorFn: (row) => row.rata_rata_kumulatif,
+          cell: ({ getValue }) => {
+            const { c_predikat } = getValue();
+            return (
+              <div className='text-center'>
+                <code className='font-bold'>{c_predikat}</code>{' '}
+                {/* <span>{capaian}</span> */}
+              </div>
+            );
+          },
+          meta: {
+            tdClassNames: 'text-center border-r',
           },
         },
         {
           header: 'rata_rata_triwulan_2',
           accessorFn: (row) => row.rata_rata_triwulan,
           cell: ({ getValue }) => {
-            const { r_predikat, realisasi } = getValue();
+            const { realisasi } = getValue();
             return (
               <div className='text-center'>
-                <code className='italic font-bold'>({r_predikat})</code>{' '}
                 <span>{realisasi}</span>
               </div>
             );
           },
           meta: {
-            tdClassNames: 'text-center',
+            tdClassNames: 'text-center border-l',
+          },
+        },
+        {
+          header: 'rata_rata_triwulan_2',
+          accessorFn: (row) => row.rata_rata_triwulan,
+          cell: ({ getValue }) => {
+            const { r_predikat } = getValue();
+            return (
+              <div className='text-center'>
+                <code className='font-bold'>{r_predikat}</code>{' '}
+              </div>
+            );
+          },
+          meta: {
+            tdClassNames: 'text-center border-r',
           },
         },
       ],
@@ -107,35 +179,33 @@ const DashRKPDTable = () => {
       header: 'rata_rata_kumulatif',
       columns: [
         {
-          header: 'rata_rata_kumulatif_1',
+          header: 'rata_rata_kumulatif_2',
           accessorFn: (row) => row.rata_rata_kumulatif,
           cell: ({ getValue }) => {
-            const { c_predikat, capaian } = getValue();
+            const { realisasi } = getValue();
             return (
               <div className='text-center'>
-                <code className='italic font-bold'>({c_predikat})</code>{' '}
-                <span>{capaian}</span>
+                <span>{realisasi}</span>
               </div>
             );
           },
           meta: {
-            tdClassNames: 'text-center',
+            tdClassNames: 'text-center border-l',
           },
         },
         {
           header: 'rata_rata_kumulatif_2',
           accessorFn: (row) => row.rata_rata_kumulatif,
           cell: ({ getValue }) => {
-            const { r_predikat, realisasi } = getValue();
+            const { r_predikat } = getValue();
             return (
               <div className='text-center'>
-                <code className='italic font-bold'>({r_predikat})</code>{' '}
-                <span>{realisasi}</span>
+                <code className='italic font-bold'>{r_predikat}</code>{' '}
               </div>
             );
           },
           meta: {
-            tdClassNames: 'text-center',
+            tdClassNames: 'text-center border-r',
           },
         },
       ],
@@ -147,14 +217,14 @@ const DashRKPDTable = () => {
           header: 'total_realisasi.triwulan',
           accessorFn: (row) => row.total_realisasi.triwulan,
           meta: {
-            tdClassNames: 'text-center',
+            tdClassNames: 'text-center border-x',
           },
         },
         {
           header: 'total_realisasi.kumulatif',
           accessorFn: (row) => row.total_realisasi.kumulatif,
           meta: {
-            tdClassNames: 'text-center',
+            tdClassNames: 'text-center border-x',
           },
         },
       ],
