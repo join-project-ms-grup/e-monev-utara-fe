@@ -2,6 +2,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { waktuNowGabung } from '../../lib/helper';
 import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
+import type { FlatRKPDTriwulan } from '../RKPDService';
 
 /**
  * Export RKPD mimic dari file sumber.
@@ -15,7 +16,7 @@ import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/
  * @param opts.startRow (optional) baris mulai data (default 13)
  */
 export const exportRenja = async (
-    data: any[],
+    data: FlatRKPDTriwulan[],
     skpd: string,
     opts?: { startRow?: number },
 ) => {
@@ -126,97 +127,146 @@ export const exportRenja = async (
 
     //#region Mapping Data
     let rowIndex = startRow;
-    let nomorUrut = 1;
-    // let subKegiatanIndex = 1;
+    data.forEach((item, idx) => {
+        const row = worksheet.getRow(rowIndex);
 
-    // 1️⃣ Kelompokkan data berdasarkan rekening
-    const groupedByRekening: Record<string, typeof data> = {};
-    for (const item of data) {
-        if (!groupedByRekening[item.rekening]) groupedByRekening[item.rekening] = [];
-        groupedByRekening[item.rekening].push(item);
-    }
+        row.getCell('A').value = idx + 1;
+        row.getCell('C').value = item.name;
+        row.getCell('D').value = item.ind_name;
 
-    // 2️⃣ Iterasi setiap kelompok rekening
-    for (const [rekening, group] of Object.entries(groupedByRekening)) {
-        const startMergeRow = rowIndex; // baris pertama dari kelompok ini
+        row.getCell('E').value = item.ind_target_akhir_periode;
+        row.getCell('F').value = item.paguPeriode;
 
-        for (const item of group) {
-            const row = worksheet.getRow(rowIndex++);
+        row.getCell('G').value = '';
+        row.getCell('H').value = '';
+        row.getCell('I').value = '';
+        row.getCell('J').value = '';
 
-            row.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+        row.getCell('K').value = item.ind_triwulan_capaian_1;
+        row.getCell('L').value = item.pagu_triwulan_realisasi_1;
+        row.getCell('M').value = item.ind_triwulan_capaian_2;
+        row.getCell('N').value = item.pagu_triwulan_realisasi_2;
+        row.getCell('O').value = item.ind_triwulan_capaian_3;
+        row.getCell('P').value = item.pagu_triwulan_realisasi_3;
+        row.getCell('Q').value = item.ind_triwulan_capaian_4;
+        row.getCell('R').value = item.pagu_triwulan_realisasi_4;
 
-            // if (item.level === 'sub_kegiatan') row.getCell('A').value = subKegiatanIndex++;
-            row.getCell('A').value = nomorUrut++;
-            row.getCell('A').alignment = { vertical: 'middle', horizontal: 'center' };
-            row.getCell('B').value = item.sasaran;
-            row.getCell('C').value = item.rekening;
-            row.getCell('D').value = item.indikator_kinerja;
+        row.getCell('S').value = '';
+        row.getCell('T').value = '';
 
-            // Jangan render angka kalau urusan/bidang
-            if (item.level !== 'urusan' && item.level !== 'bidang') {
-                row.getCell('E').value = Number(item.target_rpjmd_kinerja);
-                row.getCell('F').value = Number(item.target_rpjmd_anggaran);
-                row.getCell('G').value = Number(item.realisasi_rpjmd_kinerja);
-                row.getCell('H').value = Number(item.realisasi_rpjmd_anggaran);
+        row.getCell('U').value = item.persen_capaian_periode;
+        row.getCell('V').value = item.persenRealisasiPeriode;
 
-                row.getCell('I').value = Number(item.target_rkpd_kinerja);
-                row.getCell('J').value = Number(item.target_rkpd_anggaran);
+        row.getCell('W').value = item.persen_capaian;
+        row.getCell('X').value = item.persenRealisasi;
 
-                row.getCell('K').value = Number(item.realisasi_triwulan_I_kinerja);
-                row.getCell('L').value = Number(item.realisasi_triwulan_I_anggaran);
-                row.getCell('M').value = Number(item.realisasi_triwulan_II_kinerja);
-                row.getCell('N').value = Number(item.realisasi_triwulan_II_anggaran);
-                row.getCell('O').value = Number(item.realisasi_triwulan_III_kinerja);
-                row.getCell('P').value = Number(item.realisasi_triwulan_III_anggaran);
-                row.getCell('Q').value = Number(item.realisasi_triwulan_IV_kinerja);
-                row.getCell('R').value = Number(item.realisasi_triwulan_IV_anggaran);
+        row.getCell('Y').value = skpd;
 
-                row.getCell('S').value = Number(item.realisasi_rkpd_kinerja);
-                row.getCell('T').value = Number(item.realisasi_rkpd_anggaran);
 
-                row.getCell('U').value = Number(item.realisasi_rpjmd_sd_tahun_kinerja);
-                row.getCell('V').value = Number(item.realisasi_rpjmd_sd_tahun_anggaran);
-
-                row.getCell('W').value = Number(item.tingkat_capaian_rpjmd_kinerja);
-                row.getCell('X').value = Number(item.tingkat_capaian_rpjmd_anggaran);
-            }
-
-            row.getCell('Y').value = item.perangkat_daerah;
-
-            const satuan = item.satuan ?? '';
-            const numFmtK = satuan.includes('%') ? '0.00 "%"' : 'General';
-            ['E', 'I', 'K', 'M', 'O', 'Q', 'S', 'W'].forEach((col) => {
-                row.getCell(col).numFmt = numFmtK;
-            });
-
-            const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-            ['F', 'H', 'J', 'L', 'N', 'P', 'R', 'T', 'V', 'X'].forEach((col) => {
-                row.getCell(col).numFmt = fmtRupiah;
-            });
-
-            if (item.level === 'urusan' || item.level === 'bidang') {
-                ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
-                    row.getCell(col).font = { bold: true };
-                });
-            }
-            ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
-                row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-            });
-
-            row.getCell('Z').numFmt = '0.00%';
-            row.getCell('AA').numFmt = '0.00%';
+        for (let c = 1; c <= 11; c++) {
+            const cell = row.getCell(c);
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+            // cell.alignment = { vertical: 'middle', horizontal: c === 2 ? 'left' : 'center', wrapText: true };
+            cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
         }
 
-        const endMergeRow = rowIndex - 1; // baris terakhir dari kelompok ini
+        rowIndex++;
+    });
+    // // let subKegiatanIndex = 1;
 
-        // 3️⃣ Merge sel untuk kolom "kode" (C–G) dan "rekening" (H)
-        worksheet.mergeCells(`C${startMergeRow}:C${endMergeRow}`);
-        worksheet.mergeCells(`D${startMergeRow}:D${endMergeRow}`);
-        worksheet.mergeCells(`E${startMergeRow}:E${endMergeRow}`);
-        worksheet.mergeCells(`F${startMergeRow}:F${endMergeRow}`);
-        worksheet.mergeCells(`G${startMergeRow}:G${endMergeRow}`);
-        worksheet.mergeCells(`H${startMergeRow}:H${endMergeRow}`);
-    }
+    // // 1️⃣ Kelompokkan data berdasarkan rekening
+    // const groupedByRekening: Record<string, typeof data> = {};
+    // for (const item of data) {
+    //     if (!groupedByRekening[item.rekening]) groupedByRekening[item.rekening] = [];
+    //     groupedByRekening[item.rekening].push(item);
+    // }
+
+    // // 2️⃣ Iterasi setiap kelompok rekening
+    // for (const [rekening, group] of Object.entries(groupedByRekening)) {
+    //     const startMergeRow = rowIndex; // baris pertama dari kelompok ini
+
+    //     for (const item of group) {
+    //         const row = worksheet.getRow(rowIndex++);
+
+    //         row.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+
+    //         // if (item.level === 'sub_kegiatan') row.getCell('A').value = subKegiatanIndex++;
+    //         row.getCell('A').value = nomorUrut++;
+    //         row.getCell('A').alignment = { vertical: 'middle', horizontal: 'center' };
+    //         row.getCell('B').value = item.sasaran;
+    //         row.getCell('C').value = item.rekening;
+    //         row.getCell('D').value = item.indikator_kinerja;
+
+    //         // Jangan render angka kalau urusan/bidang
+    //         if (item.level !== 'urusan' && item.level !== 'bidang') {
+    //             row.getCell('E').value = Number(item.target_rpjmd_kinerja);
+    //             row.getCell('F').value = Number(item.target_rpjmd_anggaran);
+    //             row.getCell('G').value = Number(item.realisasi_rpjmd_kinerja);
+    //             row.getCell('H').value = Number(item.realisasi_rpjmd_anggaran);
+
+    //             row.getCell('I').value = Number(item.target_rkpd_kinerja);
+    //             row.getCell('J').value = Number(item.target_rkpd_anggaran);
+
+    //             row.getCell('K').value = Number(item.realisasi_triwulan_I_kinerja);
+    //             row.getCell('L').value = Number(item.realisasi_triwulan_I_anggaran);
+    //             row.getCell('M').value = Number(item.realisasi_triwulan_II_kinerja);
+    //             row.getCell('N').value = Number(item.realisasi_triwulan_II_anggaran);
+    //             row.getCell('O').value = Number(item.realisasi_triwulan_III_kinerja);
+    //             row.getCell('P').value = Number(item.realisasi_triwulan_III_anggaran);
+    //             row.getCell('Q').value = Number(item.realisasi_triwulan_IV_kinerja);
+    //             row.getCell('R').value = Number(item.realisasi_triwulan_IV_anggaran);
+
+    //             row.getCell('S').value = Number(item.realisasi_rkpd_kinerja);
+    //             row.getCell('T').value = Number(item.realisasi_rkpd_anggaran);
+
+    //             row.getCell('U').value = Number(item.realisasi_rpjmd_sd_tahun_kinerja);
+    //             row.getCell('V').value = Number(item.realisasi_rpjmd_sd_tahun_anggaran);
+
+    //             row.getCell('W').value = Number(item.tingkat_capaian_rpjmd_kinerja);
+    //             row.getCell('X').value = Number(item.tingkat_capaian_rpjmd_anggaran);
+    //         }
+
+    //         row.getCell('Y').value = item.perangkat_daerah;
+
+    //         const satuan = item.satuan ?? '';
+    //         const numFmtK = satuan.includes('%') ? '0.00 "%"' : 'General';
+    //         ['E', 'I', 'K', 'M', 'O', 'Q', 'S', 'W'].forEach((col) => {
+    //             row.getCell(col).numFmt = numFmtK;
+    //         });
+
+    //         const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+    //         ['F', 'H', 'J', 'L', 'N', 'P', 'R', 'T', 'V', 'X'].forEach((col) => {
+    //             row.getCell(col).numFmt = fmtRupiah;
+    //         });
+
+    //         if (item.level === 'urusan' || item.level === 'bidang') {
+    //             ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
+    //                 row.getCell(col).font = { bold: true };
+    //             });
+    //         }
+    //         ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
+    //             row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+    //         });
+
+    //         row.getCell('Z').numFmt = '0.00%';
+    //         row.getCell('AA').numFmt = '0.00%';
+    //     }
+
+    //     const endMergeRow = rowIndex - 1; // baris terakhir dari kelompok ini
+
+    //     // 3️⃣ Merge sel untuk kolom "kode" (C–G) dan "rekening" (H)
+    //     worksheet.mergeCells(`C${startMergeRow}:C${endMergeRow}`);
+    //     worksheet.mergeCells(`D${startMergeRow}:D${endMergeRow}`);
+    //     worksheet.mergeCells(`E${startMergeRow}:E${endMergeRow}`);
+    //     worksheet.mergeCells(`F${startMergeRow}:F${endMergeRow}`);
+    //     worksheet.mergeCells(`G${startMergeRow}:G${endMergeRow}`);
+    //     worksheet.mergeCells(`H${startMergeRow}:H${endMergeRow}`);
+    // }
 
     const lastRow = rowIndex;
     const startCol = 1;

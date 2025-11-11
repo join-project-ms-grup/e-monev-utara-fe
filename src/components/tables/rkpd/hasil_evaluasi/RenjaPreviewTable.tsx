@@ -1,18 +1,15 @@
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef, Table } from '@tanstack/react-table';
-import type { FlatRenstraRow } from '../../../../services/RenstraService';
-import {
-  getPeriodeAkhirFromCookie,
-  getPeriodeMulaiFromCookie,
-} from '../../../../lib/usercookie';
-import { MdClose, MdPrint } from 'react-icons/md';
-import InputButton from '../../../inputs/InputButton';
-import type { FlatRKPD } from '../../../../services/RKPDService';
-import { formatUang } from '../../../../lib/helper';
+import { getPeriodeAkhirFromCookie } from '../../../../lib/usercookie';
+import type {
+  FlatRKPD,
+  FlatRKPDTriwulan,
+} from '../../../../services/RKPDService';
+import { formatUang, renderUang } from '../../../../lib/helper';
 
 interface MainTableProps {
-  data: FlatRKPD[];
+  data: FlatRKPDTriwulan[];
   skpd: string;
 }
 
@@ -94,163 +91,167 @@ const RenjaPreviewTable = ({ data, skpd }: MainTableProps) => {
     );
   };
 
-  const tableBody = ({ table }: { table: Table<FlatRKPD> }) => {
-    const rows = table.getRowModel().rows;
+  // const tableBody = ({ table }: { table: Table<FlatRKPD> }) => {
+  //   const rows = table.getRowModel().rows;
 
-    const grouped = rows.reduce<Record<string, typeof rows>>((acc, row) => {
-      const key = row.original.rekening;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(row);
-      return acc;
-    }, {});
+  //   const grouped = rows.reduce<Record<string, typeof rows>>((acc, row) => {
+  //     const key = row.original.rekening;
+  //     if (!acc[key]) acc[key] = [];
+  //     acc[key].push(row);
+  //     return acc;
+  //   }, {});
 
-    return (
-      <>
-        {Object.entries(grouped).map(([rekening, group]) =>
-          group.map((row, i) => {
-            const isHeaderLevel = ['urusan', 'bidang'].some((l) =>
-              row.original.level.includes(l),
-            );
+  //   return (
+  //     <>
+  //       {Object.entries(grouped).map(([rekening, group]) =>
+  //         group.map((row, i) => {
+  //           const isHeaderLevel = ['urusan', 'bidang'].some((l) =>
+  //             row.original.level.includes(l),
+  //           );
 
-            return (
-              <tr key={row.id}>
-                <td className='border text-center px-2 py-1'>
-                  {row.index + 1}
-                </td>
+  //           return (
+  //             <tr key={row.id}>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {row.index + 1}
+  //               </td>
 
-                <td className='border text-center px-2 py-1'>
-                  {row.original.sasaran ?? ''}
-                </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {row.original.sasaran ?? ''}
+  //               </td>
 
-                {i === 0 && (
-                  <td
-                    rowSpan={group.length}
-                    className={`border px-2 py-1 align-top ${
-                      isHeaderLevel ? 'font-bold' : ''
-                    }`}
-                  >
-                    {rekening}
-                  </td>
-                )}
+  //               {i === 0 && (
+  //                 <td
+  //                   rowSpan={group.length}
+  //                   className={`border px-2 py-1 align-top ${
+  //                     isHeaderLevel ? 'font-bold' : ''
+  //                   }`}
+  //                 >
+  //                   {rekening}
+  //                 </td>
+  //               )}
 
-                <td className='border px-2 py-1'>
-                  {row.original.indikator_kinerja ?? ''}
-                </td>
+  //               <td className='border px-2 py-1'>
+  //                 {row.original.indikator_kinerja ?? ''}
+  //               </td>
 
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? `${row.original.target_rpjmd_kinerja ?? ''} ${
-                        row.original.satuan ?? ''
-                      }`
-                    : ''}
-                </td>
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? formatUang(Number(row.original.target_rpjmd_anggaran))
-                    : ''}
-                </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? `${row.original.target_rpjmd_kinerja ?? ''} ${
+  //                       row.original.satuan ?? ''
+  //                     }`
+  //                   : ''}
+  //               </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? formatUang(Number(row.original.target_rpjmd_anggaran))
+  //                   : ''}
+  //               </td>
 
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? (row.original.realisasi_rpjmd_kinerja ?? '')
-                    : ''}
-                </td>
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? formatUang(Number(row.original.realisasi_rpjmd_anggaran))
-                    : ''}
-                </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? (row.original.realisasi_rpjmd_kinerja ?? '')
+  //                   : ''}
+  //               </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? formatUang(Number(row.original.realisasi_rpjmd_anggaran))
+  //                   : ''}
+  //               </td>
 
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? (row.original.target_rkpd_kinerja ?? '')
-                    : ''}
-                </td>
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? formatUang(Number(row.original.target_rkpd_anggaran))
-                    : ''}
-                </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? (row.original.target_rkpd_kinerja ?? '')
+  //                   : ''}
+  //               </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? formatUang(Number(row.original.target_rkpd_anggaran))
+  //                   : ''}
+  //               </td>
 
-                {[
-                  [
-                    'realisasi_triwulan_I_kinerja',
-                    'realisasi_triwulan_I_anggaran',
-                  ],
-                  [
-                    'realisasi_triwulan_II_kinerja',
-                    'realisasi_triwulan_II_anggaran',
-                  ],
-                  [
-                    'realisasi_triwulan_III_kinerja',
-                    'realisasi_triwulan_III_anggaran',
-                  ],
-                  [
-                    'realisasi_triwulan_IV_kinerja',
-                    'realisasi_triwulan_IV_anggaran',
-                  ],
-                ].map(([kinerja, anggaran]) => (
-                  <React.Fragment key={kinerja}>
-                    <td className='border text-center px-2 py-1'>
-                      {!isHeaderLevel
-                        ? (row.original[kinerja as keyof FlatRKPD] ?? '')
-                        : ''}
-                    </td>
-                    <td className='border text-center px-2 py-1'>
-                      {!isHeaderLevel
-                        ? formatUang(
-                            Number(row.original[anggaran as keyof FlatRKPD]),
-                          )
-                        : ''}
-                    </td>
-                  </React.Fragment>
-                ))}
+  //               {[
+  //                 [
+  //                   'realisasi_triwulan_I_kinerja',
+  //                   'realisasi_triwulan_I_anggaran',
+  //                 ],
+  //                 [
+  //                   'realisasi_triwulan_II_kinerja',
+  //                   'realisasi_triwulan_II_anggaran',
+  //                 ],
+  //                 [
+  //                   'realisasi_triwulan_III_kinerja',
+  //                   'realisasi_triwulan_III_anggaran',
+  //                 ],
+  //                 [
+  //                   'realisasi_triwulan_IV_kinerja',
+  //                   'realisasi_triwulan_IV_anggaran',
+  //                 ],
+  //               ].map(([kinerja, anggaran]) => (
+  //                 <React.Fragment key={kinerja}>
+  //                   <td className='border text-center px-2 py-1'>
+  //                     {!isHeaderLevel
+  //                       ? (row.original[kinerja as keyof FlatRKPD] ?? '')
+  //                       : ''}
+  //                   </td>
+  //                   <td className='border text-center px-2 py-1'>
+  //                     {!isHeaderLevel
+  //                       ? formatUang(
+  //                           Number(row.original[anggaran as keyof FlatRKPD]),
+  //                         )
+  //                       : ''}
+  //                   </td>
+  //                 </React.Fragment>
+  //               ))}
 
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? (row.original.realisasi_rkpd_kinerja ?? '')
-                    : ''}
-                </td>
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? formatUang(Number(row.original.realisasi_rkpd_anggaran))
-                    : ''}
-                </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? (row.original.realisasi_rkpd_kinerja ?? '')
+  //                   : ''}
+  //               </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? formatUang(Number(row.original.realisasi_rkpd_anggaran))
+  //                   : ''}
+  //               </td>
 
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? (row.original.realisasi_rpjmd_sd_tahun_kinerja ?? '')
-                    : ''}
-                </td>
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? formatUang(
-                        Number(row.original.realisasi_rpjmd_sd_tahun_anggaran),
-                      )
-                    : ''}
-                </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? (row.original.realisasi_rpjmd_sd_tahun_kinerja ?? '')
+  //                   : ''}
+  //               </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? formatUang(
+  //                       Number(row.original.realisasi_rpjmd_sd_tahun_anggaran),
+  //                     )
+  //                   : ''}
+  //               </td>
 
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? (row.original.tingkat_capaian_rpjmd_kinerja ?? '')
-                    : ''}
-                </td>
-                <td className='border text-center px-2 py-1'>
-                  {!isHeaderLevel
-                    ? <span className='text-nowrap'>{row.original.tingkat_capaian_rpjmd_anggaran} %</span>
-                    : ''}
-                </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel
+  //                   ? (row.original.tingkat_capaian_rpjmd_kinerja ?? '')
+  //                   : ''}
+  //               </td>
+  //               <td className='border text-center px-2 py-1'>
+  //                 {!isHeaderLevel ? (
+  //                   <span className='text-nowrap'>
+  //                     {row.original.tingkat_capaian_rpjmd_anggaran} %
+  //                   </span>
+  //                 ) : (
+  //                   ''
+  //                 )}
+  //               </td>
 
-                <td className='border text-center px-2 py-1'>
-                  {row.original.perangkat_daerah ?? ''}
-                </td>
-              </tr>
-            );
-          }),
-        )}
-      </>
-    );
-  };
+  //               <td className='border text-center px-2 py-1'>
+  //                 {row.original.perangkat_daerah ?? ''}
+  //               </td>
+  //             </tr>
+  //           );
+  //         }),
+  //       )}
+  //     </>
+  //   );
+  // };
   //#endregion
   const customAkhir = () => {
     return (
@@ -287,10 +288,127 @@ const RenjaPreviewTable = ({ data, skpd }: MainTableProps) => {
       </>
     );
   };
-
-  const columns: ColumnDef<any>[] = Array.from({ length: 25 }, (_, i) => ({
-    id: (i + 1).toString(),
-  }));
+  const columns: ColumnDef<FlatRKPDTriwulan>[] = [
+    {
+      header: 'No',
+      cell: ({ row }) => row.index + 1,
+    },
+    {
+      header: 'Sasaran',
+    },
+    {
+      header: 'Program/Kegiatan',
+      accessorKey: 'name',
+    },
+    {
+      header: 'Indikator Kinerja Program/Kegiatan',
+      accessorKey: 'ind_name',
+    },
+    //
+    {
+      header: 'Target Renstra Perangkat Daerah K',
+      accessorKey: 'ind_target_akhir_periode',
+    },
+    {
+      header: 'Target Renstra Perangkat Daerah RP',
+      accessorKey: 'paguPeriode',
+    },
+    //
+    {
+      header:
+        'Realisasi Capaian Kinerja Renstra Perangkat Daerah sampai dengan Renja Perangkat Daerah Tahun Lalu K',
+      accessorKey: '',
+    },
+    {
+      header:
+        'Realisasi Capaian Kinerja Renstra Perangkat Daerah sampai dengan Renja Perangkat Daerah Tahun Lalu RP',
+      accessorKey: '',
+    },
+    //
+    {
+      header:
+        'Target Kinerja dan Anggaran Renja Perangkat Daerah Tahun berjalan (Tahun n-1) yang dievaluasi K',
+      accessorKey: '',
+    },
+    {
+      header:
+        'Target Kinerja dan Anggaran Renja Perangkat Daerah Tahun berjalan (Tahun n-1) yang dievaluasi RP',
+      accessorKey: '',
+    },
+    //
+    {
+      header: 'TRI1',
+      accessorKey: 'ind_triwulan_capaian_1',
+    },
+    {
+      header: 'TRI1 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_1',
+    },
+    //
+    {
+      header: 'TRI2',
+      accessorKey: 'ind_triwulan_capaian_2',
+    },
+    {
+      header: 'TRI2 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_2',
+    },
+    //
+    {
+      header: 'TRI3',
+      accessorKey: 'ind_triwulan_capaian_3',
+    },
+    {
+      header: 'TRI3 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_3',
+    },
+    //
+    {
+      header: 'TRI4',
+      accessorKey: 'ind_triwulan_capaian_4',
+    },
+    {
+      header: 'TRI4 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_4',
+    },
+    //
+    {
+      header:
+        'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi K',
+      accessorKey: '',
+    },
+    {
+      header:
+        'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi RP',
+      accessorKey: '',
+    },
+    //
+    {
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 K',
+      accessorKey: 'persen_capaian_periode',
+    },
+    {
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 RP',
+      accessorKey: 'persenRealisasiPeriode',
+    },
+    //
+    {
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) K',
+      accessorKey: 'persen_capaian',
+    },
+    {
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) RP',
+      accessorKey: 'persenRealisasi',
+    },
+    {
+      header: 'perangkat',
+      cell: `${skpd}`,
+    },
+  ];
 
   return (
     <div className='flex flex-col p-4'>
@@ -317,7 +435,7 @@ const RenjaPreviewTable = ({ data, skpd }: MainTableProps) => {
             data={data}
             columns={columns}
             renderHeader={tableHead}
-            renderBody={(table) => tableBody({ table })}
+            // renderBody={(table) => tableBody({ table })}
             disablePagination
             customRowAkhir={customAkhir()}
           />

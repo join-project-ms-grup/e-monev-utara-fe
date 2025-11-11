@@ -1,13 +1,12 @@
 import { Fragment, useEffect, useState } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
-import { exportRKPD } from '../../../../services/Excel/ExcelRKPD';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import {
-  flatRKPD,
-  getRKPD,
-  type FlatRKPD,
+  flatRKPDTriwulan,
+  getRKPDTriwulan,
+  type FlatRKPDTriwulan,
 } from '../../../../services/RKPDService';
 
 import {
@@ -23,11 +22,10 @@ import InputSearchBox, {
 } from '../../../inputs/InputSearchBox';
 import Tabel from '../../Tabel';
 import Spinner from '../../../inputs/Spinner';
-import { type ColumnDef, type Table } from '@tanstack/react-table';
+import { type ColumnDef } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
-import RKPDPreviewTable from './RKPDPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import { formatUang } from '../../../../lib/helper';
+import { renderUang } from '../../../../lib/helper';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 import { exportRenja } from '../../../../services/Excel/ExcelRenja';
 import RenjaPreviewTable from './RenjaPreviewTable';
@@ -63,11 +61,11 @@ const RenjaTable = () => {
   const { data, isFetching, refetch } = useQuery({
     queryKey: ['tabel_rkpd_tahunan', selectedSKPD, tahunKe],
     queryFn: async () => {
-      const rawData = await getRKPD(Number(selectedSKPD), Number(tahunKe));
-      const skpdName =
-        dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
-          ?.skpd_name ?? '';
-      const flatData = await flatRKPD(rawData, skpdName);
+      const rawData = await getRKPDTriwulan(
+        Number(selectedSKPD),
+        Number(tahunKe),
+      );
+      const flatData = flatRKPDTriwulan(rawData as any);
       return flatData;
     },
     enabled: !!(selectedSKPD && tahunKe),
@@ -96,13 +94,14 @@ const RenjaTable = () => {
               '........'}
           </th>
           <th rowSpan={1} colSpan={2}>
-            Realisasi Capaian Kinerja RPJMD Kabupaten/kota sampai dengan RKPD
-            Kabupaten/kota Tahun Lalu <br />
-            (n-2)
+            Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang
+            dievaluasi
           </th>
           <th rowSpan={1} colSpan={2}>
-            Target Kinerja dan Anggaran RKPD Kabupaten/kota Tahun Berjalan
-            (Tahun n-1) yang Dievaluasi
+            Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun{' '}
+            {listTahunKe.find((item) => item.value === tahunKe)?.label}
+            <br />
+            (%)
           </th>
         </tr>
         <tr>
@@ -118,207 +117,140 @@ const RenjaTable = () => {
   };
   //#endregion
 
-  const tableBody = ({ table }: { table: Table<FlatRKPD> }) => {
-    const rows = table.getRowModel().rows;
-
-    // Kelompokkan berdasarkan rekening
-    const grouped = rows.reduce<Record<string, typeof rows>>((acc, row) => {
-      const key = row.original.rekening;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(row);
-      return acc;
-    }, {});
-
-    return (
-      <>
-        {Object.entries(grouped).map(([rekening, group]) =>
-          group.map((row, i) => (
-            <tr key={row.id}>
-              {/* Kolom No */}
-              <td>{row.index + 1}</td>
-
-              {/* Kolom Sasaran */}
-              <td>{row.original.sasaran ?? ''}</td>
-
-              {/* Kolom Kode dengan rowspan */}
-              {i === 0 && (
-                <td
-                  rowSpan={group.length}
-                  className='whitespace-nowrap align-top'
-                >
-                  {`${row.original.kode_urusan} ${row.original.kode_bidang} ${row.original.kode_program} ${row.original.kode_kegiatan} ${row.original.kode_subKegiatan}`}
-                </td>
-              )}
-
-              {/* Kolom Rekening dengan rowspan */}
-              {i === 0 && (
-                <td
-                  rowSpan={group.length}
-                  className={`align-top ${
-                    ['urusan', 'bidang'].some((l) =>
-                      row.original.level.includes(l),
-                    )
-                      ? 'font-bold'
-                      : ''
-                  }`}
-                >
-                  {rekening}
-                </td>
-              )}
-
-              {/* Kolom Indikator Kinerja */}
-              <td className=''>{row.original.indikator_kinerja ?? ''}</td>
-
-              {/* Target RPJMD Kinerja */}
-              <td className='text-center'>
-                {row.original.target_rpjmd_kinerja
-                  ? `${row.original.target_rpjmd_kinerja} ${row.original.satuan ?? ''}`
-                  : ''}
-              </td>
-
-              {/* Target RPJMD Anggaran */}
-              <td className='text-center'>
-                {['urusan', 'bidang'].some((l) =>
-                  row.original.level.includes(l),
-                )
-                  ? ''
-                  : formatUang(Number(row.original.target_rpjmd_anggaran))}
-              </td>
-
-              {/* Realisasi RPJMD Kinerja */}
-              <td className='text-center'>
-                {row.original.realisasi_rpjmd_kinerja
-                  ? `${row.original.realisasi_rpjmd_kinerja} ${row.original.satuan ?? ''}`
-                  : ''}
-              </td>
-
-              {/* Realisasi RPJMD Anggaran */}
-              <td className='text-center'>
-                {['urusan', 'bidang'].some((l) =>
-                  row.original.level.includes(l),
-                )
-                  ? ''
-                  : formatUang(Number(row.original.realisasi_rpjmd_anggaran))}
-              </td>
-
-              {/* Target RKPD Kinerja */}
-              <td className='text-center'>
-                {row.original.target_rkpd_kinerja
-                  ? `${row.original.target_rkpd_kinerja} ${row.original.satuan ?? ''}`
-                  : ''}
-              </td>
-
-              {/* Target RKPD Anggaran */}
-              <td className='text-center'>
-                {['urusan', 'bidang'].some((l) =>
-                  row.original.level.includes(l),
-                )
-                  ? ''
-                  : formatUang(Number(row.original.target_rkpd_anggaran))}
-              </td>
-            </tr>
-          )),
-        )}
-      </>
-    );
-  };
-
   // #region Kolom Tabel
-  const columns: ColumnDef<FlatRKPD>[] = [
+  // const columns: ColumnDef<FlatRKPD>[] = [
+  //   {
+  //     header: 'No',
+  //     meta: { tdClassNames: 'text-center' },
+  //     cell: ({ row }) => row.index + 1,
+  //   },
+  //   {
+  //     header: 'Sasaran',
+  //     meta: { tdClassNames: 'text-center' },
+  //   },
+  //   {
+  //     header: 'Kode',
+  //     accessorFn: (row) =>
+  //       `${row.kode_urusan} ${row.kode_bidang} ${row.kode_program} ${row.kode_kegiatan} ${row.kode_subKegiatan}`,
+  //     meta: { tdClassNames: 'whitespace-nowrap' },
+  //   },
+  //   {
+  //     accessorKey: 'rekening',
+  //     cell: ({ row, getValue, table }) => {
+  //       const current = getValue() as string;
+  //       const previousRow = table.getRowModel().rows[row.index - 1];
+  //       const previous = previousRow?.original.rekening;
+  //       const isSameAsPrevious = current === previous;
+
+  //       if (isSameAsPrevious) return null;
+
+  //       return (
+  //         <span
+  //           className={`${['urusan', 'bidang'].some((l) => row.original.level.includes(l)) ? 'font-bold' : ''}`}
+  //         >
+  //           {current}
+  //         </span>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     accessorKey: 'indikator_kinerja',
+  //   },
+  //   {
+  //     accessorKey: 'target_rpjmd_kinerja',
+  //     meta: {
+  //       tdClassNames: 'text-center',
+  //     },
+  //     cell: ({ row, getValue }) => getValue() + ' ' + row.original.satuan,
+  //   },
+  //   {
+  //     accessorKey: 'target_rpjmd_anggaran',
+  //     meta: {
+  //       tdClassNames: 'text-center',
+  //     },
+  //     cell: ({ row, getValue }) => {
+  //       if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
+  //         return;
+  //       }
+  //       return `${formatUang(Number(getValue()))}`;
+  //     },
+  //   },
+  //   {
+  //     accessorKey: 'realisasi_rpjmd_kinerja',
+  //     meta: {
+  //       tdClassNames: 'text-center',
+  //     },
+  //   },
+  //   {
+  //     accessorKey: 'realisasi_rpjmd_anggaran',
+  //     meta: {
+  //       tdClassNames: 'text-center',
+  //     },
+  //     cell: ({ row, getValue }) => {
+  //       if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
+  //         return;
+  //       }
+  //       return `${formatUang(Number(getValue()))}`;
+  //     },
+  //   },
+  //   {
+  //     accessorKey: 'target_rkpd_kinerja',
+  //     meta: {
+  //       tdClassNames: 'text-center',
+  //     },
+  //   },
+  //   {
+  //     accessorKey: 'target_rkpd_anggaran',
+  //     meta: {
+  //       tdClassNames: 'text-center',
+  //     },
+  //     cell: ({ row, getValue }) => {
+  //       if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
+  //         return;
+  //       }
+  //       return `${formatUang(Number(getValue()))}`;
+  //     },
+  //   },
+  // ];
+  // #endregion
+
+  const columns: ColumnDef<FlatRKPDTriwulan>[] = [
     {
       header: 'No',
-      meta: { tdClassNames: 'text-center' },
       cell: ({ row }) => row.index + 1,
     },
     {
       header: 'Sasaran',
-      meta: { tdClassNames: 'text-center' },
     },
     {
-      header: 'Kode',
-      accessorFn: (row) =>
-        `${row.kode_urusan} ${row.kode_bidang} ${row.kode_program} ${row.kode_kegiatan} ${row.kode_subKegiatan}`,
-      meta: { tdClassNames: 'whitespace-nowrap' },
+      accessorKey: 'kode',
     },
     {
-      accessorKey: 'rekening',
-      cell: ({ row, getValue, table }) => {
-        const current = getValue() as string;
-        const previousRow = table.getRowModel().rows[row.index - 1];
-        const previous = previousRow?.original.rekening;
-        const isSameAsPrevious = current === previous;
-
-        if (isSameAsPrevious) return null;
-
-        return (
-          <span
-            className={`${['urusan', 'bidang'].some((l) => row.original.level.includes(l)) ? 'font-bold' : ''}`}
-          >
-            {current}
-          </span>
-        );
-      },
+      accessorKey: 'name',
     },
     {
-      accessorKey: 'indikator_kinerja',
+      accessorKey: 'ind_name',
     },
     {
-      accessorKey: 'target_rpjmd_kinerja',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: ({ row, getValue }) => getValue() + ' ' + row.original.satuan,
+      accessorKey: 'ind_target_akhir_periode',
     },
     {
-      accessorKey: 'target_rpjmd_anggaran',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: ({ row, getValue }) => {
-        if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
-          return;
-        }
-        return `${formatUang(Number(getValue()))}`;
-      },
+      accessorKey: 'paguPeriode',
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
     },
     {
-      accessorKey: 'realisasi_rpjmd_kinerja',
-      meta: {
-        tdClassNames: 'text-center',
-      },
+      accessorKey: 'totalRealisasi',
     },
     {
-      accessorKey: 'realisasi_rpjmd_anggaran',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: ({ row, getValue }) => {
-        if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
-          return;
-        }
-        return `${formatUang(Number(getValue()))}`;
-      },
+      accessorKey: 'persenRealisasi',
     },
     {
-      accessorKey: 'target_rkpd_kinerja',
-      meta: {
-        tdClassNames: 'text-center',
-      },
+      accessorKey: 'total_capaian',
     },
     {
-      accessorKey: 'target_rkpd_anggaran',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: ({ row, getValue }) => {
-        if (['urusan', 'bidang'].some((l) => row.original.level.includes(l))) {
-          return;
-        }
-        return `${formatUang(Number(getValue()))}`;
-      },
+      accessorKey: 'persen_capaian',
     },
   ];
-  // #endregion
 
   const [isPreview, setIsPreview] = useState(false);
   useEffect(() => {
@@ -403,7 +335,7 @@ const RenjaTable = () => {
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
-          renderBody={(table) => tableBody({ table })}
+          // renderBody={(table) => tableBody({ table })}
           pesanDataKosong={
             <PesanSKPDTabel
               selectedSKPD={selectedSKPD.toString()}
@@ -429,14 +361,19 @@ const RenjaTable = () => {
                   className='h-9'
                   onClick={() => {
                     if (data) {
-                      const tahunLabel =
-                        listTahunKe.find((t) => t.value === tahunKe)?.label ??
-                        '';
-                      toast.promise(exportRenja(data, tahunLabel), {
-                        loading: 'Sedang mengunduh...',
-                        success: <b>Berhasil mengunduh.</b>,
-                        error: <b>Gagal mengunduh.</b>,
-                      });
+                      toast.promise(
+                        exportRenja(
+                          data,
+                          listSKPDPeriode.find(
+                            (item) => item.value === selectedSKPD,
+                          )?.label ?? '',
+                        ),
+                        {
+                          loading: 'Sedang mengunduh...',
+                          success: <b>Berhasil mengunduh.</b>,
+                          error: <b>Gagal mengunduh.</b>,
+                        },
+                      );
                     } else {
                       toast.error(
                         `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,

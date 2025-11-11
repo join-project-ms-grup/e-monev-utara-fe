@@ -521,3 +521,216 @@ export function flatRKPDNew(data: RKPDMasterNew['hasil']): FlatRKPDNew[] {
     console.log(result)
     return result;
 }
+
+
+// 
+export interface RKPDTriwulanMaster {
+    catatan: {
+        pendorong: string
+        penghambat: string
+        tl_1: string
+        tl_2: string
+    },
+    hasil: {
+        id: number;
+        kode: string;
+        name: string;
+        type: string;
+        bidang: {
+            id: number;
+            parent: number;
+            kode: string;
+            name: string;
+            type: string;
+            program: {
+                id: number;
+                parent: number;
+                kode: string;
+                name: string;
+                type: string;
+                pagu: {
+                    paguPeriode: number;
+                    paguTahunEval: number;
+                    triwulan: {
+                        triwulan: number;
+                        realisasi: number | string;
+                    }[];
+                    totalRealisasi: number;
+                    persenRealisasi: string;
+                    totalRealisasiPeriode: number;
+                    persenRealisasiPeriode: string;
+                }
+                kegiatan: {
+                    id: number;
+                    parent: number;
+                    kode: string;
+                    name: string;
+                    type: string;
+                    pagu: {
+                        paguPeriode: number;
+                        paguTahunEval: number;
+                        triwulan: {
+                            triwulan: number;
+                            realisasi: number | string;
+                        }[];
+                        totalRealisasi: number;
+                        persenRealisasi: string;
+                        totalRealisasiPeriode: number;
+                        persenRealisasiPeriode: string;
+                    }
+                    subKegiatan: {
+                        id: number;
+                        parent: number;
+                        kode: string;
+                        name: string;
+                        type: string;
+                        indikator: {
+                            id: number;
+                            name: string;
+                            satuan: string;
+                            target_akhir_periode: number
+                            target_tahun_dievaluasi: number
+                            triwulan: {
+                                triwulan: number;
+                                capaian: number | string;
+                            }[];
+                            total_capaian: number;
+                            persen_capaian: string;
+                            total_capaian_periode: number;
+                            persen_capaian_periode: string;
+
+                        }[]
+                        pagu: {
+                            paguPeriode: number;
+                            paguTahunEval: number;
+                            triwulan: {
+                                triwulan: number;
+                                realisasi: number | string;
+                            }[];
+                            totalRealisasi: number;
+                            persenRealisasi: string;
+                            totalRealisasiPeriode: number;
+                            persenRealisasiPeriode: string;
+                        }
+                    }[]
+                }[]
+            }[]
+        }[]
+    }[]
+}
+
+export interface FlatRKPDTriwulan {
+    kode?: string;
+    name?: string;
+    type?: string;
+
+    // program.pagu
+    paguPeriode?: number;
+    paguTahunEval?: number;
+    pagu_triwulan_realisasi_1?: number | string;
+    pagu_triwulan_realisasi_2?: number | string;
+    pagu_triwulan_realisasi_3?: number | string;
+    pagu_triwulan_realisasi_4?: number | string;
+
+    totalRealisasi?: number;
+    persenRealisasi?: string;
+    totalRealisasiPeriode?: number;
+    persenRealisasiPeriode?: string;
+
+    // indikator
+    ind_name?: string;
+    ind_satuan?: string;
+    ind_target_akhir_periode?: number;
+    ind_target_tahun_dievaluasi?: number;
+    ind_triwulan_capaian_1?: number | string
+    ind_triwulan_capaian_2?: number | string
+    ind_triwulan_capaian_3?: number | string
+    ind_triwulan_capaian_4?: number | string
+    total_capaian?: number;
+    persen_capaian?: string;
+    total_capaian_periode?: number;
+    persen_capaian_periode?: string;
+}
+
+
+export const getRKPDTriwulan = async (skpd_periode_id: number, tahun: number): Promise<RKPDMasterNew['hasil']> => {
+    const response = await api.get<ApiResponse<RKPDMasterNew>>(`/rkpd/hasil/laporan-tahunan/${skpd_periode_id}/${tahun}`);
+    return response.data.data.hasil;
+};
+
+export function flatRKPDTriwulan(data: RKPDTriwulanMaster['hasil']): FlatRKPDTriwulan[] {
+    const result: FlatRKPDTriwulan[] = [];
+
+    for (const urusan of data) {
+        result.push({
+            kode: urusan.kode,
+            name: urusan.name,
+            type: urusan.type,
+        });
+
+        for (const bidang of urusan.bidang) {
+            result.push({
+                kode: `${urusan.kode}.${bidang.kode}`,
+                name: bidang.name,
+                type: bidang.type,
+            });
+
+            for (const program of bidang.program) {
+                result.push({
+                    kode: `${urusan.kode}.${bidang.kode}.${program.kode}`,
+                    name: program.name,
+                    type: program.type,
+                    paguPeriode: program.pagu.paguPeriode,
+                    paguTahunEval: program.pagu.paguTahunEval,
+                    pagu_triwulan_realisasi_1: program.pagu.triwulan.find(item => item.triwulan === 1)?.realisasi,
+                    pagu_triwulan_realisasi_2: program.pagu.triwulan.find(item => item.triwulan === 2)?.realisasi,
+                    pagu_triwulan_realisasi_3: program.pagu.triwulan.find(item => item.triwulan === 3)?.realisasi,
+                    pagu_triwulan_realisasi_4: program.pagu.triwulan.find(item => item.triwulan === 4)?.realisasi,
+                    totalRealisasi: program.pagu.totalRealisasi,
+                    persenRealisasi: program.pagu.persenRealisasi,
+                    totalRealisasiPeriode: program.pagu.totalRealisasiPeriode,
+                    persenRealisasiPeriode: program.pagu.persenRealisasiPeriode
+                });
+                for (const kegiatan of program.kegiatan) {
+                    result.push({
+                        kode: `${urusan.kode}.${bidang.kode}.${program.kode}.${kegiatan.kode}`,
+                        name: kegiatan.name,
+                        type: kegiatan.type,
+                        paguPeriode: kegiatan.pagu.paguPeriode,
+                        paguTahunEval: kegiatan.pagu.paguTahunEval,
+                        pagu_triwulan_realisasi_1: kegiatan.pagu.triwulan.find(item => item.triwulan === 1)?.realisasi,
+                        pagu_triwulan_realisasi_2: kegiatan.pagu.triwulan.find(item => item.triwulan === 2)?.realisasi,
+                        pagu_triwulan_realisasi_3: kegiatan.pagu.triwulan.find(item => item.triwulan === 3)?.realisasi,
+                        pagu_triwulan_realisasi_4: kegiatan.pagu.triwulan.find(item => item.triwulan === 4)?.realisasi,
+                        totalRealisasi: kegiatan.pagu.totalRealisasi,
+                        persenRealisasi: kegiatan.pagu.persenRealisasi,
+                        totalRealisasiPeriode: kegiatan.pagu.totalRealisasiPeriode,
+                        persenRealisasiPeriode: kegiatan.pagu.persenRealisasiPeriode
+                    })
+                    for (const subkegiatan of kegiatan.subKegiatan) {
+                        for (const indikator of subkegiatan.indikator) {
+                            result.push({
+                                kode: `${urusan.kode}.${bidang.kode}.${program.kode}.${kegiatan.kode}.${subkegiatan.kode}`,
+                                name: subkegiatan.name,
+                                type: subkegiatan.type,
+                                ind_name: indikator.name,
+                                ind_satuan: indikator.satuan,
+                                ind_target_akhir_periode: indikator.target_akhir_periode,
+                                ind_target_tahun_dievaluasi: indikator.target_tahun_dievaluasi,
+                                ind_triwulan_capaian_1: indikator.triwulan.find(item => item.triwulan === 1)?.capaian,
+                                ind_triwulan_capaian_2: indikator.triwulan.find(item => item.triwulan === 2)?.capaian,
+                                ind_triwulan_capaian_3: indikator.triwulan.find(item => item.triwulan === 3)?.capaian,
+                                ind_triwulan_capaian_4: indikator.triwulan.find(item => item.triwulan === 4)?.capaian,
+                                total_capaian: indikator.total_capaian,
+                                persen_capaian: indikator.persen_capaian,
+                                total_capaian_periode: indikator.total_capaian_periode,
+                                persen_capaian_periode: indikator.persen_capaian_periode,
+                            })
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return result;
+}
