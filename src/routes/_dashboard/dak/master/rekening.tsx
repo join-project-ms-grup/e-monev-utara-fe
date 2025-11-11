@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import RekeningDakTable from '../../../components/tables/dak/RekeningDakTable';
-import { SITE_NAME } from '../../../lib/config';
+import RekeningDakTable from '../../../../components/tables/dak/RekeningDakTable';
+import { SITE_NAME } from '../../../../lib/config';
 
-export const Route = createFileRoute('/_dashboard/dak/rekening')({
+export const Route = createFileRoute('/_dashboard/dak/master/rekening')({
   head: () => ({
     meta: [
       {

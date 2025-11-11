@@ -10,7 +10,7 @@ import {
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   flatIdentifikasiDAK,
   getIdentifikasiDAK,

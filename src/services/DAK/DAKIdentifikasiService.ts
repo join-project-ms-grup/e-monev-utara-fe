@@ -59,41 +59,45 @@ export function flatIdentifikasiDAK(data: DAKIdentifikasi[]): FlatIdentifikasiDA
 }
 
 export interface IdentifikasiDetailDAK {
-    jenis_dak_id: number,
-    jenis_dak: string,
-    sub_jenis_dak_id: number,
-    sub_jenis_dak: string,
-    tahun: number,
-    kab_kot: string,
-    opd_id: number,
-    opd: string,
-    bidang_opd: string,
-    urusan_id: number,
-    urusan_kode: string,
-    urusan: string,
-    bidang_id: number,
-    bidang_kode: string,
-    bidang: string,
-    program_id: number,
-    program_kode: string,
-    program: string,
-    kegiatan_id: number,
-    kegiatan_kode: string,
-    kegiatan: string,
-    subKegiatan_id: number,
-    subKegiatan_kode: string,
-    subKegiatan: string,
-    catatan: string | null,
-    verif_status: string,
-    nama_paket: string,
-    detail_paket: string,
-    volume: number,
-    satuan: string,
-    estimasi_waktu: string,
-    jumlah_penerima_manfaat: string,
-    anggaran_dak: string,
-    desa_kel: string,
-    kec: string,
+    jenis_dak_id: number;
+    jenis_dak: string;
+    sub_jenis_dak_id: number;
+    sub_jenis_dak: string;
+    bidang_dak_id: number;
+    bidang_dak: string;
+    sub_bidang_dak_id: number;
+    sub_bidang_dak: string;
+    tahun: number;
+    kab_kot: string;
+    opd_id: number;
+    opd: string;
+    bidang_opd: string;
+    urusan_id: number;
+    urusan_kode: string;
+    urusan: string;
+    bidang_id: number;
+    bidang_kode: string;
+    bidang: string;
+    program_id: number;
+    program_kode: string;
+    program: string;
+    kegiatan_id: number;
+    kegiatan_kode: string;
+    kegiatan: string;
+    subKegiatan_id: number;
+    subKegiatan_kode: string;
+    subKegiatan: string;
+    catatan: string | null;
+    verif_status: "di_periksa" | "disetujui" | "ditolak";
+    nama_paket: string;
+    detail_paket: string;
+    volume: number;
+    satuan: string;
+    estimasi_waktu: string;
+    jumlah_penerima_manfaat: string;
+    anggaran_dak: string;
+    desa_kel: string;
+    kec: string;
     bujur: string[],
     lintang: string[],
     foto_kegiatan: string | null,

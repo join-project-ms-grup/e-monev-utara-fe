@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { SITE_NAME } from '../../../lib/config';
-import OPDDakTable from '../../../components/tables/dak/OPDDakTable';
+import { SITE_NAME } from '../../../../lib/config';
+import OPDDakTable from '../../../../components/tables/dak/OPDDakTable';
 
-export const Route = createFileRoute('/_dashboard/dak/opd')({
+export const Route = createFileRoute('/_dashboard/dak/master/opd')({
   head: () => ({
     meta: [
       {

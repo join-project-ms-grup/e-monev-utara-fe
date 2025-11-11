@@ -87,13 +87,6 @@ const menuRKPD: MenuItem[] = [
       { label: 'Input Capaian IKD', to: '/rkpd/ikd/ikd_capaian' },
     ],
   },
-  // {
-  //   label: 'IKD',
-  //   icon: <MdShowChart />,
-  //   akses: [2, 3],
-  //   submenu: [
-  //   ],
-  // },
   {
     label: 'RENJA - RKPD',
     icon: <MdEventNote />,
@@ -120,9 +113,12 @@ const menuDAK: MenuItem[] = [
     icon: <MdEventNote />,
     akses: [2, 4],
     submenu: [
-      { label: 'Rekening', to: '/dak/rekening' },
-      { label: 'OPD', to: '/dak/opd' },
-      { label: 'Tahun', to: '/dak/tahun' },
+      { label: 'Rekening', to: '/dak/master/rekening' },
+      { label: 'OPD', to: '/dak/master/opd' },
+      { label: 'Tahun', to: '/dak/master/tahun' },
+      { label: 'Jenis', to: '/dak/master/jenis' },
+      { label: 'Bidang', to: '/dak/master/bidang' },
+      { label: 'Masalah', to: '/dak/master/masalah' },
     ],
   },
   {

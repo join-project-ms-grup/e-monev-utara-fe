@@ -26,3 +26,21 @@ export const getSubJenisDAK = async (kode_jenis: number): Promise<SubJenisDAK[]>
     const response = await api.post<ApiResponse<SubJenisDAK[]>>("/dak/jenis/list-sub", { kode_jenis });
     return response.data.data;
 };
+
+export interface SubJenisDAKForm {
+    id?: number;
+    kode_jenis?: string | number;
+    nama: string;
+    keterangan: string | null
+    status?: boolean
+}
+
+export const addSubjenisDAK = async (payload: SubJenisDAKForm): Promise<SubJenisDAKForm> => {
+    const response = await api.post<ApiResponse<SubJenisDAKForm>>("/dak/jenis/add-sub", payload);
+    return response.data.data;
+};
+
+export const updateSubJenisDAK = async (payload: SubJenisDAKForm): Promise<SubJenisDAKForm> => {
+    const response = await api.put<ApiResponse<SubJenisDAKForm>>("/dak/jenis/update-sub", payload);
+    return response.data.data;
+};

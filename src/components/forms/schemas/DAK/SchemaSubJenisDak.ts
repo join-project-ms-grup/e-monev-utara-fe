@@ -3,18 +3,18 @@ import { z } from 'zod';
 // =============================
 // SCHEMA (OPSIONAL)
 // =============================
-export const tahundakSchema = z
+export const subjenisdakSchema = z
     .object({
-        tahun: z.string().optional(),
+        nama: z.string().optional(),
         keterangan: z.string().optional(),
     });
 
 // =============================
 // SCHEMA SUBMIT (WAJIB DIISI)
 // =============================
-export const tahundakSchemaSubmit = z
+export const subjenisdakSchemaSubmit = z
     .object({
-        tahun: z.string().nonempty({ message: 'Field wajib diisi' }),
+        nama: z.string().nonempty({ message: 'Field wajib diisi' }),
         keterangan: z.string().nonempty({ message: 'Field wajib diisi' }),
     });
 
@@ -23,8 +23,8 @@ export const tahundakSchemaSubmit = z
 // =============================
 export function mapToInput(value: any) {
     return {
-        tahun: value.kode?.toString() ?? '',
-        keterangan: value.name?.toString() ?? '',
+        nama: value.nama?.toString() ?? '',
+        keterangan: value.keterangan?.toString() ?? '',
     };
 }
 
@@ -33,8 +33,8 @@ export function mapToInput(value: any) {
 // =============================
 export function mapErrors(errors: any) {
     const mapped: Record<string, string | undefined> = {
-        tahun: errors.kode?._errors?.[0],
-        keterangan: errors.name?._errors?.[0],
+        nama: errors.nama?._errors?.[0],
+        keterangan: errors.keterangan?._errors?.[0],
     };
 
     if (errors._errors && errors._errors.length > 0) {
