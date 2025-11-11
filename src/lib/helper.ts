@@ -1,3 +1,7 @@
+export function renderUang<T extends number | null | undefined>(value: T): string {
+  return value === null || value === undefined ? '' : formatUang(Number(value));
+}
+
 export function formatUang(nilai: number): string {
   const formatted = new Intl.NumberFormat('id-ID', {
     style: 'currency',

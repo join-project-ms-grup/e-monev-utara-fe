@@ -12,10 +12,10 @@ import type { FlatRKPD } from '../RKPDService';
  */
 export const exportRKPD = async (
   data: FlatRKPD[],
-  tahun: string,
   opts?: { startRow?: number },
 ) => {
   const startRow = opts?.startRow ?? 13;
+  const tahun = '';
 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Evaluasi RKPD');
