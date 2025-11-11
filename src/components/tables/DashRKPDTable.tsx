@@ -71,18 +71,21 @@ const DashRKPDTable = () => {
       header: 'Ranking',
       accessorKey: 'rangking',
       meta: {
-        tdClassNames: 'text-center border-x',
+        tdClassNames: 'text-center border-x border-gray-400',
       },
     },
     {
       header: 'Perangkat Daerah',
       accessorKey: 'name',
+      meta: {
+        tdClassNames: 'border-x border-gray-400',
+      },
     },
     {
-      header: 'rata_rata_triwulan',
+      header: 'rata_rata_kinerja',
       columns: [
         {
-          header: 'rata_rata_triwulan_1',
+          header: 'rata_rata_kinerja_1',
           accessorFn: (row) => row.rata_rata_triwulan,
           cell: ({ getValue }) => {
             const { capaian } = getValue();
@@ -93,11 +96,11 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-l',
+            tdClassNames: 'text-center border-l border-gray-400',
           },
         },
         {
-          header: 'rata_rata_triwulan_1',
+          header: 'rata_rata_kinerja_2',
           accessorFn: (row) => row.rata_rata_triwulan,
           cell: ({ getValue }) => {
             const { c_predikat } = getValue();
@@ -108,11 +111,11 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-r',
+            tdClassNames: 'text-center border-r border-gray-400',
           },
         },
         {
-          header: 'rata_rata_kumulatif_1',
+          header: 'rata_rata_kinerja_3',
           accessorFn: (row) => row.rata_rata_kumulatif,
           cell: ({ getValue }) => {
             const { capaian } = getValue();
@@ -124,11 +127,11 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-l',
+            tdClassNames: 'text-center border-l  border-gray-400',
           },
         },
         {
-          header: 'rata_rata_kumulatif_1',
+          header: 'rata_rata_kinerja_4',
           accessorFn: (row) => row.rata_rata_kumulatif,
           cell: ({ getValue }) => {
             const { c_predikat } = getValue();
@@ -140,11 +143,16 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-r',
+            tdClassNames: 'text-center border-r  border-gray-400',
           },
-        },
+        }
+      ],
+    },
+    {
+      header: 'rata_rata_anggaran',
+      columns: [
         {
-          header: 'rata_rata_triwulan_2',
+          header: 'rata_rata_anggaran_1',
           accessorFn: (row) => row.rata_rata_triwulan,
           cell: ({ getValue }) => {
             const { realisasi } = getValue();
@@ -155,11 +163,11 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-l',
+            tdClassNames: 'text-center border-l  border-gray-400',
           },
         },
         {
-          header: 'rata_rata_triwulan_2',
+          header: 'rata_rata_anggaran_2',
           accessorFn: (row) => row.rata_rata_triwulan,
           cell: ({ getValue }) => {
             const { r_predikat } = getValue();
@@ -170,16 +178,11 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-r',
+            tdClassNames: 'text-center border-r  border-gray-400',
           },
         },
-      ],
-    },
-    {
-      header: 'rata_rata_kumulatif',
-      columns: [
         {
-          header: 'rata_rata_kumulatif_2',
+          header: 'rata_rata_angaran_3',
           accessorFn: (row) => row.rata_rata_kumulatif,
           cell: ({ getValue }) => {
             const { realisasi } = getValue();
@@ -190,11 +193,11 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-l',
+            tdClassNames: 'text-center border-l  border-gray-400',
           },
         },
         {
-          header: 'rata_rata_kumulatif_2',
+          header: 'rata_rata_anggaran_4',
           accessorFn: (row) => row.rata_rata_kumulatif,
           cell: ({ getValue }) => {
             const { r_predikat } = getValue();
@@ -205,7 +208,7 @@ const DashRKPDTable = () => {
             );
           },
           meta: {
-            tdClassNames: 'text-center border-r',
+            tdClassNames: 'text-center border-r  border-gray-400',
           },
         },
       ],
@@ -217,14 +220,14 @@ const DashRKPDTable = () => {
           header: 'total_realisasi.triwulan',
           accessorFn: (row) => row.total_realisasi.triwulan,
           meta: {
-            tdClassNames: 'text-center border-x',
+            tdClassNames: 'text-center border-x  border-gray-400',
           },
         },
         {
           header: 'total_realisasi.kumulatif',
           accessorFn: (row) => row.total_realisasi.kumulatif,
           meta: {
-            tdClassNames: 'text-center border-x',
+            tdClassNames: 'text-center border-x  border-gray-400',
           },
         },
       ],
