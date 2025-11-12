@@ -352,7 +352,7 @@ export const flattenRenstra = (data: RenstraMasterUrusan[]): FlatRenstraRow[] =>
     return rows;
 };
 
-
+// RENSTRA
 export interface RenstraMasterNew {
     catatan: {
         pendorong: string
@@ -568,6 +568,114 @@ export function flatRenstraNew(data: RenstraMasterNew['hasil']): FlatRenstraNew[
                             result.push(data);
                         }
                     }
+                }
+            }
+        }
+    }
+    return result;
+}
+
+// RPJMD
+export interface RPMJDMasterNew {
+    catatan: {
+        pendorong: string
+        penghambat: string
+        tl_1: string
+        tl_2: string
+    },
+    hasil: {
+        kode: string;
+        name: string;
+        type: string;
+        bidang: {
+            kode: string;
+            name: string;
+            type: string;
+            program: {
+                kode: string;
+                name: string;
+                outcome: {
+                    outcome: string;
+                    indikatorOutcome: {
+                        nama: string;
+                        satuan: string | null;
+                        targetIndikatorOutcome: {
+                            tahun: number;
+                            tahun_ke: number | string;
+                            target: number | string;
+                            capaian: number | string;
+                            persen: number | string;
+                        }[]
+                    }
+                }[]
+                pagu: {
+                    pagu: {
+                        tahun: number;
+                        tahun_ke: number | string;
+                        pagu: number | string;
+                        realisasi: number | string;
+                        persen: number | string;
+                    }[]
+                }
+            }[]
+        }[]
+    }[]
+}
+
+export const getRPJMDNew = async (skpd_periode_id: number): Promise<RPMJDMasterNew['hasil']> => {
+    const response = await api.get<ApiResponse<RPMJDMasterNew>>(`/renstra/hasil/rpjmd/${skpd_periode_id}`);
+    return response.data.data.hasil;
+};
+
+export function flatRPJMDNew(data: RPMJDMasterNew['hasil']): FlatRenstraNew[] {
+    const result: FlatRenstraNew[] = [];
+    for (const urusan of data) {
+        result.push({
+            kode: urusan.kode,
+            name: urusan.name,
+            type: urusan.type,
+        });
+
+        for (const bidang of urusan.bidang) {
+            result.push({
+                kode: `${urusan.kode}.${bidang.kode}`,
+                name: bidang.name,
+                type: bidang.type,
+            });
+
+            for (const program of bidang.program) {
+                const datapro: any = {
+                    kode: `${urusan.kode}.${bidang.kode}.${program.kode}`,
+                    name: program.name,
+                    type: 'program',
+                };
+                const p = program.pagu.pagu
+                for (let i = 1; i <= 5; i++) {
+                    const tahunData = p.find(item => item.tahun_ke === i);
+                    datapro[`pagu_tahun_${i}`] = tahunData?.tahun;
+                    datapro[`pagu_pagu_${i}`] = tahunData?.pagu;
+                    datapro[`pagu_realisasi_${i}`] = tahunData?.realisasi;
+                    datapro[`pagu_persen_${i}`] = tahunData?.persen;
+                }
+                result.push(datapro);
+
+                for (const outcome of program.outcome) {
+                    const io = outcome.indikatorOutcome
+                    const t = io.targetIndikatorOutcome
+                    const data: any = {
+                        name: outcome.outcome,
+                        ind_name: io.nama,
+                        satuan: io.satuan ?? '-',
+                    };
+
+                    for (let i = 1; i <= 5; i++) {
+                        const tahunData = t.find(item => item.tahun_ke === i);
+                        data[`target_tahun_${i}`] = tahunData?.tahun;
+                        data[`target_target_${i}`] = tahunData?.target;
+                        data[`target_capaian_${i}`] = tahunData?.capaian;
+                        data[`target_persen_${i}`] = tahunData?.persen;
+                    }
+                    result.push(data);
                 }
             }
         }

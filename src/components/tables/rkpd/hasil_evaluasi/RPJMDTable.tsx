@@ -19,13 +19,14 @@ import {
 import RPJMDPreviewTable from './RPJMDPreviewTable';
 import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import {
-  flatRPJMD,
-  getRPJMD,
-  type FlatRPJMD,
-} from '../../../../services/RPJMDService';
 import Spinner from '../../../inputs/Spinner';
 import { getSKPDPerRENSTRA } from '../../../../services/PeriodeService';
+import {
+  flatRPJMDNew,
+  getRPJMDNew,
+  type FlatRenstraNew,
+} from '../../../../services/RenstraService';
+import { renderSatuan, renderUang } from '../../../../lib/helper';
 
 const tableHead = () => {
   return (
@@ -33,7 +34,9 @@ const tableHead = () => {
       <tr>
         <th rowSpan={2}>No</th>
         <th rowSpan={2}>Sasaran</th>
-        <th rowSpan={2}>Program Prioritas</th>
+        <th rowSpan={2}>
+          Program Prioritas
+        </th>
         <th rowSpan={2}>Indikator Kinerja</th>
         <th rowSpan={2}>Data Capaian pada Awal Tahun Perencanaan</th>
         <th colSpan={2}>Target pada Akhir Tahun Perencanaan</th>
@@ -72,159 +75,92 @@ const RPJMDTable = () => {
 
   //#region RKPD Data Flatten
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['tabel_rkpd_5_tahunan', selectedSKPD],
+    queryKey: ['tabel_renstra', selectedSKPD, 5],
     queryFn: async () => {
-      const rawData = await getRPJMD(Number(selectedSKPD));
-      const flatten = flatRPJMD(rawData);
-      console.log(flatten);
-      return flatten;
+      const rawData = await getRPJMDNew(Number(selectedSKPD));
+      const flatData = flatRPJMDNew(rawData as any);
+      return flatData;
     },
     enabled: !!selectedSKPD,
   });
   //#endregion
 
-  const columns: ColumnDef<FlatRPJMD>[] = [
+  const columns: ColumnDef<FlatRenstraNew>[] = [
     {
       header: 'No',
       cell: ({ row }) => row.index + 1,
     },
     {
       header: 'Sasaran',
-      accessorFn: () => '', // tetap kosong
     },
     {
-      header: 'Program Prioritas',
-      accessorFn: (row) => row.name ?? '',
+      header: 'name',
+      cell: ({ row }) => (
+        <>
+          <p>{row.original.name}</p>
+          {row.original.ind_name ? (
+            <p>
+              <br />({row.original.ind_name})
+            </p>
+          ) : (
+            ''
+          )}
+        </>
+      ),
     },
     {
-      header: 'Indikator Kinerja',
-      accessorFn: (row) => row.indikator_o_name || '',
+      accessorKey: 'ind_name',
     },
     {
-      header: 'Data Capaian Awal',
+      accessorKey: 'target_capaian_1',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_capaian_1 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
     },
+    //
     {
-      header: 'Target Akhir (K)',
+      accessorKey: 'target_target_5',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_target_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
     },
     {
-      header: 'Target Akhir (Rp)',
+      accessorKey: 'pagu_pagu_5',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.pagu_pagu_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
+      cell: ({ getValue }: any) => renderUang(getValue() as number | null),
     },
+    //
     {
-      header: 'Capaian Akhir (K)',
+      accessorKey: 'target_capaian_5',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
     },
     {
-      header: 'Capaian Akhir (Rp)',
+      accessorKey: 'pagu_realisasi_5',
       meta: {
         tdClassNames: 'text-center',
       },
-      accessorFn: (row) => row.pagu_realisasi_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
+      cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+    },
+    //
+    {
+      accessorKey: 'target_persen_5',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
       },
+      cell: ({ getValue }: any) =>
+        renderSatuan(getValue() as number | null, '%'),
     },
     {
-      header: 'Rasio Akhir (%) K',
+      accessorKey: 'pagu_persen_5',
       meta: {
-        tdClassNames: 'text-center',
+        tdClassNames: 'whitespace-nowrap text-center',
       },
-      accessorFn: (row) => row.target_io_persen_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header: 'Rasio Akhir (%) Rp',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.pagu_persen_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
+      cell: ({ getValue }: any) =>
+        renderSatuan(getValue() as number | null, '%'),
     },
   ];
 
@@ -301,7 +237,7 @@ const RPJMDTable = () => {
 
       {isPreview &&
         createPortal(
-          <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
             <div className='border-b'>
               <div className='flex flex-row justify-between p-2'>
                 <button
@@ -334,14 +270,8 @@ const RPJMDTable = () => {
                 </InputButton>
               </div>
             </div>
-            <div className='p-2'>
-              <RPJMDPreviewTable
-                data={data || []}
-                skpd={
-                  listSKPDPeriode.find((item) => item.value === selectedSKPD)
-                    ?.label ?? ''
-                }
-              />
+            <div className='p-2 overflow-auto'>
+              <RPJMDPreviewTable data={data || []} />
             </div>
           </div>,
           document.body,

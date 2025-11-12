@@ -127,8 +127,14 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
       cell: ({ row }) => (
         <>
           <p>{row.original.name}</p>
-          <br />
-          {row.original.ind_name ? <p>({row.original.ind_name})</p> : ''}
+
+          {row.original.ind_name ? (
+            <p>
+              <br />({row.original.ind_name})
+            </p>
+          ) : (
+            ''
+          )}
         </>
       ),
     },

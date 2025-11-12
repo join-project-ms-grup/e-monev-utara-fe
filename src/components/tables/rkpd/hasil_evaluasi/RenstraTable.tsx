@@ -55,7 +55,7 @@ const tableHead = () => {
       </tr>
       <tr>
         {Array.from({ length: 3 }, (_, i) => (
-          <Fragment key={i} >
+          <Fragment key={i}>
             <th key={i} className='w-[200px]'>
               Fisik
             </th>
@@ -113,8 +113,14 @@ const RenstraTable = () => {
       cell: ({ row }) => (
         <>
           <p>{row.original.name}</p>
-          <br />
-          {row.original.ind_name ? <p>({row.original.ind_name})</p> : ''}
+
+          {row.original.ind_name ? (
+            <p>
+              <br />({row.original.ind_name})
+            </p>
+          ) : (
+            ''
+          )}
         </>
       ),
     },

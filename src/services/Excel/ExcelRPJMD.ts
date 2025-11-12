@@ -1,8 +1,8 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { waktuNowGabung } from '../../lib/helper';
+import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
 import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
-import type { FlatRPJMD } from '../RPJMDService';
+import type { FlatRenstraNew } from '../RenstraService';
 
 /**
  * Export RKPD mimic dari file sumber.
@@ -16,7 +16,7 @@ import type { FlatRPJMD } from '../RPJMDService';
  * @param opts.startRow (optional) baris mulai data (default 13)
  */
 export const exportRPJMD = async (
-    data: FlatRPJMD[],
+    data: FlatRenstraNew[],
     opts?: { startRow?: number },
 ) => {
     const awalPeriode = getPeriodeMulaiFromCookie();
@@ -133,106 +133,188 @@ export const exportRPJMD = async (
 
     //#region Mapping Data
     let rowIndex = startRow;
-    let no = 1;
+    data.forEach((item, idx) => {
+        const row = worksheet.getRow(rowIndex);
 
-    data.forEach((item) => {
-        if (item.type === 'urusan') {
-            const row = worksheet.getRow(rowIndex++);
-            row.getCell('A').value = no++;
-            row.getCell('C').value = item.name;
-        }
-        if (item.type === 'bidang') {
-            const row = worksheet.getRow(rowIndex++);
-            row.getCell('A').value = no++;
-            row.getCell('C').value = item.name;
-        }
-        if (item.type === 'program') {
-            const row = worksheet.getRow(rowIndex++);
-            row.getCell('A').value = no++;
-            row.getCell('C').value = item.name;
-        }
-        if (item.indikator_o_name) {
-            const row = worksheet.getRow(rowIndex++);
-            row.getCell('A').value = no++;
-            row.getCell('C').value = item.name;
-            row.getCell('D').value = item.indikator_o_name;
+        // 1
+        row.getCell('A').value = idx + 1;
+        row.getCell('A').alignment = { horizontal: 'center' }
+        // 3
+        // row.getCell('C').value = item.name + '\n' + `(${item.ind_name})`;
+        row.getCell('C').value = item.ind_name ? item.name + '\n\n' + `(${item.ind_name})` : item.name;
+        // 4
+        row.getCell('D').value = item.ind_name;
+        // 5
+        row.getCell('E').value = renderSatuan(item.target_capaian_1, '');
+        // 6
+        row.getCell('F').value = renderSatuan(item.target_capaian_5, '');
+        row.getCell('G').value = numOrEmpty(item.pagu_pagu_5);
+        // 
+        // 7 - 11
+        row.getCell('H').value = renderSatuan(item.target_target_1, '');
+        row.getCell('I').value = numOrEmpty(item.pagu_pagu_1);
 
-            // Target
-            row.getCell('H').value = item.target_io_target_1;
-            row.getCell('I').value = item.pagu_pagu_1;
+        row.getCell('J').value = renderSatuan(item.target_target_2, '');
+        row.getCell('K').value = numOrEmpty(item.pagu_pagu_2);
 
-            row.getCell('J').value = item.target_io_target_2;
-            row.getCell('K').value = item.pagu_pagu_2;
+        row.getCell('L').value = renderSatuan(item.target_target_3, '');
+        row.getCell('M').value = numOrEmpty(item.pagu_pagu_3);
 
-            row.getCell('L').value = item.target_io_target_3;
-            row.getCell('M').value = item.pagu_pagu_3;
+        row.getCell('N').value = renderSatuan(item.target_target_4, '');
+        row.getCell('O').value = numOrEmpty(item.pagu_pagu_4);
 
-            row.getCell('N').value = item.target_io_target_4;
-            row.getCell('O').value = item.pagu_pagu_4;
+        row.getCell('P').value = renderSatuan(item.target_target_5, '');
+        row.getCell('Q').value = numOrEmpty(item.pagu_pagu_5);
+        // 12 - 16
+        row.getCell('R').value = renderSatuan(item.target_capaian_1, '');
+        row.getCell('S').value = numOrEmpty(item.pagu_realisasi_1);
 
-            row.getCell('P').value = item.target_io_target_5;
-            row.getCell('Q').value = item.pagu_pagu_5;
+        row.getCell('T').value = renderSatuan(item.target_capaian_2, '');
+        row.getCell('U').value = numOrEmpty(item.pagu_realisasi_3);
 
-            // Capaian
-            row.getCell('R').value = item.target_io_capaian_1;
-            row.getCell('S').value = item.pagu_realisasi_1;
+        row.getCell('V').value = renderSatuan(item.target_capaian_3, '');
+        row.getCell('W').value = numOrEmpty(item.pagu_realisasi_4);
 
-            row.getCell('T').value = item.target_io_capaian_2;
-            row.getCell('U').value = item.pagu_realisasi_2;
+        row.getCell('X').value = renderSatuan(item.target_capaian_4, '');
+        row.getCell('Y').value = numOrEmpty(item.pagu_realisasi_5);
 
-            row.getCell('V').value = item.target_io_capaian_3;
-            row.getCell('W').value = item.pagu_realisasi_3;
+        row.getCell('Z').value = renderSatuan(item.target_capaian_5, '');
+        row.getCell('AA').value = numOrEmpty(item.pagu_realisasi_5);
+        // 17 - 21
+        row.getCell('AB').value = numOrEmpty(item.target_persen_1);
+        row.getCell('AC').value = numOrEmpty(item.pagu_persen_1);
 
-            row.getCell('X').value = item.target_io_capaian_4;
-            row.getCell('Y').value = item.pagu_realisasi_4;
+        row.getCell('AD').value = numOrEmpty(item.target_persen_2);
+        row.getCell('AE').value = numOrEmpty(item.pagu_persen_2);
 
-            row.getCell('Z').value = item.target_io_capaian_5;
-            row.getCell('AA').value = item.pagu_realisasi_5;
+        row.getCell('AF').value = numOrEmpty(item.target_persen_3);
+        row.getCell('AG').value = numOrEmpty(item.pagu_persen_3);
 
-            // Tingkat Capaian RKPD
-            row.getCell('AB').value = item.target_io_persen_1;
-            row.getCell('AC').value = item.pagu_persen_1;
+        row.getCell('AH').value = numOrEmpty(item.target_persen_4);
+        row.getCell('AI').value = numOrEmpty(item.pagu_persen_4);
 
-            row.getCell('AD').value = item.target_io_persen_2;
-            row.getCell('AE').value = item.pagu_persen_2;
+        row.getCell('AJ').value = numOrEmpty(item.target_capaian_5);
+        row.getCell('AK').value = numOrEmpty(item.pagu_realisasi_5);
+        // 22
+        row.getCell('AL').value = numOrEmpty(item.target_capaian_5);
+        row.getCell('AM').value = numOrEmpty(item.pagu_realisasi_5);
+        // 23
+        row.getCell('AN').value = numOrEmpty(item.target_persen_5);
+        row.getCell('AO').value = numOrEmpty(item.pagu_persen_5);
 
-            row.getCell('AF').value = item.target_io_persen_3;
-            row.getCell('AG').value = item.pagu_persen_3;
+        const fmtPersen = '0.00%';
+        ['AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AN', 'AO'].forEach((col) => {
+            row.getCell(col).numFmt = fmtPersen;
+        });
 
-            row.getCell('AH').value = item.target_io_persen_4;
-            row.getCell('AI').value = item.pagu_persen_4;
+        const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+        ['G', 'I', 'K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA', 'AM'].forEach((col) => {
+            row.getCell(col).numFmt = fmtRupiah;
+        });
 
-            row.getCell('AJ').value = item.target_io_persen_5;
-            row.getCell('AK').value = item.pagu_persen_5;
-
-            // Rasio capaian akhir
-            const totalTarget = (item.target_io_target_1 ?? 0) + (item.target_io_target_2 ?? 0) + (item.target_io_target_3 ?? 0) + (item.target_io_target_4 ?? 0) + (item.target_io_target_5 ?? 0);
-            const totalCapaian = (item.target_io_capaian_1 ?? 0) + (item.target_io_capaian_2 ?? 0) + (item.target_io_capaian_3 ?? 0) + (item.target_io_capaian_4 ?? 0) + (item.target_io_capaian_5 ?? 0);
-            row.getCell('AL').value = totalCapaian;
-            row.getCell('AN').value = totalTarget > 0 ? (totalCapaian / totalTarget) * 100 : 0;
-
-            const totalTargetPagu = (item.pagu_pagu_1 ?? 0) + (item.pagu_pagu_2 ?? 0) + (item.pagu_pagu_3 ?? 0) + (item.pagu_pagu_4 ?? 0) + (item.pagu_pagu_5 ?? 0);
-            const totalCapaianPagu = (item.pagu_realisasi_1 ?? 0) + (item.pagu_realisasi_2 ?? 0) + (item.pagu_realisasi_3 ?? 0) + (item.pagu_realisasi_4 ?? 0) + (item.pagu_realisasi_5 ?? 0);
-            row.getCell('AM').value = totalCapaianPagu;
-            row.getCell('AO').value = totalTargetPagu > 0 ? (totalCapaianPagu / totalTargetPagu) * 100 : 0;
-
-            const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-            ['G', 'I', 'K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA'].forEach((col) => {
-                row.getCell(col).numFmt = fmtRupiah;
-            });
-
-            row.getCell('AC').numFmt = '0.00%';
-            row.getCell('AE').numFmt = '0.00%';
-            row.getCell('AG').numFmt = '0.00%';
-            row.getCell('AI').numFmt = '0.00%';
-            row.getCell('AK').numFmt = '0.00%';
-
-            row.getCell('AN').numFmt = '0.00%';
-            row.getCell('AO').numFmt = '0.00%';
-        }
+        ['C', 'D', 'AL',].forEach((col) => {
+            row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+        });
+        rowIndex++;
     });
+    // let no = 1;
 
+    // data.forEach((item) => {
+    //     if (item.type === 'urusan') {
+    //         const row = worksheet.getRow(rowIndex++);
+    //         row.getCell('A').value = no++;
+    //         row.getCell('C').value = item.name;
+    //     }
+    //     if (item.type === 'bidang') {
+    //         const row = worksheet.getRow(rowIndex++);
+    //         row.getCell('A').value = no++;
+    //         row.getCell('C').value = item.name;
+    //     }
+    //     if (item.type === 'program') {
+    //         const row = worksheet.getRow(rowIndex++);
+    //         row.getCell('A').value = no++;
+    //         row.getCell('C').value = item.name;
+    //     }
+    //     if (item.indikator_o_name) {
+    //         const row = worksheet.getRow(rowIndex++);
+    //         row.getCell('A').value = no++;
+    //         row.getCell('C').value = item.name;
+    //         row.getCell('D').value = item.indikator_o_name;
 
+    //         // Target
+    //         row.getCell('H').value = item.target_io_target_1;
+    //         row.getCell('I').value = item.pagu_pagu_1;
+
+    //         row.getCell('J').value = item.target_io_target_2;
+    //         row.getCell('K').value = item.pagu_pagu_2;
+
+    //         row.getCell('L').value = item.target_io_target_3;
+    //         row.getCell('M').value = item.pagu_pagu_3;
+
+    //         row.getCell('N').value = item.target_io_target_4;
+    //         row.getCell('O').value = item.pagu_pagu_4;
+
+    //         row.getCell('P').value = item.target_io_target_5;
+    //         row.getCell('Q').value = item.pagu_pagu_5;
+
+    //         // Capaian
+    //         row.getCell('R').value = item.target_io_capaian_1;
+    //         row.getCell('S').value = item.pagu_realisasi_1;
+
+    //         row.getCell('T').value = item.target_io_capaian_2;
+    //         row.getCell('U').value = item.pagu_realisasi_2;
+
+    //         row.getCell('V').value = item.target_io_capaian_3;
+    //         row.getCell('W').value = item.pagu_realisasi_3;
+
+    //         row.getCell('X').value = item.target_io_capaian_4;
+    //         row.getCell('Y').value = item.pagu_realisasi_4;
+
+    //         row.getCell('Z').value = item.target_io_capaian_5;
+    //         row.getCell('AA').value = item.pagu_realisasi_5;
+
+    //         // Tingkat Capaian RKPD
+    //         row.getCell('AB').value = item.target_io_persen_1;
+    //         row.getCell('AC').value = item.pagu_persen_1;
+
+    //         row.getCell('AD').value = item.target_io_persen_2;
+    //         row.getCell('AE').value = item.pagu_persen_2;
+
+    //         row.getCell('AF').value = item.target_io_persen_3;
+    //         row.getCell('AG').value = item.pagu_persen_3;
+
+    //         row.getCell('AH').value = item.target_io_persen_4;
+    //         row.getCell('AI').value = item.pagu_persen_4;
+
+    //         row.getCell('AJ').value = item.target_io_persen_5;
+    //         row.getCell('AK').value = item.pagu_persen_5;
+
+    //         // Rasio capaian akhir
+    //         const totalTarget = (item.target_io_target_1 ?? 0) + (item.target_io_target_2 ?? 0) + (item.target_io_target_3 ?? 0) + (item.target_io_target_4 ?? 0) + (item.target_io_target_5 ?? 0);
+    //         const totalCapaian = (item.target_io_capaian_1 ?? 0) + (item.target_io_capaian_2 ?? 0) + (item.target_io_capaian_3 ?? 0) + (item.target_io_capaian_4 ?? 0) + (item.target_io_capaian_5 ?? 0);
+    //         row.getCell('AL').value = totalCapaian;
+    //         row.getCell('AN').value = totalTarget > 0 ? (totalCapaian / totalTarget) * 100 : 0;
+
+    //         const totalTargetPagu = (item.pagu_pagu_1 ?? 0) + (item.pagu_pagu_2 ?? 0) + (item.pagu_pagu_3 ?? 0) + (item.pagu_pagu_4 ?? 0) + (item.pagu_pagu_5 ?? 0);
+    //         const totalCapaianPagu = (item.pagu_realisasi_1 ?? 0) + (item.pagu_realisasi_2 ?? 0) + (item.pagu_realisasi_3 ?? 0) + (item.pagu_realisasi_4 ?? 0) + (item.pagu_realisasi_5 ?? 0);
+    //         row.getCell('AM').value = totalCapaianPagu;
+    //         row.getCell('AO').value = totalTargetPagu > 0 ? (totalCapaianPagu / totalTargetPagu) * 100 : 0;
+
+    //         const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+    //         ['G', 'I', 'K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA'].forEach((col) => {
+    //             row.getCell(col).numFmt = fmtRupiah;
+    //         });
+
+    //         row.getCell('AC').numFmt = '0.00%';
+    //         row.getCell('AE').numFmt = '0.00%';
+    //         row.getCell('AG').numFmt = '0.00%';
+    //         row.getCell('AI').numFmt = '0.00%';
+    //         row.getCell('AK').numFmt = '0.00%';
+
+    //         row.getCell('AN').numFmt = '0.00%';
+    //         row.getCell('AO').numFmt = '0.00%';
+    //     }
+    // });
 
     const lastRow = rowIndex;
     const startCol = 1;

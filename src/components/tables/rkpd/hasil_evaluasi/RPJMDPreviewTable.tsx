@@ -1,19 +1,15 @@
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
-import {
-  getPeriodeAkhirFromCookie,
-  getPeriodeMulaiFromCookie,
-} from '../../../../lib/usercookie';
 import type { FlatRPJMD } from '../../../../services/RPJMDService';
-import { formatUang } from '../../../../lib/helper';
+import { renderSatuan, renderUang } from '../../../../lib/helper';
+import type { FlatRenstraNew } from '../../../../services/RenstraService';
 
 interface MainTableProps {
   data: FlatRPJMD[];
-  skpd: string;
 }
 
-const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
+const RPJMDPreviewTable = ({ data }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -41,6 +37,9 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
             (%)
           </th>
           <th rowSpan={2} colSpan={2}>
+            Capaian Pada Akhir Tahun Perencanaan
+          </th>
+          <th rowSpan={2} colSpan={2}>
             Rasio Capaian Akhir (%)
           </th>
         </tr>
@@ -61,17 +60,14 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
           <th rowSpan={2}>(3)</th>
           <th rowSpan={2}>(4)</th>
           <th rowSpan={2}>(5)</th>
-          {[...Array(16)].map((_, i) => (
+          {[...Array(18)].map((_, i) => (
             <th key={i} rowSpan={1} colSpan={2}>
               ({i + 6})
             </th>
           ))}
-
-          <th rowSpan={2}>(22)</th>
-          <th rowSpan={2}>(23)</th>
         </tr>
         <tr>
-          {[...Array(16)].map((_, i) => (
+          {[...Array(18)].map((_, i) => (
             <React.Fragment key={i}>
               <th>K</th>
               <th>Rp.</th>
@@ -118,732 +114,126 @@ const RPJMDPreviewTable = ({ data, skpd }: MainTableProps) => {
     );
   };
 
-  // const columns: ColumnDef<any>[] = Array.from({ length: 39 }, (_, i) => ({
-  //   id: (i + 1).toString(),
-  // }));
-
-  const columns: ColumnDef<FlatRPJMD>[] = [
+  const columns: ColumnDef<FlatRenstraNew>[] = [
+    // 1
     {
       header: 'No',
+      meta: { tdClassNames: 'text-center' },
       cell: ({ row }) => row.index + 1,
     },
+    // 2
     {
       header: 'Sasaran',
-      accessorFn: () => '', // tetap kosong
     },
+    // 3
     {
-      header: 'Program Prioritas',
-      accessorFn: (row) => row.name ?? '',
-    },
-    {
-      header: 'Indikator Kinerja',
-      accessorFn: (row) => row.indikator_o_name || '',
-    },
-    {
-      header: 'Data Capaian pada Awal Tahun Perencanaan',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_capaian_1 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header: 'Target pada Akhir Tahun Perencanaan (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header: 'Target pada Akhir Tahun Perencanaan (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) =>
-        row.target_io_target_5 ? formatUang(row.target_io_target_5) : 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    //#region Target
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-1 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_target_1 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-1 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => (row.pagu_pagu_1 ? formatUang(row.pagu_pagu_1) : 0),
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-2 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_target_2 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-2 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => (row.pagu_pagu_2 ? formatUang(row.pagu_pagu_2) : 0),
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-3 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_target_3 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-3 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => (row.pagu_pagu_3 ? formatUang(row.pagu_pagu_3) : 0),
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-4 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_target_4 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-4 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => (row.pagu_pagu_4 ? formatUang(row.pagu_pagu_4) : 0),
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-5 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_target_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Target RPJMD Kabupaten/kota Pada RKPD Kabupaten/kota Tahun Ke-5 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => (row.pagu_pagu_5 ? formatUang(row.pagu_pagu_5) : 0),
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    //#endregion
-    //#region Capaian
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-1 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_capaian_1 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-1 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) =>
-        row.pagu_realisasi_1 ? formatUang(row.pagu_realisasi_1) : 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-2 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_capaian_2 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-2 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) =>
-        row.pagu_realisasi_2 ? formatUang(row.pagu_realisasi_2) : 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-3 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_capaian_3 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-3 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) =>
-        row.pagu_realisasi_3 ? formatUang(row.pagu_realisasi_3) : 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-4 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_capaian_4 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-4 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) =>
-        row.pagu_realisasi_4 ? formatUang(row.pagu_realisasi_4) : 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-5 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_capaian_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Capaian Target RPJMD Kabupaten/kota Melalui Pelaksanaan RKPD Tahun Ke-5 (Rp)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) =>
-        row.pagu_realisasi_5 ? formatUang(row.pagu_realisasi_5) : 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    //#endregion
-    //#region Tingkat
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-1 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_persen_1 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-1 (Rp)',
-      meta: {
-        tdClassNames: 'text-center whitespace-nowrap',
-      },
-      accessorFn: (row) => (row.pagu_persen_1 ? row.pagu_persen_1 : 0) + ' %',
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-2 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_persen_2 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-2 (Rp)',
-      meta: {
-        tdClassNames: 'text-center whitespace-nowrap',
-      },
-      accessorFn: (row) => (row.pagu_persen_2 ? row.pagu_persen_2 : 0) + ' %',
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-3 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_persen_3 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-3 (Rp)',
-      meta: {
-        tdClassNames: 'text-center whitespace-nowrap',
-      },
-      accessorFn: (row) => (row.pagu_persen_3 ? row.pagu_persen_3 : 0) + ' %',
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-4 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_persen_4 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-4 (Rp)',
-      meta: {
-        tdClassNames: 'text-center whitespace-nowrap',
-      },
-      accessorFn: (row) => (row.pagu_persen_4 ? row.pagu_persen_4 : 0) + ' %',
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-5 (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => row.target_io_persen_5 ?? 0,
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    {
-      header:
-        'Tingkat Capaian Target RPJMD Kabupaten/kota Hasil Pelaksanaan RKPD Kabupaten/kotaTahun Ke-5 (Rp)',
-      meta: {
-        tdClassNames: 'text-center whitespace-nowrap',
-      },
-      accessorFn: (row) => (row.pagu_persen_5 ? row.pagu_persen_5 : 0) + ' %',
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
-    },
-    //#endregion
-    {
-      header: 'Rasio Capaian Akhir  (K)',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      accessorFn: (row) => {
-        const totalTarget =
-          (row.target_io_target_1 ?? 0) +
-          (row.target_io_target_2 ?? 0) +
-          (row.target_io_target_3 ?? 0) +
-          (row.target_io_target_4 ?? 0) +
-          (row.target_io_target_5 ?? 0);
+      header: 'name',
+      cell: ({ row }) => (
+        <>
+          <p>{row.original.name}</p>
 
-        const totalCapaian =
-          (row.target_io_capaian_1 ?? 0) +
-          (row.target_io_capaian_2 ?? 0) +
-          (row.target_io_capaian_3 ?? 0) +
-          (row.target_io_capaian_4 ?? 0) +
-          (row.target_io_capaian_5 ?? 0);
-
-        return (totalTarget > 0 ? (totalCapaian / totalTarget) * 100 : 0)+ ' %';
-      },
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
+          {row.original.ind_name ? (
+            <p>
+              <br />({row.original.ind_name})
+            </p>
+          ) : (
+            ''
+          )}
+        </>
+      ),
+    },
+    // 4
+    {
+      accessorKey: 'ind_name',
+    },
+    // 5
+    {
+      header: 'Data Capaian Pada Awal Tahun Perencanaan',
+      accessorKey: 'target_capaian_1',
+    },
+    // 6
+    {
+      header: 'Target Capaian pada Akhir Tahun Perencanaan K',
+      accessorKey: 'target_target_5',
     },
     {
-      header: 'Rasio Capaian Akhir (Rp)',
+      header: 'Target Capaian pada Akhir Tahun Perencanaan Rp',
+      accessorKey: 'pagu_pagu_5',
+      cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+    },
+    // (7 - 11)
+    ...Array.from({ length: 5 }, (_, i) => i + 1).flatMap((i) => [
+      {
+        id: `target_target_${i}_k`,
+        accessorKey: `target_target_${i}`,
+      },
+      {
+        id: `pagu_pagu_${i}_rp`,
+        accessorKey: `pagu_pagu_${i}`,
+        cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+      },
+    ]),
+    // (12 - 16)
+    ...Array.from({ length: 5 }, (_, i) => i + 1).flatMap((i) => [
+      {
+        id: `target_capaian_${i}_k`,
+        accessorKey: `target_capaian_${i}`,
+      },
+      {
+        id: `pagu_realisasi_${i}_rp`,
+        accessorKey: `pagu_realisasi_${i}`,
+        cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+      },
+    ]),
+    // (17 - 21)
+    ...Array.from({ length: 5 }, (_, i) => i + 1).flatMap((i) => [
+      {
+        id: `target_persen_${i}_k`,
+        accessorKey: `target_persen_${i}`,
+        meta: {
+          tdClassNames: 'whitespace-nowrap text-center',
+        },
+        cell: ({ getValue }: any) =>
+          renderSatuan(getValue() as number | null, '%'),
+      },
+      {
+        id: `pagu_persen_${i}_rp`,
+        accessorKey: `pagu_persen_${i}`,
+        meta: {
+          tdClassNames: 'whitespace-nowrap text-center',
+        },
+        cell: ({ getValue }: any) =>
+          renderSatuan(getValue() as number | null, '%'),
+      },
+    ]),
+    // 22
+    {
+      header: 'Capaian Pada Akhir Tahun Perencanaan',
+      accessorKey: 'target_capaian_5',
+    },
+    {
+      header: 'Capaian Pada Akhir Tahun Perencanaan',
+      accessorKey: 'pagu_realisasi_5',
+      cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+    },
+    // 23
+    {
+      header: 'Rasio Capaian Akhir (%)',
+      accessorKey: 'target_persen_5',
       meta: {
-        tdClassNames: 'text-center',
+        tdClassNames: 'whitespace-nowrap text-center',
       },
-      accessorFn: (row) => {
-        const totalTargetPagu =
-          (row.pagu_pagu_1 ?? 0) +
-          (row.pagu_pagu_2 ?? 0) +
-          (row.pagu_pagu_3 ?? 0) +
-          (row.pagu_pagu_4 ?? 0) +
-          (row.pagu_pagu_5 ?? 0);
-
-        const totalCapaianPagu =
-          (row.pagu_realisasi_1 ?? 0) +
-          (row.pagu_realisasi_2 ?? 0) +
-          (row.pagu_realisasi_3 ?? 0) +
-          (row.pagu_realisasi_4 ?? 0) +
-          (row.pagu_realisasi_5 ?? 0);
-
-        return (totalTargetPagu > 0
-          ? (totalCapaianPagu / totalTargetPagu) * 100
-          : 0)+ ' %';
+      cell: ({ getValue }: any) =>
+        renderSatuan(getValue() as number | null, '%'),
+    },
+    {
+      header: 'Rasio Capaian Akhir (%)',
+      accessorKey: 'pagu_persen_5',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
       },
-      cell: ({ row, getValue }) => {
-        if (
-          row.original.type === 'urusan' ||
-          row.original.type === 'bidang' ||
-          row.original.type === 'program'
-        ) {
-          return null;
-        } else {
-          return getValue();
-        }
-      },
+      cell: ({ getValue }: any) =>
+        renderSatuan(getValue() as number | null, '%'),
     },
   ];
 
