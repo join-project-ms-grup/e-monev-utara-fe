@@ -5,20 +5,14 @@ import { exportRKPD } from '../../../../services/Excel/ExcelRKPD';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import {
-  flatRKPD,
-  flatRKPDNew,
   flatRKPDTriwulan,
-  getRKPD,
   getRKPDTriwulan,
-  type FlatRKPD,
-  type FlatRKPDNew,
   type FlatRKPDTriwulan,
 } from '../../../../services/RKPDService';
 
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
-  getPeriodeMulaiFromCookie,
   getUserSKPDID,
   isAdmin,
   isDev,
@@ -28,11 +22,11 @@ import InputSearchBox, {
 } from '../../../inputs/InputSearchBox';
 import Tabel from '../../Tabel';
 import Spinner from '../../../inputs/Spinner';
-import { type ColumnDef, type Table } from '@tanstack/react-table';
+import { type ColumnDef } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
 import RKPDPreviewTable from './RKPDPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import { formatUang, renderSatuan, renderUang } from '../../../../lib/helper';
+import { renderSatuan, renderUang } from '../../../../lib/helper';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 
 const RKPDTable = () => {
@@ -51,15 +45,6 @@ const RKPDTable = () => {
   //#endregion
 
   //#region RKPD Data Flatten
-  // const { data, isFetching, refetch } = useQuery({
-  //   queryKey: ['tabel_rkpd_tahunan', selectedSKPD],
-  //   queryFn: async () => {
-  //     const raw = await getRKPD(Number(selectedSKPD));
-  //     const flat = flatRKPDNew(raw);
-  //     return flat;
-  //   },
-  //   enabled: !!selectedSKPD,
-  // });
   const { data, isFetching, refetch } = useQuery({
     queryKey: ['tabel_rkpd_tahunan', selectedSKPD, 5],
     queryFn: async () => {
@@ -114,8 +99,6 @@ const RKPDTable = () => {
   };
   //#endregion
 
-  const mulaiPeriode = getPeriodeMulaiFromCookie();
-  const akhirPeriode = getPeriodeAkhirFromCookie();
   const columns: ColumnDef<FlatRKPDTriwulan>[] = [
     {
       header: 'No',

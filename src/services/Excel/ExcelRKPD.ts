@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
-import type { FlatRKPD, FlatRKPDNew, FlatRKPDTriwulan } from '../RKPDService';
+import type { FlatRKPDTriwulan } from '../RKPDService';
 
 /**
  * Export RKPD.

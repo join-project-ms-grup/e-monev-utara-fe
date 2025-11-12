@@ -1,8 +1,8 @@
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
-import { formatUang, renderSatuan, renderUang } from '../../../../lib/helper';
-import type { FlatRKPDNew, FlatRKPDTriwulan } from '../../../../services/RKPDService';
+import { renderSatuan, renderUang } from '../../../../lib/helper';
+import type { FlatRKPDTriwulan } from '../../../../services/RKPDService';
 import { getPeriodeAkhirFromCookie } from '../../../../lib/usercookie';
 
 interface MainTableProps {

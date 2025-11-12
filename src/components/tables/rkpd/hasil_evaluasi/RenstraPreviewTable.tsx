@@ -1,22 +1,16 @@
-import React, { useRef, type ReactNode } from 'react';
+import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
-import { formatUang } from '../../../../lib/helper';
-import type { FlatRenstraRow } from '../../../../services/RenstraService';
-import { MdClose, MdPrint } from 'react-icons/md';
-import InputButton from '../../../inputs/InputButton';
-import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../../../lib/usercookie';
+import type { FlatRenstraNew } from '../../../../services/RenstraService';
+import { renderSatuan, renderUang } from '../../../../lib/helper';
+import { id } from 'zod/v4/locales';
 
 interface MainTableProps {
-  data: FlatRenstraRow[];
+  data: FlatRenstraNew[];
   skpd: string;
 }
 
-const RenstraPreviewTable = ({
-  data,
-  skpd,
-}: MainTableProps) => {
-  console.log('data renstra', data);
+const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -102,358 +96,106 @@ const RenstraPreviewTable = ({
         </tr>
         <tr>
           <td colSpan={38}>
-            Usulan tindak lanjut pada Renja Perangkat Daerah kabupaten/kota berikutnya:
+            Usulan tindak lanjut pada Renja Perangkat Daerah kabupaten/kota
+            berikutnya:
           </td>
         </tr>
         <tr>
           <td colSpan={38}>
-            Usulan tindak lanjut pada Renstra Perangkat Daerah kabupaten/kota berikutnya:
+            Usulan tindak lanjut pada Renstra Perangkat Daerah kabupaten/kota
+            berikutnya:
           </td>
         </tr>
       </>
     );
   };
 
-  const rowHeights = useRef<{ [key: string]: number[] }>({});
-  const columns: ColumnDef<FlatRenstraRow>[] = [
-    // (1)
+  const columns: ColumnDef<FlatRenstraNew>[] = [
+    // 1
     {
       header: 'No',
       meta: { tdClassNames: 'text-center' },
       cell: ({ row }) => row.index + 1,
     },
-    // (2)
+    // 2
     {
       header: 'Sasaran',
     },
-    // (3)
+    // 3
     {
-      accessorKey: 'name',
+      header: 'name',
+      cell: ({ row }) => (
+        <>
+          <p>{row.original.name}</p>
+          <br />
+          {row.original.ind_name ? <p>({row.original.ind_name})</p> : ''}
+        </>
+      ),
     },
-    // (4)
+    // 4
     {
-      header: 'Indikator Kinerja Program (Outcome)/ Kegiatan (output)',
-      accessorFn: (row) => row.indikator || [],
-      meta: {
-        tdClassNames: 'p-0! text-center',
-      },
-      cell: ({ row, getValue }) => {
-        const indikator = getValue() as FlatRenstraRow['indikator'];
-        if (!indikator || indikator.length === 0) return '';
-        return (
-          <div>
-            <table className='w-full'>
-              <tbody>
-                {indikator.map((i, index) => (
-                  <tr key={i.id}>
-                    <td
-                      className={`block overflow-y-auto`}
-                      ref={(el) => {
-                        if (el) {
-                          const h = el.offsetHeight;
-                          if (!rowHeights.current[row.id])
-                            rowHeights.current[row.id] = [];
-                          rowHeights.current[row.id][index] = h;
-                        }
-                      }}
-                    >
-                      {i.name}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      },
+      accessorKey: 'ind_name',
     },
-    // (5)
+    // 5
     {
-      header:
-        'Data Capaian Pada Awal Tahun PerencanaanData Capaian Pada Awal Tahun Perencanaan',
+      header: 'Data Capaian Pada Awal Tahun Perencanaan',
+      accessorKey: 'target_capaian_1',
     },
-    // (6)
+    // 6
     {
-      header: 'Target Capaian pada Akhir Tahun Perencanaan',
-      columns: [
-        {
-          id: 'fisik_akhir',
-          header: 'Fisik',
-          meta: {
-            tdClassNames: 'p-0! text-center',
-          },
-          accessorFn: (row) => row.indikator || [],
-          cell: ({ row, getValue }) => {
-            const indikator = getValue() as FlatRenstraRow['indikator'];
-            if (!indikator || indikator.length === 0) return '';
-            return (
-              <div>
-                <table className='w-full'>
-                  <tbody className='border-0!'>
-                    {indikator.map((i, index) => (
-                      <tr key={i.id}>
-                        <td
-                          style={{
-                            height:
-                              rowHeights.current[row.id]?.[index] || 'auto',
-                          }}
-                        >
-                          <div className='inline-flex gap-1'>
-                            <span>{i.totalTarget}</span>
-                            <span>{i.satuan}</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            );
-          },
-        },
-        {
-          id: 'rp_akhir',
-          header: 'Rp.',
-          meta: {
-            tdClassNames: 'text-center',
-          },
-          accessorFn: (row) => row.pagu?.totalPagu ?? '',
-          cell: ({ getValue }) =>
-            getValue() ? formatUang(Number(getValue())) : '',
-        },
-      ],
+      header: 'Target Capaian pada Akhir Tahun Perencanaan K',
+      accessorKey: 'target_target_5',
+    },
+    {
+      header: 'Target Capaian pada Akhir Tahun Perencanaan Rp',
+      accessorKey: 'pagu_pagu_5',
+      cell: ({ getValue }: any) => renderUang(getValue() as number | null),
     },
     // (7 - 11)
-    {
-      header: 'Target Renstra Perangkat Daerah kabupaten/kota Tahun ke-',
-      columns: [1, 2, 3, 4, 5].map((tahun, index) => {
-        const tw = index + 1;
-        return {
-          id: `target_tahunke_${tahun}`,
-          columns: [
-            {
-              id: `target_tahunke_${tahun}_k`,
-              meta: { tdClassNames: 'p-0!' },
-              accessorFn: (row) => row.indikator || [],
-              cell: ({ row, getValue }) => {
-                const indikator = getValue() as FlatRenstraRow['indikator'];
-                if (!indikator || indikator.length === 0) return '';
-                return (
-                  <div>
-                    <table className='w-full'>
-                      <tbody className='border-0!'>
-                        {indikator.map((i, idx) => {
-                          const capaian =
-                            i.target_per_tahun?.find((t) => t.tahun_ke === tw)
-                              ?.target ?? '';
-                          return (
-                            <tr key={i.id}>
-                              <td
-                                style={{
-                                  height:
-                                    rowHeights.current[row.id]?.[idx] || 'auto',
-                                }}
-                              >
-                                <div className='inline-flex gap-1'>
-                                  <span>{capaian}</span>
-                                  <span>{i.satuan}</span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              },
-            },
-            {
-              id: `target_tahunke_${tahun}_rp`,
-              meta: { tdClassNames: 'p-0! text-center' },
-              accessorFn: (row) => row.pagu?.pagu_per_tahun || [],
-              cell: ({ getValue }) => {
-                const paguData = getValue() as {
-                  tahun_ke: number;
-                  pagu: string;
-                }[];
-                const pagu =
-                  paguData.find((t) => t.tahun_ke === tw)?.pagu ?? '';
-                return (
-                  <div>
-                    <table className='w-full'>
-                      <tbody className='border-0!'>
-                        <tr>
-                          <td>{pagu ? formatUang(Number(pagu)) : ''}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              },
-            },
-          ],
-        };
-      }),
-    },
+    ...Array.from({ length: 5 }, (_, i) => i + 1).flatMap((i) => [
+      {
+        id: `target_target_${i}_k`,
+        accessorKey: `target_target_${i}`,
+      },
+      {
+        id: `pagu_pagu_${i}_rp`,
+        accessorKey: `pagu_pagu_${i}`,
+        cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+      },
+    ]),
     // (12 - 16)
-    {
-      header: 'Realisasi Capaian Tahun ke-',
-      columns: [1, 2, 3, 4, 5].map((tahun, index) => {
-        const tw = index + 1;
-        return {
-          id: `realisasi_tahunke_${tahun}`,
-          columns: [
-            {
-              id: `realisasi_tahunke_${tahun}_k`,
-              meta: { tdClassNames: 'p-0!' },
-              accessorFn: (row) => row.indikator || [],
-              cell: ({ row, getValue }) => {
-                const indikator = getValue() as FlatRenstraRow['indikator'];
-                if (!indikator || indikator.length === 0) return '';
-                return (
-                  <div>
-                    <table className='w-full'>
-                      <tbody className='border-0!'>
-                        {indikator.map((i, idx) => {
-                          const capaian =
-                            i.capaian_per_tahun?.find((t) => t.tahun_ke === tw)
-                              ?.capaian ?? '';
-                          return (
-                            <tr key={i.id}>
-                              <td
-                                style={{
-                                  height:
-                                    rowHeights.current[row.id]?.[idx] || 'auto',
-                                }}
-                              >
-                                <div className='inline-flex gap-1'>
-                                  <span>{capaian}</span>
-                                  <span>{i.satuan}</span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              },
-            },
-            {
-              id: `realisasi_tahunke_${tahun}_rp`,
-              meta: { tdClassNames: 'p-0! text-center' },
-              accessorFn: (row) => row.pagu?.realisasi_per_tahun || [],
-              cell: ({ getValue, row }) => {
-                const paguData = getValue() as {
-                  tahun_ke: number;
-                  realisasi: string;
-                }[];
-                const realisasi =
-                  paguData.find((t) => t.tahun_ke === tw)?.realisasi ?? '';
-                return (
-                  <div>
-                    <table className='w-full'>
-                      <tbody className='border-0!'>
-                        <tr>
-                          <td>
-                            {realisasi
-                              ? formatUang(Number(realisasi))
-                              : row.original.level !== 'urusan' &&
-                                row.original.level !== 'bidang' &&
-                                'Rp.0'}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              },
-            },
-          ],
-        };
-      }),
-    },
+    ...Array.from({ length: 5 }, (_, i) => i + 1).flatMap((i) => [
+      {
+        id: `target_capaian_${i}_k`,
+        accessorKey: `target_capaian_${i}`,
+      },
+      {
+        id: `pagu_realisasi_${i}_rp`,
+        accessorKey: `pagu_realisasi_${i}`,
+        cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+      },
+    ]),
     // (17 - 21)
-    {
-      header: 'Rasio Capaian pada Tahun ke-',
-      columns: [1, 2, 3, 4, 5].map((tahun, index) => {
-        const tw = index + 1;
-        return {
-          id: `rasio_tahunke_${tahun}`,
-          columns: [
-            {
-              id: `rasio_tahunke_${tahun}_k`,
-              meta: { tdClassNames: 'p-0!' },
-              accessorFn: (row) => row.indikator || [],
-              cell: ({ row, getValue }) => {
-                const indikator = getValue() as FlatRenstraRow['indikator'];
-                if (!indikator || indikator.length === 0) return '';
-                return (
-                  <div>
-                    <table className='w-full'>
-                      <tbody className='border-0!'>
-                        {indikator.map((i, idx) => {
-                          const rasio =
-                            i.rasio_per_tahun?.find((t) => t.tahun_ke === tw)
-                              ?.rasio ?? '';
-                          return (
-                            <tr key={i.id}>
-                              <td
-                                style={{
-                                  height:
-                                    rowHeights.current[row.id]?.[idx] || 'auto',
-                                }}
-                              >
-                                <div className='inline-flex gap-1'>
-                                  <span>{rasio}</span>
-                                  <span>{i.satuan}</span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              },
-            },
-            {
-              id: `rasio_tahunke_${tahun}_rp`,
-              meta: { tdClassNames: 'p-0! text-center' },
-              accessorFn: (row) => row.pagu?.rasio_per_tahun || [],
-              cell: ({ getValue, row }) => {
-                const paguData = getValue() as {
-                  tahun_ke: number;
-                  rasio: string;
-                }[];
-                const rasio =
-                  paguData.find((t) => t.tahun_ke === tw)?.rasio ?? '';
-                return (
-                  <div>
-                    <table className='w-full'>
-                      <tbody className='border-0!'>
-                        <tr>
-                          <td>
-                            {rasio
-                              ? formatUang(Number(rasio))
-                              : row.original.level !== 'urusan' &&
-                                row.original.level !== 'bidang' &&
-                                'Rp.0'}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              },
-            },
-          ],
-        };
-      }),
-    },
+    ...Array.from({ length: 5 }, (_, i) => i + 1).flatMap((i) => [
+      {
+        id: `target_persen_${i}_k`,
+        accessorKey: `target_persen_${i}`,
+        meta: {
+          tdClassNames: 'whitespace-nowrap text-center',
+        },
+        cell: ({ getValue }: any) =>
+          renderSatuan(getValue() as number | null, '%'),
+      },
+      {
+        id: `pagu_persen_${i}_rp`,
+        accessorKey: `pagu_persen_${i}`,
+        meta: {
+          tdClassNames: 'whitespace-nowrap text-center',
+        },
+        cell: ({ getValue }: any) =>
+          renderSatuan(getValue() as number | null, '%'),
+      },
+    ]),
     // (22)
     {
       header: 'Perangkat Daerah Penanggung Jawab',
@@ -466,12 +208,18 @@ const RenstraPreviewTable = ({
       <div className='border p-2 w-fit'>
         <div className='min-w-[1500px]'>
           <div className='flex flex-col items-center justify-center text-xl'>
-            <p>Evaluasi Terhadap Hasil Renstra Perangkat Daerah Lingkup Kabupaten/kota</p>
+            <p>
+              Evaluasi Terhadap Hasil Renstra Perangkat Daerah Lingkup
+              Kabupaten/kota
+            </p>
             <p>Renstra Perangkat Daerah {skpd} Kabupaten Bengkulu Utara</p>
           </div>
           <br />
           <div className='text-xl'>
-            <p>Indikator dan target Kinerja Perangkat Daerah Kabupaten/Kota yang mengacu pada Sasaran RPJMD Kabupaten/Kota:</p>
+            <p>
+              Indikator dan target Kinerja Perangkat Daerah Kabupaten/Kota yang
+              mengacu pada Sasaran RPJMD Kabupaten/Kota:
+            </p>
             <p>…………………………………………………………………………………………………………………………………………………</p>
           </div>
           <Tabel
@@ -494,9 +242,7 @@ const RenstraPreviewTable = ({
                 <span>
                   KEPALA Perangkat Daerah....................................
                 </span>
-                <span>
-                  KABUPATEN/KOTA....................................{' '}
-                </span>
+                <span>KABUPATEN/KOTA.................................... </span>
                 <br />
                 <br />
                 <br />

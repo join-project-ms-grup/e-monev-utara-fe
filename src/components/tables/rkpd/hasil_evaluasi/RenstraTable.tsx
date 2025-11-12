@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
@@ -18,15 +18,15 @@ import Spinner from '../../../inputs/Spinner';
 import type { ColumnDef } from '@tanstack/react-table';
 import { exportRenstra } from '../../../../services/Excel/ExcelRenstra';
 import {
-  flattenRenstra,
-  getRenstra,
-  type FlatRenstraRow,
+  flatRenstraNew,
+  getRenstraNew,
+  type FlatRenstraNew,
 } from '../../../../services/RenstraService';
 import { createPortal } from 'react-dom';
 import RenstraPreviewTable from './RenstraPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import { formatRibu, formatUang } from '../../../../lib/helper';
 import { getSKPDPerRENSTRA } from '../../../../services/PeriodeService';
+import { renderSatuan, renderUang } from '../../../../lib/helper';
 
 const tableHead = () => {
   return (
@@ -47,22 +47,22 @@ const tableHead = () => {
           Target Akhir Tahun RPJM/Renstra
         </th>
         <th rowSpan={1} colSpan={2}>
-          Realisasi Kinerja RPJM/Renstra s.d Tahun sebelumnya
+          Realisasi Kinerja Akhir Tahun RPJM/Renstra
         </th>
         <th rowSpan={1} colSpan={2}>
-          Target Kinerja Tahun yang dievaluasi
+          Rasio Capaian Akhir Tahun RPJM/Renstra
         </th>
       </tr>
       <tr>
         {Array.from({ length: 3 }, (_, i) => (
-          <>
+          <Fragment key={i} >
             <th key={i} className='w-[200px]'>
               Fisik
             </th>
             <th key={i + 1} className='w-[200px]'>
               Rp.
             </th>
-          </>
+          </Fragment>
         ))}
       </tr>
     </>
@@ -86,293 +86,91 @@ const RenstraTable = () => {
 
   //#region RKPD Data Flatten
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['tabel_rkpd_5_tahunan', selectedSKPD],
+    queryKey: ['tabel_renstra', selectedSKPD, 5],
     queryFn: async () => {
-      const rawData = await getRenstra(Number(selectedSKPD));
-      const flatten = flattenRenstra(rawData);
-      return flatten;
+      const rawData = await getRenstraNew(Number(selectedSKPD));
+      const flatData = flatRenstraNew(rawData as any);
+      return flatData;
     },
     enabled: !!selectedSKPD,
   });
   //#endregion
 
   // #region Kolom Tabel
-  const rowHeights = useRef<{ [key: string]: number[] }>({});
-  const columns: ColumnDef<FlatRenstraRow>[] = [
+  const columns: ColumnDef<FlatRenstraNew>[] = [
     {
       header: 'No',
-      meta: { tdClassNames: 'text-center' },
       cell: ({ row }) => row.index + 1,
     },
     {
       header: 'Sasaran',
-      meta: { tdClassNames: 'text-center' },
     },
     {
       accessorKey: 'kode',
-      header: 'Kode',
-      meta: { tdClassNames: 'whitespace-nowrap' },
     },
     {
-      accessorKey: 'name',
-      cell: ({ getValue, row }) => {
-        const typeBold = ['urusan', 'bidang'];
-        const isBold = !!typeBold.find((item) => item === row.original.level);
-        return (
-          <>
-            <span className={isBold ? 'font-bold' : undefined}>
-              {getValue() as ReactNode}
-            </span>
-          </>
-        );
+      header: 'name',
+      cell: ({ row }) => (
+        <>
+          <p>{row.original.name}</p>
+          <br />
+          {row.original.ind_name ? <p>({row.original.ind_name})</p> : ''}
+        </>
+      ),
+    },
+    {
+      accessorKey: 'ind_name',
+    },
+    //
+    {
+      header: 'target K',
+      accessorKey: 'target_target_5',
+      meta: {
+        tdClassNames: 'text-center',
       },
     },
     {
-      header: 'Indikator',
-      accessorFn: (row) => row.indikator || [],
-      meta: { tdClassNames: 'p-0!' },
-      cell: ({ row, getValue }) => {
-        const indikator = getValue() as FlatRenstraRow['indikator'];
-        if (!indikator?.length) return '';
-        const isEven = row.index % 2 === 1;
-        const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
-
-        return (
-          <div>
-            <table className='w-full'>
-              <tbody className='border-0!'>
-                {indikator.map((i, index) => (
-                  <tr key={i.id} className={bgClass}>
-                    <td
-                      className='block overflow-y-auto'
-                      ref={(el) => {
-                        if (el) {
-                          const h = el.offsetHeight;
-                          if (!rowHeights.current[row.id])
-                            rowHeights.current[row.id] = [];
-                          rowHeights.current[row.id][index] = h;
-                        }
-                      }}
-                    >
-                      {i.name}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
+      header: 'target Rp',
+      accessorKey: 'pagu_pagu_5',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: ({ getValue }: any) => renderUang(getValue() as number | null),
+    },
+    //
+    {
+      header: 'realisasi K',
+      accessorKey: 'target_capaian_5',
+      meta: {
+        tdClassNames: 'text-center',
       },
     },
-
-    // ==========================
-    // Target Akhir RPJM / Renstra
-    // ==========================
     {
-      header: 'Target Akhir Tahun RPJM/Renstra',
-      columns: [
-        {
-          id: 'fisik_akhir',
-          header: 'Fisik',
-          meta: { tdClassNames: 'p-0! text-center' },
-          accessorFn: (row) => row.indikator || [],
-          cell: ({ row, getValue }) => {
-            const indikator = getValue() as FlatRenstraRow['indikator'];
-            if (!indikator?.length) return '';
-            const isEven = row.index % 2 === 1;
-            const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
-
-            return (
-              <div>
-                <table className='w-full'>
-                  <tbody className='border-0!'>
-                    {indikator.map((i, index) => (
-                      <tr key={i.id} className={bgClass}>
-                        <td
-                          style={{
-                            height:
-                              rowHeights.current[row.id]?.[index] || 'auto',
-                          }}
-                          className='whitespace-break-spaces'
-                        >
-                          {i.satuan === '%'
-                            ? i.totalTarget
-                                .toString()
-                                .split(/\n+/)
-                                .filter((v) => v.trim() !== '')
-                                .map((v) => `${v.trim()} ${i.satuan}`)
-                                .join('\n')
-                            : i.totalTarget
-                                .toString()
-                                .split(/\n+/)
-                                .filter((v) => v.trim() !== '')
-                                .map(
-                                  (v) => `${formatRibu(Number(v))} ${i.satuan}`,
-                                )
-                                .join('\n')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            );
-          },
-        },
-        {
-          id: 'rp_akhir',
-          header: 'Rp.',
-          meta: {
-            tdClassNames: 'text-center',
-          },
-          accessorFn: (row) => row.pagu?.totalPagu,
-          cell: ({ getValue }) => `${getValue() ? formatUang(getValue()) : ''}`,
-        },
-      ],
+      header: 'realisasi Rp',
+      accessorKey: 'pagu_realisasi_5',
+      meta: {
+        tdClassNames: 'text-center',
+      },
+      cell: ({ getValue }: any) => renderUang(getValue() as number | null),
     },
-
-    // ==========================
-    // Realisasi s.d Tahun Sebelumnya
-    // ==========================
+    //
     {
-      header: 'Realisasi Kinerja RPJM/Renstra s.d Tahun Sebelumnya',
-      columns: [
-        {
-          id: 'fisik_sebelum',
-          header: 'Fisik',
-          meta: { tdClassNames: 'p-0! text-center' },
-          accessorFn: (row) => row.indikator || [],
-          cell: ({ row, getValue }) => {
-            const indikator = getValue() as FlatRenstraRow['indikator'];
-            if (!indikator?.length) return '';
-            const isEven = row.index % 2 === 1;
-            const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
-
-            return (
-              <div>
-                <table className='w-full'>
-                  <tbody className='border-0!'>
-                    {indikator.map((i, index) => {
-                      const capaianSebelum = i.capaian_per_tahun
-                        ?.filter((t) => Number(t.tahun_ke) < 5)
-                        .reduce((sum, t) => sum + (Number(t.capaian) || 0), 0);
-
-                      if (capaianSebelum === 0) {
-                        return '-';
-                      }
-
-                      return (
-                        <tr key={i.id} className={bgClass}>
-                          <td
-                            style={{
-                              height:
-                                rowHeights.current[row.id]?.[index] || 'auto',
-                            }}
-                          >
-                            {i.satuan === '%'
-                              ? capaianSebelum + ' ' + i.satuan
-                              : formatRibu(capaianSebelum) + ' ' + i.satuan}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            );
-          },
-        },
-        {
-          id: 'rp_sebelum',
-          header: 'Rp.',
-          meta: { tdClassNames: 'text-center' },
-          accessorFn: (row) =>
-            row.pagu?.realisasi_per_tahun
-              ?.filter((r) => Number(r.tahun_ke) < 5)
-              .reduce((sum, r) => sum + (Number(r.realisasi) || 0), 0) ?? '-',
-          cell: ({ row, getValue }) => {
-            if (
-              row.original.level === 'urusan' ||
-              row.original.level === 'bidang'
-            ) {
-              return '';
-            }
-            return `${getValue() ? formatUang(getValue()) : '-'}`;
-          },
-        },
-      ],
+      header: 'rasio K',
+      accessorKey: 'target_persen_5',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }: any) =>
+        renderSatuan(getValue() as number | null, '%'),
     },
-
-    // ==========================
-    // Target Tahun yang Dievaluasi
-    // ==========================
     {
-      header: 'Target Kinerja Tahun yang Dievaluasi',
-      columns: [
-        {
-          id: 'fisik_evaluasi',
-          header: 'Fisik',
-          meta: { tdClassNames: 'p-0! text-center' },
-          accessorFn: (row) => row.indikator || [],
-          cell: ({ row, getValue }) => {
-            const indikator = getValue() as FlatRenstraRow['indikator'];
-            if (!indikator?.length) return '';
-            const isEven = row.index % 2 === 1;
-            const bgClass = isEven ? 'bg-[var(--bg-color)]!' : 'bg-white';
-
-            return (
-              <div>
-                <table className='w-full'>
-                  <tbody className='border-0!'>
-                    {indikator.map((i, index) => {
-                      const targetEvaluasi = i.target_per_tahun?.find(
-                        (t) => Number(t.tahun_ke) === 5,
-                      );
-
-                      if (targetEvaluasi?.target === 0) {
-                        return '-';
-                      }
-                      return (
-                        <tr key={i.id} className={bgClass}>
-                          <td
-                            style={{
-                              height:
-                                rowHeights.current[row.id]?.[index] || 'auto',
-                            }}
-                          >
-                            {i.satuan === '%'
-                              ? targetEvaluasi?.target + ' ' + i.satuan
-                              : formatRibu(targetEvaluasi?.target ?? 0) +
-                                ' ' +
-                                i.satuan}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            );
-          },
-        },
-        {
-          id: 'rp_evaluasi',
-          header: 'Rp.',
-          meta: { tdClassNames: 'text-center' },
-          accessorFn: (row) =>
-            row.pagu?.pagu_per_tahun?.find((p) => Number(p.tahun_ke) === 5)
-              ?.pagu ?? '',
-          cell: ({ row, getValue }) => {
-            if (
-              row.original.level === 'urusan' ||
-              row.original.level === 'bidang'
-            ) {
-              return '';
-            }
-            return `${getValue() ? formatUang(getValue()) : '-'}`;
-          },
-        },
-      ],
+      header: 'rasio Rp',
+      accessorKey: 'pagu_persen_5',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }: any) =>
+        renderSatuan(getValue() as number | null, '%'),
     },
   ];
   // #endregion
@@ -448,7 +246,7 @@ const RenstraTable = () => {
       </div>
       {isPreview &&
         createPortal(
-          <div className='fixed inset-0 z-[9999] flex flex-col bg-white overflow-auto'>
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
             <div className='border-b'>
               <div className='flex flex-row justify-between p-2'>
                 <button
@@ -485,7 +283,7 @@ const RenstraTable = () => {
                 </InputButton>
               </div>
             </div>
-            <div className='p-2'>
+            <div className='p-2 overflow-auto'>
               <RenstraPreviewTable
                 data={data || []}
                 skpd={

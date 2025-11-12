@@ -1,8 +1,8 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { waktuNowGabung } from '../../lib/helper';
+import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
 import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
-import type { FlatRenstraRow } from '../RenstraService';
+import type { FlatRenstraNew } from '../RenstraService';
 
 /**
  * Export RKPD mimic dari file sumber.
@@ -16,7 +16,7 @@ import type { FlatRenstraRow } from '../RenstraService';
  * @param opts.startRow (optional) baris mulai data (default 15)
  */
 export const exportRenstra = async (
-  data: FlatRenstraRow[],
+  data: FlatRenstraNew[],
   skpd: string,
   opts?: { startRow?: number },
 ) => {
@@ -26,7 +26,7 @@ export const exportRenstra = async (
   const worksheet = workbook.addWorksheet('Worksheet');
 
   const merges = [
-    'A2:AL2', 'A3:AL3', 'A4:AL4', 'A7:AL7', 'A8:AL8',
+    'A2:AL2', 'A3:AL3', 'A7:AL7', 'A8:AL8',
 
     'A10:A11', 'A12:A13',
     'B10:B11', 'B12:B13',
@@ -46,7 +46,6 @@ export const exportRenstra = async (
   [
     { col: 'A2', value: 'Evaluasi Terhadap Hasil Renstra Perangkat Daerah Lingkup Kabupaten/kota' },
     { col: 'A3', value: `Renstra Perangkat Daerah ${skpd} Kabupaten Bengkulu Utara` },
-    { col: 'A4', value: `Periode ${getPeriodeMulaiFromCookie()} - ${getPeriodeAkhirFromCookie()}` },
     { col: 'A7', value: 'Indikator dan target Kinerja Perangkat Daerah Kabupaten/Kota yang mengacu pada Sasaran RPJMD Kabupaten/Kota:' },
     { col: 'A8', value: '..............................................................................................................' },
 
@@ -111,12 +110,12 @@ export const exportRenstra = async (
   }
 
   const widthMap: Record<string, number> = {
-    A: 5, B: 20, C: 30, D: 30, E: 30, F: 20, G: 20,
-    H: 20, I: 20, J: 20, K: 20, L: 20, M: 20,
-    N: 20, O: 20, P: 20, Q: 20, R: 20, S: 20,
-    T: 20, U: 20, V: 20, W: 20, X: 20, Y: 20,
-    Z: 20, AA: 20, AB: 20, AC: 20, AD: 20, AE: 20,
-    AF: 20, AG: 20, AH: 20, AI: 20, AJ: 20, AK: 20, AL: 35
+    A: 5, B: 20, C: 40, D: 40, E: 30,
+    F: 30, G: 30, H: 30, I: 30, J: 30, K: 30, L: 30,
+    M: 30, N: 30, O: 30, P: 30, Q: 30, R: 30, S: 30,
+    T: 30, U: 30, V: 30, W: 30, X: 30, Y: 30, Z: 30,
+    AA: 30, AB: 30, AC: 30, AD: 30, AE: 30, AF: 30,
+    AG: 30, AH: 30, AI: 30, AJ: 30, AK: 30, AL: 35
   };
   const colLetters = Object.keys(widthMap);
   colLetters.forEach((col, idx) => {
@@ -125,133 +124,86 @@ export const exportRenstra = async (
 
   //#region Mapping Data
   let rowIndex = startRow;
-  let noIndex = 1;
 
-  const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-  const targetRenstraCols: [string, string][] = [
-    ['H', 'I'],
-    ['J', 'K'],
-    ['L', 'M'],
-    ['N', 'O'],
-    ['P', 'Q'],
-  ];
-  const realisasiCols: [string, string][] = [
-    ['R', 'S'],
-    ['T', 'U'],
-    ['V', 'W'],
-    ['X', 'Y'],
-    ['Z', 'AA'],
-  ];
-  const rasioCols: [string, string][] = [
-    ['AB', 'AC'],
-    ['AD', 'AE'],
-    ['AF', 'AG'],
-    ['AH', 'AI'],
-    ['AJ', 'AK'],
-  ];
+  data.forEach((item, idx) => {
+    const row = worksheet.getRow(rowIndex);
 
-  data.forEach((item) => {
-    const indikatorCount = item.indikator?.length ?? 0;
+    // 1
+    row.getCell('A').value = idx + 1;
+    row.getCell('A').alignment = { horizontal: 'center' }
+    // 3
+    // row.getCell('C').value = item.name + '\n' + `(${item.ind_name})`;
+    row.getCell('C').value = item.ind_name ? item.name + '\n\n' + `(${item.ind_name})` : item.name;
+    // 4
+    row.getCell('D').value = item.ind_name;
+    // 5
+    row.getCell('E').value = renderSatuan(item.target_capaian_1, '');
+    // 6
+    row.getCell('F').value = renderSatuan(item.target_capaian_5, '');
+    row.getCell('G').value = numOrEmpty(item.pagu_pagu_5);
+    // 
+    // 7 - 11
+    row.getCell('H').value = renderSatuan(item.target_target_1, '');
+    row.getCell('I').value = numOrEmpty(item.pagu_pagu_1);
 
-    if (indikatorCount > 0) {
-      const startRowItem = rowIndex;
+    row.getCell('J').value = renderSatuan(item.target_target_2, '');
+    row.getCell('K').value = numOrEmpty(item.pagu_pagu_2);
 
-      item.indikator!.forEach((ind, idx) => {
-        const row = worksheet.getRow(rowIndex++);
-        row.alignment = { vertical: 'top', wrapText: true };
+    row.getCell('L').value = renderSatuan(item.target_target_3, '');
+    row.getCell('M').value = numOrEmpty(item.pagu_pagu_3);
 
-        // format satuan
-        const satuan = ind.satuan ? ind.satuan.replace(/"/g, '').trim() : '';
-        let numFmt = 'General';
-        if (satuan) {
-          if (satuan === '%' || satuan.toLowerCase().includes('persen')) numFmt = '0.00 "%"';
-          else numFmt = `General "${satuan}"`;
-        }
+    row.getCell('N').value = renderSatuan(item.target_target_4, '');
+    row.getCell('O').value = numOrEmpty(item.pagu_pagu_4);
 
-        if (idx === 0) row.getCell('A').value = noIndex;
+    row.getCell('P').value = renderSatuan(item.target_target_5, '');
+    row.getCell('Q').value = numOrEmpty(item.pagu_pagu_5);
+    // 12 - 16
+    row.getCell('R').value = renderSatuan(item.target_capaian_1, '');
+    row.getCell('S').value = numOrEmpty(item.pagu_realisasi_1);
 
-        row.getCell('B').value = (item as any).sasaran ?? '';
-        row.getCell('C').value = item.name ?? '';
-        row.getCell('D').value = ind.name ?? '';
-        row.getCell('E').value = ''; // kosong sesuai instruksi
+    row.getCell('T').value = renderSatuan(item.target_capaian_2, '');
+    row.getCell('U').value = numOrEmpty(item.pagu_realisasi_3);
 
-        // Target akhir tahun
-        row.getCell('F').value = isFinite(Number(ind.totalTarget)) ? Number(ind.totalTarget) : '';
-        row.getCell('F').numFmt = numFmt;
-        row.getCell('G').value = isFinite(Number(item.pagu?.totalPagu))
-          ? Number(item.pagu?.totalPagu)
-          : '';
-        row.getCell('G').numFmt = fmtRupiah;
+    row.getCell('V').value = renderSatuan(item.target_capaian_3, '');
+    row.getCell('W').value = numOrEmpty(item.pagu_realisasi_4);
 
-        // Target Renstra Tahun ke-1..5
-        for (let t = 1; t <= 5; t++) {
-          const [colK, colRp] = targetRenstraCols[t - 1];
-          const targetObj = ind.target_per_tahun?.find((x) => x.tahun_ke === t);
-          const paguObj = item.pagu?.pagu_per_tahun?.find((p) => p.tahun_ke === t);
+    row.getCell('X').value = renderSatuan(item.target_capaian_4, '');
+    row.getCell('Y').value = numOrEmpty(item.pagu_realisasi_5);
 
-          row.getCell(colK).value = isFinite(Number(targetObj?.target))
-            ? Number(targetObj?.target)
-            : '';
-          row.getCell(colK).numFmt = numFmt;
-          row.getCell(colRp).value = isFinite(Number(paguObj?.pagu))
-            ? Number(paguObj?.pagu)
-            : '';
-          row.getCell(colRp).numFmt = fmtRupiah;
-        }
+    row.getCell('Z').value = renderSatuan(item.target_capaian_5, '');
+    row.getCell('AA').value = numOrEmpty(item.pagu_realisasi_5);
+    // 17 - 21
+    row.getCell('AB').value = numOrEmpty(item.target_persen_1);
+    row.getCell('AC').value = numOrEmpty(item.pagu_persen_1);
 
-        // Realisasi Tahun ke-1..5
-        for (let t = 1; t <= 5; t++) {
-          const [colK, colRp] = realisasiCols[t - 1];
-          const realObj = ind.capaian_per_tahun?.find((x) => x.tahun_ke === t);
-          const realPagu = item.pagu?.realisasi_per_tahun?.find((p) => p.tahun_ke === t);
+    row.getCell('AD').value = numOrEmpty(item.target_persen_2);
+    row.getCell('AE').value = numOrEmpty(item.pagu_persen_2);
 
-          row.getCell(colK).value = isFinite(Number(realObj?.capaian))
-            ? Number(realObj?.capaian)
-            : '';
-          row.getCell(colK).numFmt = numFmt;
-          row.getCell(colRp).value = isFinite(Number(realPagu?.realisasi))
-            ? Number(realPagu?.realisasi)
-            : '';
-          row.getCell(colRp).numFmt = fmtRupiah;
-        }
+    row.getCell('AF').value = numOrEmpty(item.target_persen_3);
+    row.getCell('AG').value = numOrEmpty(item.pagu_persen_3);
 
-        // Rasio Tahun ke-1..5
-        for (let t = 1; t <= 5; t++) {
-          const [colK, colRp] = rasioCols[t - 1];
-          const rasioObj = ind.rasio_per_tahun?.find((x) => x.tahun_ke === t);
-          const rasioPagu = item.pagu?.rasio_per_tahun?.find((p) => p.tahun_ke === t);
+    row.getCell('AH').value = numOrEmpty(item.target_persen_4);
+    row.getCell('AI').value = numOrEmpty(item.pagu_persen_4);
 
-          row.getCell(colK).value = isFinite(Number(rasioObj?.rasio))
-            ? Number(rasioObj?.rasio)
-            : '';
-          row.getCell(colK).numFmt = numFmt;
-          row.getCell(colRp).value = isFinite(Number(rasioPagu?.rasio))
-            ? Number(rasioPagu?.rasio)
-            : '';
-          row.getCell(colRp).numFmt = fmtRupiah;
-        }
+    row.getCell('AJ').value = numOrEmpty(item.target_persen_5);
+    row.getCell('AK').value = numOrEmpty(item.pagu_persen_5);
+    // 22
+    row.getCell('AL').value = skpd;
 
-        row.getCell('AL').value = (item as any).skpd ?? '';
-      });
+    const fmtPersen = '0.00%';
+    ['AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK'].forEach((col) => {
+      row.getCell(col).numFmt = fmtPersen;
+    });
 
-      if (indikatorCount > 1) {
-        const endRowItem = rowIndex - 1;
-        ['A', 'B', 'C'].forEach((col) => {
-          worksheet.mergeCells(`${col}${startRowItem}:${col}${endRowItem}`);
-          const merged = worksheet.getCell(`${col}${startRowItem}`);
-          merged.alignment = { vertical: 'top', horizontal: 'center', wrapText: true };
-        });
-      }
+    const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+    ['G', 'I', 'K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AA'].forEach((col) => {
+      row.getCell(col).numFmt = fmtRupiah;
+    });
 
-      noIndex++;
-    } else {
-      const row = worksheet.getRow(rowIndex++);
-      row.alignment = { vertical: 'top', wrapText: true };
-      row.getCell('A').value = noIndex++;
-      row.getCell('B').value = (item as any).sasaran ?? '';
-      row.getCell('C').value = item.name ?? '';
-      row.getCell('AL').value = (item as any).skpd ?? '';
-    }
+    ['C', 'D', 'AL',].forEach((col) => {
+      row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+    });
+    rowIndex++;
   });
 
   const rowsConfig = [

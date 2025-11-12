@@ -351,3 +351,226 @@ export const flattenRenstra = (data: RenstraMasterUrusan[]): FlatRenstraRow[] =>
 
     return rows;
 };
+
+
+export interface RenstraMasterNew {
+    catatan: {
+        pendorong: string
+        penghambat: string
+        tl_1: string
+        tl_2: string
+    },
+    hasil: {
+        kode: string;
+        name: string;
+        bidang: {
+            kode: string;
+            name: string;
+            program: {
+                kode: string;
+                name: string;
+                outcome: {
+                    outcome: string;
+                    indikatorOutcome: {
+                        nama: string;
+                        satuan: string | null;
+                        targetIndikatorOutcome: {
+                            tahun: number;
+                            tahun_ke: number | string;
+                            target: number | string;
+                            capaian: number | string;
+                            persen: number | string;
+                        }[]
+                    }
+                }[]
+                kegiatan: {
+                    kode: string;
+                    name: string;
+                    pagu: {
+                        tahun: number;
+                        tahun_ke: number | string;
+                        pagu: number | string;
+                        realisasi: number | string;
+                        persen: number | string;
+                    }[]
+                    subKegiatan: {
+                        kode: string;
+                        name: string;
+                        indikator: {
+                            name: string;
+                            target: {
+                                tahun: number;
+                                tahun_ke: number | string;
+                                target: number | string;
+                                capaian: number | string;
+                                persen: number | string;
+                            }[]
+                        }[]
+                        pagu: {
+                            tahun: number;
+                            tahun_ke: number | string;
+                            pagu: number | string;
+                            realisasi: number | string;
+                            persen: number | string;
+                        }[]
+                    }[]
+                }[]
+            }[]
+        }[]
+    }[]
+}
+
+export const getRenstraNew = async (skpd_periode_id: number): Promise<RenstraMasterNew['hasil']> => {
+    const response = await api.get<ApiResponse<RenstraMasterNew>>(`/renstra/hasil/renstra/${skpd_periode_id}`);
+    return response.data.data.hasil;
+};
+
+export interface FlatRenstraNew {
+    kode?: string;
+    name?: string;
+    type?: string;
+    satuan?: string;
+
+    ind_name?: string;
+
+    pagu_tahun_1?: number;
+    pagu_pagu_1?: number;
+    pagu_realisasi_1?: number;
+    pagu_persen_1?: number;
+
+    pagu_tahun_2?: number;
+    pagu_pagu_2?: number;
+    pagu_realisasi_2?: number;
+    pagu_persen_2?: number;
+
+    pagu_tahun_3?: number;
+    pagu_pagu_3?: number;
+    pagu_realisasi_3?: number;
+    pagu_persen_3?: number;
+
+    pagu_tahun_4?: number;
+    pagu_pagu_4?: number;
+    pagu_realisasi_4?: number;
+    pagu_persen_4?: number;
+
+    pagu_tahun_5?: number;
+    pagu_pagu_5?: number;
+    pagu_realisasi_5?: number;
+    pagu_persen_5?: number;
+
+    target_tahun_1?: number;
+    target_target_1?: number;
+    target_capaian_1?: number;
+    target_persen_1?: number;
+
+    target_tahun_2?: number;
+    target_target_2?: number;
+    target_capaian_2?: number;
+    target_persen_2?: number;
+
+    target_tahun_3?: number;
+    target_target_3?: number;
+    target_capaian_3?: number;
+    target_persen_3?: number;
+
+    target_tahun_4?: number;
+    target_target_4?: number;
+    target_capaian_4?: number;
+    target_persen_4?: number;
+
+    target_tahun_5?: number;
+    target_target_5?: number;
+    target_capaian_5?: number;
+    target_persen_5?: number;
+
+}
+
+export function flatRenstraNew(data: RenstraMasterNew['hasil']): FlatRenstraNew[] {
+    const result: FlatRenstraNew[] = [];
+    for (const urusan of data) {
+        result.push({
+            kode: urusan.kode,
+            name: urusan.name,
+            type: 'urusan',
+        });
+
+        for (const bidang of urusan.bidang) {
+            result.push({
+                kode: `${urusan.kode}.${bidang.kode}`,
+                name: bidang.name,
+                type: 'bidang',
+            });
+
+            for (const program of bidang.program) {
+                result.push({
+                    kode: `${urusan.kode}.${bidang.kode}.${program.kode}`,
+                    name: program.name,
+                    type: 'program',
+                });
+                for (const outcome of program.outcome) {
+                    const io = outcome.indikatorOutcome
+                    const t = io.targetIndikatorOutcome
+                    const data: any = {
+                        name: outcome.outcome,
+                        ind_name: io.nama,
+                        satuan: io.satuan ?? '-',
+                    };
+
+                    for (let i = 1; i <= 5; i++) {
+                        const tahunData = t.find(item => item.tahun_ke === i);
+                        data[`target_tahun_${i}`] = tahunData?.tahun;
+                        data[`target_target_${i}`] = tahunData?.target;
+                        data[`target_capaian_${i}`] = tahunData?.capaian;
+                        data[`target_persen_${i}`] = tahunData?.persen;
+                    }
+                    result.push(data);
+                }
+                for (const kegiatan of program.kegiatan) {
+                    const data: any = {
+                        kode: `${urusan.kode}.${bidang.kode}.${program.kode}.${kegiatan.kode}`,
+                        name: kegiatan.name,
+                        type: 'kegiatan',
+                    };
+                    const p = kegiatan.pagu
+                    for (let i = 1; i <= 5; i++) {
+                        const tahunData = p.find(item => item.tahun_ke === i);
+                        data[`pagu_tahun_${i}`] = tahunData?.tahun;
+                        data[`pagu_pagu_${i}`] = tahunData?.pagu;
+                        data[`pagu_realisasi_${i}`] = tahunData?.realisasi;
+                        data[`pagu_persen_${i}`] = tahunData?.persen;
+                    }
+                    result.push(data);
+
+                    for (const subkegiatan of kegiatan.subKegiatan) {
+                        for (const indikator of subkegiatan.indikator) {
+                            const data: any = {
+                                kode: `${urusan.kode}.${bidang.kode}.${program.kode}.${kegiatan.kode}.${subkegiatan.kode}`,
+                                name: subkegiatan.name,
+                                ind_name: indikator.name,
+                                type: 'sub_kegiatan',
+                            };
+                            const t = indikator.target
+                            for (let i = 1; i <= 5; i++) {
+                                const tahunData = t.find(item => item.tahun_ke === i);
+                                data[`target_tahun_${i}`] = tahunData?.tahun;
+                                data[`target_target_${i}`] = tahunData?.target;
+                                data[`target_capaian_${i}`] = tahunData?.capaian;
+                                data[`target_persen_${i}`] = tahunData?.persen;
+                            }
+                            const p = subkegiatan.pagu
+                            for (let i = 1; i <= 5; i++) {
+                                const tahunData = p.find(item => item.tahun_ke === i);
+                                data[`pagu_tahun_${i}`] = tahunData?.tahun;
+                                data[`pagu_pagu_${i}`] = tahunData?.pagu;
+                                data[`pagu_realisasi_${i}`] = tahunData?.realisasi;
+                                data[`pagu_persen_${i}`] = tahunData?.persen;
+                            }
+                            result.push(data);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return result;
+}
