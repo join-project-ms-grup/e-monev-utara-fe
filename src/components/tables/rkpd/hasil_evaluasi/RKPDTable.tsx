@@ -7,9 +7,12 @@ import { useQuery } from '@tanstack/react-query';
 import {
   flatRKPD,
   flatRKPDNew,
+  flatRKPDTriwulan,
   getRKPD,
+  getRKPDTriwulan,
   type FlatRKPD,
   type FlatRKPDNew,
+  type FlatRKPDTriwulan,
 } from '../../../../services/RKPDService';
 
 import {
@@ -29,7 +32,7 @@ import { type ColumnDef, type Table } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
 import RKPDPreviewTable from './RKPDPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import { formatUang, renderUang } from '../../../../lib/helper';
+import { formatUang, renderSatuan, renderUang } from '../../../../lib/helper';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 
 const RKPDTable = () => {
@@ -48,12 +51,21 @@ const RKPDTable = () => {
   //#endregion
 
   //#region RKPD Data Flatten
+  // const { data, isFetching, refetch } = useQuery({
+  //   queryKey: ['tabel_rkpd_tahunan', selectedSKPD],
+  //   queryFn: async () => {
+  //     const raw = await getRKPD(Number(selectedSKPD));
+  //     const flat = flatRKPDNew(raw);
+  //     return flat;
+  //   },
+  //   enabled: !!selectedSKPD,
+  // });
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['tabel_rkpd_tahunan', selectedSKPD],
+    queryKey: ['tabel_rkpd_tahunan', selectedSKPD, 5],
     queryFn: async () => {
-      const raw = await getRKPD(Number(selectedSKPD));
-      const flat = flatRKPDNew(raw);
-      return flat;
+      const rawData = await getRKPDTriwulan(Number(selectedSKPD), 5);
+      const flatData = flatRKPDTriwulan(rawData as any);
+      return flatData;
     },
     enabled: !!selectedSKPD,
   });
@@ -76,16 +88,17 @@ const RKPDTable = () => {
             Indikator Kinerja Program (Outcome)/ Kegiatan (output)
           </th>
           <th rowSpan={1} colSpan={2}>
-            Target RPJMD Kabupaten/kota pada Tahun {akhirPeriode}
+            Target RPJMD Kabupaten/kota pada Tahun {getPeriodeAkhirFromCookie()}
           </th>
           <th rowSpan={1} colSpan={2}>
-            Realisasi Capaian Kinerja RPJMD Kabupaten/kota sampai dengan RKPD
-            Kabupaten/kota Tahun Lalu <br />
-            (n-2)
+            Realisasi Kinerja dan Anggaran RPJMD Kabupaten/kota s/d Tahun{` `}
+            {getPeriodeAkhirFromCookie()}
           </th>
           <th rowSpan={1} colSpan={2}>
-            Target Kinerja dan Anggaran RKPD Kabupaten/kota Tahun Berjalan
-            (Tahun n-1) yang Dievaluasi
+            Tingkat Capaian Kinerja dan Realisasi Anggaran RPJMD Kabupaten/kota
+            s/d Tahun {getPeriodeAkhirFromCookie()}
+            <br />
+            {`(%)`}
           </th>
         </tr>
         <tr>
@@ -103,7 +116,7 @@ const RKPDTable = () => {
 
   const mulaiPeriode = getPeriodeMulaiFromCookie();
   const akhirPeriode = getPeriodeAkhirFromCookie();
-  const columns: ColumnDef<FlatRKPDNew>[] = [
+  const columns: ColumnDef<FlatRKPDTriwulan>[] = [
     {
       header: 'No',
       cell: ({ row }) => row.index + 1,
@@ -121,31 +134,60 @@ const RKPDTable = () => {
       accessorKey: 'ind_name',
     },
     {
-      accessorKey: 'ind_target_per_tahun_5',
-      meta: { tdClassNames: 'text-center' },
+      header: 'Target Renstra Perangkat Daerah K',
+      accessorKey: 'ind_target_akhir_periode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
     },
     {
-      accessorKey: 'pagu_per_tahun_5',
+      header: 'Target Renstra Perangkat Daerah RP',
+      accessorKey: 'paguPeriode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
       cell: ({ getValue }) => renderUang(getValue<number | null>()),
-      meta: { tdClassNames: 'text-center' },
+    },
+    // 13
+    {
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 K',
+      accessorKey: 'total_capaian_periode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
     },
     {
-      accessorKey: 'ind_capaian_per_tahun_2',
-      meta: { tdClassNames: 'text-center' },
-    },
-    {
-      accessorKey: 'realisasi_per_tahun_2',
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 RP',
+      accessorKey: 'totalRealisasiPeriode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
       cell: ({ getValue }) => renderUang(getValue<number | null>()),
-      meta: { tdClassNames: 'text-center' },
+    },
+    // 14
+    {
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) K',
+      accessorKey: 'persen_capaian',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderSatuan(getValue<number | null>(), '%'),
     },
     {
-      accessorKey: 'ind_target_per_tahun_1',
-      meta: { tdClassNames: 'text-center' },
-    },
-    {
-      accessorKey: 'pagu_per_tahun_1',
-      cell: ({ getValue }) => renderUang(getValue<number | null>()),
-      meta: { tdClassNames: 'text-center' },
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) RP',
+      accessorKey: 'persenRealisasi',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderSatuan(getValue<number | null>(), '%'),
     },
   ];
 
@@ -238,11 +280,19 @@ const RKPDTable = () => {
                   className='h-9'
                   onClick={() => {
                     if (data) {
-                      toast.promise(exportRKPD(data as any), {
-                        loading: 'Sedang mengunduh...',
-                        success: <b>Berhasil mengunduh.</b>,
-                        error: <b>Gagal mengunduh.</b>,
-                      });
+                      toast.promise(
+                        exportRKPD(
+                          data as any,
+                          listSKPDPeriode.find(
+                            (item) => item.value === selectedSKPD,
+                          )?.label ?? '',
+                        ),
+                        {
+                          loading: 'Sedang mengunduh...',
+                          success: <b>Berhasil mengunduh.</b>,
+                          error: <b>Gagal mengunduh.</b>,
+                        },
+                      );
                     } else {
                       toast.error(
                         `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
@@ -258,7 +308,13 @@ const RKPDTable = () => {
               </div>
             </div>
             <div className='p-2 overflow-auto'>
-              <RKPDPreviewTable data={data || []} />
+              <RKPDPreviewTable
+                data={data || []}
+                skpd={
+                  listSKPDPeriode.find((item) => item.value === selectedSKPD)
+                    ?.label ?? ''
+                }
+              />
             </div>
           </div>,
           document.body,

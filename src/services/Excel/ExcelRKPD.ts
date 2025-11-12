@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { waktuNowGabung } from '../../lib/helper';
-import type { FlatRKPD } from '../RKPDService';
+import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
+import type { FlatRKPD, FlatRKPDNew, FlatRKPDTriwulan } from '../RKPDService';
 
 /**
  * Export RKPD.
@@ -11,7 +11,8 @@ import type { FlatRKPD } from '../RKPDService';
  * @param opts.startRow (optional) baris mulai data (default 13)
  */
 export const exportRKPD = async (
-  data: FlatRKPD[],
+  data: FlatRKPDTriwulan[],
+  skpd: string,
   opts?: { startRow?: number },
 ) => {
   const startRow = opts?.startRow ?? 13;
@@ -23,33 +24,30 @@ export const exportRKPD = async (
   const merges = [
     'A2:AD2',
     'A3:AD3',
-    'A4:AD4',
     'A7:AD7',
     'A8:AD8',
     'A9:A10', 'A11:A12',
     'B9:B10', 'B11:B12',
-    'C9:G10', 'C11:G12',
-    'H9:H10', 'H11:H12',
-    'I9:I10', 'I11:I12',
-    'J9:K10', 'J11:K11',
-    'L9:M10', 'L11:M11',
-    'N9:O10', 'N11:O11',
-    'P9:W9', 'P10:Q10', 'R10:S10', 'T10:U10', 'V10:W10', 'P11:Q11', 'R11:S11', 'T11:U11', 'V11:W11',
-    'X9:Y10', 'X11:Y11',
-    'Z9:AA10', 'Z11:AA11',
-    'AB9:AC10', 'AB11:AC11',
-    'AD9:AD10', 'AD11:AD12'
+    'C9:C10', 'C11:C12',
+    'D9:D10', 'D11:D12',
+    'E9:E10', 'E11:E12',
+    'F9:G10', 'F11:G11',
+    'H9:I10', 'H11:I11',
+    'J9:K10', 'J11:K:11',
+    'L9:S9', 'L10:M10', 'L11:M11', 'N10:O10', 'N11:011', 'P10:Q10', 'P11:Q11', 'R10:S10', 'R11:S11',
+    'T9:U10', 'T11:U11',
+    'V9:W10', 'W11:W11',
+    'X9:Y10', 'X11:Y11', 'Z9:Z10', 'Z11:Z12'
   ];
   merges.forEach((m) => {
     try { worksheet.mergeCells(m); } catch (e) { }
   });
 
   const widthMap: Record<string, number> = {
-    A: 5, B: 20, C: 5, D: 5, E: 5, F: 5, G: 5,
-    H: 30, I: 30, J: 20, K: 20, L: 20, M: 20,
-    N: 20, O: 20, P: 20, Q: 20, R: 20, S: 20,
-    T: 20, U: 20, V: 20, W: 20, X: 20, Y: 20,
-    Z: 20, AA: 20, AB: 20, AC: 20, AD: 30
+    A: 5, B: 20, C: 25, D: 40, E: 40, F: 30, G: 30,
+    H: 30, I: 30, J: 30, K: 30, L: 30, M: 30,
+    N: 30, O: 30, P: 30, Q: 30, R: 30, S: 30,
+    T: 30, U: 30, V: 30, W: 30, X: 30, Y: 30, Z: 30, AA: 30, AB: 30, AC: 30, AD: 30,
   };
   const colLetters = Object.keys(widthMap);
   colLetters.forEach((col, idx) => {
@@ -59,7 +57,7 @@ export const exportRKPD = async (
   const fixedCells: Array<{ addr: string; value: string; style?: Partial<ExcelJS.Style> }> = [
     { addr: 'A2', value: 'Evaluasi Terhadap Hasil RKPD' },
     { addr: 'A3', value: 'Kabupaten Bengkulu Utara' },
-    { addr: 'A4', value: `Tahun ${tahun}` },
+    { addr: 'A4', value: `` },
     { addr: 'A7', value: 'Sasaran Pembangunan Tahunan Kabupaten/kota:' },
     { addr: 'A8', value: '……………………………………………………………………………………………………………………' },
 
@@ -69,41 +67,41 @@ export const exportRKPD = async (
 
     { addr: 'C9', value: 'Kode' }, { addr: 'C11', value: '3' },
 
-    { addr: 'H9', value: 'Urusan / Bidang Urusan Pemerintahan Daerah dan Program / Kegiatan / Sub Kegiatan' }, { addr: 'H11', value: '4' },
+    { addr: 'D9', value: 'Urusan / Bidang Urusan Pemerintahan Daerah dan Program / Kegiatan / Sub Kegiatan' }, { addr: 'D11', value: '4' },
 
-    { addr: 'I9', value: 'Indikator Kinerja Program (Outcome) / Kegiatan (output)' }, { addr: 'I11', value: '5' },
+    { addr: 'E9', value: 'Indikator Kinerja Program (Outcome) / Kegiatan (output)' }, { addr: 'E11', value: '5' },
 
-    { addr: 'J9', value: `Target RPJMD Kabupaten/kota pada Tahun ${tahun}\n(Akhir Periode RPJMD)` },
-    { addr: 'J11', value: '6' }, { addr: 'J12', value: 'K' }, { addr: 'K12', value: 'Rp' },
+    { addr: 'F9', value: `Target RPJMD Kabupaten/kota pada Tahun ${tahun}\n(Akhir Periode RPJMD)` },
+    { addr: 'F11', value: '6' }, { addr: 'F12', value: 'K' }, { addr: 'G12', value: 'Rp' },
 
-    { addr: 'L9', value: 'Realisasi Capaian Kinerja RPJMD Kabupaten/kota sampai dengan RKPD Kabupaten/kota Tahun Lalu\n(n-2)' },
-    { addr: 'L11', value: '7' }, { addr: 'L12', value: 'K' }, { addr: 'M12', value: 'Rp' },
+    { addr: 'H9', value: 'Realisasi Capaian Kinerja RPJMD Kabupaten/kota sampai dengan RKPD Kabupaten/kota Tahun Lalu\n(n-2)' },
+    { addr: 'H11', value: '7' }, { addr: 'H12', value: 'K' }, { addr: 'I12', value: 'Rp' },
 
-    { addr: 'N9', value: 'Target Kinerja dan Anggaran RKPD Kabupaten/kota Tahun Berjalan (Tahun n-1) yang Dievaluasi' },
-    { addr: 'N11', value: '8' }, { addr: 'N12', value: 'K' }, { addr: 'O12', value: 'Rp' },
+    { addr: 'J9', value: 'Target Kinerja dan Anggaran RKPD Kabupaten/kota Tahun Berjalan (Tahun n-1) yang Dievaluasi' },
+    { addr: 'J11', value: '8' }, { addr: 'J12', value: 'K' }, { addr: 'K12', value: 'Rp' },
 
-    { addr: 'P9', value: 'Realisasi Kinerja Pada Triwulan' },
-    { addr: 'P10', value: 'I' }, { addr: 'P11', value: '9' }, { addr: 'P12', value: 'K' }, { addr: 'Q12', value: 'Rp' },
-    { addr: 'R10', value: 'II' }, { addr: 'R11', value: '10' }, { addr: 'R12', value: 'K' }, { addr: 'S12', value: 'Rp' },
-    { addr: 'T10', value: 'III' }, { addr: 'T11', value: '11' }, { addr: 'T12', value: 'K' }, { addr: 'U12', value: 'Rp' },
-    { addr: 'V10', value: 'IV' }, { addr: 'V11', value: '12' }, { addr: 'V12', value: 'K' }, { addr: 'W12', value: 'Rp' },
+    { addr: 'L9', value: 'Realisasi Kinerja Pada Triwulan' },
+    { addr: 'L10', value: 'I' }, { addr: 'L11', value: '9' }, { addr: 'L12', value: 'K' }, { addr: 'M12', value: 'Rp' },
+    { addr: 'N10', value: 'II' }, { addr: 'N11', value: '10' }, { addr: 'N12', value: 'K' }, { addr: 'O12', value: 'Rp' },
+    { addr: 'P10', value: 'III' }, { addr: 'P11', value: '11' }, { addr: 'P12', value: 'K' }, { addr: 'Q12', value: 'Rp' },
+    { addr: 'R10', value: 'IV' }, { addr: 'R11', value: '12' }, { addr: 'R12', value: 'K' }, { addr: 'S12', value: 'Rp' },
 
-    { addr: 'X9', value: 'Realisasi Capaian Kinerja dan Anggaran RKPD Kabupaten/kota yang Dievaluasi' },
-    { addr: 'X11', value: '13' }, { addr: 'X12', value: 'K' }, { addr: 'Y12', value: 'Rp' },
+    { addr: 'T9', value: 'Realisasi Capaian Kinerja dan Anggaran RKPD Kabupaten/kota yang Dievaluasi' },
+    { addr: 'T11', value: '13' }, { addr: 'T12', value: 'K' }, { addr: 'U12', value: 'Rp' },
 
-    { addr: 'Z9', value: `Realisasi Kinerja dan Anggaran RPJMD Kabupaten/kota s/d Tahun ${tahun})` },
-    { addr: 'Z11', value: '14 = 7 + 13' }, { addr: 'Z12', value: 'K (%)' }, { addr: 'AA12', value: 'Rp (%)' },
+    { addr: 'V9', value: `Realisasi Kinerja dan Anggaran RPJMD Kabupaten/kota s/d Tahun ${tahun})` },
+    { addr: 'V11', value: '14 = 7 + 13' }, { addr: 'V12', value: 'K' }, { addr: 'W12', value: 'Rp' },
 
-    { addr: 'AB9', value: `Tingkat Capaian Kinerja dan Realisasi Anggaran RPJMD Kabupaten/kota s/d Tahun ${tahun}\n(%)` },
-    { addr: 'AB11', value: '15 = 14 / 6 x 100%' }, { addr: 'AB12', value: 'K' }, { addr: 'AC12', value: 'Rp' },
+    { addr: 'X9', value: `Tingkat Capaian Kinerja dan Realisasi Anggaran RPJMD Kabupaten/kota s/d Tahun ${tahun}\n(%)` },
+    { addr: 'X11', value: '15 = 14 / 6 x 100%' }, { addr: 'X12', value: 'K (%)' }, { addr: 'Y12', value: 'Rp (%)' },
 
-    { addr: 'AD9', value: 'Perangkat Daerah Penanggung Jawab' }, { addr: 'AD11', value: '16' },
+    { addr: 'Z9', value: 'Perangkat Daerah Penanggung Jawab' }, { addr: 'Z11', value: '16' },
   ];
 
   fixedCells.forEach((c) => {
     const cell = worksheet.getCell(c.addr);
     cell.value = c.value;
-    if (c.addr === 'A2' || c.addr === 'A3' || c.addr === 'A4') {
+    if (c.addr === 'A2' || c.addr === 'A3') {
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
       cell.font = { bold: true, size: 14 };
     }
@@ -124,107 +122,68 @@ export const exportRKPD = async (
 
   //#region Mapping Data
   let rowIndex = startRow;
-  let nomorUrut = 1;
-  // let subKegiatanIndex = 1;
+  data.forEach((item, idx) => {
+    const row = worksheet.getRow(rowIndex);
 
-  // 1️⃣ Kelompokkan data berdasarkan rekening
-  const groupedByRekening: Record<string, typeof data> = {};
-  for (const item of data) {
-    if (!groupedByRekening[item.rekening]) groupedByRekening[item.rekening] = [];
-    groupedByRekening[item.rekening].push(item);
-  }
+    // 1
+    row.getCell('A').value = idx + 1;
+    row.getCell('A').alignment = { horizontal: 'center' }
+    // 3
+    row.getCell('C').value = item.kode;
+    // 4
+    row.getCell('D').value = item.name;
+    // 5
+    row.getCell('E').value = item.ind_name;
+    // 6
+    row.getCell('F').value = renderSatuan(item.ind_target_akhir_periode, item.ind_satuan);
+    row.getCell('G').value = numOrEmpty(item.paguPeriode);
+    // 7
+    row.getCell('H').value = renderSatuan(item.total_capaian, item.ind_satuan);
+    row.getCell('I').value = numOrEmpty(item.totalRealisasi);
+    // 8
+    row.getCell('J').value = renderSatuan(item.ind_target_tahun_dievaluasi, item.ind_satuan);
+    row.getCell('K').value = numOrEmpty(item.paguTahunEval);
+    // 9
+    row.getCell('L').value = renderSatuan(item.ind_triwulan_capaian_1, item.ind_satuan);
+    row.getCell('M').value = numOrEmpty(item.pagu_triwulan_realisasi_1);
+    // 10
+    row.getCell('N').value = renderSatuan(item.ind_triwulan_capaian_2, item.ind_satuan);
+    row.getCell('O').value = numOrEmpty(item.pagu_triwulan_realisasi_2);
+    // 11
+    row.getCell('P').value = renderSatuan(item.ind_triwulan_capaian_3, item.ind_satuan);
+    row.getCell('Q').value = numOrEmpty(item.pagu_triwulan_realisasi_3);
+    // 12
+    row.getCell('R').value = renderSatuan(item.ind_triwulan_capaian_4, item.ind_satuan);
+    row.getCell('S').value = numOrEmpty(item.pagu_triwulan_realisasi_4);
+    // 13
+    row.getCell('T').value = renderSatuan(item.ind_triwulan_capaian_3, item.ind_satuan);
+    row.getCell('U').value = numOrEmpty(item.pagu_triwulan_realisasi_3);
+    // 14
+    row.getCell('V').value = renderSatuan(item.total_capaian_periode, item.ind_satuan);
+    row.getCell('W').value = numOrEmpty(item.totalRealisasiPeriode);
+    // 15
+    row.getCell('X').value = numOrEmpty(item.persen_capaian);
+    row.getCell('X').numFmt = '0.00%';
+    row.getCell('Y').value = numOrEmpty(item.persenRealisasi);
+    row.getCell('Y').numFmt = '0.00%';
+    // 16
+    row.getCell('Z').value = skpd;
 
-  // 2️⃣ Iterasi setiap kelompok rekening
-  for (const [rekening, group] of Object.entries(groupedByRekening)) {
-    const startMergeRow = rowIndex; // baris pertama dari kelompok ini
+    const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+    ['G', 'I', 'K', 'M', 'O', 'Q', 'S', 'U', 'W'].forEach((col) => {
+      row.getCell(col).numFmt = fmtRupiah;
+    });
 
-    for (const item of group) {
-      const row = worksheet.getRow(rowIndex++);
+    ['C', 'D', 'Y',].forEach((col) => {
+      row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+    });
 
-      row.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
-
-      // if (item.level === 'sub_kegiatan') row.getCell('A').value = subKegiatanIndex++;
-      row.getCell('A').value = nomorUrut++;
-      row.getCell('A').alignment = { vertical: 'middle', horizontal: 'center' };
-      row.getCell('B').value = item.sasaran;
-      row.getCell('C').value = item.kode_urusan;
-      row.getCell('D').value = item.kode_bidang;
-      row.getCell('E').value = item.kode_program;
-      row.getCell('F').value = item.kode_kegiatan;
-      row.getCell('G').value = item.kode_subKegiatan;
-      row.getCell('H').value = item.rekening;
-      row.getCell('I').value = item.indikator_kinerja;
-
-      // Jangan render angka kalau urusan/bidang
-      if (item.level !== 'urusan' && item.level !== 'bidang') {
-        row.getCell('J').value = Number(item.target_rpjmd_kinerja);
-        row.getCell('K').value = Number(item.target_rpjmd_anggaran);
-        row.getCell('L').value = Number(item.realisasi_rpjmd_kinerja);
-        row.getCell('M').value = Number(item.realisasi_rpjmd_anggaran);
-
-        row.getCell('N').value = Number(item.target_rkpd_kinerja);
-        row.getCell('O').value = Number(item.target_rkpd_anggaran);
-
-        row.getCell('P').value = Number(item.realisasi_triwulan_I_kinerja);
-        row.getCell('Q').value = Number(item.realisasi_triwulan_I_anggaran);
-        row.getCell('R').value = Number(item.realisasi_triwulan_II_kinerja);
-        row.getCell('S').value = Number(item.realisasi_triwulan_II_anggaran);
-        row.getCell('T').value = Number(item.realisasi_triwulan_III_kinerja);
-        row.getCell('U').value = Number(item.realisasi_triwulan_III_anggaran);
-        row.getCell('V').value = Number(item.realisasi_triwulan_IV_kinerja);
-        row.getCell('W').value = Number(item.realisasi_triwulan_IV_anggaran);
-
-        row.getCell('X').value = Number(item.realisasi_rkpd_kinerja);
-        row.getCell('Y').value = Number(item.realisasi_rkpd_anggaran);
-
-        row.getCell('Z').value = Number(item.realisasi_rpjmd_sd_tahun_kinerja);
-        row.getCell('AA').value = Number(item.realisasi_rpjmd_sd_tahun_anggaran);
-
-        row.getCell('AB').value = Number(item.tingkat_capaian_rpjmd_kinerja);
-        row.getCell('AC').value = Number(item.tingkat_capaian_rpjmd_anggaran);
-      }
-
-      row.getCell('AD').value = item.perangkat_daerah;
-
-      const satuan = item.satuan ?? '';
-      const numFmtK = satuan.includes('%') ? '0.00 "%"' : 'General';
-      ['J', 'N', 'P', 'R', 'T', 'V', 'X', 'AB'].forEach((col) => {
-        row.getCell(col).numFmt = numFmtK;
-      });
-
-      const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
-      ['K', 'M', 'O', 'Q', 'S', 'U', 'W', 'Y', 'AC'].forEach((col) => {
-        row.getCell(col).numFmt = fmtRupiah;
-      });
-
-      if (item.level === 'urusan' || item.level === 'bidang') {
-        ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
-          row.getCell(col).font = { bold: true };
-        });
-      }
-      ['C', 'D', 'E', 'F', 'G', 'H'].forEach(col => {
-        row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-      });
-
-      row.getCell('Z').numFmt = '0.00%';
-      row.getCell('AA').numFmt = '0.00%';
-    }
-
-    const endMergeRow = rowIndex - 1; // baris terakhir dari kelompok ini
-
-    // 3️⃣ Merge sel untuk kolom "kode" (C–G) dan "rekening" (H)
-    worksheet.mergeCells(`C${startMergeRow}:C${endMergeRow}`);
-    worksheet.mergeCells(`D${startMergeRow}:D${endMergeRow}`);
-    worksheet.mergeCells(`E${startMergeRow}:E${endMergeRow}`);
-    worksheet.mergeCells(`F${startMergeRow}:F${endMergeRow}`);
-    worksheet.mergeCells(`G${startMergeRow}:G${endMergeRow}`);
-    worksheet.mergeCells(`H${startMergeRow}:H${endMergeRow}`);
-  }
-
+    rowIndex++;
+  });
 
   const lastRow = rowIndex;
   const startCol = 1;
-  const endCol = 30;
+  const endCol = 26;
 
   for (let r = startRow - 4; r <= lastRow; r++) {
     const row = worksheet.getRow(r);
@@ -282,25 +241,6 @@ export const exportRKPD = async (
   worksheet.getRow(rowIndex + 18).getCell('AC').alignment = { horizontal: 'center' }
   worksheet.getRow(rowIndex + 18).getCell('AC').value =
     '(....................................)';
-
-  // worksheet.mergeCells(`Z${rowIndex + 8}:AA${rowIndex + 8}`);
-  // worksheet.getRow(rowIndex + 8).getCell('Z').alignment = { horizontal: 'center' }
-  // worksheet.getRow(rowIndex + 8).getCell('Z').value =
-  //   'Disusun';
-  // worksheet.mergeCells(`Z${rowIndex + 9}:AA${rowIndex + 9}`);
-  // worksheet.getRow(rowIndex + 9).getCell('Z').value =
-  //   '......................, tanggal ...................';
-  // worksheet.mergeCells(`Z${rowIndex + 11}:AA${rowIndex + 11}`);
-  // worksheet.getRow(rowIndex + 11).getCell('Z').alignment = { horizontal: 'center' }
-  // worksheet.getRow(rowIndex + 11).getCell('Z').value =
-  //   'KEPALA BAPPEDA';
-  // worksheet.mergeCells(`Z${rowIndex + 12}:AA${rowIndex + 12}`);
-  // worksheet.getRow(rowIndex + 12).getCell('Z').value =
-  //   'PROVINSI ....................................';
-  // worksheet.mergeCells(`Z${rowIndex + 18}:AA${rowIndex + 18}`);
-  // worksheet.getRow(rowIndex + 18).getCell('Z').alignment = { horizontal: 'center' }
-  // worksheet.getRow(rowIndex + 18).getCell('Z').value =
-  //   '(....................................)';
   //#endregion
 
   // Semua font default menggunakan Bookman Old Style

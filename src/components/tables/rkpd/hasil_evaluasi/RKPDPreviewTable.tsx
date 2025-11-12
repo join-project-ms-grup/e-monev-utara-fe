@@ -1,14 +1,16 @@
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
-import { formatUang, renderUang } from '../../../../lib/helper';
-import type { FlatRKPDNew } from '../../../../services/RKPDService';
+import { formatUang, renderSatuan, renderUang } from '../../../../lib/helper';
+import type { FlatRKPDNew, FlatRKPDTriwulan } from '../../../../services/RKPDService';
+import { getPeriodeAkhirFromCookie } from '../../../../lib/usercookie';
 
 interface MainTableProps {
-  data: FlatRKPDNew[];
+  data: FlatRKPDTriwulan[];
+  skpd: string;
 }
 
-const RKPDPreviewTable = ({ data }: MainTableProps) => {
+const RKPDPreviewTable = ({ data, skpd }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -24,9 +26,7 @@ const RKPDPreviewTable = ({ data }: MainTableProps) => {
             Indikator Kinerja Program (Outcome)/ Kegiatan (output)
           </th>
           <th rowSpan={2} colSpan={2}>
-            Target RPJMD Kabupaten/kota
-            <br />
-            (Akhir Periode RPJMD)
+            Target RPJMD Kabupaten/kota pada Tahun {getPeriodeAkhirFromCookie()}
           </th>
           <th rowSpan={2} colSpan={2}>
             Realisasi Capaian Kinerja RPJMD Kabupaten/kota sampai dengan RKPD
@@ -43,11 +43,11 @@ const RKPDPreviewTable = ({ data }: MainTableProps) => {
             Dievaluasi
           </th>
           <th rowSpan={2} colSpan={2}>
-            Realisasi Kinerja dan Anggaran RPJMD Kabupaten/kota s/d Tahun{` `}
+            Realisasi Kinerja dan Anggaran RPJMD Kabupaten/kota s/d Tahun{` `}{getPeriodeAkhirFromCookie()}
           </th>
           <th rowSpan={2} colSpan={2}>
             Tingkat Capaian Kinerja dan Realisasi Anggaran RPJMD Kabupaten/kota
-            s/d Tahun
+            s/d Tahun {getPeriodeAkhirFromCookie()}
             <br />
             {`(%)`}
           </th>
@@ -127,56 +127,224 @@ const RKPDPreviewTable = ({ data }: MainTableProps) => {
     );
   };
 
-  // const mulaiPeriode = getPeriodeMulaiFromCookie();
-  // const akhirPeriode = getPeriodeAkhirFromCookie();
-  const columns: ColumnDef<FlatRKPDNew>[] = [
+  const columns: ColumnDef<FlatRKPDTriwulan>[] = [
+    // 1
     {
       header: 'No',
       cell: ({ row }) => row.index + 1,
     },
+    // 2
     {
       header: 'Sasaran',
     },
+    // 3
     {
+      header: 'Kode',
       accessorKey: 'kode',
     },
+    // 4
     {
+      header: 'Program/Kegiatan',
       accessorKey: 'name',
     },
+    // 5
     {
+      header: 'Indikator Kinerja Program/Kegiatan',
       accessorKey: 'ind_name',
     },
+    // 6
     {
-      accessorKey: 'ind_target_per_tahun_5',
-      meta: { tdClassNames: 'text-center' },
-    },
-    {
-      accessorKey: 'pagu_per_tahun_5',
-      cell: ({ getValue }) => {
-        const value = getValue();
-        return value === null || value === undefined
-          ? ''
-          : formatUang(Number(value));
+      header: 'Target Renstra Perangkat Daerah K',
+      accessorKey: 'ind_target_akhir_periode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
       },
-      meta: { tdClassNames: 'text-center' },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
     },
     {
-      accessorKey: 'ind_capaian_per_tahun_2',
-      meta: { tdClassNames: 'text-center' },
-    },
-    {
-      accessorKey: 'realisasi_per_tahun_2',
+      header: 'Target Renstra Perangkat Daerah RP',
+      accessorKey: 'paguPeriode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
       cell: ({ getValue }) => renderUang(getValue<number | null>()),
-      meta: { tdClassNames: 'text-center' },
+    },
+    // 7
+    {
+      header:
+        'Realisasi Capaian Kinerja Renstra Perangkat Daerah sampai dengan Renja Perangkat Daerah Tahun Lalu K',
+      accessorKey: 'total_capaian',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
     },
     {
-      accessorKey: 'ind_target_per_tahun_1',
-      meta: { tdClassNames: 'text-center' },
-    },
-    {
-      accessorKey: 'pagu_per_tahun_1',
+      header:
+        'Realisasi Capaian Kinerja Renstra Perangkat Daerah sampai dengan Renja Perangkat Daerah Tahun Lalu RP',
+      accessorKey: 'totalRealisasi',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
       cell: ({ getValue }) => renderUang(getValue<number | null>()),
-      meta: { tdClassNames: 'text-center' },
+    },
+    // 8
+    {
+      header:
+        'Target Kinerja dan Anggaran Renja Perangkat Daerah Tahun berjalan (Tahun n-1) yang dievaluasi K',
+      accessorKey: 'ind_target_tahun_dievaluasi',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
+    },
+    {
+      header:
+        'Target Kinerja dan Anggaran Renja Perangkat Daerah Tahun berjalan (Tahun n-1) yang dievaluasi RP',
+      accessorKey: 'paguTahunEval',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
+    },
+    // 9
+    {
+      header: 'TRI1',
+      accessorKey: 'ind_triwulan_capaian_1',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
+    },
+    {
+      header: 'TRI1 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_1',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
+    },
+    // 10
+    {
+      header: 'TRI2',
+      accessorKey: 'ind_triwulan_capaian_2',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
+    },
+    {
+      header: 'TRI2 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_2',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
+    },
+    // 11
+    {
+      header: 'TRI3',
+      accessorKey: 'ind_triwulan_capaian_3',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
+    },
+    {
+      header: 'TRI3 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_3',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
+    },
+    // 12
+    {
+      header: 'TRI4',
+      accessorKey: 'ind_triwulan_capaian_4',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
+    },
+    {
+      header: 'TRI4 PAGU',
+      accessorKey: 'pagu_triwulan_realisasi_4',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
+    },
+    // 13
+    {
+      header:
+        'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi K',
+      accessorKey: 'ind_triwulan_capaian_3',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
+    },
+    {
+      header:
+        'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi RP',
+      accessorKey: 'pagu_triwulan_realisasi_3',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
+    },
+    // 14
+    {
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 K',
+      accessorKey: 'total_capaian_periode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
+    },
+    {
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 RP',
+      accessorKey: 'totalRealisasiPeriode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
+    },
+    // 15
+    {
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) K',
+      accessorKey: 'persen_capaian',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderSatuan(getValue<number | null>(), '%'),
+    },
+    {
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) RP',
+      accessorKey: 'persenRealisasi',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderSatuan(getValue<number | null>(), '%'),
+    },
+    // 16
+    {
+      header: 'perangkat',
+      cell: `${skpd}`,
     },
   ];
 

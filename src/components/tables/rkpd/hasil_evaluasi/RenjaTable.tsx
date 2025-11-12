@@ -79,9 +79,6 @@ const RenjaTable = () => {
         <tr>
           <th rowSpan={2}>No</th>
           <th rowSpan={2}>Sasaran</th>
-          <th rowSpan={2} className='w-[50px]'>
-            Kode
-          </th>
           <th rowSpan={2} className='w-[20%]'>
             Urusan / Bidang / Program / Kegiatan / Sub Kegiatan
           </th>
@@ -223,9 +220,6 @@ const RenjaTable = () => {
     },
     {
       header: 'Sasaran',
-    },
-    {
-      accessorKey: 'kode',
     },
     {
       accessorKey: 'name',
