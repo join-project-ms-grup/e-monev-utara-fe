@@ -1,5 +1,12 @@
+export function numOrEmpty<T>(v: T | null | undefined): number | '' {
+  return v === null || v === undefined ? '' : Number(v);
+}
+
 export function renderUang<T extends number | null | undefined>(value: T): string {
   return value === null || value === undefined ? '' : formatUang(Number(value));
+}
+export function renderSatuan<T extends number | string | null | undefined>(value: T, satuan?: string): string {
+  return value === null || value === undefined ? '' : value + ' ' + satuan;
 }
 
 export function formatUang(nilai: number): string {

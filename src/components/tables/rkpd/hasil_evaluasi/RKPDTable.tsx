@@ -126,12 +126,7 @@ const RKPDTable = () => {
     },
     {
       accessorKey: 'pagu_per_tahun_5',
-      cell: ({ getValue }) => {
-        const value = getValue();
-        return value === null || value === undefined
-          ? ''
-          : formatUang(Number(value));
-      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
       meta: { tdClassNames: 'text-center' },
     },
     {

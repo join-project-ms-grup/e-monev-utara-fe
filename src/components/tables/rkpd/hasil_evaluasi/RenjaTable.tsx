@@ -25,7 +25,7 @@ import Spinner from '../../../inputs/Spinner';
 import { type ColumnDef } from '@tanstack/react-table';
 import { createPortal } from 'react-dom';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
-import { renderUang } from '../../../../lib/helper';
+import { renderSatuan, renderUang } from '../../../../lib/helper';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 import { exportRenja } from '../../../../services/Excel/ExcelRenja';
 import RenjaPreviewTable from './RenjaPreviewTable';
@@ -89,17 +89,19 @@ const RenjaTable = () => {
             Indikator Kinerja Program (Outcome)/ Kegiatan (output)
           </th>
           <th rowSpan={1} colSpan={2}>
-            Target RPJMD Kabupaten/kota pada Tahun{' '}
-            {listTahunKe.find((item) => item.value === tahunKe)?.label ??
-              '........'}
+            Target Renstra Perangkat Daerah pada Tahun{' '}
+            {getPeriodeAkhirFromCookie()}
           </th>
           <th rowSpan={1} colSpan={2}>
-            Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang
-            dievaluasi
+            Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun
+            {` `}
+            {getPeriodeAkhirFromCookie()}
           </th>
           <th rowSpan={1} colSpan={2}>
-            Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun{' '}
-            {listTahunKe.find((item) => item.value === tahunKe)?.label}
+            Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat
+            Daerah s/d tahun
+            {` `}
+            {getPeriodeAkhirFromCookie()}
             <br />
             (%)
           </th>
@@ -232,23 +234,60 @@ const RenjaTable = () => {
       accessorKey: 'ind_name',
     },
     {
+      header: 'Target Renstra Perangkat Daerah K',
       accessorKey: 'ind_target_akhir_periode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
     },
     {
+      header: 'Target Renstra Perangkat Daerah RP',
       accessorKey: 'paguPeriode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
       cell: ({ getValue }) => renderUang(getValue<number | null>()),
     },
+    // 13
     {
-      accessorKey: 'totalRealisasi',
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 K',
+      accessorKey: 'total_capaian_periode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ row, getValue }) =>
+        renderSatuan(getValue<number | null>(), row.original.ind_satuan),
     },
     {
-      accessorKey: 'persenRealisasi',
+      header:
+        'Realisasi Kinerja dan Anggaran Renstra Perangkat Daerah s/d tahun 2030 RP',
+      accessorKey: 'totalRealisasiPeriode',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderUang(getValue<number | null>()),
     },
+    // 14
     {
-      accessorKey: 'total_capaian',
-    },
-    {
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) K',
       accessorKey: 'persen_capaian',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderSatuan(getValue<number | null>(), '%'),
+    },
+    {
+      header:
+        'Tingkat Capaian Kinerja Dan Realisasi Anggaran Renstra Perangkat Daerah s/d tahun (%) RP',
+      accessorKey: 'persenRealisasi',
+      meta: {
+        tdClassNames: 'whitespace-nowrap text-center',
+      },
+      cell: ({ getValue }) => renderSatuan(getValue<number | null>(), '%'),
     },
   ];
 
