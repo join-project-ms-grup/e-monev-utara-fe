@@ -161,7 +161,6 @@ const RENSTRA_RealisasiTable = () => {
     {
       header: 'perhitungan',
       cell: ({ row }) => {
-        const [localOut, setLocalOut] = useState('');
         const [localPer, setLocalPer] = useState('');
 
         if (row.original.type === 'subkegiatan') {
@@ -175,7 +174,7 @@ const RENSTRA_RealisasiTable = () => {
                   perhitunganMutation.mutate({
                     id_indikator: Number(row.original.indikator_id),
                     perhitungan: localPer,
-                    type: localOut ?? null,
+                    type: row.original.type === 'program' ? 'outcome' : null,
                   });
                 } else {
                   toast.error('Perhitungan belum dipilih');
@@ -183,15 +182,6 @@ const RENSTRA_RealisasiTable = () => {
               }}
             >
               <div className='space-y-2'>
-                <label className='select-none'>
-                  <input
-                    type='checkbox'
-                    name='outcome'
-                    value='outcome'
-                    onChange={(e) => setLocalOut(e.target.value)}
-                  />
-                  {` `}Outcome
-                </label>
                 <InputSearchBox
                   id='perhitungan'
                   placeholder='Perhitungan'

@@ -179,7 +179,6 @@ const RKPD_RealisasiTable = () => {
     {
       header: 'perhitungan',
       cell: ({ row }) => {
-        const [localOut, setLocalOut] = useState('');
         const [localPer, setLocalPer] = useState('');
 
         if (!row.original.type) {
@@ -193,7 +192,7 @@ const RKPD_RealisasiTable = () => {
                   perhitunganMutation.mutate({
                     id_indikator: Number(row.original.id_indikator),
                     perhitungan: localPer,
-                    type: localOut ?? null,
+                    type: row.original.level === 'program' ? 'outcome' : null,
                   });
                 } else {
                   toast.error('Perhitungan belum dipilih');
@@ -201,15 +200,6 @@ const RKPD_RealisasiTable = () => {
               }}
             >
               <div className='space-y-2'>
-                <label className='select-none'>
-                  <input
-                    type='checkbox'
-                    name='outcome'
-                    value='outcome'
-                    onChange={(e) => setLocalOut(e.target.value)}
-                  />
-                  {` `}Outcome
-                </label>
                 <InputSearchBox
                   id='perhitungan'
                   placeholder='Perhitungan'
@@ -379,7 +369,7 @@ const RKPD_RealisasiTable = () => {
       setLoadingMutation(false);
     },
   });
-  
+
   const perhitunganMutation = useMutation({
     mutationFn: async (payload: PerhitunganRenstraRKPDForm) => {
       setLoadingMutation(true);
