@@ -27,6 +27,9 @@ import {
   type FlatRenstraNew,
 } from '../../../../services/RenstraService';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
+import type { CatatanForm } from '../../../../services/CatatanService';
+import FormCatatan from '../../../forms/FormCatatan';
+import DialogModal from '../../../inputs/DialogModal';
 
 const tableHead = () => {
   return (
@@ -34,9 +37,7 @@ const tableHead = () => {
       <tr>
         <th rowSpan={2}>No</th>
         <th rowSpan={2}>Sasaran</th>
-        <th rowSpan={2}>
-          Program Prioritas
-        </th>
+        <th rowSpan={2}>Program Prioritas</th>
         <th rowSpan={2}>Indikator Kinerja</th>
         <th rowSpan={2}>Data Capaian pada Awal Tahun Perencanaan</th>
         <th colSpan={2}>Target pada Akhir Tahun Perencanaan</th>
@@ -164,9 +165,11 @@ const RPJMDTable = () => {
     },
   ];
 
-  const [isPreview, setIsPreview] = useState(false);
+  const [mode, setMode] = useState<'close' | 'catatan' | 'preview'>('close');
+  const [catatan, setCatatan] = useState<CatatanForm>({});
+
   useEffect(() => {
-    if (isPreview) {
+    if (mode === 'preview') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -175,7 +178,7 @@ const RPJMDTable = () => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isPreview]);
+  }, [mode === 'preview']);
 
   return (
     <>
@@ -206,7 +209,7 @@ const RPJMDTable = () => {
               onClick={() => {
                 const data = true;
                 if (data && selectedSKPD) {
-                  setIsPreview(true);
+                  setMode('catatan')
                 } else {
                   toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                 }
@@ -235,7 +238,70 @@ const RPJMDTable = () => {
         />
       </div>
 
-      {isPreview &&
+      {mode === 'catatan' ? (
+        <DialogModal
+        widthLevel={6}
+          title='Catatan'
+          isOpen={mode === 'catatan'}
+          onClose={() => {
+            setMode('close');
+          }}
+        >
+          <FormCatatan onPreview={() => setMode('preview')} type='rpjmd' skpdPerId={Number(selectedSKPD)} setCatatan={setCatatan}/>
+        </DialogModal>
+      ) : (
+        mode === 'preview' &&
+        createPortal(
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
+            <div className='border-b'>
+              <div className='flex flex-row justify-between p-2'>
+                <button
+                  onClick={() => setMode('close')}
+                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+                  aria-label='Tutup preview'
+                >
+                  <MdClose />
+                </button>
+                <InputButton
+                  className='h-9'
+                  onClick={() => {
+                    if (data) {
+                      toast.promise(exportRPJMD(data, catatan), {
+                        loading: 'Sedang mengunduh...',
+                        success: <b>Berhasil mengunduh.</b>,
+                        error: <b>Gagal mengunduh.</b>,
+                      });
+                    } else {
+                      toast.error(
+                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
+                      );
+                    }
+                  }}
+                >
+                  <span className='inline-flex items-center gap-2 px-2'>
+                    <MdPrint />
+                    Cetak Excel
+                  </span>
+                </InputButton>
+              </div>
+            </div>
+            <div className='p-2 overflow-auto'>
+              <RPJMDPreviewTable data={data || []} catatan={catatan} />
+              {/* <RenstraPreviewTable
+                data={data || []}
+                catatan={catatan}
+                skpd={
+                  dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
+                    ?.skpd_name ?? ''
+                }
+              /> */}
+            </div>
+          </div>,
+          document.body,
+        )
+      )}
+
+      {/* {isPreview &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
             <div className='border-b'>
@@ -275,7 +341,7 @@ const RPJMDTable = () => {
             </div>
           </div>,
           document.body,
-        )}
+        )} */}
     </>
   );
 };

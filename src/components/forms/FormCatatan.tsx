@@ -54,7 +54,7 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
       tl_1: data?.tl_1,
       tl_2: data?.tl_2,
       skpd_periode_id: skpdPerId,
-      type: 'renstra',
+      type: type,
     },
     onSubmit: async ({ value }) => {
       updateMutation.mutate(value);
@@ -77,7 +77,7 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
         queryKey: ['tabel_renstra', skpdPerId, 5],
       });
       onPreview();
-      toast.success('Data berhasil diperbarui');
+      toast.success('Catatan berhasil ditambahkan');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
       if (error.status === 400) {
@@ -88,6 +88,8 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
       setLoadingMutation(false);
     },
   });
+
+  const inputTitleRenstra = ['Faktor pendorong pencapaian kinerja', 'Faktor penghambat']
 
   return (
     <div>
@@ -172,9 +174,9 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
         {children ? (
           children
         ) : (
-          <div className='inline-flex gap-2 float-end'>
-            <InputButton className='px-2 bg-green-600' isLoading={loadingMutation}>
-              Lihat Evaluasi
+          <div className='float-end'>
+            <InputButton className='px-4 bg-green-600' isLoading={loadingMutation}>
+              Lihat Evaluasi<span className='uppercase'>{type}</span>
             </InputButton>
           </div>
         )}

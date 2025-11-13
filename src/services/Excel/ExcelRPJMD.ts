@@ -3,6 +3,7 @@ import { saveAs } from 'file-saver';
 import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
 import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
 import type { FlatRenstraNew } from '../RenstraService';
+import type { CatatanForm } from '../CatatanService';
 
 /**
  * Export RKPD mimic dari file sumber.
@@ -17,6 +18,7 @@ import type { FlatRenstraNew } from '../RenstraService';
  */
 export const exportRPJMD = async (
     data: FlatRenstraNew[],
+    catatan: CatatanForm,
     opts?: { startRow?: number },
 ) => {
     const awalPeriode = getPeriodeMulaiFromCookie();
@@ -342,10 +344,10 @@ export const exportRPJMD = async (
     const rowsConfig = [
         { offset: 1, merge: 'A:AA', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
         { offset: 2, merge: 'A:AA', text: 'Predikat kinerja', align: 'right' },
-        { offset: 3, merge: 'A:AO', text: 'Faktor pendorong keberhasilan pencapaian:' },
-        { offset: 4, merge: 'A:AO', text: 'Faktor penghambat pencapaian kinerja:' },
-        { offset: 5, merge: 'A:AO', text: 'Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya:' },
-        { offset: 6, merge: 'A:AO', text: 'Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya:' }
+        { offset: 3, merge: 'A:AO', text: `Faktor pendorong keberhasilan pencapaian: ${catatan.pendorong}` },
+        { offset: 4, merge: 'A:AO', text: `Faktor penghambat pencapaian kinerja: ${catatan.penghambat}` },
+        { offset: 5, merge: 'A:AO', text: `Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya: ${catatan.tl_1}` },
+        { offset: 6, merge: 'A:AO', text: `Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya: ${catatan.tl_2}` }
     ];
 
     rowsConfig.forEach(({ offset, merge, text, align = 'left' }) => {

@@ -4,12 +4,14 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { FlatRPJMD } from '../../../../services/RPJMDService';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
 import type { FlatRenstraNew } from '../../../../services/RenstraService';
+import type { CatatanForm } from '../../../../services/CatatanService';
 
 interface MainTableProps {
   data: FlatRPJMD[];
+  catatan: CatatanForm,
 }
 
-const RPJMDPreviewTable = ({ data }: MainTableProps) => {
+const RPJMDPreviewTable = ({ data, catatan }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -95,19 +97,19 @@ const RPJMDPreviewTable = ({ data }: MainTableProps) => {
           <td colSpan={12}></td>
         </tr>
         <tr>
-          <td colSpan={39}>Faktor pendorong keberhasilan pencapaian:</td>
+          <td colSpan={39}>Faktor pendorong keberhasilan pencapaian: {catatan.pendorong}</td>
         </tr>
         <tr>
-          <td colSpan={39}>Faktor penghambat pencapaian kinerja:</td>
+          <td colSpan={39}>Faktor penghambat pencapaian kinerja: {catatan.penghambat}</td>
         </tr>
         <tr>
           <td colSpan={39}>
-            Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya:
+            Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya: {catatan.tl_1}
           </td>
         </tr>
         <tr>
           <td colSpan={39}>
-            Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya:
+            Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya: {catatan.tl_2}
           </td>
         </tr>
       </>
