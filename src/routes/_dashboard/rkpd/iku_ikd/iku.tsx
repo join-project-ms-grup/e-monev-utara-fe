@@ -1,17 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SITE_NAME } from '../../../../lib/config'
-import IndikatorIKUTable from '../../../../components/tables/rkpd/iku/IndikatorIKUTable'
+import IndikatorIKUTable from '../../../../components/tables/rkpd/iku_ikd/IndikatorIKUTable'
 
-export const Route = createFileRoute('/_dashboard/rkpd/iku/iku_list')({
+export const Route = createFileRoute('/_dashboard/rkpd/iku_ikd/iku')({
     head: () => ({
     meta: [
       {
-        title: `Indikator IKU - ${SITE_NAME}`,
+        title: `Indikator Kinerja Utama - ${SITE_NAME}`,
       },
     ],
   }),
   staticData: {
-    title: 'Indikator IKU',
+    title: 'Indikator Kinerja Utama',
   },
   component: RouteComponent,
 })

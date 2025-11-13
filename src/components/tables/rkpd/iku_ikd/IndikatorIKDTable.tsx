@@ -1,13 +1,12 @@
 import { Fragment, useState } from 'react';
 import Tabel from '../../Tabel';
-import toast from 'react-hot-toast';
-import { MdRefresh, MdTag } from 'react-icons/md';
+import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
 } from '../../../inputs/InputSearchBox';
 import { type ColumnDef, type Table } from '@tanstack/react-table';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
@@ -17,19 +16,18 @@ import {
   isDev,
 } from '../../../../lib/usercookie';
 import {
+  flatHasilIK,
   flatIK,
+  getHasilIK,
+  getIKD,
   getIKSKPD,
-  getIKU,
-  toggleTagIKU,
   type FlatIK,
 } from '../../../../services/IKUIKDService';
 import Spinner from '../../../inputs/Spinner';
-import AksiButton from '../../../inputs/AksiButton';
-import type { AxiosError } from 'axios';
-import type { ApiResponse } from '../../../../lib/api';
-import InputToggle from '../../../inputs/InputToggle';
+import toast from 'react-hot-toast';
+import { exportIKU } from '../../../../services/Excel/ExcelIKU';
 
-const TaggingIndikatorTable = () => {
+const IndikatorIKDTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
   //#region SKPD
   const userSKPDID = getUserSKPDID();
@@ -47,12 +45,12 @@ const TaggingIndikatorTable = () => {
 
   const { data, isFetching, refetch } = useQuery({
     queryKey: [
-      'list_iku',
+      'list_ikd',
       selectedSKPD ? Number(selectedSKPD) : 'all',
       idPeriode,
     ],
     queryFn: async () => {
-      const rawData = await getIKU({
+      const rawData = await getIKD({
         skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
         periodeId: idPeriode,
       });
@@ -78,6 +76,9 @@ const TaggingIndikatorTable = () => {
       header: 'No',
     },
     {
+      header: 'Urusan di RPJMD',
+    },
+    {
       header: 'IKU',
     },
     {
@@ -90,9 +91,6 @@ const TaggingIndikatorTable = () => {
       header: `Target Tahun ${i + 1}`,
       accessorKey: `targetTahun${i + 1}`,
     })),
-    {
-      header: 'Aksi',
-    },
   ];
 
   const tableHead = () => {
@@ -100,11 +98,11 @@ const TaggingIndikatorTable = () => {
       <>
         <tr>
           <th rowSpan={2}>No</th>
+          <th rowSpan={2}>Urusan di RPJMD</th>
           <th rowSpan={2}>Indikator Kinerja Utama</th>
           <th rowSpan={2}>Satuan</th>
           <th rowSpan={2}>Kondisi Awal {mulaiPeriode - 2}</th>
           <th colSpan={periode.length}>Target Tahun</th>
-          <th rowSpan={2}>Aksi</th>
         </tr>
         <tr>
           {periode.map((thn) => (
@@ -126,11 +124,11 @@ const TaggingIndikatorTable = () => {
 
     let lastSkpd = '';
     let counter = pageIndex * pageSize + 1;
-    const grouped: Record<string, FlatIK[]> = {};
 
+    const grouped: Record<string, FlatIK[]> = {};
     rowModel.rows.forEach((row) => {
       const item = row.original;
-      const key = `${item.skpdName}-${item.uraianId}`;
+      const key = `${item.skpdName}-${item.wMasterName}`;
       if (!grouped[key]) grouped[key] = [];
       grouped[key].push(item);
     });
@@ -139,11 +137,10 @@ const TaggingIndikatorTable = () => {
       <>
         {Object.values(grouped).map((group) => {
           const firstItem = group[0];
-
           const headerRow =
             firstItem.skpdName !== lastSkpd ? (
               <tr className='odd gradeX' key={`header-${firstItem.skpdName}`}>
-                <td colSpan={periode.length + 5} className='bg-blue'>
+                <td colSpan={periode.length + 6} className='bg-blue'>
                   <p
                     style={{
                       margin: 0,
@@ -160,77 +157,36 @@ const TaggingIndikatorTable = () => {
             ) : null;
 
           lastSkpd = firstItem.skpdName;
-
           return (
-            <Fragment key={`${firstItem.skpdName}-${firstItem.uraianId}`}>
+            <Fragment key={`${firstItem.skpdName}-${firstItem.wMasterName}`}>
               {headerRow}
-              <tr
-                className='odd gradeX text-center'
-                id={`dtTb${firstItem.uraianId}`}
-              >
-                <td>{counter++}</td>
-                <td className='text-left!'>{firstItem.uraianName}</td>
-                <td>{firstItem.satuan}</td>
-                <td>{firstItem.base_line}</td>
-                <td>{firstItem.t_1_target}</td>
-                <td>{firstItem.t_2_target}</td>
-                <td>{firstItem.t_3_target}</td>
-                <td>{firstItem.t_4_target}</td>
-                <td>{firstItem.t_5_target}</td>
-                <td>{firstItem.t_6_target}</td>
-                <td className='w-[120px]'>
-                  <div className='h-9'>
-                    <InputToggle
-                      tooltip='Tag sebagai IKD'
-                      onLabel='IKU'
-                      offLabel='IKD'
-                      checked={firstItem.is_iku}
-                      onToggle={async () => {
-                        toggleIKUMutation.mutate({
-                          id: firstItem.uraianId,
-                          skpd_id: Number(selectedSKPD),
-                          periodeId: idPeriode,
-                        });
-                      }}
-                    />
-                  </div>
-                </td>
-              </tr>
+              {group.map((item, index) => (
+                <tr
+                  className='odd gradeX text-center'
+                  id={`dtTb${item.uraianId}`}
+                  key={item.uraianId}
+                >
+                  <td>{counter++}</td>
+                  <td className='text-left!'>
+                    {index === 0 ? item.wMasterName : ''}
+                  </td>
+                  <td className='text-left!'>{item.uraianName}</td>
+                  <td>{item.satuan}</td>
+                  <td>{item.base_line}</td>
+                  <td>{item.t_1_target}</td>
+                  <td>{item.t_2_target}</td>
+                  <td>{item.t_3_target}</td>
+                  <td>{item.t_4_target}</td>
+                  <td>{item.t_5_target}</td>
+                  <td>{item.t_6_target}</td>
+                </tr>
+              ))}
             </Fragment>
           );
         })}
       </>
     );
   };
-
-  const queryClient = useQueryClient();
-  const [loadingMutation, setLoadingMutation] = useState(false);
-  const toggleIKUMutation = useMutation({
-    mutationFn: async ({
-      id,
-      skpd_id,
-      periodeId,
-    }: {
-      id: number;
-      skpd_id: number;
-      periodeId: number;
-    }) => {
-      setLoadingMutation(true);
-      return toggleTagIKU({ id, skpd_id, periodeId });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list_iku'] });
-      toast.success('Data berhasil diperbarui');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
-      }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
-  });
 
   return (
     <div className='space-y-2'>
@@ -256,6 +212,37 @@ const TaggingIndikatorTable = () => {
         </div>
         <div className='inline-flex gap-2'>
           <InputButton
+            className='btn btn-theme w-9 h-9'
+            tooltip='Cetak Excel'
+            onClick={async () => {
+              try {
+                const rawhasilData = await getHasilIK({
+                  type: 'ikd',
+                  skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
+                  periodeId: idPeriode,
+                });
+                const hasilData = flatHasilIK(rawhasilData);
+
+                if (!hasilData) {
+                  toast.error('Data tidak ditemukan.');
+                  return;
+                }
+                toast.promise(exportIKU(hasilData, 'ikd'), {
+                  loading: 'Sedang mengunduh...',
+                  success: <b>Berhasil mengunduh.</b>,
+                  error: <b>Gagal mengunduh.</b>,
+                });
+
+                console.log(hasilData);
+              } catch (error) {
+                console.error(error);
+                toast.error('Terjadi kesalahan saat mengambil data.');
+              }
+            }}
+          >
+            <MdPrint />
+          </InputButton>
+          <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
             onClick={() => refetch()}
@@ -275,4 +262,4 @@ const TaggingIndikatorTable = () => {
   );
 };
 
-export default TaggingIndikatorTable;
+export default IndikatorIKDTable;

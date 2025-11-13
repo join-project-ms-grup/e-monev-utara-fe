@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, memo, useEffect, useRef, useState } from 'react';
 import Tabel from '../../Tabel';
 import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
@@ -122,10 +122,6 @@ const CapaianIKDTable = () => {
     );
   };
 
-  const [realisasiValues, setRealisasiValues] = useState<
-    Record<number, string>
-  >({});
-
   const tableBody = (table: Table<FlatIK>) => {
     const rowModel = table.getRowModel();
     const { pageIndex, pageSize } = table.getState().pagination ?? {
@@ -168,16 +164,11 @@ const CapaianIKDTable = () => {
             ) : null;
 
           lastSkpd = firstItem.skpdName;
+
           return (
             <Fragment key={`${firstItem.skpdName}-${firstItem.wMasterName}`}>
               {headerRow}
               {group.map((item, index) => {
-                const initialValue =
-                  (item as any)[`t_${tahunKe}_realisasi`] ?? '';
-                const localValue =
-                  realisasiValues[(item as any)[`t_${tahunKe}_id`]] ??
-                  initialValue;
-                const showButton = localValue !== initialValue;
                 return (
                   <tr
                     className='odd gradeX text-center'
@@ -192,37 +183,17 @@ const CapaianIKDTable = () => {
                     <td>{item.satuan}</td>
                     <td>{(item as any)[`t_${tahunKe}_target`]}</td>
                     <td className='w-[150px]'>
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          const payload: IKUIKDForm = {
-                            id_target: (item as any)[`t_${tahunKe}_id`], // ambil id dari item sesuai tahunKe
-                            realisasi:
-                              realisasiValues[
-                                (item as any)[`t_${tahunKe}_id`]
-                              ] ?? '',
-                          };
-                          realisasiMutation.mutate(payload);
+                      <InputRealisasi
+                        key={item.uraianId}
+                        item={item}
+                        tahunKe={tahunKe}
+                        onSubmit={(id_target, val) => {
+                          realisasiMutation.mutate({
+                            id_target,
+                            realisasi: val,
+                          });
                         }}
-                      >
-                        <InputText
-                          value={
-                            realisasiValues[(item as any)[`t_${tahunKe}_id`]] ??
-                            (item as any)[`t_${tahunKe}_realisasi`] ??
-                            ''
-                          }
-                          onChange={(
-                            e: React.ChangeEvent<HTMLInputElement>,
-                          ) => {
-                            const val = e.target.value;
-                            setRealisasiValues((prev) => ({
-                              ...prev,
-                              [(item as any)[`t_${tahunKe}_id`]]: val,
-                            }));
-                          }}
-                          withButton={showButton}
-                        />
-                      </form>
+                      />
                     </td>
 
                     <td>
@@ -243,10 +214,8 @@ const CapaianIKDTable = () => {
   };
 
   const queryClient = useQueryClient();
-  const [loadingMutation, setLoadingMutation] = useState(false);
   const realisasiMutation = useMutation({
     mutationFn: async (payload: IKUIKDForm) => {
-      setLoadingMutation(true);
       return addRealisasi(payload);
     },
     onSuccess: () => {
@@ -257,9 +226,6 @@ const CapaianIKDTable = () => {
       if (error.status === 400) {
         toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
       }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
     },
   });
 
@@ -279,24 +245,23 @@ const CapaianIKDTable = () => {
               onChange={(val) => setTahunKe(val)}
             />
           </div>
-          {isDev() ||
-            (isAdmin() && (
-              <div>
-                <label htmlFor='skpd'>SKPD</label>
-                <InputSearchBox
-                  id='skpd'
-                  className='w-64 h-9'
-                  btnclassName='bg-white'
-                  placeholder='Pilih SKPD...'
-                  value={selectedSKPD.toString()}
-                  options={listIKSKPD as OptionItem[]}
-                  onChange={(val) => setSelectedSKPD(val)}
-                  onClear={() => setSelectedSKPD('')}
-                  tooltip
-                  withSearch
-                />
-              </div>
-            ))}
+          {(isDev() || isAdmin()) && (
+            <div>
+              <label htmlFor='skpd'>SKPD</label>
+              <InputSearchBox
+                id='skpd'
+                className='w-64 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih SKPD...'
+                value={selectedSKPD.toString()}
+                options={listIKSKPD as OptionItem[]}
+                onChange={(val) => setSelectedSKPD(val)}
+                onClear={() => setSelectedSKPD('')}
+                tooltip
+                withSearch
+              />
+            </div>
+          )}
         </div>
         <div className='inline-flex gap-2'>
           <InputButton
@@ -320,3 +285,43 @@ const CapaianIKDTable = () => {
 };
 
 export default CapaianIKDTable;
+
+interface InputRealisasiProps {
+  item: any;
+  tahunKe: string;
+  onSubmit: (id_target: number, value: string) => void;
+}
+
+const InputRealisasi = memo(
+  ({ item, tahunKe, onSubmit }: InputRealisasiProps) => {
+    const idTarget = (item as any)[`t_${tahunKe}_id`];
+    const rawInitial = (item as any)[`t_${tahunKe}_realisasi`];
+    const initialValue = rawInitial == null ? '' : String(rawInitial);
+
+    const [value, setValue] = useState(initialValue);
+    const [baseValue, setBaseValue] = useState(initialValue);
+
+    useEffect(() => {
+      setBaseValue(initialValue);
+      setValue(initialValue);
+    }, [initialValue]);
+
+    const showButton = value.trim() !== baseValue.trim();
+
+    return (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(Number(idTarget), value);
+        }}
+      >
+        <InputText
+          inputMode='numeric'
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          withButton={showButton}
+        />
+      </form>
+    );
+  },
+);

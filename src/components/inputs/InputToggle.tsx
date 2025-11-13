@@ -34,14 +34,22 @@ const InputToggle = ({
     }
   };
 
+  console.log('test')
+
   return (
     <label
       {...(tooltip ? { 'data-tooltip-id': tooltipId } : {})}
       {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
       htmlFor={id}
-      className={`h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm ${checked ? 'bg-green-500' : 'bg-red-500'} font-bold select-none overflow-hidden transition-all duration-300 ${
-        disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
-      }`}
+      className={`h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm font-bold select-none overflow-hidden transition-all duration-300 ${
+        (isControlled ? checked : defaultChecked)
+          ? 'bg-green-500'
+          : 'bg-red-500'
+      } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+
+      // className={`h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm ${checked ? 'bg-green-500' : 'bg-red-500'} font-bold select-none overflow-hidden transition-all duration-300 ${
+      //   disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+      // }`}
     >
       <input
         id={id}
@@ -57,7 +65,8 @@ const InputToggle = ({
       <span
         className={`absolute flex items-center justify-center z-10 left-full -translate-x-9 top-0 h-full w-9 rounded-full bg-white transition-all duration-300 peer-checked:left-0 peer-checked:translate-x-0`}
       >
-        {checked ? <MdCheck /> : <MdClose />}
+        {(isControlled ? checked : defaultChecked) ? <MdCheck /> : <MdClose />}
+        {/* {checked ? <MdCheck /> : <MdClose />} */}
       </span>
       <div
         className={`py-1.5 px-4 text-center z-0 transition-all duration-300 text-[var(--text-3)] opacity-100 peer-checked:opacity-0`}
@@ -73,4 +82,4 @@ const InputToggle = ({
   );
 };
 
-export default InputToggle;
+export default React.memo(InputToggle);

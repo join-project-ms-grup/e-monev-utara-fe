@@ -79,12 +79,11 @@ const menuRKPD: MenuItem[] = [
     icon: <MdShowChart />,
     akses: [2, 3],
     submenu: [
-      { label: 'Pilih IKU/IKD', to: '/rkpd/ikd/ikd_tagging' },
-      { label: 'Indikator Kinerja Utama', to: '/rkpd/iku/iku_list' },
-      // { label: 'Tagging IKU', to: '/rkpd/iku/iku_tagging' },
-      { label: 'Input Capaian IKU', to: '/rkpd/iku/iku_capaian' },
-      { label: 'Indikator Kinerja Daerah', to: '/rkpd/ikd/ikd_list' },
-      { label: 'Input Capaian IKD', to: '/rkpd/ikd/ikd_capaian' },
+      { label: 'Pilih IKU/IKD', to: '/rkpd/iku_ikd/tagging' },
+      { label: 'Indikator Kinerja Utama', to: '/rkpd/iku_ikd/iku' },
+      { label: 'Input Capaian IKU', to: '/rkpd/iku_ikd/iku_capaian' },
+      { label: 'Indikator Kinerja Daerah', to: '/rkpd/iku_ikd/ikd' },
+      { label: 'Input Capaian IKD', to: '/rkpd/iku_ikd/ikd_capaian' },
     ],
   },
   {

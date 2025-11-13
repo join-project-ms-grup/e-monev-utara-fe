@@ -1,6 +1,5 @@
-import { Fragment, useState } from 'react';
+import { Fragment, memo, useEffect, useState } from 'react';
 import Tabel from '../../Tabel';
-import toast from 'react-hot-toast';
 import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
@@ -17,18 +16,21 @@ import {
   isDev,
 } from '../../../../lib/usercookie';
 import {
+  addRealisasi,
   flatIK,
-  getIK,
   getIKSKPD,
-  toggleTagIKU,
+  getIKU,
   type FlatIK,
+  type IKUIKDForm,
 } from '../../../../services/IKUIKDService';
 import Spinner from '../../../inputs/Spinner';
+import InputText from '../../../inputs/InputText';
 import type { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../../lib/api';
-import InputToggle from '../../../inputs/InputToggle';
+import { calculateAchievementPercentage } from '../../../../lib/helper';
 
-const TaggingIndikatorIKDTable = () => {
+const CapaianIKUTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
   //#region SKPD
   const userSKPDID = getUserSKPDID();
@@ -46,12 +48,12 @@ const TaggingIndikatorIKDTable = () => {
 
   const { data, isFetching, refetch } = useQuery({
     queryKey: [
-      'list_ikd',
+      'list_iku',
       selectedSKPD ? Number(selectedSKPD) : 'all',
       idPeriode,
     ],
     queryFn: async () => {
-      const rawData = await getIK({
+      const rawData = await getIKU({
         skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
         periodeId: idPeriode,
       });
@@ -63,7 +65,6 @@ const TaggingIndikatorIKDTable = () => {
 
   const mulaiPeriode = Number(getPeriodeMulaiFromCookie()!);
   const akhirPeriode = Number(getPeriodeAkhirFromCookie()!);
-
   const periode = [
     mulaiPeriode - 1,
     ...Array.from(
@@ -71,10 +72,18 @@ const TaggingIndikatorIKDTable = () => {
       (_, i) => mulaiPeriode + i,
     ),
   ];
+  const [tahunKe, setTahunKe] = useState('1');
+  const listTahunKe = periode.map((tahun, i) => ({
+    label: `${tahun}`,
+    value: `${i + 1}`,
+  }));
 
   const columns: ColumnDef<FlatIK>[] = [
     {
       header: 'No',
+    },
+    {
+      header: 'Urusan di RPJMD',
     },
     {
       header: 'IKU',
@@ -98,19 +107,16 @@ const TaggingIndikatorIKDTable = () => {
     return (
       <>
         <tr>
-          <th rowSpan={2}>No</th>
-          <th rowSpan={2}>Indikator Kinerja Utama</th>
-          <th rowSpan={2}>Satuan</th>
-          <th rowSpan={2}>Kondisi Awal {mulaiPeriode - 2}</th>
-          <th colSpan={periode.length}>Target Tahun</th>
-          <th rowSpan={2}>Aksi</th>
-        </tr>
-        <tr>
-          {periode.map((thn) => (
-            <th key={thn} rowSpan={1}>
-              {thn}
-            </th>
-          ))}
+          <th>No</th>
+          <th>Urusan di RPJMD</th>
+          <th>Indikator Kinerja Utama</th>
+          <th>Satuan</th>
+          <th>
+            Target Tahun{' '}
+            {listTahunKe.find((item) => item.value === tahunKe)?.label}
+          </th>
+          <th>Realisasi</th>
+          <th>Capaian</th>
         </tr>
       </>
     );
@@ -125,11 +131,11 @@ const TaggingIndikatorIKDTable = () => {
 
     let lastSkpd = '';
     let counter = pageIndex * pageSize + 1;
-    const grouped: Record<string, FlatIK[]> = {};
 
+    const grouped: Record<string, FlatIK[]> = {};
     rowModel.rows.forEach((row) => {
       const item = row.original;
-      const key = `${item.skpdName}-${item.uraianId}`;
+      const key = `${item.skpdName}-${item.wMasterName}`;
       if (!grouped[key]) grouped[key] = [];
       grouped[key].push(item);
     });
@@ -138,11 +144,10 @@ const TaggingIndikatorIKDTable = () => {
       <>
         {Object.values(grouped).map((group) => {
           const firstItem = group[0];
-
           const headerRow =
             firstItem.skpdName !== lastSkpd ? (
               <tr className='odd gradeX' key={`header-${firstItem.skpdName}`}>
-                <td colSpan={periode.length + 5} className='bg-blue'>
+                <td colSpan={periode.length + 6} className='bg-blue'>
                   <p
                     style={{
                       margin: 0,
@@ -159,42 +164,47 @@ const TaggingIndikatorIKDTable = () => {
             ) : null;
 
           lastSkpd = firstItem.skpdName;
-
           return (
-            <Fragment key={`${firstItem.skpdName}-${firstItem.uraianId}`}>
+            <Fragment key={`${firstItem.skpdName}-${firstItem.wMasterName}`}>
               {headerRow}
-              <tr
-                className='odd gradeX text-center'
-                id={`dtTb${firstItem.uraianId}`}
-              >
-                <td>{counter++}</td>
-                <td className='text-left!'>{firstItem.uraianName}</td>
-                <td>{firstItem.satuan}</td>
-                <td>{firstItem.base_line}</td>
-                <td>{firstItem.t_1_target}</td>
-                <td>{firstItem.t_2_target}</td>
-                <td>{firstItem.t_3_target}</td>
-                <td>{firstItem.t_4_target}</td>
-                <td>{firstItem.t_5_target}</td>
-                <td>{firstItem.t_6_target}</td>
-                <td className='w-[120px]'>
-                  <div className='h-9'>
-                    <InputToggle
-                      tooltip='Tag sebagai IKU'
-                      onLabel='IKU'
-                      offLabel='IKD'
-                      checked={firstItem.is_iku}
-                      onToggle={() => {
-                        toggleIKUMutation.mutate({
-                          id: firstItem.uraianId,
-                          skpd_id: Number(selectedSKPD),
-                          periodeId: idPeriode,
-                        });
-                      }}
-                    />
-                  </div>
-                </td>
-              </tr>
+              {group.map((item, index) => {
+                return (
+                  <tr
+                    className='odd gradeX text-center'
+                    id={`dtTb${item.uraianId}`}
+                    key={item.uraianId}
+                  >
+                    <td>{counter++}</td>
+                    <td className='text-left!'>
+                      {index === 0 ? item.wMasterName : ''}
+                    </td>
+                    <td className='text-left!'>{item.uraianName}</td>
+                    <td>{item.satuan}</td>
+                    <td>{(item as any)[`t_${tahunKe}_target`]}</td>
+                    <td className='w-[150px]'>
+                      <InputRealisasi
+                        key={item.uraianId}
+                        item={item}
+                        tahunKe={tahunKe}
+                        onSubmit={(id_target, val) => {
+                          realisasiMutation.mutate({
+                            id_target,
+                            realisasi: val,
+                          });
+                        }}
+                      />
+                    </td>
+
+                    <td>
+                      {calculateAchievementPercentage(
+                        (item as any)[`t_${tahunKe}_target`],
+                        (item as any)[`t_${tahunKe}_realisasi`],
+                      ) ?? 0}
+                      {` %`}
+                    </td>
+                  </tr>
+                );
+              })}
             </Fragment>
           );
         })}
@@ -203,23 +213,12 @@ const TaggingIndikatorIKDTable = () => {
   };
 
   const queryClient = useQueryClient();
-  const [loadingMutation, setLoadingMutation] = useState(false);
-  const toggleIKUMutation = useMutation({
-    mutationFn: async ({
-      id,
-      skpd_id,
-      periodeId,
-    }: {
-      id: number;
-      skpd_id: number;
-      periodeId: number;
-    }) => {
-      setLoadingMutation(true);
-      // return console.log(payload)
-      return toggleTagIKU({ id, skpd_id, periodeId });
+  const realisasiMutation = useMutation({
+    mutationFn: async (payload: IKUIKDForm) => {
+      return addRealisasi(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list_ikd'] });
+      queryClient.invalidateQueries({ queryKey: ['list_iku'] });
       toast.success('Data berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
@@ -227,15 +226,24 @@ const TaggingIndikatorIKDTable = () => {
         toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
       }
     },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
   });
 
   return (
     <div className='space-y-2'>
       <div className='flex items-end justify-between'>
         <div className='inline-flex gap-2'>
+          <div>
+            <label htmlFor='tahun_ke'>Tahun ke</label>
+            <InputSearchBox
+              id='tahun_ke'
+              className='w-42 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Tahun ke...'
+              value={tahunKe}
+              options={listTahunKe}
+              onChange={(val) => setTahunKe(val)}
+            />
+          </div>
           {(isDev() || isAdmin()) && (
             <div>
               <label htmlFor='skpd'>SKPD</label>
@@ -275,4 +283,44 @@ const TaggingIndikatorIKDTable = () => {
   );
 };
 
-export default TaggingIndikatorIKDTable;
+export default CapaianIKUTable;
+
+interface InputRealisasiProps {
+  item: any;
+  tahunKe: string;
+  onSubmit: (id_target: number, value: string) => void;
+}
+
+const InputRealisasi = memo(
+  ({ item, tahunKe, onSubmit }: InputRealisasiProps) => {
+    const idTarget = (item as any)[`t_${tahunKe}_id`];
+    const rawInitial = (item as any)[`t_${tahunKe}_realisasi`];
+    const initialValue = rawInitial == null ? '' : String(rawInitial);
+
+    const [value, setValue] = useState(initialValue);
+    const [baseValue, setBaseValue] = useState(initialValue);
+
+    useEffect(() => {
+      setBaseValue(initialValue);
+      setValue(initialValue);
+    }, [initialValue]);
+
+    const showButton = value.trim() !== baseValue.trim();
+
+    return (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(Number(idTarget), value);
+        }}
+      >
+        <InputText
+          inputMode='numeric'
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          withButton={showButton}
+        />
+      </form>
+    );
+  },
+);

@@ -160,4 +160,5 @@ const InputText = ({
   );
 };
 
-export default InputText;
+// export default InputText;
+export default React.memo(InputText);

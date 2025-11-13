@@ -142,6 +142,7 @@ export const exportIKU = async (
         rowIndex++;
     });
 
+    console.log(data)
     const lastRow = rowIndex;
     const startCol = 1;
     const endCol = 11;
