@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, type SetStateAction } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';
@@ -27,6 +27,9 @@ import RenstraPreviewTable from './RenstraPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import { getSKPDPerRENSTRA } from '../../../../services/PeriodeService';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
+import DialogModal from '../../../inputs/DialogModal';
+import FormCatatan from '../../../forms/FormCatatan';
+import type { CatatanForm } from '../../../../services/CatatanService';
 
 const tableHead = () => {
   return (
@@ -181,9 +184,11 @@ const RenstraTable = () => {
   ];
   // #endregion
 
-  const [isPreview, setIsPreview] = useState(false);
+  const [mode, setMode] = useState<'close' | 'catatan' | 'preview'>('close');
+  const [catatan, setCatatan] = useState<CatatanForm>({})
+
   useEffect(() => {
-    if (isPreview) {
+    if (mode==='preview') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -192,7 +197,7 @@ const RenstraTable = () => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isPreview]);
+  }, [mode==='preview']);
 
   return (
     <>
@@ -218,11 +223,11 @@ const RenstraTable = () => {
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
-              tooltip='Lihat tabel penuh'
+              tooltip='Lihat Evaluasi'
               className='btn btn-theme w-9 h-9'
               onClick={() => {
                 if (data) {
-                  setIsPreview(true);
+                  setMode('catatan')
                 } else {
                   toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                 }
@@ -250,13 +255,25 @@ const RenstraTable = () => {
           }
         />
       </div>
-      {isPreview &&
+      {mode === 'catatan' ? (
+        <DialogModal
+        widthLevel={6}
+          title='Catatan'
+          isOpen={mode === 'catatan'}
+          onClose={() => {
+            setMode('close');
+          }}
+        >
+          <FormCatatan onPreview={() => setMode('preview')} type='renstra' skpdPerId={Number(selectedSKPD)} setCatatan={setCatatan}/>
+        </DialogModal>
+      ) : (
+        mode === 'preview' &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
             <div className='border-b'>
               <div className='flex flex-row justify-between p-2'>
                 <button
-                  onClick={() => setIsPreview(false)}
+                  onClick={() => setMode('close')}
                   className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
                   aria-label='Tutup preview'
                 >
@@ -270,7 +287,7 @@ const RenstraTable = () => {
                         dataSKPDPeriode?.find(
                           (s) => s.id === Number(selectedSKPD),
                         )?.skpd_name ?? '';
-                      toast.promise(exportRenstra(data, skpdLabel), {
+                      toast.promise(exportRenstra(data, skpdLabel, catatan), {
                         loading: 'Sedang mengunduh...',
                         success: <b>Berhasil mengunduh.</b>,
                         error: <b>Gagal mengunduh.</b>,
@@ -292,6 +309,7 @@ const RenstraTable = () => {
             <div className='p-2 overflow-auto'>
               <RenstraPreviewTable
                 data={data || []}
+                catatan={catatan}
                 skpd={
                   dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
                     ?.skpd_name ?? ''
@@ -300,7 +318,8 @@ const RenstraTable = () => {
             </div>
           </div>,
           document.body,
-        )}
+        )
+      )}
     </>
   );
 };

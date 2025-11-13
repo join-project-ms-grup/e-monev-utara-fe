@@ -4,13 +4,15 @@ import type { ColumnDef } from '@tanstack/react-table';
 import type { FlatRenstraNew } from '../../../../services/RenstraService';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
 import { id } from 'zod/v4/locales';
+import type { CatatanForm } from '../../../../services/CatatanService';
 
 interface MainTableProps {
   data: FlatRenstraNew[];
   skpd: string;
+  catatan: CatatanForm;
 }
 
-const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
+const RenstraPreviewTable = ({ data, skpd, catatan }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -89,21 +91,21 @@ const RenstraPreviewTable = ({ data, skpd }: MainTableProps) => {
           <td colSpan={11}></td>
         </tr>
         <tr>
-          <td colSpan={38}>Faktor pendorong pencapaian kinerja:</td>
+          <td colSpan={38}>Faktor pendorong pencapaian kinerja: {catatan.pendorong}</td>
         </tr>
         <tr>
-          <td colSpan={38}>Faktor penghambat:</td>
+          <td colSpan={38}>Faktor penghambat: {catatan.penghambat}</td>
         </tr>
         <tr>
           <td colSpan={38}>
             Usulan tindak lanjut pada Renja Perangkat Daerah kabupaten/kota
-            berikutnya:
+            berikutnya: {catatan.tl_1}
           </td>
         </tr>
         <tr>
           <td colSpan={38}>
             Usulan tindak lanjut pada Renstra Perangkat Daerah kabupaten/kota
-            berikutnya:
+            berikutnya: {catatan.tl_2}
           </td>
         </tr>
       </>
