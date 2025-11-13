@@ -4,13 +4,15 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
 import type { FlatRKPDTriwulan } from '../../../../services/RKPDService';
 import { getPeriodeAkhirFromCookie } from '../../../../lib/usercookie';
+import type { CatatanForm } from '../../../../services/CatatanService';
 
 interface MainTableProps {
   data: FlatRKPDTriwulan[];
   skpd: string;
+  catatan: CatatanForm;
 }
 
-const RKPDPreviewTable = ({ data, skpd }: MainTableProps) => {
+const RKPDPreviewTable = ({ data, skpd, catatan }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -108,19 +110,19 @@ const RKPDPreviewTable = ({ data, skpd }: MainTableProps) => {
           <td colSpan={15}></td>
         </tr>
         <tr>
-          <td colSpan={26}>Faktor pendorong keberhasilan kinerja:</td>
+          <td colSpan={26}>Faktor pendorong keberhasilan kinerja: {catatan.pendorong}</td>
         </tr>
         <tr>
-          <td colSpan={26}>Faktor penghambat pencapaian kinerja:</td>
+          <td colSpan={26}>Faktor penghambat pencapaian kinerja: {catatan.penghambat}</td>
         </tr>
         <tr>
           <td colSpan={26}>
-            Tindak lanjut yang diperlukan dalam triwulan berikutnya:
+            Tindak lanjut yang diperlukan dalam triwulan berikutnya: {catatan.tl_1}
           </td>
         </tr>
         <tr>
           <td colSpan={26}>
-            Tindak lanjut yang diperlukan dalam RKPD berikutnya:
+            Tindak lanjut yang diperlukan dalam RKPD berikutnya: {catatan.tl_2}
           </td>
         </tr>
       </>
@@ -286,7 +288,7 @@ const RKPDPreviewTable = ({ data, skpd }: MainTableProps) => {
     {
       header:
         'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi K',
-      accessorKey: 'ind_triwulan_capaian_3',
+      accessorKey: 'ind_triwulan_capaian_3_re',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -296,7 +298,7 @@ const RKPDPreviewTable = ({ data, skpd }: MainTableProps) => {
     {
       header:
         'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi RP',
-      accessorKey: 'pagu_triwulan_realisasi_3',
+      accessorKey: 'pagu_triwulan_realisasi_3_re',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },

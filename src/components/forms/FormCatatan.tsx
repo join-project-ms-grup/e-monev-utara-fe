@@ -15,9 +15,12 @@ import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../lib/api';
 import {
   getCatatanEvaluasi,
+  getCatatanEvaluasiRKPD,
   updateCatatanEvaluasi,
+  updateCatatanEvaluasiRKPD,
   type CatatanForm,
 } from '../../services/CatatanService';
+import { isEqual } from 'lodash';
 
 interface Props {
   onPreview: () => void;
@@ -27,16 +30,30 @@ interface Props {
   skpdPerId: number;
 }
 
-const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props) => {
+const FormCatatan = ({
+  onPreview,
+  children,
+  type,
+  skpdPerId,
+  setCatatan,
+}: Props) => {
   const queryClient = useQueryClient();
   const [loadingMutation, setLoadingMutation] = useState(false);
-  const { data, refetch, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ['catatan', type, skpdPerId],
-    queryFn: () =>
-      getCatatanEvaluasi({
-        skpd_periode_id: skpdPerId,
-        type: type,
-      }),
+    queryFn: async () => {
+      if (['renstra', 'rpjmd'].includes(type)) {
+        return await getCatatanEvaluasi({
+          skpd_periode_id: skpdPerId,
+          type,
+        });
+      } else if (['rkpd', 'renja'].includes(type)) {
+        return await getCatatanEvaluasiRKPD({
+          skpd_periode_id: skpdPerId,
+          type,
+        });
+      }
+    },
   });
 
   const validateWith = (schema: any, value: any) => {
@@ -46,6 +63,17 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
       ? { fields: {} }
       : { fields: mapErrorsCatatan(result.error.format()) };
   };
+
+  const initialValue = [
+    {
+      pendorong: data?.pendorong,
+      penghambat: data?.penghambat,
+      tl_1: data?.tl_1,
+      tl_2: data?.tl_2,
+      skpd_periode_id: skpdPerId,
+      type: type,
+    },
+  ];
 
   const form = useForm({
     defaultValues: {
@@ -57,7 +85,11 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
       type: type,
     },
     onSubmit: async ({ value }) => {
-      updateMutation.mutate(value);
+      if (!isEqual([value], initialValue)) {
+        updateMutation.mutate(value);
+      } else {
+        onPreview();
+      }
     },
     validators: {
       onChange: ({ value }) => validateWith(catatanSchema, value),
@@ -68,16 +100,27 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
   const updateMutation = useMutation({
     mutationFn: async (payload: CatatanForm) => {
       setLoadingMutation(true);
-      setCatatan(payload)
-      return updateCatatanEvaluasi(payload);
+      setCatatan(payload);
+      if (['renstra', 'rpjmd'].includes(type)) {
+        return updateCatatanEvaluasi(payload);
+      } else if (['rkpd', 'renja'].includes(type)) {
+        return updateCatatanEvaluasiRKPD(payload);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['catatan', type, skpdPerId] });
-      queryClient.invalidateQueries({
-        queryKey: ['tabel_renstra', skpdPerId, 5],
-      });
+      if (['renstra', 'rpjmd'].includes(type)) {
+        queryClient.invalidateQueries({
+          queryKey: ['tabel_renstra'],
+        });
+      } else if (['rkpd', 'renja'].includes(type)) {
+        queryClient.invalidateQueries({
+          queryKey: ['tabel_rkpd_tahunan'],
+        });
+      }
+
       onPreview();
-      toast.success('Catatan berhasil ditambahkan');
+      toast.success('Catatan berhasil diperbarui');
     },
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
       if (error.status === 400) {
@@ -89,7 +132,33 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
     },
   });
 
-  const inputTitleRenstra = ['Faktor pendorong pencapaian kinerja', 'Faktor penghambat']
+  const inputTitleRenstra = [
+    'Faktor pendorong pencapaian kinerja',
+    'Faktor penghambat',
+    'Usulan tindak lanjut pada Renja Perangkat Daerah kabupaten/kota berikutnya',
+    'Usulan tindak lanjut pada Renstra Perangkat Daerah kabupaten/kota berikutnya',
+  ];
+
+  const inputTitleRpjmd = [
+    'Faktor pendorong keberhasilan pencapaian',
+    'Faktor penghambat pencapaian kinerja',
+    'Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya',
+    'Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya',
+  ];
+
+  const inputTitleRkpd = [
+    'Faktor pendorong keberhasilan kinerja',
+    'Faktor penghambat pencapaian kinerja',
+    'Tindak lanjut yang diperlukan dalam triwulan berikutnya',
+    'Tindak lanjut yang diperlukan dalam RKPD berikutnya',
+  ];
+
+  const inputTitleRenja = [
+    'Faktor pendorong keberhasilan kinerja',
+    'Faktor penghambat pencapaian kinerja',
+    'Tindak lanjut yang diperlukan dalam triwulan berikutnya*)',
+    'indak lanjut yang diperlukan dalam Renja Perangkat Daerah kabupaten/kota berikutnya*)',
+  ];
 
   return (
     <div>
@@ -105,7 +174,13 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
             {(field) => (
               <div className='flex-1'>
                 <label htmlFor='pendorong'>
-                  Faktor pendorong pencapaian kinerja
+                  {type === 'renstra'
+                    ? inputTitleRenstra[0]
+                    : type === 'rpjmd'
+                      ? inputTitleRpjmd[0]
+                      : type === 'rkpd'
+                        ? inputTitleRkpd[0]
+                        : inputTitleRenja[0]}
                 </label>
                 <InputTextArea
                   placeholder='Faktor pendorong...'
@@ -121,7 +196,15 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
           <form.Field name='penghambat'>
             {(field) => (
               <div className='flex-1'>
-                <label htmlFor='penghambat'>Faktor penghambat</label>
+                <label htmlFor='penghambat'>
+                  {type === 'renstra'
+                    ? inputTitleRenstra[1]
+                    : type === 'rpjmd'
+                      ? inputTitleRpjmd[1]
+                      : type === 'rkpd'
+                        ? inputTitleRkpd[1]
+                        : inputTitleRenja[1]}
+                </label>
                 <InputTextArea
                   placeholder='Faktor penghambat...'
                   id='penghambat'
@@ -137,11 +220,16 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
             {(field) => (
               <div className='flex-1'>
                 <label htmlFor='tl_1'>
-                  Usulan tindak lanjut pada Renja Perangkat Daerah
-                  kabupaten/kota berikutnya
+                  {type === 'renstra'
+                    ? inputTitleRenstra[2]
+                    : type === 'rpjmd'
+                      ? inputTitleRpjmd[2]
+                      : type === 'rkpd'
+                        ? inputTitleRkpd[2]
+                        : inputTitleRenja[2]}
                 </label>
                 <InputTextArea
-                  placeholder='Usulan tindak lanjut pada Renja...'
+                  placeholder='Usulan tindak lanjut...'
                   id='tl_1'
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -155,11 +243,16 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
             {(field) => (
               <div className='flex-1'>
                 <label htmlFor='tl_2'>
-                  Usulan tindak lanjut pada Renstra Perangkat Daerah
-                  kabupaten/kota berikutnya
+                  {type === 'renstra'
+                    ? inputTitleRenstra[3]
+                    : type === 'rpjmd'
+                      ? inputTitleRpjmd[3]
+                      : type === 'rkpd'
+                        ? inputTitleRkpd[3]
+                        : inputTitleRenja[3]}
                 </label>
                 <InputTextArea
-                  placeholder='Usulan tindak lanjut pada Renstra...'
+                  placeholder='Usulan tindak lanjut...'
                   id='tl_2'
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -175,7 +268,10 @@ const FormCatatan = ({ onPreview, children, type, skpdPerId, setCatatan }: Props
           children
         ) : (
           <div className='float-end'>
-            <InputButton className='px-4 bg-green-600' isLoading={loadingMutation}>
+            <InputButton
+              className='px-4 bg-green-600'
+              isLoading={loadingMutation}
+            >
               Lihat Evaluasi<span className='uppercase'>{type}</span>
             </InputButton>
           </div>

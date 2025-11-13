@@ -29,6 +29,9 @@ import { renderSatuan, renderUang } from '../../../../lib/helper';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 import { exportRenja } from '../../../../services/Excel/ExcelRenja';
 import RenjaPreviewTable from './RenjaPreviewTable';
+import type { CatatanForm } from '../../../../services/CatatanService';
+import FormCatatan from '../../../forms/FormCatatan';
+import DialogModal from '../../../inputs/DialogModal';
 
 const RenjaTable = () => {
   //#region SKPD dan Tahun ke
@@ -188,9 +191,11 @@ const RenjaTable = () => {
     },
   ];
 
-  const [isPreview, setIsPreview] = useState(false);
+  const [mode, setMode] = useState<'close' | 'catatan' | 'preview'>('close');
+  const [catatan, setCatatan] = useState<CatatanForm>({});
+
   useEffect(() => {
-    if (isPreview) {
+    if (mode === 'preview') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -199,7 +204,7 @@ const RenjaTable = () => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isPreview]);
+  }, [mode === 'preview']);
 
   return (
     <>
@@ -246,7 +251,7 @@ const RenjaTable = () => {
               className='btn btn-theme w-9 h-9'
               onClick={() => {
                 if (data) {
-                  setIsPreview(true);
+                  setMode('catatan');
                 } else {
                   toast.error(
                     `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
@@ -271,7 +276,6 @@ const RenjaTable = () => {
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
-          // renderBody={(table) => tableBody({ table })}
           pesanDataKosong={
             <PesanSKPDTabel
               selectedSKPD={selectedSKPD.toString()}
@@ -281,7 +285,83 @@ const RenjaTable = () => {
           }
         />
       </div>
-      {isPreview &&
+
+      {mode === 'catatan' ? (
+        <DialogModal
+          widthLevel={6}
+          title='Catatan'
+          isOpen={mode === 'catatan'}
+          onClose={() => {
+            setMode('close');
+          }}
+        >
+          <FormCatatan
+            onPreview={() => setMode('preview')}
+            type='renja'
+            skpdPerId={Number(selectedSKPD)}
+            setCatatan={setCatatan}
+          />
+        </DialogModal>
+      ) : (
+        mode === 'preview' &&
+        createPortal(
+          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
+            <div className='border-b'>
+              <div className='flex flex-row justify-between p-2'>
+                <button
+                  onClick={() => setMode('close')}
+                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
+                  aria-label='Tutup preview'
+                >
+                  <MdClose />
+                </button>
+                <InputButton
+                  className='h-9'
+                  onClick={() => {
+                    if (data) {
+                      toast.promise(
+                        exportRenja(
+                          data,
+                          listSKPDPeriode.find(
+                            (item) => item.value === selectedSKPD,
+                          )?.label ?? '', catatan
+                        ),
+                        {
+                          loading: 'Sedang mengunduh...',
+                          success: <b>Berhasil mengunduh.</b>,
+                          error: <b>Gagal mengunduh.</b>,
+                        },
+                      );
+                    } else {
+                      toast.error(
+                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
+                      );
+                    }
+                  }}
+                >
+                  <span className='inline-flex items-center gap-2 px-2'>
+                    <MdPrint />
+                    Cetak Excel
+                  </span>
+                </InputButton>
+              </div>
+            </div>
+            <div className='p-2 overflow-auto'>
+              <RenjaPreviewTable
+                data={data || []}
+                catatan={catatan}
+                skpd={
+                  listSKPDPeriode.find((item) => item.value === selectedSKPD)
+                    ?.label ?? ''
+                }
+              />
+            </div>
+          </div>,
+          document.body,
+        )
+      )}
+
+      {/* {isPreview &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
             <div className='border-b'>
@@ -302,7 +382,7 @@ const RenjaTable = () => {
                           data,
                           listSKPDPeriode.find(
                             (item) => item.value === selectedSKPD,
-                          )?.label ?? '',
+                          )?.label ?? '', catatan
                         ),
                         {
                           loading: 'Sedang mengunduh...',
@@ -332,15 +412,10 @@ const RenjaTable = () => {
                     ?.label ?? ''
                 }
               />
-              {/* <RKPDPreviewTable
-                data={data || []}
-                listTahunKe={listTahunKe}
-                tahunKe={tahunKe}
-              /> */}
             </div>
           </div>,
           document.body,
-        )}
+        )} */}
     </>
   );
 };

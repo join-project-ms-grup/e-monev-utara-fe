@@ -4,13 +4,15 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { getPeriodeAkhirFromCookie } from '../../../../lib/usercookie';
 import type { FlatRKPDTriwulan } from '../../../../services/RKPDService';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
+import type { CatatanForm } from '../../../../services/CatatanService';
 
 interface MainTableProps {
   data: FlatRKPDTriwulan[];
   skpd: string;
+  catatan: CatatanForm
 }
 
-const RenjaPreviewTable = ({ data, skpd }: MainTableProps) => {
+const RenjaPreviewTable = ({ data, skpd, catatan }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -105,20 +107,22 @@ const RenjaPreviewTable = ({ data, skpd }: MainTableProps) => {
           <td colSpan={15}></td>
         </tr>
         <tr>
-          <td colSpan={25}>Faktor pendorong keberhasilan kinerja:</td>
+          <td colSpan={25}>Faktor pendorong keberhasilan kinerja: {catatan.pendorong}</td>
         </tr>
         <tr>
-          <td colSpan={25}>Faktor penghambat pencapaian kinerja:</td>
+          <td colSpan={25}>Faktor penghambat pencapaian kinerja: {catatan.penghambat}</td>
         </tr>
         <tr>
           <td colSpan={25}>
             Tindak lanjut yang diperlukan dalam triwulan berikutnya*{`)`}:
+            {` `}{catatan.tl_1}
           </td>
         </tr>
         <tr>
           <td colSpan={25}>
             Tindak lanjut yang diperlukan dalam Renja Perangkat Daerah
             kabupaten/kota berikutnya*{`)`}:
+            {` `}{catatan.tl_2}
           </td>
         </tr>
       </>

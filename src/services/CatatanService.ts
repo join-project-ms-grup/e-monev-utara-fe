@@ -19,3 +19,13 @@ export const updateCatatanEvaluasi = async (payload: CatatanForm): Promise<Catat
     const response = await api.post<ApiResponse<CatatanForm>>(`/renstra/hasil/cu-catatan`, payload);
     return response.data.data;
 };
+
+export const getCatatanEvaluasiRKPD = async (payload: Pick<CatatanForm, 'skpd_periode_id' | 'type'>): Promise<Omit<CatatanForm, 'type' | 'skpd_periode_id'>> => {
+    const response = await api.post<ApiResponse<Omit<CatatanForm, 'type' | 'skpd_periode_id'>>>(`/rkpd/hasil/get-catatan`, payload);
+    return response.data.data;
+};
+
+export const updateCatatanEvaluasiRKPD = async (payload: CatatanForm): Promise<CatatanForm> => {
+    const response = await api.post<ApiResponse<CatatanForm>>(`/rkpd/hasil/cu-catatan`, payload);
+    return response.data.data;
+};

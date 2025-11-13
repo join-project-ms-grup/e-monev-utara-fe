@@ -2,6 +2,7 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
 import type { FlatRKPDTriwulan } from '../RKPDService';
+import type { CatatanForm } from '../CatatanService';
 
 /**
  * Export RKPD.
@@ -13,6 +14,7 @@ import type { FlatRKPDTriwulan } from '../RKPDService';
 export const exportRKPD = async (
   data: FlatRKPDTriwulan[],
   skpd: string,
+  catatan: CatatanForm,
   opts?: { startRow?: number },
 ) => {
   const startRow = opts?.startRow ?? 13;
@@ -201,10 +203,10 @@ export const exportRKPD = async (
   const rowsConfig = [
     { offset: 1, merge: 'A:O', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
     { offset: 2, merge: 'A:O', text: 'Predikat kinerja', align: 'right' },
-    { offset: 3, merge: 'A:AD', text: 'Faktor pendorong keberhasilan kinerja:' },
-    { offset: 4, merge: 'A:AD', text: 'Faktor penghambat pencapaian kinerja:' },
-    { offset: 5, merge: 'A:AD', text: 'Tindak lanjut yang diperlukan dalam triwulan berikutnya:' },
-    { offset: 6, merge: 'A:AD', text: 'Tindak lanjut yang diperlukan dalam RKPD berikutnya:' }
+    { offset: 3, merge: 'A:AD', text: `Faktor pendorong keberhasilan kinerja: ${catatan.pendorong}` },
+    { offset: 4, merge: 'A:AD', text: `Faktor penghambat pencapaian kinerja: ${catatan.penghambat}` },
+    { offset: 5, merge: 'A:AD', text: `Tindak lanjut yang diperlukan dalam triwulan berikutnya: ${catatan.tl_1}` },
+    { offset: 6, merge: 'A:AD', text: `Tindak lanjut yang diperlukan dalam RKPD berikutnya: ${catatan.tl_2}` }
   ];
 
   rowsConfig.forEach(({ offset, merge, text, align = 'left' }) => {

@@ -28,6 +28,9 @@ import RKPDPreviewTable from './RKPDPreviewTable';
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
 import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
+import type { CatatanForm } from '../../../../services/CatatanService';
+import DialogModal from '../../../inputs/DialogModal';
+import FormCatatan from '../../../forms/FormCatatan';
 
 const RKPDTable = () => {
   //#region SKPD dan Tahun ke
@@ -174,9 +177,11 @@ const RKPDTable = () => {
     },
   ];
 
-  const [isPreview, setIsPreview] = useState(false);
+  const [mode, setMode] = useState<'close' | 'catatan' | 'preview'>('close');
+  const [catatan, setCatatan] = useState<CatatanForm>({});
+
   useEffect(() => {
-    if (isPreview) {
+    if (mode === 'preview') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -185,7 +190,7 @@ const RKPDTable = () => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isPreview]);
+  }, [mode === 'preview']);
 
   return (
     <>
@@ -217,7 +222,7 @@ const RKPDTable = () => {
               className='btn btn-theme w-9 h-9'
               onClick={() => {
                 if (data) {
-                  setIsPreview(true);
+                  setMode('catatan');
                 } else {
                   toast.error(
                     `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
@@ -247,13 +252,31 @@ const RKPDTable = () => {
           }
         />
       </div>
-      {isPreview &&
+
+      {mode === 'catatan' ? (
+        <DialogModal
+          widthLevel={6}
+          title='Catatan'
+          isOpen={mode === 'catatan'}
+          onClose={() => {
+            setMode('close');
+          }}
+        >
+          <FormCatatan
+            onPreview={() => setMode('preview')}
+            type='rkpd'
+            skpdPerId={Number(selectedSKPD)}
+            setCatatan={setCatatan}
+          />
+        </DialogModal>
+      ) : (
+        mode === 'preview' &&
         createPortal(
           <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
             <div className='border-b'>
               <div className='flex flex-row justify-between p-2'>
                 <button
-                  onClick={() => setIsPreview(false)}
+                  onClick={() => setMode('close')}
                   className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
                   aria-label='Tutup preview'
                 >
@@ -269,6 +292,7 @@ const RKPDTable = () => {
                           listSKPDPeriode.find(
                             (item) => item.value === selectedSKPD,
                           )?.label ?? '',
+                          catatan,
                         ),
                         {
                           loading: 'Sedang mengunduh...',
@@ -293,6 +317,7 @@ const RKPDTable = () => {
             <div className='p-2 overflow-auto'>
               <RKPDPreviewTable
                 data={data || []}
+                catatan={catatan}
                 skpd={
                   listSKPDPeriode.find((item) => item.value === selectedSKPD)
                     ?.label ?? ''
@@ -301,7 +326,8 @@ const RKPDTable = () => {
             </div>
           </div>,
           document.body,
-        )}
+        )
+      )}
     </>
   );
 };

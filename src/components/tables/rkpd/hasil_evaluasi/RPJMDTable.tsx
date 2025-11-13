@@ -231,7 +231,6 @@ const RPJMDTable = () => {
           data={data || []}
           columns={columns}
           renderHeader={tableHead}
-          // renderBody={(table) => tableBody(table)}
           pesanDataKosong={
             <PesanSKPDTabel selectedSKPD={selectedSKPD.toString()} />
           }
@@ -287,61 +286,11 @@ const RPJMDTable = () => {
             </div>
             <div className='p-2 overflow-auto'>
               <RPJMDPreviewTable data={data || []} catatan={catatan} />
-              {/* <RenstraPreviewTable
-                data={data || []}
-                catatan={catatan}
-                skpd={
-                  dataSKPDPeriode?.find((s) => s.id === Number(selectedSKPD))
-                    ?.skpd_name ?? ''
-                }
-              /> */}
             </div>
           </div>,
           document.body,
         )
       )}
-
-      {/* {isPreview &&
-        createPortal(
-          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
-            <div className='border-b'>
-              <div className='flex flex-row justify-between p-2'>
-                <button
-                  onClick={() => setIsPreview(false)}
-                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-                  aria-label='Tutup preview'
-                >
-                  <MdClose />
-                </button>
-                <InputButton
-                  className='h-9'
-                  onClick={() => {
-                    if (data) {
-                      toast.promise(exportRPJMD(data), {
-                        loading: 'Sedang mengunduh...',
-                        success: <b>Berhasil mengunduh.</b>,
-                        error: <b>Gagal mengunduh.</b>,
-                      });
-                    } else {
-                      toast.error(
-                        `${!selectedSKPD ? 'SKPD' : ''} belum dipilih`,
-                      );
-                    }
-                  }}
-                >
-                  <span className='inline-flex items-center gap-2 px-2'>
-                    <MdPrint />
-                    Cetak Excel
-                  </span>
-                </InputButton>
-              </div>
-            </div>
-            <div className='p-2 overflow-auto'>
-              <RPJMDPreviewTable data={data || []} />
-            </div>
-          </div>,
-          document.body,
-        )} */}
     </>
   );
 };
