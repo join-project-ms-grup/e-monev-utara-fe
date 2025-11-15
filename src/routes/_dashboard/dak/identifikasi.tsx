@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import FormIdentifikasiDak from '../../../components/forms/IdentifikasiDak/FormIdentifikasiDak';
 import IdentifikasiDakTable from '../../../components/tables/dak/IdentifikasiDakTable';
 import { SITE_NAME } from '../../../lib/config';
 import FormEditIdentDak from '../../../components/forms/IdentifikasiDak/FormEditIdentDak';
+import F_IdentDak from '../../../components/forms/IdentifikasiDak/F_IdentDak';
 
 export const Route = createFileRoute('/_dashboard/dak/identifikasi')({
   head: () => ({
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_dashboard/dak/identifikasi')({
 });
 
 function RouteComponent() {
-  const [posisi, setPosisi] = useState<'Tabel' | 'Add' | 'Edit'>('Tabel');
+  const [posisi, setPosisi] = useState<'Tabel' | 'Add' | 'Edit'>('Add');
 
   type DakData = {
     tahun: string;
@@ -52,29 +52,31 @@ function RouteComponent() {
           handleChange('id_ident', '');
           setPosisi('Add');
         }}
-        onEdit={() => setPosisi('Edit')}
+        onEdit={() => setPosisi('Add')}
         dakData={dakData}
         changeDakData={handleChange}
       />
     );
   } else if (posisi === 'Add') {
     return (
-      <FormIdentifikasiDak
+      <F_IdentDak
+        dakData={dakData}
         onBack={() => {
           handleChange('id_ident', '');
           setPosisi('Tabel');
         }}
       />
     );
-  } else {
-    return (
-      <FormEditIdentDak
-        dataDak={dakData}
-        onBack={() => {
-          handleChange('id_ident', '');
-          setPosisi('Tabel');
-        }}
-      />
-    );
-  }
+  } 
+  // else {
+  //   return (
+  //     <FormEditIdentDak
+  //       dataDak={dakData}
+  //       onBack={() => {
+  //         handleChange('id_ident', '');
+  //         setPosisi('Tabel');
+  //       }}
+  //     />
+  //   );
+  // }
 }

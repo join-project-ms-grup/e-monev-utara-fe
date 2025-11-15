@@ -54,6 +54,7 @@ function RootComponent() {
       <HeadContent />
       <Outlet />
       <Tooltip id='tooltip' className='z-[99999]' />
+      <Tooltip id='tooltip-input' className='z-[99999]' />
       <ToastComponent />
     </>
   );

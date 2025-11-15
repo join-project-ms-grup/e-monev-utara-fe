@@ -61,7 +61,7 @@ const InputFile = ({
     <div
       {...(tooltip &&
         fileName && {
-          'data-tooltip-id': 'tooltip',
+          'data-tooltip-id': 'tooltip-input',
           'data-tooltip-content': fileName,
         })}
       className={`${wrapperClassname} bg-white shadow input-wrapper h-9 inline-flex items-center ${

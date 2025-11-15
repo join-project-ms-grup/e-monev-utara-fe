@@ -43,7 +43,7 @@ const InputText = ({
   isRibu = false,
   onClear,
   tooltip,
-  tooltipId = 'tooltip',
+  tooltipId = 'tooltip-input',
   IconlabelPos = 'left',
   ...props
 }: InputProps) => {
@@ -160,5 +160,4 @@ const InputText = ({
   );
 };
 
-// export default InputText;
 export default React.memo(InputText);

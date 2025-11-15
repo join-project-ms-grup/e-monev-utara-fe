@@ -1,39 +1,39 @@
-import React from 'react';
-import InputFile from '../../inputs/InputFile';
-import InputTextArea from '../../inputs/InputTextArea';
-import ErrorField from '../ErrorField';
+import { withForm } from '../form-context';
+import { initIdentDAKForm } from './FV_IdentDak';
 
-const FormIdentDokumenDak = ({ form }: { form: any }) => {
-  const listDokName = [
-    { kode: 0, name: 'PERENCANAAN' },
-    { kode: 1, name: 'PMK (Alokasi dan Pedoman Umum)' },
-    { kode: 2, name: 'Petunjuk Teknis (Juknis)' },
-    { kode: 3, name: 'Penyusunan Rencana Kerja dan Anggaran SKPD' },
-    { kode: 4, name: 'Penetapan DPA - SKPD' },
-    { kode: 0, name: 'PELAKSANAAN' },
-    { kode: 5, name: 'SK Penetapan Pelaksanaan Kegiatan' },
-    { kode: 6, name: 'Pelaksanaan Tender Pekerjaan Kontrak' },
-    { kode: 7, name: 'Persiapan Pekerjaan Swakelola' },
-    { kode: 8, name: 'Pelaksanaan Pekerjaan Kontrak' },
-    { kode: 9, name: 'Pelaksanaan Pekerjaan Swakelola' },
-    { kode: 10, name: 'Penerbitan Surat Permintaan Pembayaran (SPP)' },
-    { kode: 11, name: 'Penerbitan Surat Perintah Membayar (SPM)' },
-    { kode: 12, name: 'Penerbitan Surat Perintah Pencairan Dana (SP2D)' },
-  ];
+export const FC_DokIdentDak = withForm({
+  defaultValues: initIdentDAKForm,
+  props: {
+    title: '',
+  },
+  render: function Render({ form, title }) {
+    const listDokName = [
+      { kode: 0, name: 'PERENCANAAN' },
+      { kode: 1, name: 'PMK (Alokasi dan Pedoman Umum)' },
+      { kode: 2, name: 'Petunjuk Teknis (Juknis)' },
+      { kode: 3, name: 'Penyusunan Rencana Kerja dan Anggaran SKPD' },
+      { kode: 4, name: 'Penetapan DPA - SKPD' },
+      { kode: 0, name: 'PELAKSANAAN' },
+      { kode: 5, name: 'SK Penetapan Pelaksanaan Kegiatan' },
+      { kode: 6, name: 'Pelaksanaan Tender Pekerjaan Kontrak' },
+      { kode: 7, name: 'Persiapan Pekerjaan Swakelola' },
+      { kode: 8, name: 'Pelaksanaan Pekerjaan Kontrak' },
+      { kode: 9, name: 'Pelaksanaan Pekerjaan Swakelola' },
+      { kode: 10, name: 'Penerbitan Surat Permintaan Pembayaran (SPP)' },
+      { kode: 11, name: 'Penerbitan Surat Perintah Membayar (SPM)' },
+      { kode: 12, name: 'Penerbitan Surat Perintah Pencairan Dana (SP2D)' },
+    ];
 
-  return (
-    <>
-      {/* NARK: CHECKLIST DOKUMEN KEGIATAN */}
-      <div>
-        <div className='flex items-center mb-4'>
+    return (
+      <>
+        <div className='flex items-center justify-center mb-4'>
           <div className='flex-grow h-px bg-[var(--color-3)]'></div>
-          <h5 className='whitespace-nowrap mx-3'>
-            Checklist Dokumen dan Kegiatan Pelaksanaan
-          </h5>
+          {/* MARK: CHECKLIST DOKUMEN DAN KEGIATAN PELAKSANAAN */}
+          <h5 className='whitespace-nowrap mx-3'>{title}</h5>
           <div className='flex-grow h-px bg-[var(--color-3)]'></div>
         </div>
         <i className='opacity-75'>
-          *Maks. @File Upload <b>98 MB</b>- File yang diijinkan:{' '}
+          *Maks. @File Upload <b>98 MB</b>- Format:{' '}
           <b>doc, docx, xls, xlsx, pdf</b>
         </i>
 
@@ -72,7 +72,11 @@ const FormIdentDokumenDak = ({ form }: { form: any }) => {
                       <b>{dok.name}</b>
                     </td>
                     <td>
-                      <form.Field name={`dokumen[${dok.kode - 1}].file`}>
+                      <form.AppField
+                        name={`dokumen[${dok.kode - 1}].file`}
+                        children={(field) => <field.FileField label='' />}
+                      />
+                      {/* <form.Field name={`dokumen[${dok.kode - 1}].file`}>
                         {(field: any) => (
                           <div>
                             <InputFile
@@ -89,11 +93,20 @@ const FormIdentDokumenDak = ({ form }: { form: any }) => {
                             <ErrorField field={field} />
                           </div>
                         )}
-                      </form.Field>
+                      </form.Field> */}
                     </td>
                     <td></td>
                     <td>
-                      <form.Field name={`dokumen[${dok.kode - 1}].Waktu`}>
+                      <form.AppField
+                        name={`dokumen[${dok.kode - 1}].Waktu`}
+                        children={(field) => (
+                          <field.TextAreaField
+                            label=''
+                            placeholder='Waktu...'
+                          />
+                        )}
+                      />
+                      {/* <form.Field name={`dokumen[${dok.kode - 1}].Waktu`}>
                         {(field: any) => (
                           <div>
                             <InputTextArea
@@ -109,10 +122,19 @@ const FormIdentDokumenDak = ({ form }: { form: any }) => {
                             <ErrorField field={field} />
                           </div>
                         )}
-                      </form.Field>
+                      </form.Field> */}
                     </td>
                     <td>
-                      <form.Field name={`dokumen[${dok.kode - 1}].Keterangan`}>
+                      <form.AppField
+                        name={`dokumen[${dok.kode - 1}].Keterangan`}
+                        children={(field) => (
+                          <field.TextAreaField
+                            label=''
+                            placeholder='Keterangan...'
+                          />
+                        )}
+                      />
+                      {/* <form.Field name={`dokumen[${dok.kode - 1}].Keterangan`}>
                         {(field: any) => (
                           <div>
                             <InputTextArea
@@ -128,7 +150,7 @@ const FormIdentDokumenDak = ({ form }: { form: any }) => {
                             <ErrorField field={field} />
                           </div>
                         )}
-                      </form.Field>
+                      </form.Field> */}
                     </td>
                     <td></td>
                     <td></td>
@@ -138,9 +160,7 @@ const FormIdentDokumenDak = ({ form }: { form: any }) => {
             </tbody>
           </table>
         </div>
-      </div>
-    </>
-  );
-};
-
-export default FormIdentDokumenDak;
+      </>
+    );
+  },
+});

@@ -8,13 +8,12 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
     queryFn: () => getIdentifikasiDetailDAK(id_ident),
   });
 
-  console.log('DATA DETAIL', data);
   return (
     <>
       {' '}
       <div className='grid grid-cols-2 gap-2'>
         <div className='col-start-1 row-span-2'>
-          <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden'>
+          <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden h-full'>
             <div className='bg-[var(--color-2)] text-[var(--text-3)] px-4 py-2 h-14 flex items-center'>
               Jenis, Bidang, Program & Kegiatan DAK
             </div>
@@ -22,10 +21,10 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
               <table>
                 <tbody className='capitalize'>
                   <tr>
-                    <td className='text-right pr-4 font-bold capitalize w-[150px]'>
+                    <td className='text-right pr-4 font-bold capitalize w-[25%]'>
                       Jenis DAK
                     </td>
-                    <td>{data?.jenis_dak}</td>
+                    <td className='w-[75%]'>{data?.jenis_dak}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Sub-Jenis DAK</td>
@@ -33,13 +32,13 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Bidang DAK</td>
-                    <td>-</td>
+                    <td>{data?.bidang_dak}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>
                       Sub-Bidang DAK
                     </td>
-                    <td>-</td>
+                    <td>{data?.sub_bidang_dak}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Tahun</td>
@@ -94,10 +93,10 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
               <table>
                 <tbody className='capitalize'>
                   <tr>
-                    <td className='text-right pr-4 font-bold w-[150px]'>
+                    <td className='text-right pr-4 font-bold w-[25%]'>
                       Nama Paket
                     </td>
-                    <td>{data?.nama_paket}</td>
+                    <td className='w-[75%]'>{data?.nama_paket}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Detail Paket</td>
@@ -163,10 +162,10 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
               <table>
                 <tbody className='capitalize'>
                   <tr>
-                    <td className='text-right pr-4 font-bold w-[150px]'>
+                    <td className='text-right pr-4 font-bold w-[25%]'>
                       Mekanisme
                     </td>
-                    <td>{data?.mekanisme}</td>
+                    <td className='w-[75%]'>{data?.mekanisme}</td>
                   </tr>
                   <tr>
                     <td className='text-right pr-4 font-bold'>Volume</td>

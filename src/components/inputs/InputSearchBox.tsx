@@ -35,6 +35,7 @@ export interface InputSelectBoxProps {
   placeholder?: string;
   tooltip?: boolean;
   onClear?: () => void;
+  onBlur?: () => void;
 }
 
 export default function InputSearchBox({
@@ -54,6 +55,7 @@ export default function InputSearchBox({
   placeholder,
   tooltip = false,
   onClear,
+  onBlur,
 }: InputSelectBoxProps) {
   const allOptions = defaultOptionLabel
     ? [{ label: defaultOptionLabel, value: '' }, ...options]
@@ -97,7 +99,7 @@ export default function InputSearchBox({
     'focus:outline-none',
     `after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-gray-200 after:transition-all after:opacity-100`,
     'focus:after:bg-[var(--color-2)] focus:after:opacity-50',
-    `${disabled ? 'opacity-60 cursor-default!' : ''}`
+    `${disabled ? 'opacity-60 cursor-default!' : ''}`,
   );
   const menuClass = clsx(
     '[--anchor-gap:0] [--anchor-max-height:12rem] w-(--button-width) p-1 bg-gray-50 rounded-b shadow-lg focus-visible:outline-0 z-[9999]',
@@ -110,6 +112,7 @@ export default function InputSearchBox({
           id={id}
           ref={buttonRef}
           className={btnClass}
+          onBlur={onBlur}
           {...(tooltip &&
             currentValue && {
               'data-tooltip-id': 'tooltip',
@@ -126,7 +129,7 @@ export default function InputSearchBox({
             className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-8 ${invalid ? 'opacity-100' : 'opacity-0'}`}
           />
         </ListboxButton>
-        {onClear && (currentValue !== '' && currentValue !== '0') && (
+        {onClear && currentValue !== '' && currentValue !== '0' && (
           <button
             type='button'
             className='bg-white transition-all text-red-500 hover:text-red-400 px-1'
@@ -135,7 +138,7 @@ export default function InputSearchBox({
             <MdClear className='transition-all active:scale-80' />
           </button>
         )}
-        <ListboxOptions anchor='bottom' className={menuClass} modal={false} >
+        <ListboxOptions anchor='bottom' className={menuClass} modal={false}>
           {withSearch && (
             <input
               type='text'
@@ -159,7 +162,7 @@ export default function InputSearchBox({
                 value={option.value}
                 disabled={option.disabled || option.value === ''}
                 className={`truncate data-focus:bg-[var(--color-2)] data-focus:text-[var(--text-3)] cursor-pointer py-1 px-2 rounded ${
-                  (option.value === '') ? 'text-gray-400' : ''
+                  option.value === '' ? 'text-gray-400' : ''
                 } ${option.disabled ? 'text-gray-400' : ''}`}
               >
                 {option.label}

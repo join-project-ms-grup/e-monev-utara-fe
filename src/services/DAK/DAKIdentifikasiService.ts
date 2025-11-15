@@ -137,12 +137,12 @@ export const getIdentifikasiDetailDAK = async (id: number): Promise<Identifikasi
 
 export interface IdentifikasiDAKForm {
     // non payload
-    n_jenisDAK: string;
-    n_bidangDAK: string;
-    n_idUrusan: string;
-    n_idBidang: string;
-    n_idProgram: string;
-    n_idKegiatan: string;
+    jenis_dak_id: string;
+    bidang_dak_id: string;
+    urusan_id: string;
+    bidang_id: string;
+    program_id: string;
+    kegiatan_id: string;
     // payload
     sub_jenis_id: number;
     sub_bidang_id: number;
@@ -176,6 +176,7 @@ export interface IdentifikasiDAKForm {
 }
 
 export interface IdentifikasiDAKFormSubmit {
+    id_ident?: number;
     sub_jenis_id: number;
     sub_bidang_id: number;
     tahun: number;
@@ -199,7 +200,7 @@ export interface IdentifikasiDAKFormSubmit {
     metode: string;
     volume_mekanisme: number;
     uang_mekanisme: number;
-    dokumen: {
+    dokumen?: {
         id_berkas: number;
         file: File | string | null;
         Waktu: string | null;
@@ -212,11 +213,7 @@ export const addIdentifikasiDAK = async (payload: IdentifikasiDAKFormSubmit): Pr
     return response.data.data;
 };
 
-export type IdentifikasiDAKFormEdit = Omit<IdentifikasiDAKFormSubmit, 'dokumen'> & {
-    id_ident: number;
-};
-
-export const editIdentifikasiDAK = async (payload: IdentifikasiDAKFormEdit): Promise<IdentifikasiDAKFormEdit> => {
-    const response = await api.put<ApiResponse<IdentifikasiDAKFormEdit>>("/dak/fisik/update-ident", payload);
+export const editIdentifikasiDAK = async (payload: IdentifikasiDAKFormSubmit): Promise<IdentifikasiDAKFormSubmit> => {
+    const response = await api.put<ApiResponse<IdentifikasiDAKFormSubmit>>("/dak/fisik/update-ident", payload);
     return response.data.data;
 };

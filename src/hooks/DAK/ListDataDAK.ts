@@ -91,7 +91,7 @@ export const useListRekUrusanDAK = () => {
         })) as OptionItem[] || []
     )
 }
-export const useListRekBidangDAK = (id_urusan: number | null) => {
+export const useListRekBidangDAK = (id_urusan: number) => {
     const { data } = useQuery({
         queryKey: ['list_rek_bidang_dak', id_urusan],
         queryFn: () => getRekBidangDAK(id_urusan),
