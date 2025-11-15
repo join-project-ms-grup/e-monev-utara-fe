@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import IdentifikasiDakTable from '../../../components/tables/dak/IdentifikasiDakTable';
 import { SITE_NAME } from '../../../lib/config';
-import FormEditIdentDak from '../../../components/forms/IdentifikasiDak/FormEditIdentDak';
 import F_IdentDak from '../../../components/forms/IdentifikasiDak/F_IdentDak';
 
 export const Route = createFileRoute('/_dashboard/dak/identifikasi')({
@@ -20,7 +19,7 @@ export const Route = createFileRoute('/_dashboard/dak/identifikasi')({
 });
 
 function RouteComponent() {
-  const [posisi, setPosisi] = useState<'Tabel' | 'Add' | 'Edit'>('Add');
+  const [posisi, setPosisi] = useState<'Tabel' | 'Add' | 'Edit'>('Tabel');
 
   type DakData = {
     tahun: string;
@@ -68,15 +67,4 @@ function RouteComponent() {
       />
     );
   } 
-  // else {
-  //   return (
-  //     <FormEditIdentDak
-  //       dataDak={dakData}
-  //       onBack={() => {
-  //         handleChange('id_ident', '');
-  //         setPosisi('Tabel');
-  //       }}
-  //     />
-  //   );
-  // }
 }

@@ -193,36 +193,6 @@ const IdentifikasiDakTable = ({
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
           <div>
-            <label htmlFor='tahun_ke'>Tahun</label>
-            <InputSearchBox
-              id='tahun_ke'
-              className='w-42 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih Tahun ke...'
-              value={dakData.tahun}
-              options={listTahunDAK}
-              onChange={(val) => {
-                changeDakData('tahun', val);
-              }}
-              onClear={() => changeDakData('tahun', '')}
-            />
-          </div>
-          <div>
-            <label htmlFor='opd'>OPD</label>
-            <InputSearchBox
-              id='opd'
-              className='w-72 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih OPD'
-              value={dakData.opd}
-              options={listOPDDAK}
-              onChange={(val) => changeDakData('opd', val)}
-              onClear={() => changeDakData('opd', '')}
-              withSearch
-              tooltip
-            />
-          </div>
-          <div>
             <label htmlFor='subJenis'>Jenis DAK</label>
             <InputSearchBox
               id='subJenis'
@@ -248,13 +218,47 @@ const IdentifikasiDakTable = ({
             <label htmlFor='subJenis'>Sub-Jenis DAK</label>
             <InputSearchBox
               id='subJenis'
-              className='w-44 h-9'
+              className='w-56 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
               options={listSubJenisDAK}
               value={dakData.subJenis}
               onChange={(val) => changeDakData('subJenis', val)}
               onClear={() => changeDakData('subJenis', '')}
+              withSearch
+              disabled={!dakData.jenis}
+            />
+          </div>
+          <div>
+            <label htmlFor='tahun_ke'>Tahun</label>
+            <InputSearchBox
+              id='tahun_ke'
+              className='w-42 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Tahun ke...'
+              value={dakData.tahun}
+              options={listTahunDAK}
+              onChange={(val) => {
+                changeDakData('tahun', val);
+              }}
+              onClear={() => changeDakData('tahun', '')}
+              disabled={!dakData.subJenis}
+            />
+          </div>
+          <div>
+            <label htmlFor='opd'>OPD</label>
+            <InputSearchBox
+              id='opd'
+              className='w-72 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih OPD'
+              value={dakData.opd}
+              options={listOPDDAK}
+              onChange={(val) => changeDakData('opd', val)}
+              onClear={() => changeDakData('opd', '')}
+              withSearch
+              tooltip
+              disabled={!dakData.tahun}
             />
           </div>
         </div>
