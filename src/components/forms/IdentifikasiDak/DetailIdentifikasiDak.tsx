@@ -1,6 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatUang } from '../../../lib/helper';
-import { getIdentifikasiDetailDAK } from '../../../services/DAK/DAKIdentifikasiService';
+import {
+  getIdentifikasiDetailDAK,
+  setStatusIdentDak,
+} from '../../../services/DAK/DAKIdentifikasiService';
+import InputSearchBox from '../../inputs/InputSearchBox';
+import toast from 'react-hot-toast';
 
 const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
   const { data } = useQuery({
@@ -8,9 +13,28 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
     queryFn: () => getIdentifikasiDetailDAK(id_ident),
   });
 
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (payload: { id_ident: number; status: string }) => {
+      return setStatusIdentDak(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['detail_identifikasi_dak', id_ident],
+      });
+    },
+  });
+
+  const handleStatus = (data: { id_ident: number; status: string }) => {
+    toast.promise(mutation.mutateAsync(data), {
+      loading: 'Memperbarui status...',
+      success: 'Status berhasil diubah',
+      error: 'Terjadi kesalahan',
+    });
+  };
+
   return (
     <>
-      {' '}
       <div className='grid grid-cols-2 gap-2'>
         <div className='col-start-1 row-span-2'>
           <div className='border border-gray-300 bg-gray-100 rounded overflow-hidden h-full'>
@@ -77,6 +101,47 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                   <tr>
                     <td className='text-right pr-4 font-bold'>Sub Kegiatan</td>
                     <td>{data?.subKegiatan}</td>
+                  </tr>
+                  <tr>
+                    <td className='text-right pr-4 font-bold'>Status</td>
+                    <td>
+                      <div className='space-y-2'>
+                        <InputSearchBox
+                          value={data?.verif_status}
+                          options={[
+                            { label: 'Di Periksa', value: 'di_periksa' },
+                            { label: 'Cek Ulang', value: 'cek_ulang' },
+                            { label: 'Di Verifikasi', value: 'di_verifikasi' },
+                            { label: 'Belum Sesuai', value: 'belum_sesuai' },
+                          ]}
+                          onChange={(val) => {
+                            handleStatus({ id_ident: id_ident, status: val });
+                          }}
+                        />
+                        <span
+                          className={
+                            data?.verif_status === 'di_periksa'
+                              ? 'text-blue-600'
+                              : data?.verif_status === 'cek_ulang'
+                                ? 'text-orange-600'
+                                : data?.verif_status === 'di_verifikasi'
+                                  ? 'text-green-600'
+                                  : data?.verif_status === 'belum_sesuai'
+                                    ? 'text-red-600'
+                                    : ''
+                          }
+                        >
+                          {data?.verif_status === 'di_periksa' &&
+                            'Data sedang dalam proses pemeriksaan.'}
+                          {data?.verif_status === 'cek_ulang' &&
+                            'Diperlukan pengecekan ulang atau perbaikan data.'}
+                          {data?.verif_status === 'di_verifikasi' &&
+                            'Data telah berhasil diverifikasi.'}
+                          {data?.verif_status === 'belum_sesuai' &&
+                            'Data belum sesuai.'}
+                        </span>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </table>

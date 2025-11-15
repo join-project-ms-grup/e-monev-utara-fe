@@ -17,7 +17,7 @@ import {
   type FlatIdentifikasiDAK,
 } from '../../../services/DAK/DAKIdentifikasiService';
 import { formatUang } from '../../../lib/helper';
-import { FaInfo } from 'react-icons/fa';
+import { FaExchangeAlt, FaInfo } from 'react-icons/fa';
 import DialogModal from '../../inputs/DialogModal';
 import DetailIdentifikasiDak from '../../forms/IdentifikasiDak/DetailIdentifikasiDak';
 import {
@@ -154,17 +154,18 @@ const IdentifikasiDakTable = ({
                 {formatUang(Number(item.anggaran))}
               </td>
               <td>
-                <div className='inline-flex gap-1'>
+                <div className='inline-flex'>
                   <AksiButton
-                    tooltip='Detail Data'
+                    tooltip='Detail'
                     Icon={FaInfo}
                     onClick={() => {
-                      setFormData({ id_ident: item.id_ident });
-                      setOpenModal(true);
+                      // setFormData({ id_ident: item.id_ident });
+                      setIdIdent(item.id_ident ?? 0);
+                      setModal('Detail');
                     }}
                   />
                   <AksiButton
-                    tooltip='Ubah Data'
+                    tooltip='Ubah'
                     className='hover:bg-green-500!'
                     Icon={MdEdit}
                     onClick={() => {
@@ -181,12 +182,8 @@ const IdentifikasiDakTable = ({
     );
   };
 
-  const [openModal, setOpenModal] = useState(false);
-  // Form Data
-  const initialFormData: any = {
-    id_ident: 0,
-  };
-  const [formData, setFormData] = useState<any>(initialFormData);
+  const [idIdent, setIdIdent] = useState(0);
+  const [modal, setModal] = useState<'' | 'Detail'>('');
 
   return (
     <div className='space-y-2'>
@@ -285,14 +282,20 @@ const IdentifikasiDakTable = ({
         columns={columns}
         renderBody={(table) => tableBody(table)}
       />
-      <DialogModal
-        widthLevel={10}
-        title='Detail Identifikasi DAK'
-        isOpen={openModal}
-        onClose={() => setOpenModal(false)}
-      >
-        <DetailIdentifikasiDak id_ident={formData.id_ident} />
-      </DialogModal>
+      {/* MARK: MODAL */}
+      {modal === 'Detail' && (
+        <DialogModal
+          widthLevel={10}
+          title='Detail Identifikasi DAK'
+          isOpen={modal === 'Detail'}
+          onClose={() => {
+            setModal('');
+            setIdIdent(0);
+          }}
+        >
+          <DetailIdentifikasiDak id_ident={idIdent} />
+        </DialogModal>
+      )}
     </div>
   );
 };

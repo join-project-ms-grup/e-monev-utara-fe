@@ -24,7 +24,7 @@ const AksiButton = ({
   const iconCN = clsx(iconClassName, 'text-xl');
   const btnCN = clsx(
     className,
-    'p-1 transition-all rounded-full hover:text-[var(--text-3)] active:scale-90',
+    'p-2 transition-all bg-red-50 shadow-sm rounded-full hover:text-[var(--text-3)] scale-85 active:scale-70',
     `hover:${hoverColor}`
   );
 

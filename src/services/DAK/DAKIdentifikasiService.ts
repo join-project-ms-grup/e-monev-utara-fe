@@ -88,7 +88,7 @@ export interface IdentifikasiDetailDAK {
     subKegiatan_kode: string;
     subKegiatan: string;
     catatan: string | null;
-    verif_status: "di_periksa" | "disetujui" | "ditolak";
+    verif_status: string;
     nama_paket: string;
     detail_paket: string;
     volume: number;
@@ -216,4 +216,9 @@ export const addIdentifikasiDAK = async (payload: IdentifikasiDAKFormSubmit): Pr
 export const editIdentifikasiDAK = async (payload: IdentifikasiDAKFormSubmit): Promise<IdentifikasiDAKFormSubmit> => {
     const response = await api.put<ApiResponse<IdentifikasiDAKFormSubmit>>("/dak/fisik/update-ident", payload);
     return response.data.data;
+};
+
+export const setStatusIdentDak = async (payload: {id_ident: number, status: string}) => {
+  const response = await api.patch<ApiResponse<any>>(`/dak/fisik/update-tindakan`, payload);
+  return response.data.data;
 };
