@@ -33,6 +33,27 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
     });
   };
 
+  const mapBerkas = Object.fromEntries(
+    data?.dokumen.map((d) => [d.id_berkas, d]) ?? [],
+  );
+
+  const listDokName = [
+    { kode: 0, name: 'PERENCANAAN' },
+    { kode: 1, name: 'PMK (Alokasi dan Pedoman Umum)' },
+    { kode: 2, name: 'Petunjuk Teknis (Juknis)' },
+    { kode: 3, name: 'Penyusunan Rencana Kerja dan Anggaran SKPD' },
+    { kode: 4, name: 'Penetapan DPA - SKPD' },
+    { kode: 0, name: 'PELAKSANAAN' },
+    { kode: 5, name: 'SK Penetapan Pelaksanaan Kegiatan' },
+    { kode: 6, name: 'Pelaksanaan Tender Pekerjaan Kontrak' },
+    { kode: 7, name: 'Persiapan Pekerjaan Swakelola' },
+    { kode: 8, name: 'Pelaksanaan Pekerjaan Kontrak' },
+    { kode: 9, name: 'Pelaksanaan Pekerjaan Swakelola' },
+    { kode: 10, name: 'Penerbitan Surat Permintaan Pembayaran (SPP)' },
+    { kode: 11, name: 'Penerbitan Surat Perintah Membayar (SPM)' },
+    { kode: 12, name: 'Penerbitan Surat Perintah Pencairan Dana (SP2D)' },
+  ];
+
   return (
     <>
       <div className='grid grid-cols-2 gap-2'>
@@ -254,215 +275,64 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
           </div>
         </div>
         <div className='col-span-2'>
-          <div className='table-responsive'>
-            <table className='w-full'>
-              <thead>
-                <tr>
-                  <th>Kode Berkas</th>
-                  <th>Checklist</th>
-                  <th>Berkas</th>
-                  <th>Kesesuaian</th>
-                  <th>Waktu</th>
-                  <th>Keterangan</th>
-                  <th>Pesan Verifikasi</th>
-                  <th>Tanggal & Jam Upload</th>
-                </tr>
-              </thead>
+          <form onSubmit={(e) => {
+            e.preventDefault()
+            alert('SUBMIT')
+          }}>
+            <div className='table-responsive'>
+              <table className='w-full'>
+                <thead>
+                  <tr>
+                    <th>Kode Berkas</th>
+                    <th>Checklist</th>
+                    <th>Berkas</th>
+                    <th>Kesesuaian</th>
+                    <th>Waktu</th>
+                    <th>Keterangan</th>
+                    <th>Pesan Verifikasi</th>
+                    <th>Tanggal & Jam Upload</th>
+                  </tr>
+                </thead>
 
-              <tbody className='text-center'>
-                <tr>
-                  <td>-</td>
-                  <td colSpan={7} className='text-left'>
-                    <b>PERENCANAAN</b>
-                  </td>
-                </tr>
-                {/* 1 */}
-                <tr>
-                  <td>1</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      PMK (Alokasi dan Pedoman Umum)
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 2 */}
-                <tr>
-                  <td>2</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Petunjuk Teknis (Juknis)
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 3 */}
-                <tr>
-                  <td>3</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Penyusunan Rencana Kerja dan Anggaran SKPD
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 4 */}
-                <tr>
-                  <td>4</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>Penetapan DPA - SKPD</span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                <tr>
-                  <td>-</td>
-                  <td colSpan={7} className='text-left'>
-                    <b>PELAKSANAAN</b>
-                  </td>
-                </tr>
-                {/* 5 */}
-                <tr>
-                  <td>5</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      SK Penetapan Pelaksanaan Kegiatan
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 6 */}
-                <tr>
-                  <td>6</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Pelaksanaan Tender Pekerjaan Kontrak
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 7 */}
-                <tr>
-                  <td>7</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Persiapan Pekerjaan Swakelola
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 8 */}
-                <tr>
-                  <td>8</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Pelaksanaan Pekerjaan Kontrak
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 9 */}
-                <tr>
-                  <td>9</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Pelaksanaan Pekerjaan Swakelola
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 10 */}
-                <tr>
-                  <td>10</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Penerbitan Surat Permintaan Pembayaran (SPP)
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 11 */}
-                <tr>
-                  <td>11</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Penerbitan Surat Perintah Membayar (SPM)
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-                {/* 12 */}
-                <tr>
-                  <td>12</td>
-                  <td className='text-left'>
-                    <span className='text-red-500'>
-                      Penerbitan Surat Perintah Pencairan Dana (SP2D)
-                    </span>
-                  </td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                <tbody className='text-center'>
+                  {/* MARK: 12 DOKUMEN */}
+                  {listDokName.map((dok, index) => {
+                    if (dok.kode === 0) {
+                      return (
+                        <tr key={`${index}_${dok.kode}`}>
+                          <td></td>
+                          <td colSpan={7} className='text-left!'>
+                            <b>{dok.name}</b>
+                          </td>
+                        </tr>
+                      );
+                    }
+                    return (
+                      <tr key={`${index}_${dok.kode}`}>
+                        <td>{dok.kode}</td>
+                        <td className='text-left!'>
+                          <b>{dok.name}</b>
+                        </td>
+                        <td>{mapBerkas[dok.kode]?.file ?? '-'}</td>
+                        <td>{mapBerkas[dok.kode]?.Kesesuaian ?? '-'}</td>
+                        <td>{mapBerkas[dok.kode]?.Waktu ?? '-'}</td>
+                        <td>{mapBerkas[dok.kode]?.Keterangan ?? '-'}</td>
+                        <td>{mapBerkas[dok.kode]?.pesan ?? '-'}</td>
+                        <td>
+                          {mapBerkas[dok.kode]?.create_at &&
+                            new Date(
+                              mapBerkas[dok.kode].create_at,
+                            ).toLocaleDateString('id-ID', {
+                              timeZone: 'Asia/Jakarta',
+                            })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </form>
         </div>
       </div>
     </>
