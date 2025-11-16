@@ -1,19 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
-import InputSearchBox, {
-  type OptionItem,
-} from '../../../components/inputs/InputSearchBox';
+import InputSearchBox from '../../../components/inputs/InputSearchBox';
 import { useState } from 'react';
-import {
-  getPeriodeMulaiFromCookie,
-  getPeriodeAkhirFromCookie,
-} from '../../../lib/usercookie';
 import InputButton from '../../../components/inputs/InputButton';
 import { MdPreview } from 'react-icons/md';
-import { exportDAK } from '../../../services/Excel/ExcelDAK';
-import { exportDAKSD } from '../../../services/Excel/ExcelDAKSD';
 import { useQuery } from '@tanstack/react-query';
-import { getOPDDAK } from '../../../services/DAK/DAKOPDService';
+import {
+  useListTahunDAK,
+  useListSubJenisDAK,
+  useListOPDDAK,
+} from '../../../hooks/DAK/ListDataDAK';
+import {
+  getMonitoringDAK,
+  flatMonitoringDAK,
+  flatMonitoringDAKLaporan,
+  getMasalahDAK,
+} from '../../../services/DAK/DAKMonitoringService';
+import { exportDAK } from '../../../services/Excel/ExcelDAK';
 
 export const Route = createFileRoute('/_dashboard/dak/laporan')({
   head: () => ({
@@ -29,159 +32,170 @@ export const Route = createFileRoute('/_dashboard/dak/laporan')({
   component: RouteComponent,
 });
 
+interface DakData {
+  tahun: string;
+  opd: string;
+  jenis: string;
+  subJenis: string;
+  triwulan?: string;
+}
+
 function RouteComponent() {
-  //#region List data periode
-  const [tahunKe, setTahunKe] = useState('');
-  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
-  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
-  const listTahunKe = Array.from(
-    { length: tahunAkhir - tahunMulai + 1 },
-    (_, i) => ({
-      label: `${tahunMulai + i}`,
-      value: `${i + 1}`,
-    }),
-  );
-  //#endregion
-
-  const listPerLaporan = [
-    { label: 'Bulan', value: 'bulan' },
-    { label: 'Triwulan', value: 'triwulan' },
-    { label: 'Semester', value: 'semester' },
-  ];
-
-  const listBulan = [
-    { label: 'Januari', value: '1' },
-    { label: 'Februari', value: '2' },
-    { label: 'Maret', value: '3' },
-    { label: 'April', value: '4' },
-    { label: 'Mei', value: '5' },
-    { label: 'Juni', value: '6' },
-    { label: 'Juli', value: '7' },
-    { label: 'Agustus', value: '8' },
-    { label: 'September', value: '9' },
-    { label: 'Oktober', value: '10' },
-    { label: 'November', value: '11' },
-    { label: 'Desember', value: '12' },
-  ];
-
-  const listTriwulan = [
-    { label: 'Triwulan I', value: '1' },
-    { label: 'Triwulan II', value: '2' },
-    { label: 'Triwulan III', value: '3' },
-    { label: 'Triwulan IV', value: '4' },
-  ];
-
-  const listSemester = [
-    { label: 'Semester I', value: '1' },
-    { label: 'Semester II', value: '2' },
-  ];
-
-  const [perLaporan, setPerLaporan] = useState('triwulan');
-  const [perWaktuLaporan, setPerWaktuLaporan] = useState('1');
-  const [jenisDAK, setJenisDAK] = useState('fisik');
-
-  const [opdDAK, setOPDDAK] = useState('');
-  const { data: dataOPD } = useQuery({
-    queryKey: ['list_opd_dak'],
-    queryFn: getOPDDAK,
+  const [dakData, setDakData] = useState<DakData>({
+    tahun: '',
+    opd: '',
+    jenis: '',
+    subJenis: '',
+    triwulan: '',
   });
-  const listOPD =
-    dataOPD?.map((item) => ({
-      label: `${item.fullname}`,
-      value: item.id?.toString(),
-    })) || [];
+
+  const changeDakData = (key: keyof DakData, val: string) => {
+    setDakData((prev) => ({ ...prev, [key]: val }));
+  };
+
+  const listTahunDAK = useListTahunDAK();
+  const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
+  const listOPDDAK = useListOPDDAK();
+
+  const { data } = useQuery({
+    queryKey: [
+      'list_monitoring_dak',
+      dakData.tahun,
+      dakData.opd,
+      dakData.subJenis,
+      dakData.triwulan,
+    ],
+    queryFn: async () => {
+      const data = await getMonitoringDAK({
+        tahun: Number(dakData.tahun),
+        opd_id: Number(dakData.opd) ?? null,
+        sub_jenis: Number(dakData.subJenis) ?? null,
+        triwulan: Number(dakData.triwulan),
+      });
+      const flatData = flatMonitoringDAK(data);
+      return flatData;
+    },
+    enabled: !!(
+      dakData.tahun &&
+      dakData.opd &&
+      dakData.subJenis &&
+      dakData.triwulan
+    ),
+  });
+
+  const { data: dataMasalah } = useQuery({
+    queryKey: ['list_masalah_dak', dakData.jenis],
+    queryFn: async () => getMasalahDAK(Number(dakData.jenis)),
+    enabled: !!dakData.jenis,
+  });
 
   return (
     <div className='max-w-xl mx-auto flex flex-col space-y-2'>
+      <div className='grid grid-cols-[1fr_2fr] gap-2'>
+        <div>
+          <label htmlFor='jenis'>Jenis DAK</label>
+          <InputSearchBox
+            id='jenis'
+            className='h-9'
+            btnclassName='bg-white'
+            placeholder='Pilih Jenis DAK'
+            options={[
+              { label: 'Fisik', value: '1' },
+              { label: 'Non-Fisik', value: '2' },
+            ]}
+            value={dakData.jenis}
+            onChange={(val) => {
+              changeDakData('jenis', val);
+              changeDakData('subJenis', '');
+              changeDakData('tahun', '');
+              changeDakData('opd', '');
+              changeDakData('triwulan', '');
+            }}
+            onClear={() => {
+              changeDakData('jenis', '');
+              changeDakData('subJenis', '');
+              changeDakData('tahun', '');
+              changeDakData('opd', '');
+              changeDakData('triwulan', '');
+            }}
+          />
+        </div>
+        <div>
+          <label htmlFor='subJenis'>Sub-Jenis DAK</label>
+          <InputSearchBox
+            id='subJenis'
+            className='h-9'
+            btnclassName='bg-white'
+            placeholder='Pilih Sub-Jenis DAK'
+            options={listSubJenisDAK}
+            value={dakData.subJenis}
+            onChange={(val) => {
+              changeDakData('subJenis', val);
+              changeDakData('tahun', '');
+              changeDakData('opd', '');
+              changeDakData('triwulan', '');
+            }}
+            onClear={() => {
+              changeDakData('subJenis', '');
+              changeDakData('tahun', '');
+              changeDakData('opd', '');
+              changeDakData('triwulan', '');
+            }}
+            withSearch
+            disabled={!dakData.jenis}
+          />
+        </div>
+      </div>
       <div className='grid grid-cols-[1fr_1fr] gap-2'>
         <div>
-          <label htmlFor='tahun_ke'>Tahun Anggaran</label>
+          <label htmlFor='tahun_ke'>Tahun</label>
           <InputSearchBox
             id='tahun_ke'
             className='h-9'
-            placeholder='Pilih Tahun...'
-            value={tahunKe}
-            options={listTahunKe}
-            onChange={(val) => setTahunKe(val)}
-            onClear={() => setTahunKe('')}
+            btnclassName='bg-white'
+            placeholder='Pilih Tahun ke...'
+            value={dakData.tahun}
+            options={listTahunDAK}
+            onChange={(val) => {
+              changeDakData('tahun', val);
+              changeDakData('opd', '');
+              changeDakData('triwulan', '');
+            }}
+            onClear={() => {
+              changeDakData('tahun', '');
+              changeDakData('opd', '');
+              changeDakData('triwulan', '');
+            }}
+            disabled={!dakData.subJenis}
           />
         </div>
         <div>
-          <label htmlFor='perTriwulan'>Triwulan</label>
+          <label htmlFor='triwulan'>Triwulan</label>
           <InputSearchBox
-            id='perTriwulan'
+            id='triwulan'
             className='h-9'
-            placeholder='Pilih Triwulan...'
-            options={listTriwulan}
-            value={perWaktuLaporan}
-            onChange={(val) => setPerWaktuLaporan(val)}
+            btnclassName='bg-white'
+            placeholder='Pilih Triwulan'
+            options={[
+              { label: 'I', value: '1' },
+              { label: 'II', value: '2' },
+              { label: 'III', value: '3' },
+              { label: 'IV', value: '4' },
+            ]}
+            value={dakData.triwulan}
+            onChange={(val) => {
+              changeDakData('triwulan', val);
+              changeDakData('opd', '');
+            }}
+            onClear={() => {
+              changeDakData('triwulan', '');
+              changeDakData('opd', '');
+            }}
+            disabled={!dakData.tahun}
           />
         </div>
-        {/* <div>
-          <label htmlFor='jadwal'>Jadwal</label>
-          <InputSearchBox
-            id='jadwal'
-            className='h-9'
-            placeholder='Pilih Jadwal...'
-            options={[]}
-          />
-        </div> */}
       </div>
-      {/* <div className='grid grid-cols-[1fr_2fr] gap-2'>
-        <div>
-          <label htmlFor='perLaporan'>Periode Laporan</label>
-          <InputSearchBox
-            id='perLaporan'
-            className='h-9'
-            placeholder='Pilih Periode...'
-            options={listPerLaporan}
-            value={perLaporan}
-            onChange={(val) => setPerLaporan(val)}
-          />
-        </div>
-        <div>
-          {perLaporan === 'bulan' && (
-            <>
-              <label htmlFor='perBulan'>Bulan</label>
-              <InputSearchBox
-                id='perBulan'
-                className='h-9'
-                placeholder='Pilih Bulan...'
-                options={listBulan}
-                value={perWaktuLaporan}
-                onChange={(val) => setPerWaktuLaporan(val)}
-              />
-            </>
-          )}
-          {perLaporan === 'triwulan' && (
-            <>
-              <label htmlFor='perTriwulan'>Triwulan</label>
-              <InputSearchBox
-                id='perTriwulan'
-                className='h-9'
-                placeholder='Pilih Triwulan...'
-                options={listTriwulan}
-                value={perWaktuLaporan}
-                onChange={(val) => setPerWaktuLaporan(val)}
-              />
-            </>
-          )}
-          {perLaporan === 'semester' && (
-            <>
-              <label htmlFor='perSemester'>Semester</label>
-              <InputSearchBox
-                id='perSemester'
-                className='h-9'
-                placeholder='Pilih Semester...'
-                options={listSemester}
-                value={perWaktuLaporan}
-                onChange={(val) => setPerWaktuLaporan(val)}
-              />
-            </>
-          )}
-        </div>
-      </div> */}
-      <div className='grid grid-cols-[2fr_1fr] gap-2'>
+      <div>
         <div>
           <label htmlFor='opd'>OPD</label>
           <InputSearchBox
@@ -189,26 +203,13 @@ function RouteComponent() {
             className='h-9'
             btnclassName='bg-white'
             placeholder='Pilih OPD'
-            value={opdDAK}
-            options={listOPD as OptionItem[]}
-            onChange={(val) => setOPDDAK(val)}
-            onClear={() => setOPDDAK('')}
+            value={dakData.opd}
+            options={listOPDDAK}
+            onChange={(val) => changeDakData('opd', val)}
+            onClear={() => changeDakData('opd', '')}
             withSearch
             tooltip
-          />
-        </div>
-        <div>
-          <label htmlFor='jenisDak'>Jenis DAK</label>
-          <InputSearchBox
-            id='jenisDak'
-            className='h-9'
-            placeholder='Jenis DAK...'
-            options={[
-              { label: 'DAK Fisik', value: 'fisik' },
-              { label: 'DAK Non-Fisik', value: 'nonfisik' },
-            ]}
-            value={jenisDAK}
-            onChange={(val) => setJenisDAK(val)}
+            disabled={!dakData.triwulan}
           />
         </div>
       </div>
@@ -216,70 +217,19 @@ function RouteComponent() {
         <InputButton
           className='px-2 w-full bg-green-700'
           onClick={() => {
-            const perla = listPerLaporan.find(
-              (item) => item.value === perLaporan,
-            )?.label;
-            const perwala =
-              perLaporan === 'bulan'
-                ? listBulan.find((item) => item.value === perWaktuLaporan)
-                    ?.label
-                : perLaporan === 'triwulan'
-                  ? listTriwulan
-                      .find((item) => item.value === perWaktuLaporan)
-                      ?.label.replace('Triwulan ', '')
-                  : listSemester.find((item) => item.value === perWaktuLaporan)
-                      ?.label;
-            const jdak = jenisDAK === 'fisik' ? 'DAK Fisik' : 'DAK Non-Fisik';
-
-            exportDAK(
-              [],
-              listTahunKe
-                .find((item) => item.value === tahunKe)
-                ?.label.toUpperCase() ?? '',
-              perla?.toUpperCase() ?? '',
-              perwala?.toUpperCase() ?? '',
-              listOPD.find((item) => item.value === opdDAK)?.label ?? '',
-              jdak.toUpperCase(),
-            );
+            if (dakData.opd && data) {
+              exportDAK(
+                data,
+                dataMasalah ?? [],
+                dakData,
+                listOPDDAK.find((i) => i.value === dakData.opd)?.label ?? '',
+              );
+              console.log(data);
+            }
           }}
         >
           <MdPreview />
           Laporan Kemajuan Pelaksanaan Kegiatan DAK
-        </InputButton>
-      </div>
-      <div className='w-full'>
-        <InputButton
-          className='px-2 w-full bg-cyan-700'
-          onClick={() => {
-            const perla = listPerLaporan.find(
-              (item) => item.value === perLaporan,
-            )?.label;
-            const perwala =
-              perLaporan === 'bulan'
-                ? listBulan.find((item) => item.value === perWaktuLaporan)
-                    ?.label
-                : perLaporan === 'triwulan'
-                  ? listTriwulan
-                      .find((item) => item.value === perWaktuLaporan)
-                      ?.label.replace('Triwulan ', '')
-                  : listSemester.find((item) => item.value === perWaktuLaporan)
-                      ?.label;
-            const jdak = jenisDAK === 'fisik' ? 'DAK Fisik' : 'DAK Non-Fisik';
-
-            exportDAKSD(
-              [],
-              listTahunKe
-                .find((item) => item.value === tahunKe)
-                ?.label.toUpperCase() ?? '',
-              perla?.toUpperCase() ?? '',
-              perwala?.toUpperCase() ?? '',
-              listOPD.find((item) => item.value === opdDAK)?.label ?? '',
-              jdak.toUpperCase(),
-            );
-          }}
-        >
-          <MdPreview />
-          Laporan Kemajuan Pelaksanaan Kegiatan DAK (sampai dengan)
         </InputButton>
       </div>
     </div>

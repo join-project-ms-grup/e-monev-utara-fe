@@ -616,16 +616,6 @@ const IdentifikasiDakTable = () => {
                       }
                     }}
                   />
-                  {/* <AksiButton
-                    Icon={MdSave}
-                    className='hover:bg-blue-700!'
-                    tooltip='Simpan Data'
-                  />
-                  <AksiButton
-                    Icon={MdCheckBox}
-                    className='hover:bg-amber-700!'
-                    tooltip='Data Ditindak'
-                  /> */}
                 </div>
               </td>
             </tr>
@@ -721,8 +711,18 @@ const IdentifikasiDakTable = () => {
               placeholder='Pilih Sub-Jenis DAK'
               options={listSubJenisDAK}
               value={dakData.subJenis}
-              onChange={(val) => changeDakData('subJenis', val)}
-              onClear={() => changeDakData('subJenis', '')}
+              onChange={(val) => {
+                changeDakData('subJenis', val);
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+                changeDakData('triwulan', '');
+              }}
+              onClear={() => {
+                changeDakData('subJenis', '');
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+                changeDakData('triwulan', '');
+              }}
               withSearch
               disabled={!dakData.jenis}
             />
@@ -737,8 +737,16 @@ const IdentifikasiDakTable = () => {
               placeholder='Pilih Tahun ke...'
               value={dakData.tahun}
               options={listTahunDAK}
-              onChange={(val) => changeDakData('tahun', val)}
-              onClear={() => changeDakData('tahun', '')}
+              onChange={(val) => {
+                changeDakData('tahun', val);
+                changeDakData('opd', '');
+                changeDakData('triwulan', '');
+              }}
+              onClear={() => {
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+                changeDakData('triwulan', '');
+              }}
               disabled={!dakData.subJenis}
             />
           </div>
@@ -752,8 +760,14 @@ const IdentifikasiDakTable = () => {
               placeholder='Pilih OPD'
               value={dakData.opd}
               options={listOPDDAK}
-              onChange={(val) => changeDakData('opd', val)}
-              onClear={() => changeDakData('opd', '')}
+              onChange={(val) => {
+                changeDakData('opd', val);
+                changeDakData('triwulan', '');
+              }}
+              onClear={() => {
+                changeDakData('opd', '');
+                changeDakData('triwulan', '');
+              }}
               withSearch
               tooltip
               disabled={!dakData.tahun}

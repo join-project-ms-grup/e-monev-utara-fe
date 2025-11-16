@@ -1,6 +1,15 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
-import { waktuNowGabung } from '../../lib/helper';
+import { numOrEmpty, waktuNowGabung } from '../../lib/helper';
+import { type FlatMonitoringDAK, type MasalahDAK } from '../DAK/DAKMonitoringService';
+
+interface DakData {
+    tahun: string;
+    opd: string;
+    jenis: string;
+    subJenis: string;
+    triwulan?: string;
+}
 
 /**
  * Export RKPD mimic dari file sumber.
@@ -13,13 +22,10 @@ import { waktuNowGabung } from '../../lib/helper';
  * @param opts.startRow (optional) baris mulai data (default 16)
  */
 export const exportDAK = async (
-    data: any[],
-    tahun: string,
-    periodeLaporan: string,
-    periodeWaktuLaporan: string,
-    // jadwal: string,
+    data: FlatMonitoringDAK[],
+    dataMasalah: MasalahDAK[],
+    dakData: DakData,
     skpd: string,
-    jenis: string,
     opts?: { startRow?: number },
 ) => {
     const startRow = opts?.startRow ?? 16;
@@ -34,23 +40,22 @@ export const exportDAK = async (
         'A4:S4',
         'A5:S5',
         'B7:S7',
-        'B8:S8',
-        'B9:S9',
         'B10:S10',
-        'A12:A15',
-        'B12:E14', 'B15:E15',
-        'F12:J12', 'F13:F14', 'G13:G14', 'H13:H14','I13:I14',
-        'K12:M12',
-        'M13:M14',
-        'N12:Q12', 'N13:O13', 'P13:Q13',
-        'R12:S12', 'R13:R14', 'S13:S14', 'R15:S15'
+        'B11:S11',
+        'A12:A14',
+        'B12:B14', 'B15:B15',
+
+        'C12:E12', 'C13:C14', 'D13:D14', 'F13:F14',
+        'F12:H12', 'G13:G14',
+        'I12:L12', 'I13:J13', 'K13:L13',
+        'M12:N12', 'M13:M14', 'N13:N14'
     ];
     merges.forEach((m) => {
         try { worksheet.mergeCells(m); } catch (e) { }
     });
 
     const widthMap: Record<string, number> = {
-        A: 15, B: 20, C: 20, D: 20, E: 20, F: 20, G: 20,
+        A: 15, B: 40, C: 20, D: 20, E: 20, F: 20, G: 20,
         H: 20, I: 20, J: 20, K: 20, L: 20, M: 20, N: 20, O: 20,
         P: 20, Q: 20, R: 30, S: 30,
     };
@@ -63,39 +68,37 @@ export const exportDAK = async (
         { addr: 'A2', value: `LAPORAN KEMAJUAN PELAKSANAAN KEGIATAN` },
         { addr: 'A3', value: 'DANA ALOKASI KHUSUS (DAK)' },
         { addr: 'A4', value: 'KABUPATEN BENGKULU UTARA' },
-        { addr: 'A5', value: `TAHUN ANGGARAN ${tahun}` },
+        { addr: 'A5', value: `TAHUN ANGGARAN ${dakData.tahun} TRIWULAN ${dakData.triwulan}` },
 
-        { addr: 'A7', value: `${periodeLaporan}` }, { addr: 'B7', value: `${periodeWaktuLaporan}` },
+        // { addr: 'A7', value: `${periodeLaporan}` }, { addr: 'B7', value: `${periodeWaktuLaporan}` },
         // { addr: 'A8', value: `JADWAL` }, { addr: 'B8', value: `${jadwal}` },
-        { addr: 'A8', value: `SKPD` }, { addr: 'B8', value: `${skpd}` },
-        { addr: 'A9', value: `JENIS` }, { addr: 'B9', value: `${jenis}` },
+        { addr: 'A10', value: `SKPD` }, { addr: 'B10', value: `${skpd.toUpperCase()}` },
+        { addr: 'A11', value: `JENIS` }, { addr: 'B11', value: `${dakData.jenis === '1' ? 'FISIK' : 'NON-FISIK'}` },
 
         { addr: 'A12', value: 'NO' }, { addr: 'A15', value: '1' },
 
         { addr: 'B12', value: 'URAIAN' }, { addr: 'B15', value: '2' },
 
-        { addr: 'F12', value: 'PERENCANAAN KEGIATAN' },
-        { addr: 'F13', value: 'KLASIFIKASI' }, { addr: 'F15', value: '3' },
-        { addr: 'G13', value: 'VOLUME' }, { addr: 'G15', value: '4' },
-        { addr: 'H13', value: 'SATUAN' }, { addr: 'H15', value: '5' },
-        { addr: 'I13', value: 'PENERIMA MANFAAT' }, { addr: 'I15', value: '6' },
-        { addr: 'J13', value: 'PAGU DAK FISIK' }, { addr: 'J14', value: '(Rp)' }, { addr: 'J15', value: '7' },
+        { addr: 'C12', value: 'PERENCANAAN KEGIATAN' },
+        { addr: 'C13', value: 'VOLUME' }, { addr: 'C15', value: '4' },
+        { addr: 'D13', value: 'PENERIMA MANFAAT' }, { addr: 'D15', value: '6' },
+        { addr: 'E13', value: 'PAGU DAK FISIK' }, { addr: 'E14', value: '(Rp)' }, { addr: 'E15', value: '7' },
 
-        { addr: 'K12', value: 'MEKANISME PELAKSANAAN' },
-        { addr: 'K13', value: 'SWAKELOLA' }, { addr: 'K14', value: '(Rp)' }, { addr: 'K15', value: '8' },
-        { addr: 'L13', value: 'KONTRAKTUAL' }, { addr: 'L14', value: '(Rp)' }, { addr: 'L15', value: '9' },
-        { addr: 'M13', value: 'METODE PEMBAYARAN' }, { addr: 'M15', value: '10' },
+        { addr: 'F12', value: 'MEKANISME PELAKSANAAN' },
+        { addr: 'F13', value: 'KEGIATAN' }, { addr: 'F15', value: '8' },
+        { addr: 'G13', value: 'VOLUME' }, { addr: 'G15', value: '9' },
+        { addr: 'H13', value: 'PAGU DAK FISIK' }, { addr: 'H14', value: '(Rp)' }, { addr: 'H15', value: '10' },
 
-        { addr: 'N12', value: `REALISASI ${periodeLaporan} ${periodeWaktuLaporan}` },
-        { addr: 'N13', value: 'KEUANGAN' },
-        { addr: 'N14', value: '(Rp)' }, { addr: 'M15', value: '11' },
-        { addr: 'O14', value: '(%)' }, { addr: 'O15', value: '12' },
-        { addr: 'P13', value: 'FISIK' },
-        { addr: 'P14', value: 'VOLUME' }, { addr: 'P15', value: '13' },
-        { addr: 'Q14', value: '(%)' }, { addr: 'Q15', value: '14' },
+        { addr: 'I12', value: `REALISASI ${dakData.tahun}` },
+        { addr: 'I13', value: 'KEUANGAN' },
+        { addr: 'I14', value: '(Rp)' }, { addr: 'I15', value: '11' },
+        { addr: 'J14', value: '(%)' }, { addr: 'J15', value: '12' },
+        { addr: 'K13', value: 'FISIK' },
+        { addr: 'K14', value: 'VOLUME' }, { addr: 'K15', value: '13' },
+        { addr: 'L14', value: 'sd' }, { addr: 'L15', value: '14' },
 
-        { addr: 'R12', value: 'IDENTIFIKASI PERMASALAHAN' },
-        { addr: 'R13', value: 'PILIHAN' }, { addr: 'S13', value: 'TEKS' }, { addr: 'R15', value: '15' },
+        { addr: 'M12', value: 'IDENTIFIKASI PERMASALAHAN' },
+        { addr: 'M13', value: 'PILIHAN' }, { addr: 'N13', value: 'TEKS' }, { addr: 'M15', value: '15' },
     ];
 
     fixedCells.forEach((c) => {
@@ -105,25 +108,73 @@ export const exportDAK = async (
             cell.alignment = { horizontal: 'center', vertical: 'middle' };
             cell.font = { bold: true, size: 14 };
         }
-        if (c.addr === 'A7' || c.addr === 'A8' || c.addr === 'A9' || c.addr === 'A10' || c.addr === 'B7' || c.addr === 'B8' || c.addr === 'B9' || c.addr === 'B10') {
+        if (c.addr === 'A10' || c.addr === 'A11' || c.addr === 'B10' || c.addr === 'B11') {
             cell.font = { bold: true };
         }
     });
 
-    // for (let row = 5; row <= 7; row++) {
-    //     const cols = worksheet.getRow(row);
-    //     cols.eachCell({ includeEmpty: true }, (cell) => {
-    //         cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-    //         cell.font = { bold: true };
-    //     });
-    // }
-
     //#region Mapping Data
     let rowIndex = startRow;
+    let indexPaket = 1;
+    data.forEach((item) => {
+        const row = worksheet.getRow(rowIndex);
+
+        if (item.nama_paket) {
+            row.getCell('A').value = indexPaket;
+            indexPaket++;
+        } else {
+            row.getCell('A').value = '';
+        }
+        row.getCell('A').alignment = { horizontal: 'center' }
+        if (item.level === 'sub_jenis_dak') {
+            row.getCell('B').value = `SUB JENIS DAK\n${item.nama}`;
+        } else if (item.level === 'bidang') {
+            row.getCell('B').value = `BIDANG DAK\n${item.nama}`;
+        } else if (item.level === 'sub_bidang') {
+            row.getCell('B').value = `SUB BIDANG DAK\n${item.nama}`;
+        } else {
+            row.getCell('B').value = item.nama_paket;
+        }
+        // row.getCell('B').value = item.nama ?? item.nama_paket;
+
+        row.getCell('C').value = item.perencanaan?.volume;
+        row.getCell('D').value = item.perencanaan?.jumlah_penerima;
+        row.getCell('E').value = numOrEmpty(item.perencanaan?.anggaran);
+
+        row.getCell('F').value = item.mekanisme?.kegiatan;
+        row.getCell('G').value = item.mekanisme?.volume;
+        row.getCell('H').value = numOrEmpty(item.mekanisme?.uang);
+
+        row.getCell('I').value = numOrEmpty(item.realisasi?.keuangan?.capaian);
+        row.getCell('J').value = item.realisasi?.keuangan?.persen;
+        row.getCell('K').value = item.realisasi?.fisik?.capaian;
+        row.getCell('L').value = item.realisasi?.fisik?.totalSd;
+
+        const fmtRupiah = '"Rp"* #,##0.00;[<0]"Rp"* "-"#,##0.00;"Rp"* "0"';
+        ['E', 'H', 'I'].forEach((col) => {
+            row.getCell(col).numFmt = fmtRupiah;
+        });
+
+        for (let c = 2; c <= 2; c++) {
+            const cell = row.getCell(c);
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+            cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+            if (item.nama) {
+                cell.font = { bold: true }
+            }
+        }
+
+        rowIndex++;
+    });
 
     const lastRow = rowIndex;
     const startCol = 1;
-    const endCol = 19;
+    const endCol = 14;
 
     for (let r = startRow - 4; r <= lastRow; r++) {
         const row = worksheet.getRow(r);
@@ -141,30 +192,34 @@ export const exportDAK = async (
 
 
     //#region TTD
-    worksheet.mergeCells(`Q${rowIndex + 3}:S${rowIndex + 3}`);
-    worksheet.getRow(rowIndex + 3).getCell('Q').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 3).getCell('Q').value =
+    worksheet.mergeCells(`L${rowIndex + 3}:N${rowIndex + 3}`);
+    worksheet.getRow(rowIndex + 3).getCell('L').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 3).getCell('L').value =
         'Kabupaten Bengkulu Utara, .........................................';
-    worksheet.mergeCells(`Q${rowIndex + 9}:S${rowIndex + 9}`);
-    worksheet.getRow(rowIndex + 9).getCell('Q').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 9).getCell('Q').value =
+    worksheet.mergeCells(`L${rowIndex + 9}:N${rowIndex + 9}`);
+    worksheet.getRow(rowIndex + 9).getCell('L').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 9).getCell('L').value =
         'NIP.';
     //#endregion
 
     //#region KETERANGAN
     const problems = [
         'KETERANGAN PERMASALAHAN',
-        '1. Permasalahan Terkait dengan Peraturan Menteri Keuangan (PMK)',
-        '2. Permasalahan Terkait dengan Petunjuk Teknis',
-        '3. Permasalahan Terkait dengan Rencana Kerja dan Anggaran SKPD',
-        '4. Permasalahan Terkait dengan DPA - SKPD',
-        '5. Permasalahan Terkait dengan SK Penetapan Pelaksanaan Kegiatan',
-        '6. Permasalahan Terkait dengan Pelaksanaan Tender Pekerjaan Kontrak',
-        '7. Permasalahan Terkait dengan Persiapan Pekerjaan Swakelola',
-        '8. Permasalahan Terkait dengan Penerbitan SP2D',
-        '9. Permasalahan Terkait dengan Pelaksanaan Pekerjaan Kontrak',
-        '10. Permasalahan Terkait dengan Pelaksana Pekerjaan Swakelola'
+        // '1. Permasalahan Terkait dengan Peraturan Menteri Keuangan (PMK)',
+        // '2. Permasalahan Terkait dengan Petunjuk Teknis',
+        // '3. Permasalahan Terkait dengan Rencana Kerja dan Anggaran SKPD',
+        // '4. Permasalahan Terkait dengan DPA - SKPD',
+        // '5. Permasalahan Terkait dengan SK Penetapan Pelaksanaan Kegiatan',
+        // '6. Permasalahan Terkait dengan Pelaksanaan Tender Pekerjaan Kontrak',
+        // '7. Permasalahan Terkait dengan Persiapan Pekerjaan Swakelola',
+        // '8. Permasalahan Terkait dengan Penerbitan SP2D',
+        // '9. Permasalahan Terkait dengan Pelaksanaan Pekerjaan Kontrak',
+        // '10. Permasalahan Terkait dengan Pelaksana Pekerjaan Swakelola'
     ];
+
+    dataMasalah.forEach((item, index) => {
+        problems.push(`${index+1}. ${item.name}`)
+    })
 
     problems.forEach((text, i) => {
         const row = rowIndex + 3 + i;
@@ -219,5 +274,5 @@ export const exportDAK = async (
     const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-    saveAs(blob, `Laporan Kemajuan Pelaksanaan Kegiatan ${periodeLaporan} ${periodeWaktuLaporan} DAK - Kabupaten Bengkulu Utara Tahun Anggaran ${tahun} ${waktuNowGabung}.xlsx`);
+    saveAs(blob, `Laporan Kemajuan Pelaksanaan Kegiatan DAK - Kabupaten Bengkulu Utara Tahun Anggaran ${dakData.tahun} Triwulan ${dakData.triwulan} ${waktuNowGabung}.xlsx`);
 };
