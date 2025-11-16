@@ -6,12 +6,12 @@ export const Route = createFileRoute('/_dashboard/rkpd/iku_ikd/ikd_capaian')({
   head: () => ({
     meta: [
       {
-        title: `Capaian Indikator Kinerja Daerah - ${SITE_NAME}`,
+        title: `Realisasi Indikator Kinerja Daerah - ${SITE_NAME}`,
       },
     ],
   }),
   staticData: {
-    title: 'Capaian Indikator Kinerja Daerah',
+    title: 'Realisasi Indikator Kinerja Daerah',
   },
   component: RouteComponent,
 });

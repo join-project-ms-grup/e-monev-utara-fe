@@ -223,7 +223,7 @@ export interface ListHasilIK {
                 tahun_ke: number;
                 target: string;
                 capaian?: string;
-                persentase?: string;
+                persetase?: string;
             }[];
         }[];
     }[]
@@ -249,7 +249,7 @@ export const flatHasilIK = (data: ListHasilIK[]): FlatHasilIK[] => {
                     flatItem[`${prefix}tahun_ke`] = t.tahun_ke;
                     flatItem[`${prefix}target`] = t.target;
                     flatItem[`${prefix}capaian`] = t.capaian ?? null;
-                    flatItem[`${prefix}persentase`] = t.persentase ?? null;
+                    flatItem[`${prefix}persetase`] = t.persetase ?? null;
                 });
 
                 flat.push(flatItem as FlatHasilIK);

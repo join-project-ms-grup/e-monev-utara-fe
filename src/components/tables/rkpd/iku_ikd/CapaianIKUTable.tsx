@@ -1,6 +1,6 @@
 import { Fragment, memo, useEffect, useState } from 'react';
 import Tabel from '../../Tabel';
-import { MdRefresh } from 'react-icons/md';
+import { MdPrint, MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -17,7 +17,9 @@ import {
 } from '../../../../lib/usercookie';
 import {
   addRealisasi,
+  flatHasilIK,
   flatIK,
+  getHasilIK,
   getIKSKPD,
   getIKU,
   type FlatIK,
@@ -29,6 +31,7 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../../lib/api';
 import { calculateAchievementPercentage } from '../../../../lib/helper';
+import { exportIKU } from '../../../../services/Excel/ExcelIKU';
 
 const CapaianIKUTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
@@ -263,6 +266,37 @@ const CapaianIKUTable = () => {
           )}
         </div>
         <div className='inline-flex gap-2'>
+          <InputButton
+            className='btn btn-theme w-9 h-9'
+            tooltip='Cetak Excel'
+            onClick={async () => {
+              try {
+                const rawhasilData = await getHasilIK({
+                  type: 'iku',
+                  skpd_id: selectedSKPD ? Number(selectedSKPD) : 'all',
+                  periodeId: idPeriode,
+                });
+                const hasilData = flatHasilIK(rawhasilData);
+
+                if (!hasilData) {
+                  toast.error('Data tidak ditemukan.');
+                  return;
+                }
+                toast.promise(exportIKU(hasilData, 'iku'), {
+                  loading: 'Sedang mengunduh...',
+                  success: <b>Berhasil mengunduh.</b>,
+                  error: <b>Gagal mengunduh.</b>,
+                });
+
+                console.log(hasilData);
+              } catch (error) {
+                console.error(error);
+                toast.error('Terjadi kesalahan saat mengambil data.');
+              }
+            }}
+          >
+            <MdPrint />
+          </InputButton>
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'

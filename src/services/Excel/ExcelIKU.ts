@@ -43,7 +43,9 @@ export const exportIKU = async (
         'C5:C6',
         'D5:D6',
         'E5:J5',
-        'K5:K6',
+        'K5:P5',
+        'Q5:V5',
+        'W5:W6',
     ];
     merges.forEach((m) => {
         try { worksheet.mergeCells(m); } catch (e) { }
@@ -51,7 +53,8 @@ export const exportIKU = async (
 
     const widthMap: Record<string, number> = {
         A: 10, B: 40, C: 20, D: 20, E: 20, F: 20, G: 20,
-        H: 20, I: 20, J: 20, K: 20, L: 20, M: 20
+        H: 20, I: 20, J: 20, K: 20, L: 20, M: 20, N: 20,
+        O: 20, P: 20, Q: 20, R: 20, S: 20, T: 20, U: 20, V: 20, W: 20,
     };
     const colLetters = Object.keys(widthMap);
     colLetters.forEach((col, idx) => {
@@ -77,7 +80,24 @@ export const exportIKU = async (
         { addr: 'H6', value: `${periode[3]}` }, { addr: 'H7', value: '(08)' },
         { addr: 'I6', value: `${periode[4]}` }, { addr: 'I7', value: '(09)' },
         { addr: 'J6', value: `${periode[5]}` }, { addr: 'J7', value: '(10)' },
-        { addr: 'K5', value: 'KETERANGAN' }, { addr: 'K7', value: '(13)' },
+
+        { addr: 'K5', value: 'CAPAIAN' },
+        { addr: 'K6', value: `${periode[0]}` }, { addr: 'K7', value: '(11)' },
+        { addr: 'L6', value: `${periode[1]}` }, { addr: 'L7', value: '(12)' },
+        { addr: 'M6', value: `${periode[2]}` }, { addr: 'M7', value: '(13)' },
+        { addr: 'N6', value: `${periode[3]}` }, { addr: 'N7', value: '(14)' },
+        { addr: 'O6', value: `${periode[4]}` }, { addr: 'O7', value: '(15)' },
+        { addr: 'P6', value: `${periode[5]}` }, { addr: 'P7', value: '(16)' },
+
+        { addr: 'Q5', value: 'RASIO (%)' },
+        { addr: 'Q6', value: `${periode[0]}` }, { addr: 'Q7', value: '(17)' },
+        { addr: 'R6', value: `${periode[1]}` }, { addr: 'R7', value: '(18)' },
+        { addr: 'S6', value: `${periode[2]}` }, { addr: 'S7', value: '(19)' },
+        { addr: 'T6', value: `${periode[3]}` }, { addr: 'T7', value: '(20)' },
+        { addr: 'U6', value: `${periode[4]}` }, { addr: 'U7', value: '(21)' },
+        { addr: 'V6', value: `${periode[5]}` }, { addr: 'V7', value: '(22)' },
+
+        { addr: 'W5', value: 'KETERANGAN' }, { addr: 'W7', value: '(23)' },
 
     ];
 
@@ -121,14 +141,28 @@ export const exportIKU = async (
         row.getCell('C').value = item.satuan;
         row.getCell('D').value = item.base_line;
 
-        row.getCell('E').value = item.t_1_capaian;
-        row.getCell('F').value = item.t_2_capaian;
-        row.getCell('G').value = item.t_3_capaian;
-        row.getCell('H').value = item.t_4_capaian;
-        row.getCell('I').value = item.t_5_capaian;
-        row.getCell('J').value = item.t_6_capaian;
+        row.getCell('E').value = item.t_1_target;
+        row.getCell('F').value = item.t_2_target;
+        row.getCell('G').value = item.t_3_target;
+        row.getCell('H').value = item.t_4_target;
+        row.getCell('I').value = item.t_5_target;
+        row.getCell('J').value = item.t_6_target;
 
-        for (let c = 1; c <= 11; c++) {
+        row.getCell('K').value = item.t_1_capaian;
+        row.getCell('L').value = item.t_2_capaian;
+        row.getCell('M').value = item.t_3_capaian;
+        row.getCell('N').value = item.t_4_capaian;
+        row.getCell('O').value = item.t_5_capaian;
+        row.getCell('P').value = item.t_6_capaian;
+
+        row.getCell('Q').value = item.t_1_persetase;
+        row.getCell('R').value = item.t_2_persetase;
+        row.getCell('S').value = item.t_3_persetase;
+        row.getCell('T').value = item.t_4_persetase;
+        row.getCell('U').value = item.t_5_persetase;
+        row.getCell('V').value = item.t_6_persetase;
+
+        for (let c = 1; c <= 23; c++) {
             const cell = row.getCell(c);
             cell.border = {
                 top: { style: 'thin' },
@@ -145,7 +179,7 @@ export const exportIKU = async (
     console.log(data)
     const lastRow = rowIndex;
     const startCol = 1;
-    const endCol = 11;
+    const endCol = 23;
 
     for (let r = startRow - 3; r <= lastRow; r++) {
         const row = worksheet.getRow(r);

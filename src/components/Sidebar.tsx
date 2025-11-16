@@ -81,9 +81,9 @@ const menuRKPD: MenuItem[] = [
     submenu: [
       { label: 'Pilih IKU/IKD', to: '/rkpd/iku_ikd/tagging' },
       { label: 'Indikator Kinerja Utama', to: '/rkpd/iku_ikd/iku' },
-      { label: 'Input Capaian IKU', to: '/rkpd/iku_ikd/iku_capaian' },
+      { label: 'Realisasi IKU', to: '/rkpd/iku_ikd/iku_capaian' },
       { label: 'Indikator Kinerja Daerah', to: '/rkpd/iku_ikd/ikd' },
-      { label: 'Input Capaian IKD', to: '/rkpd/iku_ikd/ikd_capaian' },
+      { label: 'Realisasi IKD', to: '/rkpd/iku_ikd/ikd_capaian' },
     ],
   },
   {
