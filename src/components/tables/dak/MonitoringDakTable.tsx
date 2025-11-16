@@ -570,7 +570,7 @@ const IdentifikasiDakTable = () => {
               <td>
                 <AksiButton
                   Icon={MdLockOpen}
-                  className='bg-green-500 text-white hover:bg-green-700!'
+                  className='hover:bg-green-700!'
                   tooltip='Terbuka'
                 />
               </td>
@@ -578,18 +578,18 @@ const IdentifikasiDakTable = () => {
                 <div className='inline-flex gap-1'>
                   <AksiButton
                     Icon={MdFindReplace}
-                    className='bg-red-500 text-white hover:bg-red-700!'
+                    className='hover:bg-red-700!'
                     tooltip='Identifikasi Masalah'
                     onClick={() => setOpenModal(true)}
                   />
                   <AksiButton
                     Icon={MdSave}
-                    className='bg-blue-500 text-white hover:bg-blue-700!'
+                    className='hover:bg-blue-700!'
                     tooltip='Simpan Data'
                   />
                   <AksiButton
                     Icon={MdCheckBox}
-                    className='bg-amber-500 text-white hover:bg-amber-700!'
+                    className='hover:bg-amber-700!'
                     tooltip='Data Ditindak'
                   />
                 </div>

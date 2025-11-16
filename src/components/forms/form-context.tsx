@@ -35,7 +35,7 @@ const TextField = ({
   onClear,
 }: FieldProps) => {
   const field = useFieldContext<string>();
-  console.log(label);
+  
   return (
     <div>
       <label htmlFor={field.name}>
@@ -72,7 +72,7 @@ const TextAreaField = ({
   onClear,
 }: FieldProps) => {
   const field = useFieldContext<string>();
-  console.log(label);
+  
   return (
     <div>
       <label htmlFor={field.name}>
@@ -106,7 +106,7 @@ const SelectField = ({
   disabled = false,
 }: FieldProps) => {
   const field = useFieldContext<string>();
-  console.log(label);
+  
   return (
     <div>
       <label htmlFor={field.name}>
@@ -144,7 +144,7 @@ const FileField = ({
   disabled = false,
 }: FieldProps) => {
   const field = useFieldContext<File | null>();
-  console.log(label);
+  
   return (
     <div>
       <label htmlFor={field.name}>

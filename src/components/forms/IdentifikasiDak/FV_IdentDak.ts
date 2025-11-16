@@ -1,10 +1,70 @@
 import { useQuery } from '@tanstack/react-query';
-import type z from "zod";
-import type { SchemaFormIdentDAK } from "../schemas/DAK/SchemaIdentifikasiDak";
+import z from "zod";
 import { getIdentifikasiDetailDAK } from '../../../services/DAK/DAKIdentifikasiService';
+
+
+const nonZero = z.union([z.string(), z.number()]).refine(
+  (val) => {
+    const num = Number(val);
+    return !isNaN(num) && num !== 0;
+  },
+  { message: 'Field wajib diisi' }
+);
+
+// FS (FORM Schema)
+export const SchemaFormIdentDAK = z
+  .object({
+    // non 
+    id_ident: z.number().optional(),
+    jenis_dak_id: nonZero,
+    bidang_dak_id: nonZero,
+    urusan_id: nonZero,
+    bidang_id: nonZero,
+    program_id: nonZero,
+    kegiatan_id: nonZero,
+
+    // payload
+    sub_jenis_id: nonZero,
+    sub_bidang_id: nonZero,
+    tahun: nonZero,
+    opd_id: nonZero,
+    bidang_opd: z.string().nonempty({ message: 'Field wajib diisi' }),
+    sub_kegiatan_id: nonZero,
+    // detail
+    nama_paket: z.string().nonempty({ message: 'Field wajib diisi' }),
+    detail_paket: z.string().nonempty({ message: 'Field wajib diisi' }),
+    volume: nonZero,
+    satuan: z.string().nonempty({ message: 'Field wajib diisi' }),
+    estimasi: z.string().nonempty({ message: 'Field wajib diisi' }),
+    jumlah_penerima: z.union([z.string().nonempty({ message: 'Field wajib diisi' }), z.number()]).optional(),
+    anggaran: nonZero,
+    des_kel: z.string().nonempty({ message: 'Field wajib diisi' }),
+    kec: z.string().nonempty({ message: 'Field wajib diisi' }),
+    bujur: z.any().optional(),
+    lintang: z.any().optional(),
+    foto: z.any().nullable(),
+    // mekanisme
+    mekanisme: z.enum(['swakelola', 'kontrak', 'ekatalog']),
+    catatan: z.string().nonempty({ message: 'Field wajib diisi' }),
+    metode: z.string().nonempty({ message: 'Field wajib diisi' }),
+    volume_mekanisme: nonZero,
+    uang_mekanisme: nonZero,
+    // dokumen
+    dokumen: z
+      .array(
+        z.object({
+          id_berkas: nonZero,
+          file: z.any().nullable(),
+          Waktu: z.string().nullable(),
+          Keterangan: z.string().nullable(),
+        })
+      )
+      .optional(),
+  });
 
 type IdentForm = z.infer<typeof SchemaFormIdentDAK>;
 
+// FV (FORM VALUE)
 export const initIdentDAKForm: IdentForm = {
   // non payload
   id_ident: 0,
@@ -103,49 +163,3 @@ export const useIdentDAKFormData = (id_ident?: number) => {
 
   return { initialValues, query, data };
 };
-
-
-// import type z from "zod";
-// import type { SchemaFormIdentDAK } from "../schemas/DAK/SchemTest";
-
-// type IdentForm = z.infer<typeof SchemaFormIdentDAK>;
-
-// export const initIdentDAKForm: IdentForm = {
-//   // non payload
-//   jenis_dak_id: '',
-//   bidang_dak_id: '',
-//   urusan_id: '',
-//   bidang_id: '',
-//   program_id: '',
-//   kegiatan_id: '',
-//   // payload
-//   sub_jenis_id: 0,
-//   sub_bidang_id: 0,
-//   tahun: 0,
-//   opd_id: 0,
-//   bidang_opd: '',
-//   sub_kegiatan_id: 0,
-//   catatan: '',
-//   nama_paket: '',
-//   detail_paket: '',
-//   volume: 0,
-//   satuan: '',
-//   estimasi: '',
-//   jumlah_penerima: '',
-//   anggaran: 0,
-//   des_kel: '',
-//   kec: '',
-//   bujur: ['0', '0', '0'],
-//   lintang: ['0', '0', '0'],
-//   foto: null,
-//   mekanisme: 'swakelola',
-//   metode: '',
-//   volume_mekanisme: 0,
-//   uang_mekanisme: 0,
-//   dokumen: Array.from({ length: 12 }, (_, i) => ({
-//     id_berkas: i + 1,
-//     file: null,
-//     Waktu: null,
-//     Keterangan: null,
-//   })),
-// };

@@ -208,33 +208,21 @@ export const getRekSubKegiatanDAK = async (
     return subList
 };
 
+export interface DAKRekeningForm {
+    id?: number | null;
+    kode?: string | number;
+    name?: string;
+    parent_id?: string | number | null;
+    status?: boolean | null;
+    type?: string;
+}
 
-// export const getRekBidangDAK = async (id_urusan: number | null): Promise<DAKMasterUrusan[]> => {
-//     const response = await api.post<ApiResponse<DAKMasterUrusan[]>>("/dak/rek/list-bidang", { urusan: id_urusan });
+export const addDAKRek = async (payload: DAKRekeningForm): Promise<DAKRekeningForm> => {
+  const response = await api.post<ApiResponse<DAKRekeningForm>>("/dak/rek/add", payload);
+  return response.data.data;
+};
 
-//     const rawData = response.data.data;
-//     const bidangList: DAKMasterBidang[] = rawData.flatMap((urusan) =>
-//         urusan.children?.map((bidang) => ({
-//             id: bidang.id,
-//             kode: bidang.kode,
-//             name: bidang.name,
-//             rekening: bidang.rekening,
-//             parent: urusan.id,
-//             type: bidang.type,
-//         })) ?? []
-//     );
-//     return bidangList;
-// };
-
-// export const getRekProgramDAK = async (id_urusan: number, id_bidang: number | null): Promise<DAKMaster[]> => {
-//     const response = await api.post<ApiResponse<DAKMaster[]>>("/dak/rek/list-program", { urusan: id_urusan, bidang: id_bidang });
-//     return response.data.data;
-// };
-// export const getRekKegiatanDAK = async (id_urusan: number, id_bidang: number, id_program: number | null): Promise<DAKMaster[]> => {
-//     const response = await api.post<ApiResponse<DAKMaster[]>>("/dak/rek/list-kegiatan", { urusan: id_urusan, bidang: id_bidang, program: id_program });
-//     return response.data.data;
-// };
-// export const getRekSubKegiatanDAK = async (id_urusan: number, id_bidang: number, id_program: number, id_kegiatan: number | null): Promise<DAKMaster[]> => {
-//     const response = await api.post<ApiResponse<DAKMaster[]>>("/dak/rek/list-sub", { urusan: id_urusan, bidang: id_bidang, program: id_program, kegiatan: id_kegiatan });
-//     return response.data.data;
-// };
+export const updateDAKRek = async (payload: DAKRekeningForm): Promise<DAKRekeningForm> => {
+  const response = await api.put<ApiResponse<DAKRekeningForm>>(`/dak/rek/update`, payload);
+  return response.data.data;
+};

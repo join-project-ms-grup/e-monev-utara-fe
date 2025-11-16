@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { type ColumnDef, type Table } from '@tanstack/react-table';
-import { MdRefresh, MdSubdirectoryArrowRight } from 'react-icons/md';
+import {
+  MdAdd,
+  MdEdit,
+  MdRefresh,
+  MdSubdirectoryArrowRight,
+} from 'react-icons/md';
 import { useEffect, useState, type JSX } from 'react';
 import {
   getRekeningDAK,
@@ -12,6 +17,11 @@ import InputSearchBox from '../../inputs/InputSearchBox';
 import InputButton from '../../inputs/InputButton';
 import Spinner from '../../inputs/Spinner';
 import Tabel from '../Tabel';
+import { isAdmin, isDev } from '../../../lib/usercookie';
+import F_RekDak from '../../forms/DAK/Master/F_RekDak';
+import DialogModal from '../../inputs/DialogModal';
+import AksiButton from '../../inputs/AksiButton';
+import type { RekDakForm } from '../../forms/DAK/Master/FV_RekDak';
 
 const tableHead = () => {
   return (
@@ -19,6 +29,7 @@ const tableHead = () => {
       <th className='w-[50px]'>No</th>
       <th>Kode</th>
       <th>Nama</th>
+      <th>Aksi</th>
     </tr>
   );
 };
@@ -30,10 +41,19 @@ const RekeningDakTable = () => {
     queryFn: async () => {
       const dak = await getRekeningDAK();
       const dakflat = await getRekeningDAKFlat(dak);
-      console.log(dakflat);
       return dakflat;
     },
   });
+
+  const initSelectedData: RekDakForm = {
+    id: 0,
+    name: '',
+    kode: '',
+    status: true,
+    type: '',
+  };
+
+  const [selectedData, setSelectedData] = useState(initSelectedData);
 
   const tableBody = ({
     table,
@@ -132,6 +152,20 @@ const RekeningDakTable = () => {
             {item.kodeFull?.join('.') ?? ''}
           </td>
           <td>{item.name}</td>
+          <td className='text-center w-[50px]'>
+            <AksiButton
+              Icon={MdEdit}
+              onClick={() => {
+                setModal('Add');
+                setSelectedData({
+                  id: item.id ?? 0,
+                  kode: item.kode?.toString() ?? '',
+                  name: item.name ?? '',
+                  status: true,
+                });
+              }}
+            />
+          </td>
         </tr>,
       );
     });
@@ -197,7 +231,12 @@ const RekeningDakTable = () => {
       accessorKey: 'name',
       header: 'Nama',
     },
+    {
+      header: 'Aksi',
+    },
   ];
+
+  const [modal, setModal] = useState<'' | 'Add'>('');
 
   return (
     <div className='space-y-2'>
@@ -256,6 +295,17 @@ const RekeningDakTable = () => {
           </div>
         </div>
         <div className='flex justify-end items-end gap-2'>
+          {(isDev() || isAdmin()) && (
+            <InputButton
+              tooltip='Tambah data'
+              className='btn btn-theme w-9 h-9'
+              onClick={() => {
+                setModal('Add');
+              }}
+            >
+              <MdAdd />
+            </InputButton>
+          )}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -275,6 +325,22 @@ const RekeningDakTable = () => {
           tableBody({ table, selectedRekening: searchFields.rekening })
         }
       />
+      <DialogModal
+        title={`${selectedData.id ? 'Ubah' : 'Tambah'} Data Rekening DAK`}
+        isOpen={modal === 'Add'}
+        onClose={() => {
+          setModal('');
+          setSelectedData(initSelectedData);
+        }}
+      >
+        <F_RekDak
+          data={selectedData}
+          onSuccess={() => {
+            setModal('');
+            setSelectedData(initSelectedData);
+          }}
+        />
+      </DialogModal>
     </div>
   );
 };

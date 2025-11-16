@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_dashboard/dak/identifikasi')({
 });
 
 function RouteComponent() {
-  const [posisi, setPosisi] = useState<'Tabel' | 'Add' | 'Edit'>('Tabel');
+  const [posisi, setPosisi] = useState<'Tabel' | 'Add'>('Tabel');
 
   type DakData = {
     tahun: string;
