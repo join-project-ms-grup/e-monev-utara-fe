@@ -6,6 +6,14 @@ import {
 } from '../../../services/DAK/DAKIdentifikasiService';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import toast from 'react-hot-toast';
+import { useAppForm } from '../form-context';
+import {
+  SchemaFormDokIdentDak,
+  useDokIdentDakFormData,
+} from './FV_DokIdentDak';
+import AksiButton from '../../inputs/AksiButton';
+import { MdCheck, MdEdit } from 'react-icons/md';
+import { useState } from 'react';
 
 const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
   const { data } = useQuery({
@@ -53,6 +61,33 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
     { kode: 11, name: 'Penerbitan Surat Perintah Membayar (SPM)' },
     { kode: 12, name: 'Penerbitan Surat Perintah Pencairan Dana (SP2D)' },
   ];
+
+  const { initialValues } = useDokIdentDakFormData();
+  const form = useAppForm({
+    defaultValues: initialValues,
+    onSubmit: ({ value }) => {
+      alert(JSON.stringify(value));
+    },
+    onSubmitInvalid: () => {
+      toast.error('Validasi gagal\nMohon lengkapi form');
+    },
+    validators: {
+      onSubmit: SchemaFormDokIdentDak,
+    },
+  });
+
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const startEdit = (kode: number) => {
+    const d = mapBerkas[kode];
+
+    form.setFieldValue('id_dok', kode);
+    form.setFieldValue('Kesesuaian', d?.Kesesuaian ?? '');
+    form.setFieldValue('Waktu', d?.Waktu ?? '');
+    form.setFieldValue('Keterangan', d?.Keterangan ?? '');
+    form.setFieldValue('pesan', d?.pesan ?? '');
+
+    setEditingId(kode);
+  };
 
   return (
     <>
@@ -275,10 +310,12 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
           </div>
         </div>
         <div className='col-span-2'>
-          <form onSubmit={(e) => {
-            e.preventDefault()
-            alert('SUBMIT')
-          }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
             <div className='table-responsive'>
               <table className='w-full'>
                 <thead>
@@ -291,6 +328,7 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                     <th>Keterangan</th>
                     <th>Pesan Verifikasi</th>
                     <th>Tanggal & Jam Upload</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
 
@@ -301,7 +339,7 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                       return (
                         <tr key={`${index}_${dok.kode}`}>
                           <td></td>
-                          <td colSpan={7} className='text-left!'>
+                          <td colSpan={8} className='text-left!'>
                             <b>{dok.name}</b>
                           </td>
                         </tr>
@@ -313,11 +351,84 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                         <td className='text-left!'>
                           <b>{dok.name}</b>
                         </td>
-                        <td>{mapBerkas[dok.kode]?.file ?? '-'}</td>
-                        <td>{mapBerkas[dok.kode]?.Kesesuaian ?? '-'}</td>
-                        <td>{mapBerkas[dok.kode]?.Waktu ?? '-'}</td>
-                        <td>{mapBerkas[dok.kode]?.Keterangan ?? '-'}</td>
-                        <td>{mapBerkas[dok.kode]?.pesan ?? '-'}</td>
+                        <td>
+                          {editingId === dok.kode ? (
+                            <form.AppField
+                              name='file'
+                              children={(field) => (
+                                <field.FileField
+                                  label=''
+                                  placeholder='File...'
+                                />
+                              )}
+                            />
+                          ) : (
+                            (mapBerkas[dok.kode]?.file ?? '-')
+                          )}
+                        </td>
+                        <td>
+                          {editingId === dok.kode ? (
+                            <form.AppField
+                              name='Kesesuaian'
+                              children={(field) => (
+                                <field.TextAreaField
+                                  label=''
+                                  placeholder='Kesesuaian...'
+                                />
+                              )}
+                            />
+                          ) : (
+                            (mapBerkas[dok.kode]?.Kesesuaian ?? '-')
+                          )}
+                        </td>
+                        <td>
+                          {editingId === dok.kode ? (
+                            <form.AppField
+                              name='Waktu'
+                              children={(field) => (
+                                <input
+                                  type='date'
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                />
+                              )}
+                            />
+                          ) : (
+                            (mapBerkas[dok.kode]?.Waktu ?? '-')
+                          )}
+                        </td>
+                        <td>
+                          {editingId === dok.kode ? (
+                            <form.AppField
+                              name='Keterangan'
+                              children={(field) => (
+                                <field.TextAreaField
+                                  label=''
+                                  placeholder='Keterangan...'
+                                />
+                              )}
+                            />
+                          ) : (
+                            (mapBerkas[dok.kode]?.Keterangan ?? '-')
+                          )}
+                        </td>
+                        <td>
+                          {editingId === dok.kode ? (
+                            <form.AppField
+                              name='pesan'
+                              children={(field) => (
+                                <field.TextAreaField
+                                  label=''
+                                  placeholder='Pesan...'
+                                />
+                              )}
+                            />
+                          ) : (
+                            (mapBerkas[dok.kode]?.pesan ?? '-')
+                          )}
+                        </td>
                         <td>
                           {mapBerkas[dok.kode]?.create_at &&
                             new Date(
@@ -325,6 +436,51 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                             ).toLocaleDateString('id-ID', {
                               timeZone: 'Asia/Jakarta',
                             })}
+                        </td>
+                        <td>
+                          <div className='inline-flex'>
+                            {editingId !== dok.kode ? (
+                              <AksiButton
+                                type='submit'
+                                Icon={MdEdit}
+                                onClick={() => {
+                                  const d = mapBerkas[dok.kode];
+                                  form.setFieldValue('id_dok', dok.kode);
+                                  form.setFieldValue(
+                                    'Kesesuaian',
+                                    d?.Kesesuaian ?? '',
+                                  );
+                                  form.setFieldValue('Waktu', d?.Waktu ?? '');
+                                  form.setFieldValue(
+                                    'Keterangan',
+                                    d?.Keterangan ?? '',
+                                  );
+                                  form.setFieldValue('pesan', d?.pesan ?? '');
+                                  setEditingId(dok.kode);
+                                }}
+                              />
+                            ) : (
+                              <AksiButton
+                                type='button'
+                                className='hover:bg-green-500!'
+                                Icon={MdCheck}
+                                onClick={() => setEditingId(null)}
+                              />
+                            )}
+
+                            {/* {editingId === dok.kode ? (
+                              <AksiButton
+                                type='submit'
+                                Icon={MdCheck}
+                                onClick={() => setEditingId(null)}
+                              />
+                            ) : (
+                              <AksiButton
+                                Icon={MdEdit}
+                                onClick={() => startEdit(dok.kode)}
+                              />
+                            )} */}
+                          </div>
                         </td>
                       </tr>
                     );

@@ -222,3 +222,17 @@ export const setStatusIdentDak = async (payload: {id_ident: number, status: stri
   const response = await api.patch<ApiResponse<any>>(`/dak/fisik/update-tindakan`, payload);
   return response.data.data;
 };
+
+export interface FileIdentifikasiDAK {
+    id_dok: number;
+    file?: File | null;
+    Kesesuaian?: string;
+    Waktu?: string;
+    Keterangan?: string;
+    pesan?: string;
+}
+
+export const updateFileIdentifikasiDAK = async (payload: FileIdentifikasiDAK): Promise<FileIdentifikasiDAK> => {
+    const response = await api.put<ApiResponse<FileIdentifikasiDAK>>("/dak/fisik/update-file", payload);
+    return response.data.data;
+};

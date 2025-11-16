@@ -10,6 +10,7 @@ interface AksiButton {
   tooltip?: string;
   tooltipId?: string;
   label?:string
+  type?: "button" | "submit" | "reset" | undefined;
 }
 
 const AksiButton = ({
@@ -21,6 +22,7 @@ const AksiButton = ({
   tooltip,
   tooltipId = 'tooltip',
   label,
+  type = 'button',
   ...props
 }: AksiButton) => {
   const iconCN = clsx(iconClassName, 'text-xl');
@@ -34,7 +36,7 @@ const AksiButton = ({
   return (
     <>
       <button
-        type='button'
+        type={type}
         {...(tooltip ? { 'data-tooltip-id': tooltipId } : {})}
         {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
         className={btnCN}
