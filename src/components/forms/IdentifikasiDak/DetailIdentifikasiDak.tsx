@@ -66,7 +66,9 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
   const form = useAppForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
-      alert(JSON.stringify(value));
+      // alert(JSON.stringify(value));
+      console.log(value);
+      
     },
     onSubmitInvalid: () => {
       toast.error('Validasi gagal\nMohon lengkapi form');
