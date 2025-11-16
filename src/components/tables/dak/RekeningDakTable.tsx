@@ -18,10 +18,10 @@ import InputButton from '../../inputs/InputButton';
 import Spinner from '../../inputs/Spinner';
 import Tabel from '../Tabel';
 import { isAdmin, isDev } from '../../../lib/usercookie';
-import F_RekDak from '../../forms/DAK/Master/F_RekDak';
+import F_RekDak from '../../forms/DAK/Master/Rekening/F_RekDak';
 import DialogModal from '../../inputs/DialogModal';
 import AksiButton from '../../inputs/AksiButton';
-import type { RekDakForm } from '../../forms/DAK/Master/FV_RekDak';
+import type { RekDakForm } from '../../forms/DAK/Master/Rekening/FV_RekDak';
 
 const tableHead = () => {
   return (

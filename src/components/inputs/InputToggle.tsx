@@ -12,6 +12,7 @@ interface InputProps {
   offLabel?: string;
   tooltip?: string;
   tooltipId?: string;
+  wrapperClassName?: string;
 }
 
 const InputToggle = ({
@@ -25,6 +26,7 @@ const InputToggle = ({
   offLabel = 'Off',
   tooltip,
   tooltipId = 'tooltip',
+  wrapperClassName,
 }: InputProps) => {
   const isControlled = checked !== undefined;
 
@@ -34,22 +36,16 @@ const InputToggle = ({
     }
   };
 
-  console.log('test')
-
   return (
     <label
       {...(tooltip ? { 'data-tooltip-id': tooltipId } : {})}
       {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
       htmlFor={id}
-      className={`h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm font-bold select-none overflow-hidden transition-all duration-300 ${
+      className={`${wrapperClassName} h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm font-bold select-none overflow-hidden transition-all duration-300 ${
         (isControlled ? checked : defaultChecked)
           ? 'bg-green-500'
           : 'bg-red-500'
       } ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
-
-      // className={`h-9 relative inline-grid grid-cols-2 rounded-full shadow-sm ${checked ? 'bg-green-500' : 'bg-red-500'} font-bold select-none overflow-hidden transition-all duration-300 ${
-      //   disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
-      // }`}
     >
       <input
         id={id}

@@ -9,7 +9,7 @@ import InputButton from '../inputs/InputButton';
 import FieldError from './FieldError';
 import InputFile from '../inputs/InputFile';
 import InputTextArea from '../inputs/InputTextArea';
-
+import InputToggle from '../inputs/InputToggle';
 export const { fieldContext, useFieldContext, formContext, useFormContext } =
   createFormHookContexts();
 
@@ -22,6 +22,9 @@ type FieldProps = {
   disabled?: boolean;
   Rupiah?: boolean;
   Nomor?: boolean;
+  onLabel?: string;
+  offLabel?: string;
+  defaultChecked?: boolean;
   onClear?: () => void;
 };
 
@@ -35,7 +38,7 @@ const TextField = ({
   onClear,
 }: FieldProps) => {
   const field = useFieldContext<string>();
-  
+
   return (
     <div>
       <label htmlFor={field.name}>
@@ -72,7 +75,7 @@ const TextAreaField = ({
   onClear,
 }: FieldProps) => {
   const field = useFieldContext<string>();
-  
+
   return (
     <div>
       <label htmlFor={field.name}>
@@ -106,7 +109,7 @@ const SelectField = ({
   disabled = false,
 }: FieldProps) => {
   const field = useFieldContext<string>();
-  
+
   return (
     <div>
       <label htmlFor={field.name}>
@@ -144,7 +147,7 @@ const FileField = ({
   disabled = false,
 }: FieldProps) => {
   const field = useFieldContext<File | null>();
-  
+
   return (
     <div>
       <label htmlFor={field.name}>
@@ -175,9 +178,42 @@ const FileField = ({
   );
 };
 
+const ToggleField = ({
+  label,
+  reqLabel,
+  disabled = false,
+  defaultChecked = true,
+  onLabel = 'Aktif',
+  offLabel = 'Nonaktif',
+}: FieldProps) => {
+  const field = useFieldContext<boolean>();
+
+  return (
+    <div className='flex flex-col'>
+      <label htmlFor={field.name}>
+        {label}
+        {reqLabel && (
+          <code className='text-red-500 text-xs align-text-top'> (*)</code>
+        )}
+      </label>
+      <InputToggle
+        id='status'
+        wrapperClassName='w-[120px]'
+        onLabel={onLabel}
+        offLabel={offLabel}
+        checked={field.state.value}
+        defaultChecked={defaultChecked}
+        onToggle={(val) => field.handleChange(val)}
+        disabled={disabled}
+      />
+      <FieldError field={field} />
+    </div>
+  );
+};
+
 type SubmitButtonProps = {
   children: React.ReactNode;
-  isLoading?: boolean
+  isLoading?: boolean;
 };
 
 const SubmitButton = ({ children, isLoading }: SubmitButtonProps) => {
@@ -206,6 +242,7 @@ export const { useAppForm, withForm, withFieldGroup } = createFormHook({
     SelectField,
     FileField,
     TextAreaField,
+    ToggleField,
   },
   formComponents: {
     SubmitButton,

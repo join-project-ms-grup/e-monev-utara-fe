@@ -30,6 +30,7 @@ import {
 import {
   flatMonitoringDAK,
   getMonitoringDAK,
+  kunciMonitoringDAK,
   realisasiMonitoringDAK,
   type FlatMonitoringDAK,
   type RealisasiMonitoringDAKForm,
@@ -287,7 +288,6 @@ const IdentifikasiDakTable = () => {
         triwulan: Number(triwulanDAK),
       });
       const flatData = flatMonitoringDAK(data);
-      console.log('MONITORING DAK', flatData);
       return flatData;
     },
     enabled: !!(tahunDAK && opdDAK && subJenisDAK && triwulanDAK),
@@ -552,17 +552,11 @@ const IdentifikasiDakTable = () => {
                           },
                         }));
                       }}
+                      withButton={
+                        (currentRowValues.catatan ?? item.catatan ?? '') !==
+                        (item.catatan ?? '')
+                      }
                     />
-
-                    {(currentRowValues.catatan ?? item.catatan ?? '') !==
-                      (item.catatan ?? '') && (
-                      <button
-                        type='submit'
-                        className='text-green-500 hover:text-green-700 transition-colors mt-1'
-                      >
-                        <MdCheck />
-                      </button>
-                    )}
                   </div>
                 </form>
               </td>
@@ -572,6 +566,9 @@ const IdentifikasiDakTable = () => {
                   Icon={MdLockOpen}
                   className='hover:bg-green-700!'
                   tooltip='Terbuka'
+                  onClick={() =>
+                    kunciMutation.mutate({ id_realisasi: item.id_realisasi })
+                  }
                 />
               </td>
               <td>
@@ -601,25 +598,32 @@ const IdentifikasiDakTable = () => {
     );
   };
 
-  // const [formData, setFormData] =
-  //   useState<RealisasiMonitoringDAKForm>(initialFormData);
-  // useEffect(() => {
-  //   if (!openModal) {
-  //     const timeout = setTimeout(() => {
-  //       setFormData(initialFormData);
-  //     }, 200);
-  //     return () => clearTimeout(timeout);
-  //   } else {
-  //     console.log(formData);
-  //   }
-  // }, [openModal]);
-
   const queryClient = useQueryClient();
   const [loadingMutation, setLoadingMutation] = useState(false);
   const realisasiMutation = useMutation({
     mutationFn: async (payload: RealisasiMonitoringDAKForm) => {
       setLoadingMutation(true);
       return realisasiMonitoringDAK(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['list_monitoring_dak'] });
+      // setFormData(initialFormData);
+      setOpenModal(false);
+      toast.success('Data berhasil diperbarui');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+    },
+  });
+  const kunciMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      setLoadingMutation(true);
+      return kunciMonitoringDAK(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['list_monitoring_dak'] });

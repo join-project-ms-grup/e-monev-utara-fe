@@ -2,34 +2,34 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import type { ApiResponse } from "../../../../lib/api";
-import { addDAKRek, updateDAKRek, type DAKRekeningForm } from "../../../../services/DAK/DAKRekeningService";
+import type { ApiResponse } from "../../../../../lib/api";
+import { addMasalahDAK, updateMasalahDAK, type MasalahDAK } from "../../../../../services/DAK/DAKMonitoringService";
 
 /**
- * FUNGSI API REKENING DAK
+ * FUNGSI API MASALAH DAK
  */
-export const useM_RekDAK = () => {
+export const useM_MasalahDAK = () => {
     const queryClient = useQueryClient();
     const [loading, setLoading] = useState(false);
 
     const mutation = useMutation({
-        mutationFn: (payload: DAKRekeningForm) => {
+        mutationFn: (payload: MasalahDAK) => {
             setLoading(true);
 
             if (payload.id) {
-                return updateDAKRek(payload);
+                return updateMasalahDAK(payload);
             }
 
-            return addDAKRek(payload);
+            return addMasalahDAK(payload);
         },
 
         onSettled: () => setLoading(false),
         onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ["dak_rekening"] }),
+            queryClient.invalidateQueries({ queryKey: ["list_masalah_dak"] }),
     });
 
     const mutateWithToast = async (
-        payload: DAKRekeningForm,
+        payload: MasalahDAK,
         onSuccessCallback?: (data: any) => void
     ) => {
         const isUpdate = Boolean(payload.id);

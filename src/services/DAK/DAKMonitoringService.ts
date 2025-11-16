@@ -129,14 +129,25 @@ export function flatMonitoringDAK(data: DAKMonitoring[]): FlatMonitoringDAK[] {
 }
 
 export interface MasalahDAK {
-    id: number;
-    name: string;
-    keterangan: string;
-    status: boolean;
+    kode_jenis?: string | number | null;
+    id?: number | null;
+    name?: string;
+    keterangan?: string;
+    status?: boolean | null;
 }
 
 export const getMasalahDAK = async (kode_jenis: number): Promise<MasalahDAK[]> => {
     const response = await api.post<ApiResponse<MasalahDAK[]>>("/dak/masalah/list", { kode_jenis });
+    return response.data.data;
+};
+
+export const addMasalahDAK = async (payload: MasalahDAK): Promise<MasalahDAK> => {
+    const response = await api.post<ApiResponse<MasalahDAK>>("/dak/masalah/add", payload);
+    return response.data.data;
+};
+
+export const updateMasalahDAK = async (payload: MasalahDAK): Promise<MasalahDAK> => {
+    const response = await api.put<ApiResponse<MasalahDAK>>("/dak/masalah/update", payload);
     return response.data.data;
 };
 
@@ -151,5 +162,10 @@ export interface RealisasiMonitoringDAKForm {
 
 export const realisasiMonitoringDAK = async (payload: RealisasiMonitoringDAKForm): Promise<RealisasiMonitoringDAKForm> => {
     const response = await api.post<ApiResponse<RealisasiMonitoringDAKForm>>("/dak/fisik/realisasi", payload);
+    return response.data.data;
+};
+
+export const kunciMonitoringDAK = async ({ id_realisasi }: { id_realisasi: number }): Promise<any> => {
+    const response = await api.patch<ApiResponse<any>>("/dak/fisik/toggle-kunci", { id_realisasi });
     return response.data.data;
 };
