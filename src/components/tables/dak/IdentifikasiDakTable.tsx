@@ -204,10 +204,14 @@ const IdentifikasiDakTable = ({
               onChange={(val) => {
                 changeDakData('jenis', val);
                 changeDakData('subJenis', '');
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
               }}
               onClear={() => {
                 changeDakData('jenis', '');
                 changeDakData('subJenis', '');
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
               }}
             />
           </div>
@@ -220,8 +224,16 @@ const IdentifikasiDakTable = ({
               placeholder='Pilih Sub-Jenis DAK'
               options={listSubJenisDAK}
               value={dakData.subJenis}
-              onChange={(val) => changeDakData('subJenis', val)}
-              onClear={() => changeDakData('subJenis', '')}
+              onChange={(val) => {
+                changeDakData('subJenis', val);
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+              }}
+              onClear={() => {
+                changeDakData('subJenis', '');
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+              }}
               withSearch
               disabled={!dakData.jenis}
             />
@@ -237,8 +249,12 @@ const IdentifikasiDakTable = ({
               options={listTahunDAK}
               onChange={(val) => {
                 changeDakData('tahun', val);
+                changeDakData('opd', '');
               }}
-              onClear={() => changeDakData('tahun', '')}
+              onClear={() => {
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+              }}
               disabled={!dakData.subJenis}
             />
           </div>

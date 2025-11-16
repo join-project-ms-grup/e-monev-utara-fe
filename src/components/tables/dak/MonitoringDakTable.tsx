@@ -13,11 +13,8 @@ import {
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
-import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
+import InputSearchBox from '../../inputs/InputSearchBox';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getTahunDAK } from '../../../services/DAK/DAKTahunService';
-import { getOPDDAK } from '../../../services/DAK/DAKOPDService';
-import { getSubJenisDAK } from '../../../services/DAK/DAKJenisService';
 import {
   flatMonitoringDAK,
   getMonitoringDAK,
@@ -35,6 +32,19 @@ import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import F_MonitorMasalahDak from '../../forms/DAK/MonitoringDAK/F_MonitorMasalahDak';
+import {
+  useListOPDDAK,
+  useListSubJenisDAK,
+  useListTahunDAK,
+} from '../../../hooks/DAK/ListDataDAK';
+
+interface DakData {
+  tahun: string;
+  opd: string;
+  jenis: string;
+  subJenis: string;
+  triwulan?: string;
+}
 
 const columns: ColumnDef<FlatMonitoringDAK>[] = [
   {
@@ -230,62 +240,48 @@ const tableHead = () => {
 };
 
 const IdentifikasiDakTable = () => {
-  const [tahunDAK, setTahunDAK] = useState('');
-  const { data: dataTahunDAK } = useQuery({
-    queryKey: ['list_tahun_dak'],
-    queryFn: getTahunDAK,
+  const [dakData, setDakData] = useState<DakData>({
+    tahun: '',
+    opd: '',
+    jenis: '',
+    subJenis: '',
+    triwulan: '',
   });
-  const listTahunDAK =
-    dataTahunDAK?.map((item) => ({
-      label: `${item.tahun}`,
-      value: item.id?.toString(),
-    })) || [];
 
-  const [opdDAK, setOPDDAK] = useState('');
-  const { data: dataOPD } = useQuery({
-    queryKey: ['list_opd_dak'],
-    queryFn: getOPDDAK,
-  });
-  const listOPD =
-    dataOPD?.map((item) => ({
-      label: `${item.fullname}`,
-      value: item.id?.toString(),
-    })) || [];
+  const changeDakData = (key: keyof DakData, val: string) => {
+    setDakData((prev) => ({ ...prev, [key]: val }));
+  };
 
-  const [triwulanDAK, setTriwulanDAK] = useState('');
-
-  const [subJenisDAK, setSubJenisDAK] = useState('');
-  const { data: dataSubJenisDAK } = useQuery({
-    queryKey: ['list_sub_jenis_dak'],
-    queryFn: () => getSubJenisDAK(1),
-  });
-  const listSubJenisDAK =
-    dataSubJenisDAK?.map((item) => ({
-      label: `${item.nama}`,
-      value: item.id?.toString(),
-    })) || [];
+  const listTahunDAK = useListTahunDAK();
+  const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
+  const listOPDDAK = useListOPDDAK();
 
   const { data, isFetching, refetch } = useQuery({
     queryKey: [
       'list_monitoring_dak',
-      tahunDAK,
-      opdDAK,
-      subJenisDAK,
-      triwulanDAK,
+      dakData.tahun,
+      dakData.opd,
+      dakData.subJenis,
+      dakData.triwulan,
     ],
     queryFn: async () => {
       const data = await getMonitoringDAK({
         tahun: Number(
-          listTahunDAK.find((item) => item.value === tahunDAK)?.label,
+          listTahunDAK.find((item) => item.value === dakData.tahun)?.label,
         ),
-        opd_id: Number(opdDAK) ?? null,
-        sub_jenis: Number(subJenisDAK) ?? null,
-        triwulan: Number(triwulanDAK),
+        opd_id: Number(dakData.opd) ?? null,
+        sub_jenis: Number(dakData.subJenis) ?? null,
+        triwulan: Number(dakData.triwulan),
       });
       const flatData = flatMonitoringDAK(data);
       return flatData;
     },
-    enabled: !!(tahunDAK && opdDAK && subJenisDAK && triwulanDAK),
+    enabled: !!(
+      dakData.tahun &&
+      dakData.opd &&
+      dakData.subJenis &&
+      dakData.triwulan
+    ),
   });
 
   const [openModal, setOpenModal] = useState(false);
@@ -565,7 +561,8 @@ const IdentifikasiDakTable = () => {
                       id_realisasi: item.id_realisasi ?? 0,
                       fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
                       anggaran: Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                      kesesuaian_juknis: null,
+                      kesesuaian_juknis:
+                        Boolean(item.kesesuaian_juknis) ?? null,
                       sasaran_lokasi: Boolean(item.sasaran_lokasi),
                       catatan: currentRowValues.catatan ?? '',
                     });
@@ -613,8 +610,10 @@ const IdentifikasiDakTable = () => {
                     className='hover:bg-red-700!'
                     tooltip='Identifikasi Masalah'
                     onClick={() => {
-                      setOpenModal(true);
-                      setSelectedRealisasi(item.id_realisasi ?? 0);
+                      if (item.id_realisasi) {
+                        setOpenModal(true);
+                        setSelectedRealisasi(item.id_realisasi);
+                      }
                     }}
                   />
                   {/* <AksiButton
@@ -685,18 +684,65 @@ const IdentifikasiDakTable = () => {
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex gap-2'>
           <div>
+            <label htmlFor='jenis'>Jenis DAK</label>
+            <InputSearchBox
+              id='jenis'
+              className='w-44 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Jenis DAK'
+              options={[
+                { label: 'Fisik', value: '1' },
+                { label: 'Non-Fisik', value: '2' },
+              ]}
+              value={dakData.jenis}
+              onChange={(val) => {
+                changeDakData('jenis', val);
+                changeDakData('subJenis', '');
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+                changeDakData('triwulan', '');
+              }}
+              onClear={() => {
+                changeDakData('jenis', '');
+                changeDakData('subJenis', '');
+                changeDakData('tahun', '');
+                changeDakData('opd', '');
+                changeDakData('triwulan', '');
+              }}
+            />
+          </div>
+
+          <div>
+            <label htmlFor='subJenis'>Sub-Jenis DAK</label>
+            <InputSearchBox
+              id='subJenis'
+              className='w-56 h-9'
+              btnclassName='bg-white'
+              placeholder='Pilih Sub-Jenis DAK'
+              options={listSubJenisDAK}
+              value={dakData.subJenis}
+              onChange={(val) => changeDakData('subJenis', val)}
+              onClear={() => changeDakData('subJenis', '')}
+              withSearch
+              disabled={!dakData.jenis}
+            />
+          </div>
+
+          <div>
             <label htmlFor='tahun_ke'>Tahun</label>
             <InputSearchBox
               id='tahun_ke'
               className='w-42 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Tahun ke...'
-              value={tahunDAK}
-              options={listTahunDAK as OptionItem[]}
-              onChange={(val) => setTahunDAK(val)}
-              onClear={() => setTahunDAK('')}
+              value={dakData.tahun}
+              options={listTahunDAK}
+              onChange={(val) => changeDakData('tahun', val)}
+              onClear={() => changeDakData('tahun', '')}
+              disabled={!dakData.subJenis}
             />
           </div>
+
           <div>
             <label htmlFor='opd'>OPD</label>
             <InputSearchBox
@@ -704,27 +750,16 @@ const IdentifikasiDakTable = () => {
               className='w-72 h-9'
               btnclassName='bg-white'
               placeholder='Pilih OPD'
-              value={opdDAK}
-              options={listOPD as OptionItem[]}
-              onChange={(val) => setOPDDAK(val)}
-              onClear={() => setOPDDAK('')}
+              value={dakData.opd}
+              options={listOPDDAK}
+              onChange={(val) => changeDakData('opd', val)}
+              onClear={() => changeDakData('opd', '')}
               withSearch
               tooltip
+              disabled={!dakData.tahun}
             />
           </div>
-          <div>
-            <label htmlFor='subJenis'>Sub-Jenis DAK</label>
-            <InputSearchBox
-              id='subJenis'
-              className='w-44 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih Sub-Jenis DAK'
-              options={listSubJenisDAK as OptionItem[]}
-              value={subJenisDAK}
-              onChange={(val) => setSubJenisDAK(val)}
-              onClear={() => setSubJenisDAK('')}
-            />
-          </div>
+
           <div>
             <label htmlFor='triwulan'>Triwulan</label>
             <InputSearchBox
@@ -738,9 +773,10 @@ const IdentifikasiDakTable = () => {
                 { label: 'III', value: '3' },
                 { label: 'IV', value: '4' },
               ]}
-              value={triwulanDAK}
-              onChange={(val) => setTriwulanDAK(val)}
-              onClear={() => setTriwulanDAK('')}
+              value={dakData.triwulan}
+              onChange={(val) => changeDakData('triwulan', val)}
+              onClear={() => changeDakData('triwulan', '')}
+              disabled={!dakData.opd}
             />
           </div>
         </div>
@@ -772,7 +808,7 @@ const IdentifikasiDakTable = () => {
         widthLevel={7}
       >
         <F_MonitorMasalahDak
-          triwulan={triwulanDAK}
+          triwulan={dakData.triwulan ?? ''}
           id_realisasi={selectedRealisasi}
           onSuccess={() => {
             setOpenModal(false);

@@ -60,7 +60,7 @@ const F_MonitorMasalahDak = ({
     onSubmit: ({ value }) => {
       if (id_realisasi) {
         const payload = {
-          id_realisasi: value.id_realisasi!,
+          id_realisasi: id_realisasi,
           masalah: value.masalah,
           masalah_lain: value.masalah_lain,
           file_masalah: '[]',
