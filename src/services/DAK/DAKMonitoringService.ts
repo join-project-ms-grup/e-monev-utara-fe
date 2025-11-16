@@ -31,7 +31,9 @@ export interface DAKMonitoring {
                     }
                 },
                 sisa_anggaran: number;
+                kunci: string | null;
                 sasaran_lokasi: string | null;
+                kesesuaian_juknis: string | null;
                 catatan: string | null;
             }[]
         }[]
@@ -70,7 +72,9 @@ export interface FlatMonitoringDAK {
         }
     },
     sisa_anggaran?: number;
+    kunci?: string | null;
     sasaran_lokasi?: string | null;
+    kesesuaian_juknis?: string | null;
     catatan?: string | null;
 }
 
@@ -118,6 +122,8 @@ export function flatMonitoringDAK(data: DAKMonitoring[]): FlatMonitoringDAK[] {
                         },
                         sisa_anggaran: row.sisa_anggaran,
                         sasaran_lokasi: row.sasaran_lokasi,
+                        kesesuaian_juknis: row.kesesuaian_juknis,
+                        kunci: row.kunci,
                         catatan: row.catatan,
                     })
                 }
@@ -167,5 +173,22 @@ export const realisasiMonitoringDAK = async (payload: RealisasiMonitoringDAKForm
 
 export const kunciMonitoringDAK = async ({ id_realisasi }: { id_realisasi: number }): Promise<any> => {
     const response = await api.patch<ApiResponse<any>>("/dak/fisik/toggle-kunci", { id_realisasi });
+    return response.data.data;
+};
+
+export interface MonitorMasalahDak{
+    id_realisasi?: number;
+    masalah?: string;
+    masalah_lain?: string;
+    file_masalah?: string;
+}
+
+export const getMonitorMasalahDAK = async (id_realisasi: number): Promise<MonitorMasalahDak> => {
+    const response = await api.post<ApiResponse<MonitorMasalahDak>>("/dak/fisik/masalah-realisasi", { id_realisasi });
+    return response.data.data;
+};
+
+export const updateMonitorMasalahDAK = async (payload: MonitorMasalahDak): Promise<MonitorMasalahDak> => {
+    const response = await api.put<ApiResponse<MonitorMasalahDak>>("/dak/fisik/update-masalah-realisasi", payload);
     return response.data.data;
 };

@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Tabel from '../Tabel';
 import type { ColumnDef, Table } from '@tanstack/react-table';
 import AksiButton from '../../inputs/AksiButton';
 import {
   MdAssignmentTurnedIn,
-  MdCheck,
-  MdCheckBox,
   MdContentPasteSearch,
   MdFindReplace,
   MdLock,
@@ -16,17 +14,10 @@ import {
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox, { type OptionItem } from '../../inputs/InputSearchBox';
-import {
-  getPeriodeMulaiFromCookie,
-  getPeriodeAkhirFromCookie,
-} from '../../../lib/usercookie';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getTahunDAK } from '../../../services/DAK/DAKTahunService';
 import { getOPDDAK } from '../../../services/DAK/DAKOPDService';
-import {
-  getJenisDAK,
-  getSubJenisDAK,
-} from '../../../services/DAK/DAKJenisService';
+import { getSubJenisDAK } from '../../../services/DAK/DAKJenisService';
 import {
   flatMonitoringDAK,
   getMonitoringDAK,
@@ -39,11 +30,11 @@ import Spinner from '../../inputs/Spinner';
 import { formatUang } from '../../../lib/helper';
 import InputText from '../../inputs/InputText';
 import InputTextArea from '../../inputs/InputTextArea';
-import FormMonitoringIdenDak from '../../forms/DAK/MonitoringDAK/FormMonitoringIdenDak';
 import DialogModal from '../../inputs/DialogModal';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
+import F_MonitorMasalahDak from '../../forms/DAK/MonitoringDAK/F_MonitorMasalahDak';
 
 const columns: ColumnDef<FlatMonitoringDAK>[] = [
   {
@@ -171,7 +162,7 @@ const columns: ColumnDef<FlatMonitoringDAK>[] = [
   },
   {
     id: 'aksi',
-    header: 'Aksi / Keterangan',
+    header: 'Aksi',
     cell: () => (
       //   <button className='px-2 py-1 bg-blue-500 text-white rounded'>Edit</button>
       <div className='flex justify-center'>
@@ -205,14 +196,18 @@ const tableHead = () => {
         <th colSpan={3}>Mekanisme Pelaksana</th>
         <th colSpan={4}>Realisasi</th>
         <th rowSpan={3}>Sisa Anggaran s.d Triwulan Ini</th>
-        <th rowSpan={3}>Kesesuaian Sasaran dan Lokasi dengan RKPD</th>
-        <th rowSpan={3}>Keseuaian antara DPA-SKPD dengan Juknis</th>
+        <th rowSpan={3} className='w-[150px]'>
+          Kesesuaian Sasaran dan Lokasi dengan RKPD
+        </th>
+        <th rowSpan={3} className='w-[150px]'>
+          Keseuaian antara DPA-SKPD dengan Juknis
+        </th>
         <th rowSpan={3}>Kodefikasi Masalah</th>
         <th rowSpan={3}>Masalah Lain</th>
         <th rowSpan={3}>Catatan</th>
         <th rowSpan={3}>SKPD Pelaksana</th>
         <th rowSpan={3}>Kunci Proses</th>
-        <th rowSpan={3}>Aksi / Keterangan</th>
+        <th rowSpan={3}>Aksi</th>
       </tr>
       <tr>
         <th rowSpan={2}>Volume</th>
@@ -295,7 +290,9 @@ const IdentifikasiDakTable = () => {
 
   const [openModal, setOpenModal] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, any>>({});
+  const [selectedRealisasi, setSelectedRealisasi] = useState(0);
 
+  //#region TABLE BODY
   const tableBody = (table: Table<FlatMonitoringDAK & { level?: string }>) => {
     const rows = table.getRowModel().rows;
     let nomor = 1;
@@ -361,9 +358,10 @@ const IdentifikasiDakTable = () => {
                         fisik: Number(currentRowValues.fisik),
                         anggaran:
                           Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                        kesesuaian_juknis: null,
+                        kesesuaian_juknis:
+                          Boolean(item.kesesuaian_juknis) ?? null,
                         sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
-                        catatan: null,
+                        catatan: item.catatan,
                       },
                       {
                         onSuccess: () => {
@@ -417,9 +415,10 @@ const IdentifikasiDakTable = () => {
                         id_realisasi: item.id_realisasi ?? 0,
                         fisik: Number(item.realisasi?.fisik?.capaian),
                         anggaran: Number(currentRowValues.uang) ?? 0,
-                        kesesuaian_juknis: null,
+                        kesesuaian_juknis:
+                          Boolean(item.kesesuaian_juknis) ?? null,
                         sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
-                        catatan: null,
+                        catatan: item.catatan,
                       },
                       {
                         onSuccess: () => {
@@ -494,7 +493,8 @@ const IdentifikasiDakTable = () => {
                         fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
                         anggaran:
                           Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                        kesesuaian_juknis: null,
+                        kesesuaian_juknis:
+                          Boolean(item.kesesuaian_juknis) ?? null,
                         sasaran_lokasi: value === 'true',
                         catatan: item.catatan,
                       },
@@ -515,11 +515,45 @@ const IdentifikasiDakTable = () => {
                 <InputSearchBox
                   id='kese_dpaskpd'
                   placeholder='Pilih...'
+                  value={
+                    currentRowValues.kesesuaian_juknis ??
+                    item.kesesuaian_juknis?.toString() ??
+                    ''
+                  }
                   options={[
                     { label: 'Ya', value: 'true' },
                     { label: 'Tidak', value: 'false' },
                   ]}
-                ></InputSearchBox>
+                  onChange={(value) => {
+                    setFormValues((prev) => ({
+                      ...prev,
+                      [item.id_realisasi ?? 0]: {
+                        ...prev[item.id_realisasi ?? 0],
+                        kesesuaian_juknis: value,
+                      },
+                    }));
+                    realisasiMutation.mutate(
+                      {
+                        id_realisasi: item.id_realisasi ?? 0,
+                        fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
+                        anggaran:
+                          Number(item.realisasi?.keuangan?.capaian) ?? 0,
+                        kesesuaian_juknis: value === 'true',
+                        sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
+                        catatan: item.catatan,
+                      },
+                      {
+                        onSuccess: () => {
+                          setFormValues((prev) => {
+                            const updated = { ...prev };
+                            delete updated[item.id_realisasi ?? 0];
+                            return updated;
+                          });
+                        },
+                      },
+                    );
+                  }}
+                />
               </td>
               <td>-</td>
               <td>-</td>
@@ -563,23 +597,27 @@ const IdentifikasiDakTable = () => {
               <td>-</td>
               <td>
                 <AksiButton
-                  Icon={MdLockOpen}
-                  className='hover:bg-green-700!'
-                  tooltip='Terbuka'
+                  Icon={!!item.kunci ? MdLock : MdLockOpen}
+                  className={`hover:bg-green-700! ${!!item.kunci ? 'text-red-500' : ''}`}
+                  tooltip={!!item.kunci ? 'Buka ?' : 'Kunci ?'}
+                  label={!!item.kunci ? 'Terkunci' : 'Terbuka'}
                   onClick={() =>
                     kunciMutation.mutate({ id_realisasi: item.id_realisasi })
                   }
                 />
               </td>
-              <td>
+              <td className='text-center'>
                 <div className='inline-flex gap-1'>
                   <AksiButton
                     Icon={MdFindReplace}
                     className='hover:bg-red-700!'
                     tooltip='Identifikasi Masalah'
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => {
+                      setOpenModal(true);
+                      setSelectedRealisasi(item.id_realisasi ?? 0);
+                    }}
                   />
-                  <AksiButton
+                  {/* <AksiButton
                     Icon={MdSave}
                     className='hover:bg-blue-700!'
                     tooltip='Simpan Data'
@@ -588,7 +626,7 @@ const IdentifikasiDakTable = () => {
                     Icon={MdCheckBox}
                     className='hover:bg-amber-700!'
                     tooltip='Data Ditindak'
-                  />
+                  /> */}
                 </div>
               </td>
             </tr>
@@ -597,6 +635,7 @@ const IdentifikasiDakTable = () => {
       </>
     );
   };
+  //#endregion
 
   const queryClient = useQueryClient();
   const [loadingMutation, setLoadingMutation] = useState(false);
@@ -726,10 +765,20 @@ const IdentifikasiDakTable = () => {
       <DialogModal
         title='Identifikasi Masalah Data Monitoring DAK Kabupaten / Kota per Triwulan'
         isOpen={openModal}
-        onClose={() => setOpenModal(false)}
+        onClose={() => {
+          setOpenModal(false);
+          setSelectedRealisasi(0);
+        }}
         widthLevel={7}
       >
-        <FormMonitoringIdenDak triwulan={triwulanDAK} />
+        <F_MonitorMasalahDak
+          triwulan={triwulanDAK}
+          id_realisasi={selectedRealisasi}
+          onSuccess={() => {
+            setOpenModal(false);
+            setSelectedRealisasi(0);
+          }}
+        />
       </DialogModal>
     </div>
   );
