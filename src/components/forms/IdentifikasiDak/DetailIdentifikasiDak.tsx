@@ -3,6 +3,7 @@ import { formatUang } from '../../../lib/helper';
 import {
   getIdentifikasiDetailDAK,
   setStatusIdentDak,
+  type FileIdentifikasiDAK,
 } from '../../../services/DAK/DAKIdentifikasiService';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import toast from 'react-hot-toast';
@@ -14,6 +15,8 @@ import {
 import AksiButton from '../../inputs/AksiButton';
 import { MdCheck, MdEdit } from 'react-icons/md';
 import { useState } from 'react';
+import { useM_DokIdentDAK } from './M_DokIdentDak';
+import { isEqual } from 'lodash';
 
 const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
   const { data } = useQuery({
@@ -63,12 +66,20 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
   ];
 
   const { initialValues } = useDokIdentDakFormData();
+  const [initEdit, setInitEdit] = useState<FileIdentifikasiDAK | null>({});
+  const { mutateWithToast, loading } = useM_DokIdentDAK();
   const form = useAppForm({
     defaultValues: initialValues,
     onSubmit: ({ value }) => {
-      // alert(JSON.stringify(value));
-      console.log(value);
-      
+      if (!isEqual(initEdit, value)) {
+        if (value.id_dok) {
+          mutateWithToast({
+            ...value,
+            Waktu: new Date(value.Waktu ?? '').toISOString(),
+            file: null,
+          });
+        }
+      }
     },
     onSubmitInvalid: () => {
       toast.error('Validasi gagal\nMohon lengkapi form');
@@ -79,17 +90,6 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
   });
 
   const [editingId, setEditingId] = useState<number | null>(null);
-  const startEdit = (kode: number) => {
-    const d = mapBerkas[kode];
-
-    form.setFieldValue('id_dok', kode);
-    form.setFieldValue('Kesesuaian', d?.Kesesuaian ?? '');
-    form.setFieldValue('Waktu', d?.Waktu ?? '');
-    form.setFieldValue('Keterangan', d?.Keterangan ?? '');
-    form.setFieldValue('pesan', d?.pesan ?? '');
-
-    setEditingId(kode);
-  };
 
   return (
     <>
@@ -389,16 +389,29 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                               name='Waktu'
                               children={(field) => (
                                 <input
+                                className='h-9 bg-white px-2 rounded shadow border-b-2 border-gray-200'
                                   type='date'
-                                  value={field.state.value}
+                                  value={
+                                    field.state.value
+                                      ? new Date(field.state.value)
+                                          .toISOString()
+                                          .slice(0, 10)
+                                      : ''
+                                  }
                                   onChange={(e) =>
                                     field.handleChange(e.target.value)
                                   }
                                 />
                               )}
                             />
+                          ) : mapBerkas[dok.kode]?.Waktu ? (
+                            new Date(
+                              mapBerkas[dok.kode].create_at,
+                            ).toLocaleDateString('id-ID', {
+                              timeZone: 'Asia/Jakarta',
+                            })
                           ) : (
-                            (mapBerkas[dok.kode]?.Waktu ?? '-')
+                            '-'
                           )}
                         </td>
                         <td>
@@ -445,9 +458,10 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                               <AksiButton
                                 type='submit'
                                 Icon={MdEdit}
+                                disabled={loading}
                                 onClick={() => {
                                   const d = mapBerkas[dok.kode];
-                                  form.setFieldValue('id_dok', dok.kode);
+                                  form.setFieldValue('id_dok', d.id);
                                   form.setFieldValue(
                                     'Kesesuaian',
                                     d?.Kesesuaian ?? '',
@@ -458,30 +472,28 @@ const DetailIdentifikasiDak = ({ id_ident }: { id_ident: number }) => {
                                     d?.Keterangan ?? '',
                                   );
                                   form.setFieldValue('pesan', d?.pesan ?? '');
+
+                                  setInitEdit({
+                                    id_dok: d.id,
+                                    file: null,
+                                    Keterangan: d.Keterangan ?? '',
+                                    Kesesuaian: d.Kesesuaian ?? '',
+                                    pesan: d.pesan ?? '',
+                                    Waktu: d.Waktu ?? '',
+                                  });
+
                                   setEditingId(dok.kode);
                                 }}
                               />
                             ) : (
                               <AksiButton
-                                type='button'
                                 className='hover:bg-green-500!'
                                 Icon={MdCheck}
-                                onClick={() => setEditingId(null)}
+                                onClick={() => {
+                                  setEditingId(null);
+                                }}
                               />
                             )}
-
-                            {/* {editingId === dok.kode ? (
-                              <AksiButton
-                                type='submit'
-                                Icon={MdCheck}
-                                onClick={() => setEditingId(null)}
-                              />
-                            ) : (
-                              <AksiButton
-                                Icon={MdEdit}
-                                onClick={() => startEdit(dok.kode)}
-                              />
-                            )} */}
                           </div>
                         </td>
                       </tr>

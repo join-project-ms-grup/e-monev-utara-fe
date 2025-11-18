@@ -155,48 +155,6 @@ const DashRKPD = () => {
 const DashDAK = () => {
   return (
     <div className='space-y-2'>
-      {/* <div className='inline-flex gap-2'>
-        <div>
-          <label htmlFor='tahun_ke'>Tahun</label>
-          <InputSearchBox
-            id='tahun_ke'
-            className='w-42 h-9'
-            btnclassName='bg-white'
-            placeholder='Pilih Tahun...'
-            options={[]}
-          />
-        </div>
-        <div>
-          <label htmlFor='jadwal'>Jadwal</label>
-          <InputSearchBox
-            id='jadwal'
-            className='w-42 h-9'
-            btnclassName='bg-white'
-            placeholder='Pilih Jadwal...'
-            options={[]}
-          />
-        </div>
-        <div className='flex flex-col'>
-          <label htmlFor='periode'>Periode Laporan</label>
-          <div className='inline-flex gap-2'>
-            <InputSearchBox
-              id='periode'
-              className='w-42 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih Periode...'
-              options={[]}
-            />
-            <InputSearchBox
-              id='periode2'
-              className='w-42 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih Waktu...'
-              options={[]}
-              disabled
-            />
-          </div>
-        </div>
-      </div> */}
       <br />
       <br />
       <DashDAKChart />

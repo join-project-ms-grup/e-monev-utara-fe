@@ -10,14 +10,14 @@ import {
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   flatIdentifikasiDAK,
   getIdentifikasiDAK,
   type FlatIdentifikasiDAK,
 } from '../../../services/DAK/DAKIdentifikasiService';
 import { formatUang } from '../../../lib/helper';
-import { FaExchangeAlt, FaInfo } from 'react-icons/fa';
+import { FaInfo } from 'react-icons/fa';
 import DialogModal from '../../inputs/DialogModal';
 import DetailIdentifikasiDak from '../../forms/IdentifikasiDak/DetailIdentifikasiDak';
 import {

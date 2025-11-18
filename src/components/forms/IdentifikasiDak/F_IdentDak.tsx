@@ -8,7 +8,7 @@ import { FC_MekanIdentDak } from './FC_MekanIdentDak';
 import { FC_DokIdentDak } from './FC_DokIdentDak';
 import { useStore } from '@tanstack/react-form';
 import toast from 'react-hot-toast';
-import { useM_IdentDAK } from '../../../hooks/Mutasi/DAK/M_IdentifikasiDAK';
+import { useM_IdentDAK } from './M_IdentifikasiDAK';
 
 type DakData = {
   tahun: string;

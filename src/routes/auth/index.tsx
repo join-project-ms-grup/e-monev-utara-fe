@@ -8,7 +8,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import api, { type ApiResponse } from '../../lib/api';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
-import { TfiWorld } from 'react-icons/tfi';
 import InputText from '../../components/inputs/InputText';
 
 export const Route = createFileRoute('/auth/')({

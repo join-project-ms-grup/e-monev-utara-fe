@@ -224,7 +224,7 @@ export const setStatusIdentDak = async (payload: {id_ident: number, status: stri
 };
 
 export interface FileIdentifikasiDAK {
-    id_dok: number;
+    id_dok?: number;
     file?: File | null;
     Kesesuaian?: string;
     Waktu?: string;

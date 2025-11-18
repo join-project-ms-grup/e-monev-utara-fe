@@ -1,10 +1,8 @@
 import {
   createFileRoute,
-  Link,
   Outlet,
   redirect,
   useNavigate,
-  useRouter,
 } from '@tanstack/react-router';
 import { useState } from 'react';
 import Sidebar from '../../components/Sidebar';
@@ -21,7 +19,7 @@ import InputSearchBox, {
 import Cookies from 'js-cookie';
 import { useAuth } from '../../contexts/AuthContext';
 import AksiButton from '../../components/inputs/AksiButton';
-import { getRoleId, isDev, skipPeriode } from '../../lib/usercookie';
+import { getRoleId, isDev } from '../../lib/usercookie';
 import BackToTop from '../../components/BackToTop';
 
 export const Route = createFileRoute('/_dashboard')({

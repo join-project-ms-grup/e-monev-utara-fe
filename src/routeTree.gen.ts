@@ -24,11 +24,9 @@ import { Route as DashboardRkpdPagu_indikatifRouteImport } from './routes/_dashb
 import { Route as DashboardRkpdIndikatorRouteImport } from './routes/_dashboard/rkpd/indikator'
 import { Route as DashboardRkpdCapaianRouteImport } from './routes/_dashboard/rkpd/capaian'
 import { Route as DashboardKonfigurasiUserRouteImport } from './routes/_dashboard/konfigurasi/user'
-import { Route as DashboardKonfigurasiTransferdataRouteImport } from './routes/_dashboard/konfigurasi/transferdata'
 import { Route as DashboardKonfigurasiSkpdRouteImport } from './routes/_dashboard/konfigurasi/skpd'
 import { Route as DashboardKonfigurasiRoleRouteImport } from './routes/_dashboard/konfigurasi/role'
 import { Route as DashboardKonfigurasiPeriodeRouteImport } from './routes/_dashboard/konfigurasi/periode'
-import { Route as DashboardKonfigurasiJadwalRouteImport } from './routes/_dashboard/konfigurasi/jadwal'
 import { Route as DashboardDakMonitoringRouteImport } from './routes/_dashboard/dak/monitoring'
 import { Route as DashboardDakLaporanRouteImport } from './routes/_dashboard/dak/laporan'
 import { Route as DashboardDakIdentifikasiRouteImport } from './routes/_dashboard/dak/identifikasi'
@@ -154,12 +152,6 @@ const DashboardKonfigurasiUserRoute =
     path: '/user',
     getParentRoute: () => DashboardKonfigurasiRouteRoute,
   } as any)
-const DashboardKonfigurasiTransferdataRoute =
-  DashboardKonfigurasiTransferdataRouteImport.update({
-    id: '/transferdata',
-    path: '/transferdata',
-    getParentRoute: () => DashboardKonfigurasiRouteRoute,
-  } as any)
 const DashboardKonfigurasiSkpdRoute =
   DashboardKonfigurasiSkpdRouteImport.update({
     id: '/skpd',
@@ -176,12 +168,6 @@ const DashboardKonfigurasiPeriodeRoute =
   DashboardKonfigurasiPeriodeRouteImport.update({
     id: '/periode',
     path: '/periode',
-    getParentRoute: () => DashboardKonfigurasiRouteRoute,
-  } as any)
-const DashboardKonfigurasiJadwalRoute =
-  DashboardKonfigurasiJadwalRouteImport.update({
-    id: '/jadwal',
-    path: '/jadwal',
     getParentRoute: () => DashboardKonfigurasiRouteRoute,
   } as any)
 const DashboardDakMonitoringRoute = DashboardDakMonitoringRouteImport.update({
@@ -465,11 +451,9 @@ export interface FileRoutesByFullPath {
   '/dak/identifikasi': typeof DashboardDakIdentifikasiRoute
   '/dak/laporan': typeof DashboardDakLaporanRoute
   '/dak/monitoring': typeof DashboardDakMonitoringRoute
-  '/konfigurasi/jadwal': typeof DashboardKonfigurasiJadwalRoute
   '/konfigurasi/periode': typeof DashboardKonfigurasiPeriodeRoute
   '/konfigurasi/role': typeof DashboardKonfigurasiRoleRoute
   '/konfigurasi/skpd': typeof DashboardKonfigurasiSkpdRoute
-  '/konfigurasi/transferdata': typeof DashboardKonfigurasiTransferdataRoute
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
@@ -520,11 +504,9 @@ export interface FileRoutesByTo {
   '/dak/identifikasi': typeof DashboardDakIdentifikasiRoute
   '/dak/laporan': typeof DashboardDakLaporanRoute
   '/dak/monitoring': typeof DashboardDakMonitoringRoute
-  '/konfigurasi/jadwal': typeof DashboardKonfigurasiJadwalRoute
   '/konfigurasi/periode': typeof DashboardKonfigurasiPeriodeRoute
   '/konfigurasi/role': typeof DashboardKonfigurasiRoleRoute
   '/konfigurasi/skpd': typeof DashboardKonfigurasiSkpdRoute
-  '/konfigurasi/transferdata': typeof DashboardKonfigurasiTransferdataRoute
   '/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
@@ -589,11 +571,9 @@ export interface FileRoutesById {
   '/_dashboard/dak/identifikasi': typeof DashboardDakIdentifikasiRoute
   '/_dashboard/dak/laporan': typeof DashboardDakLaporanRoute
   '/_dashboard/dak/monitoring': typeof DashboardDakMonitoringRoute
-  '/_dashboard/konfigurasi/jadwal': typeof DashboardKonfigurasiJadwalRoute
   '/_dashboard/konfigurasi/periode': typeof DashboardKonfigurasiPeriodeRoute
   '/_dashboard/konfigurasi/role': typeof DashboardKonfigurasiRoleRoute
   '/_dashboard/konfigurasi/skpd': typeof DashboardKonfigurasiSkpdRoute
-  '/_dashboard/konfigurasi/transferdata': typeof DashboardKonfigurasiTransferdataRoute
   '/_dashboard/konfigurasi/user': typeof DashboardKonfigurasiUserRoute
   '/_dashboard/rkpd/capaian': typeof DashboardRkpdCapaianRoute
   '/_dashboard/rkpd/indikator': typeof DashboardRkpdIndikatorRoute
@@ -658,11 +638,9 @@ export interface FileRouteTypes {
     | '/dak/identifikasi'
     | '/dak/laporan'
     | '/dak/monitoring'
-    | '/konfigurasi/jadwal'
     | '/konfigurasi/periode'
     | '/konfigurasi/role'
     | '/konfigurasi/skpd'
-    | '/konfigurasi/transferdata'
     | '/konfigurasi/user'
     | '/rkpd/capaian'
     | '/rkpd/indikator'
@@ -713,11 +691,9 @@ export interface FileRouteTypes {
     | '/dak/identifikasi'
     | '/dak/laporan'
     | '/dak/monitoring'
-    | '/konfigurasi/jadwal'
     | '/konfigurasi/periode'
     | '/konfigurasi/role'
     | '/konfigurasi/skpd'
-    | '/konfigurasi/transferdata'
     | '/konfigurasi/user'
     | '/rkpd/capaian'
     | '/rkpd/indikator'
@@ -781,11 +757,9 @@ export interface FileRouteTypes {
     | '/_dashboard/dak/identifikasi'
     | '/_dashboard/dak/laporan'
     | '/_dashboard/dak/monitoring'
-    | '/_dashboard/konfigurasi/jadwal'
     | '/_dashboard/konfigurasi/periode'
     | '/_dashboard/konfigurasi/role'
     | '/_dashboard/konfigurasi/skpd'
-    | '/_dashboard/konfigurasi/transferdata'
     | '/_dashboard/konfigurasi/user'
     | '/_dashboard/rkpd/capaian'
     | '/_dashboard/rkpd/indikator'
@@ -941,13 +915,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardKonfigurasiUserRouteImport
       parentRoute: typeof DashboardKonfigurasiRouteRoute
     }
-    '/_dashboard/konfigurasi/transferdata': {
-      id: '/_dashboard/konfigurasi/transferdata'
-      path: '/transferdata'
-      fullPath: '/konfigurasi/transferdata'
-      preLoaderRoute: typeof DashboardKonfigurasiTransferdataRouteImport
-      parentRoute: typeof DashboardKonfigurasiRouteRoute
-    }
     '/_dashboard/konfigurasi/skpd': {
       id: '/_dashboard/konfigurasi/skpd'
       path: '/skpd'
@@ -967,13 +934,6 @@ declare module '@tanstack/react-router' {
       path: '/periode'
       fullPath: '/konfigurasi/periode'
       preLoaderRoute: typeof DashboardKonfigurasiPeriodeRouteImport
-      parentRoute: typeof DashboardKonfigurasiRouteRoute
-    }
-    '/_dashboard/konfigurasi/jadwal': {
-      id: '/_dashboard/konfigurasi/jadwal'
-      path: '/jadwal'
-      fullPath: '/konfigurasi/jadwal'
-      preLoaderRoute: typeof DashboardKonfigurasiJadwalRouteImport
       parentRoute: typeof DashboardKonfigurasiRouteRoute
     }
     '/_dashboard/dak/monitoring': {
@@ -1349,23 +1309,18 @@ const DashboardDakRouteRouteWithChildren =
   DashboardDakRouteRoute._addFileChildren(DashboardDakRouteRouteChildren)
 
 interface DashboardKonfigurasiRouteRouteChildren {
-  DashboardKonfigurasiJadwalRoute: typeof DashboardKonfigurasiJadwalRoute
   DashboardKonfigurasiPeriodeRoute: typeof DashboardKonfigurasiPeriodeRoute
   DashboardKonfigurasiRoleRoute: typeof DashboardKonfigurasiRoleRoute
   DashboardKonfigurasiSkpdRoute: typeof DashboardKonfigurasiSkpdRoute
-  DashboardKonfigurasiTransferdataRoute: typeof DashboardKonfigurasiTransferdataRoute
   DashboardKonfigurasiUserRoute: typeof DashboardKonfigurasiUserRoute
   DashboardKonfigurasiIndexRoute: typeof DashboardKonfigurasiIndexRoute
 }
 
 const DashboardKonfigurasiRouteRouteChildren: DashboardKonfigurasiRouteRouteChildren =
   {
-    DashboardKonfigurasiJadwalRoute: DashboardKonfigurasiJadwalRoute,
     DashboardKonfigurasiPeriodeRoute: DashboardKonfigurasiPeriodeRoute,
     DashboardKonfigurasiRoleRoute: DashboardKonfigurasiRoleRoute,
     DashboardKonfigurasiSkpdRoute: DashboardKonfigurasiSkpdRoute,
-    DashboardKonfigurasiTransferdataRoute:
-      DashboardKonfigurasiTransferdataRoute,
     DashboardKonfigurasiUserRoute: DashboardKonfigurasiUserRoute,
     DashboardKonfigurasiIndexRoute: DashboardKonfigurasiIndexRoute,
   }

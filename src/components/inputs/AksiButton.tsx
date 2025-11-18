@@ -2,15 +2,16 @@ import clsx from 'clsx';
 import type { IconType } from 'react-icons/lib';
 
 interface AksiButton {
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   Icon: IconType;
   iconClassName?: string;
   className?: string;
   hoverColor?: string;
   tooltip?: string;
   tooltipId?: string;
-  label?:string
-  type?: "button" | "submit" | "reset" | undefined;
+  label?: string;
+  type?: 'button' | 'submit' | 'reset' | undefined;
+  disabled?: boolean;
 }
 
 const AksiButton = ({
@@ -23,6 +24,7 @@ const AksiButton = ({
   tooltipId = 'tooltip',
   label,
   type = 'button',
+  disabled = false,
   ...props
 }: AksiButton) => {
   const iconCN = clsx(iconClassName, 'text-xl');
@@ -41,13 +43,17 @@ const AksiButton = ({
         {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
         className={btnCN}
         onClick={onClick}
+        disabled={disabled}
         {...props}
       >
-        {label ? 
-        (Icon && <span className='inline-flex gap-1 items-center mt-1 mr-1'><Icon className={iconCN} />{label}</span>)
-        : 
-        (Icon && <Icon className={iconCN} />)
-        }
+        {label
+          ? Icon && (
+              <span className='inline-flex gap-1 items-center mt-1 mr-1'>
+                <Icon className={iconCN} />
+                {label}
+              </span>
+            )
+          : Icon && <Icon className={iconCN} />}
       </button>
     </>
   );
