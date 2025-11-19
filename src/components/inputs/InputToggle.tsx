@@ -59,7 +59,7 @@ const InputToggle = ({
       />
 
       <span
-        className={`absolute flex items-center justify-center z-10 left-full -translate-x-9 top-0 h-full w-9 rounded-full bg-white transition-all duration-300 peer-checked:left-0 peer-checked:translate-x-0`}
+        className={`absolute flex items-center justify-center z-10 left-full -translate-x-9 top-0 h-9 w-9 scale-80 shadow rounded-full bg-white transition-all duration-300 peer-checked:left-0 peer-checked:translate-x-0`}
       >
         {(isControlled ? checked : defaultChecked) ? <MdCheck /> : <MdClose />}
         {/* {checked ? <MdCheck /> : <MdClose />} */}

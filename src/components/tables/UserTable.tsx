@@ -1,12 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import {
+  deleteUser,
   getUsers,
   setStatusUser,
   type UserType,
 } from '../../services/UserService';
 import Spinner from '../inputs/Spinner';
-import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
+import {
+  MdAdd,
+  MdDelete,
+  MdEdit,
+  MdKey,
+  MdRefresh,
+} from 'react-icons/md';
 import toast from 'react-hot-toast';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
@@ -17,8 +24,9 @@ import InputToggle from '../inputs/InputToggle';
 import Tabel from './Tabel';
 import { getRoleId, isAdmin, isDev } from '../../lib/usercookie';
 import { F_User } from '../forms/Konfigurasi/User/F_User';
-import { initUserSF } from '../forms/Konfigurasi/User/FH_User';
+import { initUserPassSF, initUserSF } from '../forms/Konfigurasi/User/FH_User';
 import AksiButton from '../inputs/AksiButton';
+import { F_UserPass } from '../forms/Konfigurasi/User/F_UserPass';
 
 const UserTable = () => {
   // Data fetching
@@ -40,6 +48,22 @@ const UserTable = () => {
     onError: (error: AxiosError<ApiResponse<unknown>>) => {
       if (error.status === 400) {
         toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
+      }
+    },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return deleteUser(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_user'] });
+      setModal('');
+      setSelectedDataPass(initUserPassSF);
+      toast.success('Data berhasil dihapus');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
       }
     },
   });
@@ -74,16 +98,18 @@ const UserTable = () => {
         thClassNames: 'w-[15%]',
         tdClassNames: 'flex items-center justify-center',
       },
-      cell: ({ cell, row }) => (
-        <div className='w-30'>
-          <InputToggle
-            onLabel='Aktif'
-            offLabel='Nonaktif'
-            checked={cell.getValue()}
-            onToggle={() => setStatusMutation.mutate(row.original.id!)}
-          />
-        </div>
-      ),
+      cell: ({ cell, row }) => {
+        return (
+          <div className='w-30'>
+            <InputToggle
+              onLabel='Aktif'
+              offLabel='Nonaktif'
+              checked={cell.getValue()}
+              onToggle={() => setStatusMutation.mutate(row.original.id!)}
+            />
+          </div>
+        );
+      },
     }),
     columnHelper.display({
       header: 'Aksi',
@@ -91,6 +117,7 @@ const UserTable = () => {
       cell: ({ row }) => (
         <div className='inline-flex gap-1'>
           <AksiButton
+            tooltip='Ubah data'
             Icon={MdEdit}
             onClick={() => {
               setSelectedData({
@@ -106,19 +133,32 @@ const UserTable = () => {
               setModal('Add');
             }}
           />
-          {/* <button
-            className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
+          <AksiButton
+            Icon={MdKey}
+            tooltip='Ubah password'
             onClick={() => {
-              setModalState('Delete');
-              setFormData({
+              setSelectedDataPass({
                 id: row.original.id,
                 fullname: row.original.fullname,
+                password: '',
+                passwordConfirm: '',
               });
-              setOpenModal(true);
+              setModal('Password');
             }}
-          >
-            <MdDelete className='text-xl' />
-          </button> */}
+          />
+          <AksiButton
+            Icon={MdDelete}
+            tooltip='Hapus user'
+            onClick={() => {
+              setSelectedDataPass({
+                id: row.original.id,
+                fullname: row.original.fullname,
+                password: '',
+                passwordConfirm: '',
+              });
+              setModal('Delete');
+            }}
+          />
         </div>
       ),
       meta: {
@@ -128,7 +168,8 @@ const UserTable = () => {
   ];
 
   const [selectedData, setSelectedData] = useState(initUserSF);
-  const [modal, setModal] = useState<'' | 'Add' | 'Delete'>('');
+  const [selectedDataPass, setSelectedDataPass] = useState(initUserPassSF);
+  const [modal, setModal] = useState<'' | 'Add' | 'Password' | 'Delete'>('');
 
   return (
     <div className='space-y-2'>
@@ -154,9 +195,9 @@ const UserTable = () => {
         </div>
       </div>
       <Tabel data={data || []} columns={columns} />
-      {modal && (
+      {modal === 'Add' && (
         <DialogModal
-          title='Tambah data User'
+          title={`${selectedData.id ? 'Ubah' : 'Tambah'} data User`}
           isOpen={modal === 'Add'}
           onClose={() => {
             setModal('');
@@ -170,6 +211,57 @@ const UserTable = () => {
               setSelectedData(initUserSF);
             }}
           />
+        </DialogModal>
+      )}
+      {modal === 'Password' && (
+        <DialogModal
+          title={`Ubah password User`}
+          isOpen={modal === 'Password'}
+          onClose={() => {
+            setModal('');
+            setSelectedData(initUserSF);
+          }}
+        >
+          <F_UserPass
+            data={selectedDataPass}
+            onSuccess={() => {
+              setModal('');
+              setSelectedDataPass(initUserPassSF);
+            }}
+          />
+        </DialogModal>
+      )}
+      {modal === 'Delete' && (
+        <DialogModal
+          title={`Yakin hapus User ?`}
+          isOpen={modal === 'Delete'}
+          onClose={() => {
+            setModal('');
+            setSelectedDataPass(initUserPassSF);
+          }}
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (selectedDataPass.id) {
+                deleteMutation.mutate(selectedDataPass.id);
+              }
+            }}
+          >
+            <div>
+              <p>
+                Anda akan menghapus user{' '}
+                <b>
+                  <i>{selectedDataPass.fullname}</i>
+                </b>
+              </p>
+              <div className='float-end'>
+                <InputButton className='px-2' type='submit'>
+                  Hapus
+                </InputButton>
+              </div>
+            </div>
+          </form>
         </DialogModal>
       )}
     </div>

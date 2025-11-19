@@ -2,7 +2,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import { addUser, updateUser, type UserForm } from '../../../../services/UserService';
+import { addUser, changePassUser, updateUser, type UserForm, type UserPassForm } from '../../../../services/UserService';
 
 // *FH (FORM HOOK)
 
@@ -33,7 +33,7 @@ export const UserSchema = z
             .union([z.string(), z.number(), z.null()])
             .refine((val) => val !== '', { message: 'Field wajib diisi' }),
         password: z.string().optional(),
-        passwordConfirm: z.string().optional()
+        passwordConfirm: z.string().optional(),
     })
     .superRefine((d, ctx) => {
         if (!d.id) {
@@ -75,7 +75,6 @@ export const UserSchema = z
         }
     })
 
-
 // *SF (SCHEMA FORM)
 export type UserSF = z.infer<typeof UserSchema>;
 
@@ -103,7 +102,7 @@ export const useUserSFData = (data?: UserSF) => {
 };
 
 /**
- * FUNGSI API REKENING DAK
+ * FUNGSI API
  */
 export const useM_User = () => {
     const queryClient = useQueryClient();
@@ -152,3 +151,79 @@ export const useM_User = () => {
 
     return { ...mutation, loading, mutateWithToast };
 };
+
+//#region PASSOWRD FORM
+export const UserPassSchema = z.object({
+    id: z.number().nullish().optional(),
+    fullname: z.string().nullish().optional(),
+    password: z.string().nonempty({ message: 'Field wajib diisi' }).min(6, { message: 'Minimal 6 karakter' }),
+    passwordConfirm: z.string().nonempty({ message: 'Field wajib diisi' }).min(6, { message: 'Minimal 6 karakter' })
+}).refine((data) => data.password === data.passwordConfirm, {
+    message: 'Konfirmasi password tidak cocok',
+    path: ['passwordConfirm']
+});
+
+export type UserPassSF = z.infer<typeof UserPassSchema>;
+
+export const initUserPassSF: UserPassSF = {
+    id: 0,
+    fullname: '',
+    password: '',
+    passwordConfirm: '',
+};
+
+export const useUserPassSFData = (data?: UserPassSF) => {
+
+    const initialValues: UserPassSF = data
+        ? {
+            ...initUserPassSF,
+            ...data,
+        }
+        : initUserPassSF;
+
+    return { initialValues, data };
+};
+
+export const useM_UserPass = () => {
+    const queryClient = useQueryClient();
+    const [loading, setLoading] = useState(false);
+
+    const mutation = useMutation({
+        mutationFn: (payload: UserPassForm) => {
+            setLoading(true);
+            // return alert(JSON.stringify(payload, null, 2))
+            return changePassUser(payload);
+        },
+
+        onSettled: () => setLoading(false),
+        onSuccess: () =>
+            queryClient.invalidateQueries({ queryKey: ["tabel_user"] }),
+    });
+
+    const mutateWithToast = async (
+        payload: UserPassForm,
+        onSuccessCallback?: (data: any) => void
+    ) => {
+        const isUpdate = Boolean(payload.id);
+
+        const txt = isUpdate
+            ? { load: "Memperbarui data...", success: "Data berhasil diperbarui", fail: "Gagal memperbarui data" }
+            : { load: "Menyimpan data...", success: "Data berhasil ditambahkan", fail: "Gagal menambahkan data" };
+
+        return toast.promise(
+            mutation.mutateAsync(payload).then((data) => {
+                onSuccessCallback?.(data);
+                return data;
+            }),
+            {
+                loading: txt.load,
+                success: () => txt.success,
+                error: () => txt.fail
+            }
+        );
+    };
+
+
+    return { ...mutation, loading, mutateWithToast };
+};
+//#endregion

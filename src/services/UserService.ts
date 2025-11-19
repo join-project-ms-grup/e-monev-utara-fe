@@ -20,7 +20,8 @@ export interface UserType {
   userRole?: RoleType;
   userSkpd?: number;
 }
-export type UserForm = Pick<UserType, 'id' | 'name' | 'fullname' | 'email' | 'role_id' | 'skpd_id' | 'password' | 'passwordConfirm'>;
+export type UserForm = Pick<UserType, 'id' | 'name' | 'fullname' | 'email' | 'role_id' | 'skpd_id' | 'password' | 'passwordConfirm' >;
+export type UserPassForm = Pick<UserType, 'id' | 'password' | 'passwordConfirm' >;
 
 /**
  * Ambil semua user
@@ -54,6 +55,14 @@ export const updateUser = async (id: number, payload: UserForm): Promise<UserFor
 };
 
 /**
+ * Update data password user
+ */
+export const changePassUser = async (payload: UserForm): Promise<UserForm> => {
+    const response = await api.put<ApiResponse<UserForm>>(`/config/user/change-password`, payload);
+    return response.data.data;
+};
+
+/**
  * Patch status user
  */
 export const setStatusUser = async (id: number) => {
@@ -65,6 +74,6 @@ export const setStatusUser = async (id: number) => {
  * Hapus data user
  */
 export const deleteUser = async (id: number) => {
-    const response = await api.delete<ApiResponse<null>>(`/user/delete/${id}`);
+    const response = await api.delete<ApiResponse<null>>(`/config/user/delete/${id}`);
     return response.data;
 };
