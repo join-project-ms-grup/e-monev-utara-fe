@@ -320,6 +320,7 @@ export interface RealisasiRenstraMaster {
                         id: number;
                         name: string;
                         satuan: string;
+                        perhitungan: string;
                         target_capaian: {
                             id_rincian: number;
                             tahun_ke: number;
@@ -351,6 +352,8 @@ export interface FlatRealisasiRENSTRA {
     nama?: string;
     type?: string;
     id_parent?: number;
+
+    perhitungan?: string;
 
     pagu_id?: number;
     pagu_target?: number;
@@ -450,6 +453,7 @@ export function flatRealisasiRENSTRA(data: RealisasiRenstraMaster[]): FlatRealis
                                 indikator_id: indikator.id,
                                 indikator_name: indikator.name,
                                 indikator_satuan: indikator.satuan,
+                                perhitungan: indikator.perhitungan,
                                 target_capaian_i_id: indikator.target_capaian.id_rincian,
                                 target_capaian_i_capaian: indikator.target_capaian.capaian,
                                 target_capaian_i_tahun_ke: indikator.target_capaian.tahun_ke,

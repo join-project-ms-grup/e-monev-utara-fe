@@ -19,6 +19,7 @@ import type { CatatanForm } from '../CatatanService';
 export const exportRenja = async (
     data: FlatRKPDTriwulan[],
     skpd: string,
+    tahun: string,
     catatan: CatatanForm,
     opts?: { startRow?: number },
 ) => {
@@ -32,6 +33,7 @@ export const exportRenja = async (
     const merges = [
         'A2:Y2',
         'A3:Y3',
+        'A4:Y4',
         'A7:Y7',
         'A8:Y8',
         'A9:A10', 'A11:A12',
@@ -66,7 +68,7 @@ export const exportRenja = async (
     const fixedCells: Array<{ addr: string; value: string; style?: Partial<ExcelJS.Style> }> = [
         { addr: 'A2', value: 'Evaluasi Terhadap Hasil Renja Perangkat Daerah Lingkup Kabupaten/kota' },
         { addr: 'A3', value: `Renja Perangkat Daerah ${skpd} Kabupaten Bengkulu Utara` },
-        { addr: 'A4', value: `` },
+        { addr: 'A4', value: `Tahun ${tahun}` },
         { addr: 'A7', value: 'Indikator dan target kinerja Perangkat Daerah Kabupaten/Kota yang mengacu pada sasaran RKPD:' },
         { addr: 'A8', value: '................................................................................................' },
 
@@ -108,7 +110,7 @@ export const exportRenja = async (
     fixedCells.forEach((c) => {
         const cell = worksheet.getCell(c.addr);
         cell.value = c.value;
-        if (c.addr === 'A2' || c.addr === 'A3') {
+        if (c.addr === 'A2' || c.addr === 'A3' || c.addr === 'A4') {
             cell.alignment = { horizontal: 'center', vertical: 'middle' };
             cell.font = { bold: true, size: 14 };
         }

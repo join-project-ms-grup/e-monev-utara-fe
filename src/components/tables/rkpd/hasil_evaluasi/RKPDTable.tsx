@@ -13,6 +13,7 @@ import {
 import {
   getPeriodeAkhirFromCookie,
   getPeriodeIDFromCookie,
+  getPeriodeMulaiFromCookie,
   getUserSKPDID,
   isAdmin,
   isDev,
@@ -47,11 +48,27 @@ const RKPDTable = () => {
     })) || [];
   //#endregion
 
+  //#region List data periode
+  const [tahunKe, setTahunKe] = useState('');
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+  //#endregion
+
   //#region RKPD Data Flatten
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ['tabel_rkpd_tahunan', selectedSKPD, 5],
+    queryKey: ['tabel_rkpd_tahunan', selectedSKPD, tahunKe],
     queryFn: async () => {
-      const rawData = await getRKPDTriwulan(Number(selectedSKPD), 5);
+      const rawData = await getRKPDTriwulan(
+        Number(selectedSKPD),
+        Number(tahunKe),
+      );
       const flatData = flatRKPDTriwulan(rawData as any);
       return flatData;
     },
@@ -215,6 +232,20 @@ const RKPDTable = () => {
                 />
               </div>
             )}
+            <div>
+              <label htmlFor='tahun_ke'>Tahun ke</label>
+              <InputSearchBox
+                id='tahun_ke'
+                className='w-42 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih Tahun ke...'
+                value={tahunKe}
+                options={listTahunKe}
+                onChange={(val) => setTahunKe(val)}
+                onClear={() => setTahunKe('')}
+                disabled={!selectedSKPD}
+              />
+            </div>
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
@@ -292,6 +323,7 @@ const RKPDTable = () => {
                           listSKPDPeriode.find(
                             (item) => item.value === selectedSKPD,
                           )?.label ?? '',
+                          listTahunKe.find(item => item.value === tahunKe)?.label ?? '',
                           catatan,
                         ),
                         {
@@ -322,6 +354,7 @@ const RKPDTable = () => {
                   listSKPDPeriode.find((item) => item.value === selectedSKPD)
                     ?.label ?? ''
                 }
+                tahun={listTahunKe.find(item => item.value === tahunKe)?.label ?? ''}
               />
             </div>
           </div>,

@@ -14,11 +14,11 @@ import type { CatatanForm } from '../CatatanService';
 export const exportRKPD = async (
   data: FlatRKPDTriwulan[],
   skpd: string,
+  tahun: string,
   catatan: CatatanForm,
   opts?: { startRow?: number },
 ) => {
   const startRow = opts?.startRow ?? 13;
-  const tahun = '';
 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Evaluasi RKPD');
@@ -26,6 +26,7 @@ export const exportRKPD = async (
   const merges = [
     'A2:AD2',
     'A3:AD3',
+    'A4:AD4',
     'A7:AD7',
     'A8:AD8',
     'A9:A10', 'A11:A12',
@@ -59,7 +60,7 @@ export const exportRKPD = async (
   const fixedCells: Array<{ addr: string; value: string; style?: Partial<ExcelJS.Style> }> = [
     { addr: 'A2', value: 'Evaluasi Terhadap Hasil RKPD' },
     { addr: 'A3', value: 'Kabupaten Bengkulu Utara' },
-    { addr: 'A4', value: `` },
+    { addr: 'A4', value: `Tahun ${tahun}` },
     { addr: 'A7', value: 'Sasaran Pembangunan Tahunan Kabupaten/kota:' },
     { addr: 'A8', value: '……………………………………………………………………………………………………………………' },
 
@@ -103,7 +104,7 @@ export const exportRKPD = async (
   fixedCells.forEach((c) => {
     const cell = worksheet.getCell(c.addr);
     cell.value = c.value;
-    if (c.addr === 'A2' || c.addr === 'A3') {
+    if (c.addr === 'A2' || c.addr === 'A3' || c.addr === 'A4') {
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
       cell.font = { bold: true, size: 14 };
     }

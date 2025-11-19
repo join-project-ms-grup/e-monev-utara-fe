@@ -47,7 +47,6 @@ const RENSTRA_RealisasiTable = () => {
     queryKey: ['list_renstra_skpd_periode'],
     queryFn: async () => {
       const data = await getSKPDPerRENSTRA(idPeriodeCookie);
-      console.log(data);
       return data;
     },
   });
@@ -67,6 +66,8 @@ const RENSTRA_RealisasiTable = () => {
         tahun_ke: Number(tahunKe),
       });
       const flatData = flatRealisasiRENSTRA(rawData);
+      console.log(flatData);
+      
       return flatData;
     },
     enabled: !!(selectedSKPD && tahunKe),
@@ -161,7 +162,7 @@ const RENSTRA_RealisasiTable = () => {
     {
       header: 'perhitungan',
       cell: ({ row }) => {
-        const [localPer, setLocalPer] = useState('');
+        const [localPer, setLocalPer] = useState(row.original.perhitungan ?? '');
 
         if (row.original.type === 'subkegiatan') {
           return (
@@ -193,7 +194,7 @@ const RENSTRA_RealisasiTable = () => {
                     { label: 'Tetap', value: 'tetap' },
                   ]}
                   onChange={(val) => setLocalPer(val)}
-                  onClear={() => setLocalPer('')}
+                  // onClear={() => setLocalPer('')}
                 />
                 <InputButton className='w-[150px] h-9' disabled={!localPer}>
                   Konfirmasi

@@ -179,7 +179,7 @@ const RKPD_RealisasiTable = () => {
     {
       header: 'perhitungan',
       cell: ({ row }) => {
-        const [localPer, setLocalPer] = useState(row.original.perhitungan);
+        const [localPer, setLocalPer] = useState(row.original.perhitungan ?? '');
 
         if (!row.original.type) {
           return (

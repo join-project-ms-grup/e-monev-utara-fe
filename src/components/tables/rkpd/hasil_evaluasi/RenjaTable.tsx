@@ -324,7 +324,9 @@ const RenjaTable = () => {
                           data,
                           listSKPDPeriode.find(
                             (item) => item.value === selectedSKPD,
-                          )?.label ?? '', catatan
+                          )?.label ?? '',
+                          listTahunKe.find(item => item.value === tahunKe)?.label ?? '',
+                          catatan,
                         ),
                         {
                           loading: 'Sedang mengunduh...',
@@ -354,6 +356,7 @@ const RenjaTable = () => {
                   listSKPDPeriode.find((item) => item.value === selectedSKPD)
                     ?.label ?? ''
                 }
+                tahun={listTahunKe.find(item => item.value === tahunKe)?.label ?? ''}
               />
             </div>
           </div>,

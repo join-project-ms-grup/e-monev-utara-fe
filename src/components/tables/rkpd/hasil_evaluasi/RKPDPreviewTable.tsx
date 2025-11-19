@@ -9,10 +9,11 @@ import type { CatatanForm } from '../../../../services/CatatanService';
 interface MainTableProps {
   data: FlatRKPDTriwulan[];
   skpd: string;
+  tahun: string;
   catatan: CatatanForm;
 }
 
-const RKPDPreviewTable = ({ data, skpd, catatan }: MainTableProps) => {
+const RKPDPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -357,6 +358,7 @@ const RKPDPreviewTable = ({ data, skpd, catatan }: MainTableProps) => {
           <div className='flex flex-col items-center justify-center text-xl'>
             <p>Evaluasi Terhadap Hasil RKPD</p>
             <p>Kabupaten Bengkulu Utara</p>
+            <p>Tahun {tahun}</p>
           </div>
           <br />
           <div className='text-xl'>
