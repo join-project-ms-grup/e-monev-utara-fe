@@ -179,7 +179,7 @@ const RKPD_RealisasiTable = () => {
     {
       header: 'perhitungan',
       cell: ({ row }) => {
-        const [localPer, setLocalPer] = useState('');
+        const [localPer, setLocalPer] = useState(row.original.perhitungan);
 
         if (!row.original.type) {
           return (
@@ -211,7 +211,7 @@ const RKPD_RealisasiTable = () => {
                     { label: 'Tetap', value: 'tetap' },
                   ]}
                   onChange={(val) => setLocalPer(val)}
-                  onClear={() => setLocalPer('')}
+                  // onClear={() => setLocalPer('')}
                 />
                 <InputButton className='w-[150px] h-9' disabled={!localPer}>
                   Konfirmasi

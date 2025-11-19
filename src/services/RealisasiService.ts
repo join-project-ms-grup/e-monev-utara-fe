@@ -5,6 +5,7 @@ export interface RealisasiIndikator {
     id: number;
     name: string;
     satuan: string;
+    perhitungan: string;
     target_capaian: {
         id_rincian: number;
         tahun_ke: number;
@@ -75,6 +76,7 @@ export interface RealisasiFormRKPD {
     capaian_2?: string | number
     capaian_3?: string | number
     capaian_4?: string | number
+    perhitungan?: string;
 }
 
 export interface RealisasiGetForm {
@@ -146,6 +148,7 @@ export interface FlatRealisasiRKPD {
     total_realisasi?: number | string;
     persen_realisasi?: number | string;
 
+    perhitungan?: string;
     perangkat_daerah: string;
     parent?: number;
 }
@@ -199,6 +202,7 @@ export async function flatRealisasi(
                     total_realisasi: master.pagu?.total_realisasi,
                     persen_realisasi: master.pagu?.persen_realisasi,
 
+                    perhitungan: ind.perhitungan,
                     perangkat_daerah: skpd,
                     parent: master.parent,
                 });
