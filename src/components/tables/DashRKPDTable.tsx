@@ -64,7 +64,7 @@ const DashRKPDTable = () => {
     triwulan: Number(triwulan),
   });
   //#endregion
-  console.log(Number(tahunKe), Number(triwulan))
+  console.log(Number(tahunKe), Number(triwulan));
 
   const columns: ColumnDef<DashboardRankingResult>[] = [
     {
@@ -121,7 +121,6 @@ const DashRKPDTable = () => {
             const { capaian } = getValue();
             return (
               <div className='text-center'>
-                {/* <code className='italic font-bold'>({c_predikat})</code>{' '} */}
                 <span>{capaian}</span>
               </div>
             );
@@ -138,14 +137,13 @@ const DashRKPDTable = () => {
             return (
               <div className='text-center'>
                 <code className='font-bold'>{c_predikat}</code>{' '}
-                {/* <span>{capaian}</span> */}
               </div>
             );
           },
           meta: {
             tdClassNames: 'text-center border-r  border-gray-400',
           },
-        }
+        },
       ],
     },
     {
@@ -248,10 +246,6 @@ const DashRKPDTable = () => {
               value={tahunKe}
               options={listTahunKe}
               onChange={(val) => setTahunKe(val)}
-              onClear={() => {
-                setTahunKe('');
-                setTriwulan('');
-              }}
             />
           </div>
           <div>
@@ -269,31 +263,10 @@ const DashRKPDTable = () => {
                 { label: 'III', value: '3' },
                 { label: 'IV', value: '4' },
               ]}
-              onClear={() => setTriwulan('')}
               disabled={!tahunKe}
             />
           </div>
         </div>
-        {/* <div className='inline-flex gap-2'>
-          <InputButton
-            tooltip='Print'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => {
-              toast.success('Printing...');
-              exportRankingRKPD([], tahunMulai.toString());
-            }}
-          >
-            <MdPrint />
-          </InputButton>
-          <InputButton
-            tooltip='Refresh'
-            className='btn btn-theme w-9 h-9'
-            onClick={() => refetch()}
-            disabled={isFetching}
-          >
-            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
-          </InputButton>
-        </div> */}
       </div>
       <Tabel
         data={data?.result || []}

@@ -68,7 +68,7 @@ const menuRKPD: MenuItem[] = [
     akses: [2, 3],
     submenu: [
       { label: 'Rekening', to: '/rkpd/renstra_rpjmd/rekening' },
-      { label: 'Perencanaan', to: '/rkpd/renstra_rpjmd/pagu_indikator' },
+      { label: 'Perencanaan', to: '/rkpd/renstra_rpjmd/perencanaan' },
       { label: 'Realisasi', to: '/rkpd/renstra_rpjmd/realisasi' },
       { label: 'Evaluasi RPJMD', to: '/rkpd/hasil_evaluasi/rpjmd' },
       { label: 'Evaluasi Renstra', to: '/rkpd/hasil_evaluasi/renstra' },
@@ -92,7 +92,7 @@ const menuRKPD: MenuItem[] = [
     akses: [2, 3],
     submenu: [
       { label: 'Rekening', to: '/rkpd/renja_rkpd/rekening' },
-      { label: 'Perencanaan', to: '/rkpd/renja_rkpd/renja' },
+      { label: 'Perencanaan', to: '/rkpd/renja_rkpd/perencanaan' },
       { label: 'Realisasi', to: '/rkpd/renja_rkpd/realisasi' },
       { label: 'Evaluasi RKPD', to: '/rkpd/hasil_evaluasi/rkpd' },
       { label: 'Evaulasi RENJA', to: '/rkpd/hasil_evaluasi/renja' },

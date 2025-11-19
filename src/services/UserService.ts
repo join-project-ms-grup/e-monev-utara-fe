@@ -3,13 +3,13 @@ import { isAdmin } from "../lib/usercookie";
 import type { RoleType } from "./RoleService";
 
 export interface UserType {
-  id?: number;
+  id?: number | null;
   name?: string;
   fullname?: string;
   avatar?: string;
   email?: string;
   role_id?: number | string;
-  skpd_id?: number | string;
+  skpd_id?: number | string | null;
   password?: string;
   passwordConfirm?: string;
   token?: string;

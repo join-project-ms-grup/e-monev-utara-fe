@@ -1,6 +1,6 @@
 import React from 'react';
 import InputButton from '../inputs/InputButton';
-import type { SKPDForm } from '../../services/SKPDService';
+import type { SKPDForm } from '../../services/Konfigurasi/Service_SKPD';
 import { useForm } from '@tanstack/react-form';
 import {
   mapErrors,

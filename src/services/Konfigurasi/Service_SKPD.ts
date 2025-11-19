@@ -1,4 +1,4 @@
-import api, { type ApiResponse } from "../lib/api";
+import api, { type ApiResponse } from "../../lib/api";
 
 export interface SKPDType {
   id?: number;

@@ -19,8 +19,8 @@ import {
 import PesanSKPDTabel from '../../../PesanSKPDTabel';
 import {
   flatRenja,
-  getRenjaDetailRENSTRA,
-  getRenjaRENSTRA,
+  getRenjaDetailRKPD,
+  getRenjaRKPD,
   type FlatRenja,
   type RenjaDetail,
 } from '../../../../services/RenjaService';
@@ -28,9 +28,9 @@ import Spinner from '../../../inputs/Spinner';
 import { formatUang } from '../../../../lib/helper';
 import AksiButton from '../../../inputs/AksiButton';
 import DialogModal from '../../../inputs/DialogModal';
-import { getSKPDPerRENSTRA } from '../../../../services/PeriodeService';
+import { getSKPDPerRKPD } from '../../../../services/PeriodeService';
 
-const RENSTRA_PaguIndikator = () => {
+const RKPD_PerencanaanTable = () => {
   //#region Form Data dan Modal
   const [openModal, setOpenModal] = useState(false);
   const initialFormData: RenjaDetail = {
@@ -64,17 +64,13 @@ const RENSTRA_PaguIndikator = () => {
       value: `${i + 1}`,
     }),
   );
-  const idPeriodeCookie = Number(getPeriodeIDFromCookie());
   //#region SKPD
+  const idPeriodeCookie = Number(getPeriodeIDFromCookie());
   const userSKPDID = getUserSKPDID();
   const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const { data: dataSKPDPeriode } = useQuery({
-    queryKey: ['list_renstra_skpd_periode'],
-    queryFn: async () => {
-      const data = await getSKPDPerRENSTRA(idPeriodeCookie);
-      console.log(data)
-      return data;
-    },
+    queryKey: ['list_rkpd_skpd_periode'],
+    queryFn: async () => getSKPDPerRKPD(idPeriodeCookie),
   });
   const listSKPDPeriode =
     dataSKPDPeriode?.map((item) => ({
@@ -82,11 +78,12 @@ const RENSTRA_PaguIndikator = () => {
       value: item.id?.toString(),
     })) || [];
   //#endregion
+  const [selectedBidang, setSelectedBidang] = useState('');
 
   const { data, isFetching, refetch } = useQuery({
     queryKey: ['list_renja', tahunKe, selectedSKPD],
     queryFn: async () => {
-      const rawData = await getRenjaRENSTRA({
+      const rawData = await getRenjaRKPD({
         skpd_periode_id: Number(selectedSKPD),
         tahun_ke: Number(tahunKe),
         bidang: null,
@@ -210,7 +207,7 @@ const RENSTRA_PaguIndikator = () => {
                       iconClassName='scale-75'
                       tooltip='Informasi Data'
                       onClick={async () => {
-                        const detailR = await getRenjaDetailRENSTRA({
+                        const detailR = await getRenjaDetailRKPD({
                           skpd_periode_id: Number(selectedSKPD),
                           tahun_ke: Number(tahunKe),
                           sub_id: item.id,
@@ -454,4 +451,4 @@ const DetailRenja = ({
   );
 };
 
-export default RENSTRA_PaguIndikator;
+export default RKPD_PerencanaanTable;

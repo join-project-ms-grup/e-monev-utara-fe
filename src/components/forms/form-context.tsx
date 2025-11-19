@@ -10,6 +10,7 @@ import FieldError from './FieldError';
 import InputFile from '../inputs/InputFile';
 import InputTextArea from '../inputs/InputTextArea';
 import InputToggle from '../inputs/InputToggle';
+import type { HTMLInputTypeAttribute } from 'react';
 export const { fieldContext, useFieldContext, formContext, useFormContext } =
   createFormHookContexts();
 
@@ -26,6 +27,8 @@ type FieldProps = {
   offLabel?: string;
   defaultChecked?: boolean;
   onClear?: () => void;
+  type?: HTMLInputTypeAttribute;
+  tooltip?: boolean;
 };
 
 const TextField = ({
@@ -35,6 +38,7 @@ const TextField = ({
   disabled = false,
   Rupiah = false,
   Nomor = false,
+  type = 'text',
   onClear,
 }: FieldProps) => {
   const field = useFieldContext<string>();
@@ -48,6 +52,7 @@ const TextField = ({
         )}
       </label>
       <InputText
+        type={type}
         id={field.name}
         value={field.state.value}
         {...(Rupiah
@@ -107,6 +112,7 @@ const SelectField = ({
   onClear,
   placeholder,
   disabled = false,
+  tooltip = false,
 }: FieldProps) => {
   const field = useFieldContext<string>();
 
@@ -132,6 +138,7 @@ const SelectField = ({
         invalid={!field.state.meta.isValid}
         placeholder={placeholder}
         disabled={disabled}
+        tooltip={tooltip}
         withSearch
       />
       <FieldError field={field} />

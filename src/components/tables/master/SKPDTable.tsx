@@ -9,7 +9,7 @@ import {
   deleteSKPD,
   updateSKPD,
   type SKPDForm,
-} from '../../../services/SKPDService';
+} from '../../../services/Konfigurasi/Service_SKPD';
 import { useEffect, useState } from 'react';
 import DialogModal from '../../inputs/DialogModal';
 import InputButton from '../../inputs/InputButton';

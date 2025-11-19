@@ -179,7 +179,9 @@ const RKPD_RealisasiTable = () => {
     {
       header: 'perhitungan',
       cell: ({ row }) => {
-        const [localPer, setLocalPer] = useState(row.original.perhitungan ?? '');
+        const [localPer, setLocalPer] = useState(
+          row.original.perhitungan ?? '',
+        );
 
         if (!row.original.type) {
           return (
@@ -475,31 +477,50 @@ const RKPD_RealisasiTable = () => {
               let hasMutation = false;
               setLoadingMutation(true);
 
-              if (data.id_pagu) {
-                hasMutation = true;
-                await addAnggaran.mutateAsync({
-                  id_pagu: Number(data.id_pagu),
-                  realisasi: [
-                    { triwulan: 1, realisasi: Number(data.realisasi_1) },
-                    { triwulan: 2, realisasi: Number(data.realisasi_2) },
-                    { triwulan: 3, realisasi: Number(data.realisasi_3) },
-                    { triwulan: 4, realisasi: Number(data.realisasi_4) },
-                  ],
-                });
-              }
+              await addAnggaran.mutateAsync({
+                id_pagu: Number(data.id_pagu),
+                realisasi: [
+                  { triwulan: 1, realisasi: Number(data.realisasi_1) },
+                  { triwulan: 2, realisasi: Number(data.realisasi_2) },
+                  { triwulan: 3, realisasi: Number(data.realisasi_3) },
+                  { triwulan: 4, realisasi: Number(data.realisasi_4) },
+                ],
+              });
+              await addCapaian.mutateAsync({
+                id_rincian: Number(data.id_rincian),
+                capaian: [
+                  { triwulan: 1, capaian: Number(data.capaian_1) },
+                  { triwulan: 2, capaian: Number(data.capaian_2) },
+                  { triwulan: 3, capaian: Number(data.capaian_3) },
+                  { triwulan: 4, capaian: Number(data.capaian_4) },
+                ],
+              });
 
-              if (data.id_rincian) {
-                hasMutation = true;
-                await addCapaian.mutateAsync({
-                  id_rincian: Number(data.id_rincian),
-                  capaian: [
-                    { triwulan: 1, capaian: Number(data.capaian_1) },
-                    { triwulan: 2, capaian: Number(data.capaian_2) },
-                    { triwulan: 3, capaian: Number(data.capaian_3) },
-                    { triwulan: 4, capaian: Number(data.capaian_4) },
-                  ],
-                });
-              }
+              // if (data.id_pagu) {
+              //   hasMutation = true;
+              //   await addAnggaran.mutateAsync({
+              //     id_pagu: Number(data.id_pagu),
+              //     realisasi: [
+              //       { triwulan: 1, realisasi: Number(data.realisasi_1) },
+              //       { triwulan: 2, realisasi: Number(data.realisasi_2) },
+              //       { triwulan: 3, realisasi: Number(data.realisasi_3) },
+              //       { triwulan: 4, realisasi: Number(data.realisasi_4) },
+              //     ],
+              //   });
+              // }
+
+              // if (data.id_rincian) {
+              //   hasMutation = true;
+              //   await addCapaian.mutateAsync({
+              //     id_rincian: Number(data.id_rincian),
+              //     capaian: [
+              //       { triwulan: 1, capaian: Number(data.capaian_1) },
+              //       { triwulan: 2, capaian: Number(data.capaian_2) },
+              //       { triwulan: 3, capaian: Number(data.capaian_3) },
+              //       { triwulan: 4, capaian: Number(data.capaian_4) },
+              //     ],
+              //   });
+              // }
 
               if (hasMutation) toast.success('Data berhasil ditambahkan');
             } catch (err) {
