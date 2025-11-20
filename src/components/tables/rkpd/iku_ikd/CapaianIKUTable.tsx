@@ -288,7 +288,7 @@ const CapaianIKUTable = () => {
                   error: <b>Gagal mengunduh.</b>,
                 });
 
-                console.log(hasilData);
+
               } catch (error) {
                 console.error(error);
                 toast.error('Terjadi kesalahan saat mengambil data.');

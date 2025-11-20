@@ -81,7 +81,6 @@ const JenisDakTable = () => {
   const updateMutation = useMutation({
     mutationFn: async (payload: SubJenisDAKForm) => {
       setLoadingMutation(true);
-      console.log(payload);
       return updateSubJenisDAK(payload);
     },
     onSuccess: () => {

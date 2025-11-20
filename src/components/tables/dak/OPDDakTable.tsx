@@ -46,7 +46,6 @@ const OPDDakTable = () => {
       }, 200);
       return () => clearTimeout(timeout);
     } else {
-      console.log(formData);
     }
   }, [openModal]);
 
@@ -206,7 +205,6 @@ const OPDDakTable = () => {
             type='Add'
             defaultValues={formData}
             onSubmit={(data: OPDDAKForm) => {
-              console.log('Data dari form modal:', data);
               addMutation.mutate({
                 kode: data.kode,
                 fullname: data.fullname,
@@ -236,7 +234,6 @@ const OPDDakTable = () => {
             type='Edit'
             defaultValues={formData}
             onSubmit={(data: OPDDAKForm) => {
-              console.log('Data dari form modal:', data);
               updateMutation.mutate({
                 id: data.id,
                 kode: data.kode,

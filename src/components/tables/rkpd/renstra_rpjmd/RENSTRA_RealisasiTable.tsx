@@ -66,7 +66,7 @@ const RENSTRA_RealisasiTable = () => {
         tahun_ke: Number(tahunKe),
       });
       const flatData = flatRealisasiRENSTRA(rawData);
-      console.log(flatData);
+
       
       return flatData;
     },

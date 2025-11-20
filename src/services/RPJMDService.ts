@@ -190,6 +190,8 @@ export interface FlatRPJMD {
     pagu_pagu_5?: number;
     pagu_realisasi_5?: number;
     pagu_persen_5?: number;
+
+    skpd?: string;
 }
 
 export function flatRPJMD(data: RPJMDMaster[]): FlatRPJMD[] {

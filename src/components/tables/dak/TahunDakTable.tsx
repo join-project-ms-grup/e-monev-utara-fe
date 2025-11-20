@@ -229,7 +229,6 @@ const TahunDakTable = () => {
             type='Add'
             defaultValues={formData}
             onSubmit={(data: TahunDAKForm) => {
-              console.log('Data dari form modal:', data);
               addMutation.mutate({
                 keterangan: data.keterangan,
                 tahun: Number(data.tahun),
@@ -258,7 +257,6 @@ const TahunDakTable = () => {
             type='Edit'
             defaultValues={formData}
             onSubmit={(data: TahunDAKForm) => {
-              console.log('Data dari form modal:', data);
               if (data.id) {
                 updateMutation.mutate({
                   id: data.id,

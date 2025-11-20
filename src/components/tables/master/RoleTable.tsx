@@ -45,7 +45,6 @@ const RoleTable = () => {
       }, 200);
       return () => clearTimeout(timeout);
     } else {
-      console.log(formData);
     }
   }, [openModal]);
 
@@ -251,7 +250,6 @@ const RoleTable = () => {
             type='Add'
             defaultValues={formData}
             onSubmit={(data: RoleForm) => {
-              console.log('Data dari form modal:', data);
               addMutation.mutate({
                 kode: Number(data.kode),
                 name: data.name,
@@ -280,7 +278,6 @@ const RoleTable = () => {
             type='Edit'
             defaultValues={formData}
             onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', data);
               updateMutation.mutate({
                 id,
                 payload: { kode: Number(payload.kode), name: payload.name },

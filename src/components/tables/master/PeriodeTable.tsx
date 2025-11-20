@@ -57,7 +57,6 @@ const PeriodeTable = () => {
   const addMutation = useMutation({
     mutationFn: async (payload: PeriodeForm) => {
       setLoadingMutation(true);
-      // return console.log(payload)
       return addPeriode(payload);
     },
     onSuccess: () => {
@@ -236,7 +235,6 @@ const PeriodeTable = () => {
             type='Add'
             defaultValues={formData}
             onSubmit={(data: PeriodeForm) => {
-              console.log('Data dari form modal:', data);
               addMutation.mutate({
                 mulai: Number(data.mulai),
                 akhir: Number(data.akhir),
@@ -266,7 +264,6 @@ const PeriodeTable = () => {
             type='Edit'
             defaultValues={formData}
             onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', data);
               updateMutation.mutate({
                 id,
                 payload: {

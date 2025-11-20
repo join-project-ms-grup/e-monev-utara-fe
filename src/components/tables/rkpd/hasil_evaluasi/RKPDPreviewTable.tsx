@@ -15,7 +15,7 @@ interface MainTableProps {
 }
 
 const RKPDPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
-  console.log(data);
+
   
   //#region Head Tabel
   const tableHead = () => {

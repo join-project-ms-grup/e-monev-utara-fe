@@ -45,8 +45,6 @@ const SKPDTable = () => {
         setFormData(initialFormData);
       }, 200);
       return () => clearTimeout(timeout);
-    } else {
-      console.log(formData);
     }
   }, [openModal]);
 
@@ -237,7 +235,7 @@ const SKPDTable = () => {
             type='Add'
             defaultValues={formData}
             onSubmit={(data: SKPDForm) => {
-              console.log('Data dari form modal:', data);
+
               addMutation.mutate({
                 kode: Number(data.kode),
                 name: data.name,
@@ -267,7 +265,7 @@ const SKPDTable = () => {
             type='Edit'
             defaultValues={formData}
             onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', data);
+
               updateMutation.mutate({
                 id,
                 payload: {

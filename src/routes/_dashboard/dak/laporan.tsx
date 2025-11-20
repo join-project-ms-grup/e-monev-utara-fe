@@ -224,7 +224,7 @@ function RouteComponent() {
                 dakData,
                 listOPDDAK.find((i) => i.value === dakData.opd)?.label ?? '',
               );
-              console.log(data);
+
             }
           }}
         >

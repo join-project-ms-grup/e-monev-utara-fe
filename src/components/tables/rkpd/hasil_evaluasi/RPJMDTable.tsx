@@ -84,6 +84,7 @@ const RPJMDTable = () => {
     },
     enabled: !!selectedSKPD,
   });
+
   //#endregion
 
   const columns: ColumnDef<FlatRenstraNew>[] = [
@@ -207,7 +208,6 @@ const RPJMDTable = () => {
               tooltip='Lihat tabel penuh'
               className='btn btn-theme w-9 h-9'
               onClick={() => {
-                const data = true;
                 if (data && selectedSKPD) {
                   setMode('catatan');
                 } else {

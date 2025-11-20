@@ -21,9 +21,7 @@ export const bidangdakSchemaSubmit = z
         id_bidang: z.number().optional(),
     })
     .superRefine((data, ctx) => {
-        console.log('Data masuk superRefine:', data);
         if (data.type === 'sub' && (!data.id_bidang)) {
-            console.log('id_bidang wajib tapi kosong!');
             ctx.addIssue({
                 path: ['id_bidang'],
                 message: 'Field wajib diisi',

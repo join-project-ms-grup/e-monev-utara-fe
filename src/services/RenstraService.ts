@@ -482,7 +482,6 @@ export interface FlatRenstraNew {
     target_target_5?: number;
     target_capaian_5?: number;
     target_persen_5?: number;
-
 }
 
 export function flatRenstraNew(data: RenstraMasterNew['hasil']): FlatRenstraNew[] {

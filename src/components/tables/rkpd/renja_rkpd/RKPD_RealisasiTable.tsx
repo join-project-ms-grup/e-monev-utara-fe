@@ -471,7 +471,7 @@ const RKPD_RealisasiTable = () => {
         <FormRealisasi
           defaultValues={formData}
           onSubmit={async (data: RealisasiFormRKPD) => {
-            console.log('Data dari form modal:', data);
+
 
             try {
               let hasMutation = false;

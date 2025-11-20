@@ -56,8 +56,6 @@ const RKPD_RekeningTable = () => {
         setFormData(initialFormData);
       }, 200);
       return () => clearTimeout(timeout);
-    } else {
-      console.log(formData);
     }
   }, [openModal]);
 
@@ -179,7 +177,6 @@ const RKPD_RekeningTable = () => {
   const addMutation = useMutation({
     mutationFn: async (payload: Master) => {
       setLoadingMutation(true);
-      console.log(payload);
       // return addMaster(payload);
     },
     onSuccess: () => {
@@ -400,7 +397,6 @@ const RKPD_RekeningTable = () => {
             type='Add'
             defaultValues={formData}
             onSubmit={(data) => {
-              console.log('Data dari form modal:', data);
               // addMutation.mutate({
               //   kode: data.kode,
               //   name: data.name,
@@ -431,7 +427,6 @@ const RKPD_RekeningTable = () => {
             type='Edit'
             defaultValues={formData as any}
             onSubmit={({ id, payload }) => {
-              console.log('Data dari form modal:', payload);
               updateMutation.mutate({
                 id,
                 payload: {
