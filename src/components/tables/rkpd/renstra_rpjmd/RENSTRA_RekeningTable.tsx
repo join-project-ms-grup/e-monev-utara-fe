@@ -176,27 +176,26 @@ const RENSTRA_RekeningTable = () => {
   };
 
   // Add
-  const addMutation = useMutation({
-    mutationFn: async (payload: Master) => {
-      setLoadingMutation(true);
-
-      // return addMaster(payload);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['renstra_rpjmd_rekening'] });
-      setFormData(initialFormData);
-      setOpenModal(false);
-      toast.success('Data berhasil ditambahkan');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
-      }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
-  });
+  // const addMutation = useMutation({
+  //   mutationFn: async (payload: Master) => {
+  //     setLoadingMutation(true);
+  //     return addMaster(payload);
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['renstra_rpjmd_rekening'] });
+  //     setFormData(initialFormData);
+  //     setOpenModal(false);
+  //     toast.success('Data berhasil ditambahkan');
+  //   },
+  //   onError: (error: AxiosError<ApiResponse<unknown>>) => {
+  //     if (error.status === 400) {
+  //       toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+  //     }
+  //   },
+  //   onSettled: () => {
+  //     setLoadingMutation(false);
+  //   },
+  // });
   // Update
   const updateMutation = useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: Master }) => {
@@ -268,7 +267,7 @@ const RENSTRA_RekeningTable = () => {
           },
         }),
       ),
-      filterFn: (row, columnId, filterValue) => {
+      filterFn: (row, filterValue) => {
         const kodeArray = row.original.kodeFull || [];
         const joined = kodeArray.join('.');
         const search = String(filterValue).trim();
@@ -399,8 +398,7 @@ const RENSTRA_RekeningTable = () => {
           <FormRekening
             type='Add'
             defaultValues={formData}
-            onSubmit={(data) => {
-
+            onSubmit={() => {
               // addMutation.mutate({
               //   kode: data.kode,
               //   name: data.name,

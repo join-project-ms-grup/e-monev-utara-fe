@@ -74,20 +74,9 @@ const RENSTRA_RealisasiTable = () => {
   });
   //#endregion
 
-  const [paguValues, setPaguValues] = useState<Record<number, string>>({});
-
-  const handleChange = (rowId: number, val: string) => {
-    setPaguValues((prev) => ({
-      ...prev,
-      [rowId]: val,
-    }));
-  };
-
   //#region MUTASI
-  const [loadingMutation, setLoadingMutation] = useState(false);
   const capaianMutation = useMutation({
     mutationFn: async (payload: CapaianRenstraForm) => {
-      setLoadingMutation(true);
       return addCapaianRENSTRA(payload);
     },
     onSuccess: () => {
@@ -98,14 +87,10 @@ const RENSTRA_RealisasiTable = () => {
       if (error.status === 400) {
         toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
       }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
+    }
   });
   const anggaranMutation = useMutation({
     mutationFn: async (payload: AnggaranRenstraForm) => {
-      setLoadingMutation(true);
       return addAnggaranRENSTRA(payload);
     },
     onSuccess: () => {
@@ -116,14 +101,10 @@ const RENSTRA_RealisasiTable = () => {
       if (error.status === 400) {
         toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
       }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
+    }
   });
   const perhitunganMutation = useMutation({
     mutationFn: async (payload: PerhitunganRenstraRKPDForm) => {
-      setLoadingMutation(true);
       return addPerhitunganRENSTRA(payload);
     },
     onSuccess: () => {
@@ -134,10 +115,7 @@ const RENSTRA_RealisasiTable = () => {
       if (error.status === 400) {
         toast.error(`Gagal memperbarui data\n${error.response?.data.message}`);
       }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
+    }
   });
   //#endregion
 
