@@ -349,7 +349,6 @@ const InputRealisasi = memo(
         }}
       >
         <InputText
-          inputMode='numeric'
           value={value}
           onChange={(e) => setValue(e.target.value)}
           withButton={showButton}
