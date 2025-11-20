@@ -1,16 +1,10 @@
+import ttd from '/src/assets/ttd.png';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
 import type { FlatRKPDTriwulan } from '../RKPDService';
 import type { CatatanForm } from '../CatatanService';
 
-/**
- * Export RKPD.
- *
- * @param data array data FlatRKPDRow[]
- * @param tahun string tahun (mis. '2025')
- * @param opts.startRow (optional) baris mulai data (default 13)
- */
 export const exportRKPD = async (
   data: FlatRKPDTriwulan[],
   skpd: string,
@@ -204,10 +198,10 @@ export const exportRKPD = async (
   const rowsConfig = [
     { offset: 1, merge: 'A:O', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
     { offset: 2, merge: 'A:O', text: 'Predikat kinerja', align: 'right' },
-    { offset: 3, merge: 'A:AD', text: `Faktor pendorong keberhasilan kinerja: ${catatan.pendorong}` },
-    { offset: 4, merge: 'A:AD', text: `Faktor penghambat pencapaian kinerja: ${catatan.penghambat}` },
-    { offset: 5, merge: 'A:AD', text: `Tindak lanjut yang diperlukan dalam triwulan berikutnya: ${catatan.tl_1}` },
-    { offset: 6, merge: 'A:AD', text: `Tindak lanjut yang diperlukan dalam RKPD berikutnya: ${catatan.tl_2}` }
+    { offset: 3, merge: 'A:Z', text: `Faktor pendorong keberhasilan kinerja: ${catatan.pendorong}` },
+    { offset: 4, merge: 'A:Z', text: `Faktor penghambat pencapaian kinerja: ${catatan.penghambat}` },
+    { offset: 5, merge: 'A:Z', text: `Tindak lanjut yang diperlukan dalam triwulan berikutnya: ${catatan.tl_1}` },
+    { offset: 6, merge: 'A:Z', text: `Tindak lanjut yang diperlukan dalam RKPD berikutnya: ${catatan.tl_2}` }
   ];
 
   rowsConfig.forEach(({ offset, merge, text, align = 'left' }) => {
@@ -218,31 +212,48 @@ export const exportRKPD = async (
     cell.value = text;
     cell.alignment = { horizontal: align as any };
     cell.font = { bold: true };
-    cell.border = {
-      top: { style: 'thin' },
-      left: { style: 'thin' },
-      bottom: { style: 'thin' },
-      right: { style: 'thin' }
-    };
+    for (let c = startCol; c <= endCol; c++) {
+      const cell = row.getCell(c);
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    }
   });
 
-  worksheet.mergeCells(`AC${rowIndex + 8}:AD${rowIndex + 8}`);
-  worksheet.getRow(rowIndex + 8).getCell('AC').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 8).getCell('AC').value =
+  worksheet.mergeCells(`X${rowIndex + 8}:Y${rowIndex + 8}`);
+  worksheet.getRow(rowIndex + 8).getCell('X').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 8).getCell('X').value =
     'Disetujui';
-  worksheet.mergeCells(`AC${rowIndex + 9}:AD${rowIndex + 9}`);
-  worksheet.getRow(rowIndex + 9).getCell('AC').value =
+  worksheet.mergeCells(`X${rowIndex + 9}:Y${rowIndex + 9}`);
+  worksheet.getRow(rowIndex + 9).getCell('X').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 9).getCell('X').value =
     '......................, tanggal ...................';
-  worksheet.mergeCells(`AC${rowIndex + 11}:AD${rowIndex + 11}`);
-  worksheet.getRow(rowIndex + 11).getCell('AC').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 11).getCell('AC').value =
-    'KEPALA SKPD';
-  worksheet.mergeCells(`AC${rowIndex + 12}:AD${rowIndex + 12}`);
-  worksheet.getRow(rowIndex + 12).getCell('AC').value =
-    'KABUPATEN/KOTA ....................................';
-  worksheet.mergeCells(`AC${rowIndex + 18}:AD${rowIndex + 18}`);
-  worksheet.getRow(rowIndex + 18).getCell('AC').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 18).getCell('AC').value =
+  worksheet.mergeCells(`X${rowIndex + 11}:Y${rowIndex + 11}`);
+  worksheet.getRow(rowIndex + 11).getCell('X').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 11).getCell('X').value =
+    `KEPALA ${skpd.toUpperCase()}`;
+  worksheet.mergeCells(`X${rowIndex + 12}:Y${rowIndex + 12}`);
+  worksheet.getRow(rowIndex + 12).getCell('X').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 12).getCell('X').value =
+    'KABUPATEN BENGKULU UTARA';
+
+  const resp = await fetch(ttd);
+  const blobImg = await resp.arrayBuffer();
+  const imgId = workbook.addImage({
+    buffer: blobImg,
+    extension: 'png'
+  });
+  worksheet.addImage(imgId, {
+    tl: { col: 23, row: rowIndex + 10 },
+    ext: { width: 420, height: 210 }
+  });
+
+  worksheet.mergeCells(`X${rowIndex + 19}:Y${rowIndex + 19}`);
+  worksheet.getRow(rowIndex + 19).getCell('X').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 19).getCell('X').value =
     '(....................................)';
   //#endregion
 

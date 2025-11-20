@@ -1,9 +1,9 @@
+import ttd from '/src/assets/ttd.png';
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { FlatRenstraNew } from '../../../../services/RenstraService';
 import { renderSatuan, renderUang } from '../../../../lib/helper';
-import { id } from 'zod/v4/locales';
 import type { CatatanForm } from '../../../../services/CatatanService';
 
 interface MainTableProps {
@@ -248,12 +248,10 @@ const RenstraPreviewTable = ({ data, skpd, catatan }: MainTableProps) => {
                 </span>
                 <br />
                 <span>
-                  KEPALA Perangkat Daerah....................................
+                  KEPALA {skpd.toUpperCase()}
                 </span>
-                <span>KABUPATEN/KOTA.................................... </span>
-                <br />
-                <br />
-                <br />
+                <span>KABUPATEN BENGKULU UTARA</span>
+                <img className='-mt-10 -mb-10' src={ttd} alt="TTD" width={300} />
                 <span>(....................................)</span>
               </div>
             </div>

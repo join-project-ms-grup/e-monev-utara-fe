@@ -165,6 +165,12 @@ const FormCatatan = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          setCatatan({
+            pendorong: data?.pendorong,
+            penghambat: data?.penghambat,
+            tl_1: data?.tl_1,
+            tl_2: data?.tl_2,
+          });
           form.handleSubmit();
         }}
         className='mx-auto space-y-4'

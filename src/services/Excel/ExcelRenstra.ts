@@ -1,3 +1,4 @@
+import ttd from '/src/assets/ttd.png';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
@@ -5,17 +6,6 @@ import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/
 import type { FlatRenstraNew } from '../RenstraService';
 import type { CatatanForm } from '../CatatanService';
 
-/**
- * Export RKPD mimic dari file sumber.
- *
- * Data dapat berupa:
- *  - Array of objects: keys cocok dengan headerKeys array (lihat mapping di bawah)
- *  - Array of arrays: setiap item array ditulis langsung mulai dari kolom A
- *
- * @param data array data
- * @param tahun string tahun (mis. '2025')
- * @param opts.startRow (optional) baris mulai data (default 15)
- */
 export const exportRenstra = async (
   data: FlatRenstraNew[],
   skpd: string,
@@ -134,7 +124,6 @@ export const exportRenstra = async (
     row.getCell('A').value = idx + 1;
     row.getCell('A').alignment = { horizontal: 'center' }
     // 3
-    // row.getCell('C').value = item.name + '\n' + `(${item.ind_name})`;
     row.getCell('C').value = item.ind_name ? item.name + '\n\n' + `(${item.ind_name})` : item.name;
     // 4
     row.getCell('D').value = item.ind_name;
@@ -233,21 +222,33 @@ export const exportRenstra = async (
     };
   });
 
-  worksheet.mergeCells(`AK${rowIndex + 8}:AL${rowIndex + 8}`);
-  worksheet.getRow(rowIndex + 8).getCell('AK').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 8).getCell('AK').value =
+  worksheet.mergeCells(`AJ${rowIndex + 8}:AK${rowIndex + 8}`);
+  worksheet.getRow(rowIndex + 8).getCell('AJ').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 8).getCell('AJ').value =
     '......................, tanggal ...................';
-  worksheet.mergeCells(`AK${rowIndex + 10}:AL${rowIndex + 10}`);
-  worksheet.getRow(rowIndex + 10).getCell('AK').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 10).getCell('AK').value =
-    'KEPALA Perangkat Daerah ..................';
-  worksheet.mergeCells(`AK${rowIndex + 11}:AL${rowIndex + 11}`);
-  worksheet.getRow(rowIndex + 11).getCell('AK').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 11).getCell('AK').value =
-    'KABUPATEN/KOTA ....................................';
-  worksheet.mergeCells(`AK${rowIndex + 16}:AL${rowIndex + 16}`);
-  worksheet.getRow(rowIndex + 16).getCell('AK').alignment = { horizontal: 'center' }
-  worksheet.getRow(rowIndex + 16).getCell('AK').value =
+  worksheet.mergeCells(`AJ${rowIndex + 10}:AK${rowIndex + 10}`);
+  worksheet.getRow(rowIndex + 10).getCell('AJ').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 10).getCell('AJ').value =
+    `KEPALA ${skpd.toUpperCase()}`;
+  worksheet.mergeCells(`AJ${rowIndex + 11}:AK${rowIndex + 11}`);
+  worksheet.getRow(rowIndex + 11).getCell('AJ').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 11).getCell('AJ').value =
+    'KABUPATEN BENGKULU UTARA';
+
+  const resp = await fetch(ttd);
+  const blobImg = await resp.arrayBuffer();
+  const imgId = workbook.addImage({
+    buffer: blobImg,
+    extension: 'png'
+  });
+  worksheet.addImage(imgId, {
+    tl: { col: 35, row: rowIndex + 9 },
+    ext: { width: 420, height: 210 }
+  });
+
+  worksheet.mergeCells(`AJ${rowIndex + 18}:AK${rowIndex + 18}`);
+  worksheet.getRow(rowIndex + 18).getCell('AJ').alignment = { horizontal: 'center' }
+  worksheet.getRow(rowIndex + 18).getCell('AJ').value =
     '(....................................)';
   //#endregion
 

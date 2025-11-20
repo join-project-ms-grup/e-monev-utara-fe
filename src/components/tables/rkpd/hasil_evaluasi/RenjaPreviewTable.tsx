@@ -1,3 +1,4 @@
+import ttd from '/src/assets/ttd.png';
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -10,7 +11,7 @@ interface MainTableProps {
   data: FlatRKPDTriwulan[];
   skpd: string;
   tahun: string;
-  catatan: CatatanForm
+  catatan: CatatanForm;
 }
 
 const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
@@ -108,22 +109,26 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
           <td colSpan={15}></td>
         </tr>
         <tr>
-          <td colSpan={25}>Faktor pendorong keberhasilan kinerja: {catatan.pendorong}</td>
-        </tr>
-        <tr>
-          <td colSpan={25}>Faktor penghambat pencapaian kinerja: {catatan.penghambat}</td>
+          <td colSpan={25}>
+            Faktor pendorong keberhasilan kinerja: {catatan.pendorong}
+          </td>
         </tr>
         <tr>
           <td colSpan={25}>
-            Tindak lanjut yang diperlukan dalam triwulan berikutnya*{`)`}:
-            {` `}{catatan.tl_1}
+            Faktor penghambat pencapaian kinerja: {catatan.penghambat}
+          </td>
+        </tr>
+        <tr>
+          <td colSpan={25}>
+            Tindak lanjut yang diperlukan dalam triwulan berikutnya*{`)`}:{` `}
+            {catatan.tl_1}
           </td>
         </tr>
         <tr>
           <td colSpan={25}>
             Tindak lanjut yang diperlukan dalam Renja Perangkat Daerah
-            kabupaten/kota berikutnya*{`)`}:
-            {` `}{catatan.tl_2}
+            kabupaten/kota berikutnya*{`)`}:{` `}
+            {catatan.tl_2}
           </td>
         </tr>
       </>
@@ -210,7 +215,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     //
     {
       header: 'TRI1',
-      accessorKey: 'ind_triwulan_capaian_1',
+      accessorKey: 'ind_triwulan_capaian_1_k',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -219,7 +224,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     },
     {
       header: 'TRI1 PAGU',
-      accessorKey: 'pagu_triwulan_realisasi_1',
+      accessorKey: 'pagu_triwulan_realisasi_1_rp',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -228,7 +233,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     //
     {
       header: 'TRI2',
-      accessorKey: 'ind_triwulan_capaian_2',
+      accessorKey: 'ind_triwulan_capaian_2_k',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -237,7 +242,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     },
     {
       header: 'TRI2 PAGU',
-      accessorKey: 'pagu_triwulan_realisasi_2',
+      accessorKey: 'pagu_triwulan_realisasi_2_rp',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -246,7 +251,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     //
     {
       header: 'TRI3',
-      accessorKey: 'ind_triwulan_capaian_3',
+      accessorKey: 'ind_triwulan_capaian_3_k',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -255,7 +260,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     },
     {
       header: 'TRI3 PAGU',
-      accessorKey: 'pagu_triwulan_realisasi_3',
+      accessorKey: 'pagu_triwulan_realisasi_3_rp',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -264,7 +269,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     //
     {
       header: 'TRI4',
-      accessorKey: 'ind_triwulan_capaian_4',
+      accessorKey: 'ind_triwulan_capaian_4_k',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -273,7 +278,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     },
     {
       header: 'TRI4 PAGU',
-      accessorKey: 'pagu_triwulan_realisasi_4',
+      accessorKey: 'pagu_triwulan_realisasi_4_rp',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -283,7 +288,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     {
       header:
         'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi K',
-      accessorKey: 'ind_triwulan_capaian_3',
+      accessorKey: 'ind_triwulan_capaian_3_k2',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -293,7 +298,7 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
     {
       header:
         'Realisasi Capaian Kinerja dan Anggaran Renja Perangkat Daerah yang dievaluasi RP',
-      accessorKey: 'pagu_triwulan_realisasi_3',
+      accessorKey: 'pagu_triwulan_realisasi_3_rp2',
       meta: {
         tdClassNames: 'whitespace-nowrap text-center',
       },
@@ -371,7 +376,6 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
             data={data}
             columns={columns}
             renderHeader={tableHead}
-            // renderBody={(table) => tableBody({ table })}
             disablePagination
             customRowAkhir={customAkhir()}
           />
@@ -385,13 +389,14 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
                   ......................., tanggal ...................
                 </span>
                 <br />
-                <span>
-                  KEPALA Perangkat Daerah....................................
-                </span>
-                <span>KAB/KOTA .................................... </span>
-                <br />
-                <br />
-                <br />
+                <span>KEPALA {skpd.toUpperCase()}</span>
+                <span>KABUPATEN BENGKULU UTARA</span>
+                <img
+                  className='-mt-10 -mb-10'
+                  src={ttd}
+                  alt='TTD'
+                  width={300}
+                />
                 <span>(....................................)</span>
               </div>
               <div className='flex flex-col items-center'>
@@ -400,11 +405,14 @@ const RenjaPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
                   ......................., tanggal ...................
                 </span>
                 <br />
-                <span>KEPALA BAPPEDA....................................</span>
-                <span>KAB/KOTA .................................... </span>
-                <br />
-                <br />
-                <br />
+                <span>KEPALA BAPPEDA</span>
+                <span>KABUPATEN BENGKULU UTARA</span>
+                <img
+                  className='-mt-10 -mb-10'
+                  src={ttd}
+                  alt='TTD'
+                  width={300}
+                />
                 <span>(....................................)</span>
               </div>
             </div>

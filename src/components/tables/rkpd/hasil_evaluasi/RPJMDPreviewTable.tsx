@@ -1,3 +1,4 @@
+import ttd from '/src/assets/ttd.png';
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -8,10 +9,12 @@ import type { CatatanForm } from '../../../../services/CatatanService';
 
 interface MainTableProps {
   data: FlatRPJMD[];
+  skpd: string;
   catatan: CatatanForm,
 }
 
-const RPJMDPreviewTable = ({ data, catatan }: MainTableProps) => {
+const RPJMDPreviewTable = ({ data, catatan,skpd }: MainTableProps) => {
+  console.log(catatan)
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -88,27 +91,27 @@ const RPJMDPreviewTable = ({ data, catatan }: MainTableProps) => {
           <td colSpan={27} className='text-right'>
             Rata-rata capaian kinerja (%)
           </td>
-          <td colSpan={12}></td>
+          <td colSpan={14}></td>
         </tr>
         <tr>
           <td colSpan={27} className='text-right'>
             Predikat kinerja
           </td>
-          <td colSpan={12}></td>
+          <td colSpan={14}></td>
         </tr>
         <tr>
-          <td colSpan={39}>Faktor pendorong keberhasilan pencapaian: {catatan.pendorong}</td>
+          <td colSpan={41}>Faktor pendorong keberhasilan pencapaian: {catatan.pendorong}</td>
         </tr>
         <tr>
-          <td colSpan={39}>Faktor penghambat pencapaian kinerja: {catatan.penghambat}</td>
+          <td colSpan={41}>Faktor penghambat pencapaian kinerja: {catatan.penghambat}</td>
         </tr>
         <tr>
-          <td colSpan={39}>
+          <td colSpan={41}>
             Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya: {catatan.tl_1}
           </td>
         </tr>
         <tr>
-          <td colSpan={39}>
+          <td colSpan={41}>
             Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya: {catatan.tl_2}
           </td>
         </tr>
@@ -269,11 +272,9 @@ const RPJMDPreviewTable = ({ data, catatan }: MainTableProps) => {
                   ......................., tanggal ...................
                 </span>
                 <br />
-                <span>KEPALA SKPD</span>
-                <span>KABUPATEN/KOTA.................................... </span>
-                <br />
-                <br />
-                <br />
+                <span>KEPALA {skpd.toUpperCase()}</span>
+                <span>KABUPATEN BENGKULU UTARA</span>
+                <img className='-mt-10 -mb-10' src={ttd} alt="TTD" width={300} />
                 <span>(....................................)</span>
               </div>
             </div>

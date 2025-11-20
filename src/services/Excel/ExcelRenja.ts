@@ -1,3 +1,4 @@
+import ttd from '/src/assets/ttd.png';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
@@ -5,17 +6,6 @@ import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/
 import type { FlatRKPDTriwulan } from '../RKPDService';
 import type { CatatanForm } from '../CatatanService';
 
-/**
- * Export RKPD mimic dari file sumber.
- *
- * Data dapat berupa:
- *  - Array of objects: keys cocok dengan headerKeys array (lihat mapping di bawah)
- *  - Array of arrays: setiap item array ditulis langsung mulai dari kolom A
- *
- * @param data array data
- * @param tahun string tahun (mis. '2025')
- * @param opts.startRow (optional) baris mulai data (default 13)
- */
 export const exportRenja = async (
     data: FlatRKPDTriwulan[],
     skpd: string,
@@ -177,21 +167,6 @@ export const exportRenja = async (
             row.getCell(col).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
         });
 
-
-        // ['E', 'G', 'I', 'K', 'M', 'O', 'Q', 'S', 'U'].forEach((col) => {
-        //     row.getCell(col).alignment = { vertical: 'top', horizontal: 'center' };
-        // });
-        // for (let c = 1; c <= 11; c++) {
-        //     const cell = row.getCell(c);
-        //     cell.border = {
-        //         top: { style: 'thin' },
-        //         left: { style: 'thin' },
-        //         bottom: { style: 'thin' },
-        //         right: { style: 'thin' },
-        //     };
-        //     cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-        // }
-
         rowIndex++;
     });
 
@@ -229,12 +204,15 @@ export const exportRenja = async (
         cell.value = text;
         cell.alignment = { horizontal: align as any };
         cell.font = { bold: true };
-        cell.border = {
-            top: { style: 'thin' },
-            left: { style: 'thin' },
-            bottom: { style: 'thin' },
-            right: { style: 'thin' }
-        };
+        for (let c = startCol; c <= endCol; c++) {
+            const cell = row.getCell(c);
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        }
     });
 
     worksheet.mergeCells(`U${rowIndex + 8}:V${rowIndex + 8}`);
@@ -242,18 +220,32 @@ export const exportRenja = async (
     worksheet.getRow(rowIndex + 8).getCell('U').value =
         'Disusun';
     worksheet.mergeCells(`U${rowIndex + 9}:V${rowIndex + 9}`);
+    worksheet.getRow(rowIndex + 9).getCell('U').alignment = { horizontal: 'center' }
     worksheet.getRow(rowIndex + 9).getCell('U').value =
         '......................, tanggal ...................';
     worksheet.mergeCells(`U${rowIndex + 10}:V${rowIndex + 10}`);
     worksheet.getRow(rowIndex + 10).getCell('U').alignment = { horizontal: 'center' }
     worksheet.getRow(rowIndex + 10).getCell('U').value =
-        'KEPALA Perangkat Daerah....................................';
+        `KEPALA ${skpd.toUpperCase()}`;
     worksheet.mergeCells(`U${rowIndex + 11}:V${rowIndex + 11}`);
+    worksheet.getRow(rowIndex + 11).getCell('U').alignment = { horizontal: 'center' }
     worksheet.getRow(rowIndex + 11).getCell('U').value =
-        'KAB/KOTA ....................................';
-    worksheet.mergeCells(`U${rowIndex + 16}:V${rowIndex + 16}`);
-    worksheet.getRow(rowIndex + 16).getCell('U').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 16).getCell('U').value =
+        'KABUPATEN BENGKULU UTARA';
+
+    const resp = await fetch(ttd);
+    const blobImg = await resp.arrayBuffer();
+    const imgId = workbook.addImage({
+        buffer: blobImg,
+        extension: 'png'
+    });
+    worksheet.addImage(imgId, {
+        tl: { col: 20, row: rowIndex + 9 },
+        ext: { width: 420, height: 210 }
+    });
+
+    worksheet.mergeCells(`U${rowIndex + 18}:V${rowIndex + 18}`);
+    worksheet.getRow(rowIndex + 18).getCell('U').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 18).getCell('U').value =
         '(....................................)';
 
     worksheet.mergeCells(`X${rowIndex + 8}:Y${rowIndex + 8}`);
@@ -261,6 +253,7 @@ export const exportRenja = async (
     worksheet.getRow(rowIndex + 8).getCell('X').value =
         'Dievaluasi';
     worksheet.mergeCells(`X${rowIndex + 9}:Y${rowIndex + 9}`);
+    worksheet.getRow(rowIndex + 9).getCell('X').alignment = { horizontal: 'center' }
     worksheet.getRow(rowIndex + 9).getCell('X').value =
         '......................, tanggal ...................';
     worksheet.mergeCells(`X${rowIndex + 10}:Y${rowIndex + 10}`);
@@ -268,11 +261,22 @@ export const exportRenja = async (
     worksheet.getRow(rowIndex + 10).getCell('X').value =
         'KEPALA BAPPEDA';
     worksheet.mergeCells(`X${rowIndex + 11}:Y${rowIndex + 11}`);
+    worksheet.getRow(rowIndex + 11).getCell('X').alignment = { horizontal: 'center' }
     worksheet.getRow(rowIndex + 11).getCell('X').value =
-        'KAB/KOTA ....................................';
-    worksheet.mergeCells(`X${rowIndex + 16}:Y${rowIndex + 16}`);
-    worksheet.getRow(rowIndex + 16).getCell('X').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 16).getCell('X').value =
+        'KABUPATEN BENGKULU UTARA';
+
+    const imgId2 = workbook.addImage({
+        buffer: blobImg,
+        extension: 'png'
+    });
+    worksheet.addImage(imgId2, {
+        tl: { col: 23, row: rowIndex + 9 },
+        ext: { width: 420, height: 210 }
+    });
+
+    worksheet.mergeCells(`X${rowIndex + 18}:Y${rowIndex + 18}`);
+    worksheet.getRow(rowIndex + 18).getCell('X').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 18).getCell('X').value =
         '(....................................)';
     //#endregion
 

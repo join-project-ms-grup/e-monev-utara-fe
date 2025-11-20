@@ -1,3 +1,4 @@
+import ttd from '/src/assets/ttd.png';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { numOrEmpty, renderSatuan, waktuNowGabung } from '../../lib/helper';
@@ -5,20 +6,10 @@ import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/
 import type { FlatRenstraNew } from '../RenstraService';
 import type { CatatanForm } from '../CatatanService';
 
-/**
- * Export RKPD mimic dari file sumber.
- *
- * Data dapat berupa:
- *  - Array of objects: keys cocok dengan headerKeys array (lihat mapping di bawah)
- *  - Array of arrays: setiap item array ditulis langsung mulai dari kolom A
- *
- * @param data array data
- * @param tahun string tahun (mis. '2025')
- * @param opts.startRow (optional) baris mulai data (default 13)
- */
 export const exportRPJMD = async (
     data: FlatRenstraNew[],
     catatan: CatatanForm,
+    skpd: string,
     opts?: { startRow?: number },
 ) => {
     const awalPeriode = getPeriodeMulaiFromCookie();
@@ -344,10 +335,10 @@ export const exportRPJMD = async (
     const rowsConfig = [
         { offset: 1, merge: 'A:AA', text: 'Rata-rata capaian kinerja (%)', align: 'right' },
         { offset: 2, merge: 'A:AA', text: 'Predikat kinerja', align: 'right' },
-        { offset: 3, merge: 'A:AO', text: `Faktor pendorong keberhasilan pencapaian: ${catatan.pendorong}` },
-        { offset: 4, merge: 'A:AO', text: `Faktor penghambat pencapaian kinerja: ${catatan.penghambat}` },
-        { offset: 5, merge: 'A:AO', text: `Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya: ${catatan.tl_1}` },
-        { offset: 6, merge: 'A:AO', text: `Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya: ${catatan.tl_2}` }
+        { offset: 3, merge: 'A:AO', text: `Faktor pendorong keberhasilan pencapaian: ${catatan.pendorong ?? ''}` },
+        { offset: 4, merge: 'A:AO', text: `Faktor penghambat pencapaian kinerja: ${catatan.penghambat ?? ''}` },
+        { offset: 5, merge: 'A:AO', text: `Tindak lanjut yang diperlukan dalam RKPD kabupaten/kota berikutnya: ${catatan.tl_1 ?? ''}` },
+        { offset: 6, merge: 'A:AO', text: `Tindak lanjut yang diperlukan dalam RPJMD kabupaten/kota berikutnya: ${catatan.tl_2 ?? ''}` }
     ];
 
     rowsConfig.forEach(({ offset, merge, text, align = 'left' }) => {
@@ -358,50 +349,48 @@ export const exportRPJMD = async (
         cell.value = text;
         cell.alignment = { horizontal: align as any };
         cell.font = { bold: true };
-        cell.border = {
-            top: { style: 'thin' },
-            left: { style: 'thin' },
-            bottom: { style: 'thin' },
-            right: { style: 'thin' }
-        };
+        for (let c = startCol; c <= endCol; c++) {
+            const cell = row.getCell(c);
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+        }
     });
 
-    worksheet.mergeCells(`AK${rowIndex + 8}:AL${rowIndex + 8}`);
-    worksheet.getRow(rowIndex + 8).getCell('AK').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 8).getCell('AK').value =
-        'Disusun';
-    worksheet.mergeCells(`AK${rowIndex + 9}:AL${rowIndex + 9}`);
-    worksheet.getRow(rowIndex + 9).getCell('AK').value =
-        '......................, tanggal ...................';
-    worksheet.mergeCells(`AK${rowIndex + 10}:AL${rowIndex + 10}`);
-    worksheet.getRow(rowIndex + 10).getCell('AK').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 10).getCell('AK').value =
-        'KEPALA BAPPEDA';
-    worksheet.mergeCells(`AK${rowIndex + 11}:AL${rowIndex + 11}`);
-    worksheet.getRow(rowIndex + 11).getCell('AK').value =
-        'KABUPATEN/KOTA ....................................';
-    worksheet.mergeCells(`AK${rowIndex + 16}:AL${rowIndex + 16}`);
-    worksheet.getRow(rowIndex + 16).getCell('AK').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 16).getCell('AK').value =
-        '(....................................)';
-
-    worksheet.mergeCells(`AN${rowIndex + 8}:AO${rowIndex + 8}`);
-    worksheet.getRow(rowIndex + 8).getCell('AN').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 8).getCell('AN').value =
+    worksheet.mergeCells(`AM${rowIndex + 8}:AN${rowIndex + 8}`);
+    worksheet.getRow(rowIndex + 8).getCell('AM').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 8).getCell('AM').value =
         'Disetujui';
-    worksheet.mergeCells(`AN${rowIndex + 9}:AO${rowIndex + 9}`);
-    worksheet.getRow(rowIndex + 9).getCell('AN').value =
+    worksheet.mergeCells(`AM${rowIndex + 9}:AN${rowIndex + 9}`);
+    worksheet.getRow(rowIndex + 9).getCell('AM').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 9).getCell('AM').value =
         '......................, tanggal ...................';
-    worksheet.mergeCells(`AN${rowIndex + 10}:AO${rowIndex + 10}`);
-    worksheet.getRow(rowIndex + 10).getCell('AN').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 10).getCell('AN').value =
-        'GUBERNUR';
-    worksheet.mergeCells(`AN${rowIndex + 11}:AO${rowIndex + 11}`);
-    worksheet.getRow(rowIndex + 11).getCell('AN').value =
-        'PROVINSI ....................................';
-    worksheet.mergeCells(`AN${rowIndex + 16}:AO${rowIndex + 16}`);
-    worksheet.getRow(rowIndex + 16).getCell('AN').alignment = { horizontal: 'center' }
-    worksheet.getRow(rowIndex + 16).getCell('AN').value =
+    worksheet.mergeCells(`AM${rowIndex + 10}:AN${rowIndex + 10}`);
+    worksheet.getRow(rowIndex + 10).getCell('AM').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 10).getCell('AM').value =
+        `KEPALA ${skpd.toUpperCase()}`;
+    worksheet.mergeCells(`AM${rowIndex + 11}:AN${rowIndex + 11}`);
+    worksheet.getRow(rowIndex + 11).getCell('AM').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 11).getCell('AM').value =
+        'KABUPATEN BENGKULU UTARA';
+
+    const resp = await fetch(ttd);
+    const blobImg = await resp.arrayBuffer();
+    const imgId = workbook.addImage({
+        buffer: blobImg,
+        extension: 'png'
+    });
+    worksheet.addImage(imgId, {
+        tl: { col: 38, row: rowIndex + 9 },
+        ext: { width: 420, height: 210 }
+    });
+
+    worksheet.mergeCells(`AM${rowIndex + 18}:AN${rowIndex + 18}`);
+    worksheet.getRow(rowIndex + 18).getCell('AM').alignment = { horizontal: 'center' }
+    worksheet.getRow(rowIndex + 18).getCell('AM').value =
         '(....................................)';
     //#endregion
 

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type SetStateAction } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import InputButton from '../../../inputs/InputButton';
 import toast from 'react-hot-toast';
 import { MdClose, MdPreview, MdPrint, MdRefresh } from 'react-icons/md';

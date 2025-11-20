@@ -1,3 +1,4 @@
+import ttd from '/src/assets/ttd.png';
 import React from 'react';
 import Tabel from '../../Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -14,6 +15,8 @@ interface MainTableProps {
 }
 
 const RKPDPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
+  console.log(data);
+  
   //#region Head Tabel
   const tableHead = () => {
     return (
@@ -383,13 +386,9 @@ const RKPDPreviewTable = ({ data, skpd, catatan, tahun }: MainTableProps) => {
                   ......................., tanggal ...................
                 </span>
                 <br />
-                <span>KEPALA SKPD....................................</span>
-                <span>
-                  KABUPATEN/KOTA ....................................{' '}
-                </span>
-                <br />
-                <br />
-                <br />
+                <span>KEPALA {skpd.toUpperCase()}</span>
+                <span>KABUPATEN BENGKULU UTARA</span>
+                <img className='-mt-10 -mb-10' src={ttd} alt="TTD" width={300} />
                 <span>(....................................)</span>
               </div>
             </div>

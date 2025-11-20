@@ -209,7 +209,7 @@ const RPJMDTable = () => {
               onClick={() => {
                 const data = true;
                 if (data && selectedSKPD) {
-                  setMode('catatan')
+                  setMode('catatan');
                 } else {
                   toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                 }
@@ -239,14 +239,19 @@ const RPJMDTable = () => {
 
       {mode === 'catatan' ? (
         <DialogModal
-        widthLevel={6}
+          widthLevel={6}
           title='Catatan'
           isOpen={mode === 'catatan'}
           onClose={() => {
             setMode('close');
           }}
         >
-          <FormCatatan onPreview={() => setMode('preview')} type='rpjmd' skpdPerId={Number(selectedSKPD)} setCatatan={setCatatan}/>
+          <FormCatatan
+            onPreview={() => setMode('preview')}
+            type='rpjmd'
+            skpdPerId={Number(selectedSKPD)}
+            setCatatan={setCatatan}
+          />
         </DialogModal>
       ) : (
         mode === 'preview' &&
@@ -265,11 +270,20 @@ const RPJMDTable = () => {
                   className='h-9'
                   onClick={() => {
                     if (data) {
-                      toast.promise(exportRPJMD(data, catatan), {
-                        loading: 'Sedang mengunduh...',
-                        success: <b>Berhasil mengunduh.</b>,
-                        error: <b>Gagal mengunduh.</b>,
-                      });
+                      toast.promise(
+                        exportRPJMD(
+                          data,
+                          catatan,
+                          listSKPDPeriode.find(
+                            (item) => item.value === selectedSKPD,
+                          )?.label ?? '',
+                        ),
+                        {
+                          loading: 'Sedang mengunduh...',
+                          success: <b>Berhasil mengunduh.</b>,
+                          error: <b>Gagal mengunduh.</b>,
+                        },
+                      );
                     } else {
                       toast.error(
                         `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
@@ -285,7 +299,14 @@ const RPJMDTable = () => {
               </div>
             </div>
             <div className='p-2 overflow-auto'>
-              <RPJMDPreviewTable data={data || []} catatan={catatan} />
+              <RPJMDPreviewTable
+                data={data || []}
+                catatan={catatan}
+                skpd={
+                  listSKPDPeriode.find((item) => item.value === selectedSKPD)
+                    ?.label ?? ''
+                }
+              />
             </div>
           </div>,
           document.body,

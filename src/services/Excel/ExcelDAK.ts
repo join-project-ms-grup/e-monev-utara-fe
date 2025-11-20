@@ -205,16 +205,6 @@ export const exportDAK = async (
     //#region KETERANGAN
     const problems = [
         'KETERANGAN PERMASALAHAN',
-        // '1. Permasalahan Terkait dengan Peraturan Menteri Keuangan (PMK)',
-        // '2. Permasalahan Terkait dengan Petunjuk Teknis',
-        // '3. Permasalahan Terkait dengan Rencana Kerja dan Anggaran SKPD',
-        // '4. Permasalahan Terkait dengan DPA - SKPD',
-        // '5. Permasalahan Terkait dengan SK Penetapan Pelaksanaan Kegiatan',
-        // '6. Permasalahan Terkait dengan Pelaksanaan Tender Pekerjaan Kontrak',
-        // '7. Permasalahan Terkait dengan Persiapan Pekerjaan Swakelola',
-        // '8. Permasalahan Terkait dengan Penerbitan SP2D',
-        // '9. Permasalahan Terkait dengan Pelaksanaan Pekerjaan Kontrak',
-        // '10. Permasalahan Terkait dengan Pelaksana Pekerjaan Swakelola'
     ];
 
     dataMasalah.forEach((item, index) => {
