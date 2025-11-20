@@ -9,6 +9,10 @@ import {
 } from '../../lib/usercookie';
 import { useGetDashRankRKPD } from '../../hooks/RKPD/TabelDataRkpd';
 import type { DashboardRankingResult } from '../../services/DashRKPDService';
+import InputButton from '../inputs/InputButton';
+import { MdPrint } from 'react-icons/md';
+import toast from 'react-hot-toast';
+import { exportRanking } from '../../services/Excel/ExcelRanking';
 
 const tableHead = () => {
   return (
@@ -58,13 +62,18 @@ const DashRKPDTable = () => {
       value: `${i + 1}`,
     }),
   );
+  const listTriwulan = [
+    { label: 'I', value: '1' },
+    { label: 'II', value: '2' },
+    { label: 'III', value: '3' },
+    { label: 'IV', value: '4' },
+  ];
   const { data } = useGetDashRankRKPD({
     periode_id: Number(periodeId),
     tahun_ke: Number(tahunKe),
     triwulan: Number(triwulan),
   });
   //#endregion
-  console.log(Number(tahunKe), Number(triwulan));
 
   const columns: ColumnDef<DashboardRankingResult>[] = [
     {
@@ -257,15 +266,40 @@ const DashRKPDTable = () => {
               placeholder='Pilih Triwulan...'
               value={triwulan}
               onChange={(e) => setTriwulan(e)}
-              options={[
-                { label: 'I', value: '1' },
-                { label: 'II', value: '2' },
-                { label: 'III', value: '3' },
-                { label: 'IV', value: '4' },
-              ]}
+              options={listTriwulan}
               disabled={!tahunKe}
             />
           </div>
+        </div>
+        <div className='inline-flex gap-2'>
+          <InputButton
+            tooltip='Cetak Ranking'
+            className='btn btn-theme w-9 h-9'
+            onClick={() => {
+              if (data) {
+                toast.promise(
+                  exportRanking(
+                    data.result,
+                    listTahunKe.find((item) => item.value === tahunKe)?.label ??
+                      '',
+                    listTriwulan.find((item) => item.value === triwulan)
+                      ?.label ?? '',
+                  ),
+                  {
+                    loading: 'Sedang mengunduh...',
+                    success: <b>Berhasil mengunduh.</b>,
+                    error: (err) => {
+                      console.log(err);
+
+                      return <b>Gagal mengunduh.</b>;
+                    },
+                  },
+                );
+              }
+            }}
+          >
+            <MdPrint />
+          </InputButton>
         </div>
       </div>
       <Tabel
