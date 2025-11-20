@@ -28,6 +28,12 @@ export const exportDAK = async (
     skpd: string,
     opts?: { startRow?: number },
 ) => {
+    const triwulanList = [
+        { value: '1', label: 'I' },
+        { value: '2', label: 'II' },
+        { value: '3', label: 'III' },
+        { value: '4', label: 'IV' },
+    ]
     const startRow = opts?.startRow ?? 16;
 
     const workbook = new ExcelJS.Workbook();
@@ -68,10 +74,10 @@ export const exportDAK = async (
         { addr: 'A2', value: `LAPORAN KEMAJUAN PELAKSANAAN KEGIATAN` },
         { addr: 'A3', value: 'DANA ALOKASI KHUSUS (DAK)' },
         { addr: 'A4', value: 'KABUPATEN BENGKULU UTARA' },
-        { addr: 'A5', value: `TAHUN ANGGARAN ${dakData.tahun} TRIWULAN ${dakData.triwulan}` },
+        { addr: 'A5', value: `TAHUN ANGGARAN ${dakData.tahun}` },
 
         // { addr: 'A7', value: `${periodeLaporan}` }, { addr: 'B7', value: `${periodeWaktuLaporan}` },
-        // { addr: 'A8', value: `JADWAL` }, { addr: 'B8', value: `${jadwal}` },
+        { addr: 'A9', value: `TRIWULAN` }, { addr: 'B9', value: `${triwulanList.find(item => item.value === dakData.triwulan)?.label}` },
         { addr: 'A10', value: `SKPD` }, { addr: 'B10', value: `${skpd.toUpperCase()}` },
         { addr: 'A11', value: `JENIS` }, { addr: 'B11', value: `${dakData.jenis === '1' ? 'FISIK' : 'NON-FISIK'}` },
 
@@ -108,7 +114,7 @@ export const exportDAK = async (
             cell.alignment = { horizontal: 'center', vertical: 'middle' };
             cell.font = { bold: true, size: 14 };
         }
-        if (c.addr === 'A10' || c.addr === 'A11' || c.addr === 'B10' || c.addr === 'B11') {
+        if (c.addr === 'A9' || c.addr === 'B9' || c.addr === 'A10' || c.addr === 'A11' || c.addr === 'B10' || c.addr === 'B11') {
             cell.font = { bold: true };
         }
     });
@@ -208,7 +214,7 @@ export const exportDAK = async (
     ];
 
     dataMasalah.forEach((item, index) => {
-        problems.push(`${index+1}. ${item.name}`)
+        problems.push(`${index + 1}. ${item.name}`)
     })
 
     problems.forEach((text, i) => {
@@ -264,5 +270,5 @@ export const exportDAK = async (
     const blob = new Blob([buffer], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-    saveAs(blob, `Laporan Kemajuan Pelaksanaan Kegiatan DAK - Kabupaten Bengkulu Utara Tahun Anggaran ${dakData.tahun} Triwulan ${dakData.triwulan} ${waktuNowGabung}.xlsx`);
+    saveAs(blob, `Laporan Kemajuan Pelaksanaan Kegiatan DAK - Kabupaten Bengkulu Utara Tahun Anggaran ${dakData.tahun} Triwulan ${triwulanList.find(item => item.value === dakData.triwulan)?.label} ${waktuNowGabung}.xlsx`);
 };
