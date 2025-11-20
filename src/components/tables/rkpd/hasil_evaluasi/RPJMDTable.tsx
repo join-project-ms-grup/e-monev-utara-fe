@@ -30,6 +30,7 @@ import { renderSatuan, renderUang } from '../../../../lib/helper';
 import type { CatatanForm } from '../../../../services/CatatanService';
 import FormCatatan from '../../../forms/FormCatatan';
 import DialogModal from '../../../inputs/DialogModal';
+import { exportRPJMDALL } from '../../../../services/Excel/ExcelRPJMDALL';
 
 const tableHead = () => {
   return (
@@ -71,7 +72,7 @@ const RPJMDTable = () => {
     dataSKPDPeriode?.map((item) => ({
       label: `${item.skpd_name}`,
       value: item.id?.toString(),
-    })) || [];
+    })) as OptionItem[] || [];
   //#endregion
 
   //#region RKPD Data Flatten
@@ -205,7 +206,23 @@ const RPJMDTable = () => {
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
-              tooltip='Lihat tabel penuh'
+              tooltip='Cetak Semua SKPD'
+              className='btn btn-theme px-2 h-9'
+              onClick={() => {
+                toast.promise(exportRPJMDALL(listSKPDPeriode), {
+                  loading: 'Sedang mengunduh, harap tunggu...',
+                  success: <b>Berhasil mengunduh.</b>,
+                  error: (err) => {
+                    console.error(err);
+                    return <b>Gagal mengunduh.</b>;
+                  },
+                });
+              }}
+            >
+              <span className='inline-flex gap-1 items-center'><MdPrint />Cetak Semua SKPD</span>
+            </InputButton>
+            <InputButton
+              tooltip='Lihat SKPD pilihan'
               className='btn btn-theme w-9 h-9'
               onClick={() => {
                 if (data && selectedSKPD) {
@@ -279,7 +296,7 @@ const RPJMDTable = () => {
                           )?.label ?? '',
                         ),
                         {
-                          loading: 'Sedang mengunduh...',
+                          loading: 'Sedang mengunduh, harap tunggu...',
                           success: <b>Berhasil mengunduh.</b>,
                           error: <b>Gagal mengunduh.</b>,
                         },

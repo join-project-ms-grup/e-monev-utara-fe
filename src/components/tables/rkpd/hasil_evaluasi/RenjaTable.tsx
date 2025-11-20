@@ -32,6 +32,7 @@ import RenjaPreviewTable from './RenjaPreviewTable';
 import type { CatatanForm } from '../../../../services/CatatanService';
 import FormCatatan from '../../../forms/FormCatatan';
 import DialogModal from '../../../inputs/DialogModal';
+import { exportRenjaALL } from '../../../../services/Excel/ExcelRenjaALL';
 
 const RenjaTable = () => {
   //#region SKPD dan Tahun ke
@@ -43,10 +44,10 @@ const RenjaTable = () => {
     queryFn: async () => getSKPDPerRKPD(Number(getPeriodeIDFromCookie())),
   });
   const listSKPDPeriode =
-    dataSKPDPeriode?.map((item) => ({
+    (dataSKPDPeriode?.map((item) => ({
       label: `${item.skpd_name}`,
       value: item.id?.toString(),
-    })) || [];
+    })) as OptionItem[]) || [];
   //#endregion
   //#region List data periode
   const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
@@ -211,6 +212,19 @@ const RenjaTable = () => {
       <div className='space-y-2'>
         <div className='flex items-end justify-between'>
           <div className='inline-flex gap-2'>
+            <div>
+              <label htmlFor='tahun_ke'>Tahun ke</label>
+              <InputSearchBox
+                id='tahun_ke'
+                className='w-42 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih Tahun ke...'
+                value={tahunKe}
+                options={listTahunKe}
+                onChange={(val) => setTahunKe(val)}
+                onClear={() => setTahunKe('')}
+              />
+            </div>
             {(isDev() || isAdmin()) && (
               <div>
                 <label htmlFor='skpd'>SKPD</label>
@@ -226,28 +240,46 @@ const RenjaTable = () => {
                     setSelectedSKPD('');
                     setTahunKe('');
                   }}
+                  disabled={!tahunKe}
                   withSearch
                 />
               </div>
             )}
-            <div>
-              <label htmlFor='tahun_ke'>Tahun ke</label>
-              <InputSearchBox
-                id='tahun_ke'
-                className='w-42 h-9'
-                btnclassName='bg-white'
-                placeholder='Pilih Tahun ke...'
-                value={tahunKe}
-                options={listTahunKe}
-                onChange={(val) => setTahunKe(val)}
-                onClear={() => setTahunKe('')}
-                disabled={!selectedSKPD}
-              />
-            </div>
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
-              tooltip='Lihat tabel penuh'
+              tooltip='Cetak Semua SKPD'
+              className='btn btn-theme px-2 h-9'
+              onClick={() => {
+                if (tahunKe) {
+                  toast.promise(
+                    exportRenjaALL(
+                      listSKPDPeriode,
+                      listTahunKe.find((item) => item.value === tahunKe)
+                        ?.label ?? '',
+                      Number(tahunKe),
+                    ),
+                    {
+                      loading: 'Sedang mengunduh, harap tunggu...',
+                      success: <b>Berhasil mengunduh.</b>,
+                      error: (err) => {
+                        console.error(err);
+                        return <b>Gagal mengunduh.</b>;
+                      },
+                    },
+                  );
+                }else{
+                  toast.error('Tahun belum dipilih')
+                }
+              }}
+            >
+              <span className='inline-flex gap-1 items-center'>
+                <MdPrint />
+                Cetak Semua SKPD
+              </span>
+            </InputButton>
+            <InputButton
+              tooltip='Lihat SKPD pilihan'
               className='btn btn-theme w-9 h-9'
               onClick={() => {
                 if (data) {
@@ -325,11 +357,12 @@ const RenjaTable = () => {
                           listSKPDPeriode.find(
                             (item) => item.value === selectedSKPD,
                           )?.label ?? '',
-                          listTahunKe.find(item => item.value === tahunKe)?.label ?? '',
+                          listTahunKe.find((item) => item.value === tahunKe)
+                            ?.label ?? '',
                           catatan,
                         ),
                         {
-                          loading: 'Sedang mengunduh...',
+                          loading: 'Sedang mengunduh, harap tunggu...',
                           success: <b>Berhasil mengunduh.</b>,
                           error: <b>Gagal mengunduh.</b>,
                         },
@@ -356,69 +389,16 @@ const RenjaTable = () => {
                   listSKPDPeriode.find((item) => item.value === selectedSKPD)
                     ?.label ?? ''
                 }
-                tahun={listTahunKe.find(item => item.value === tahunKe)?.label ?? ''}
+                tahun={
+                  listTahunKe.find((item) => item.value === tahunKe)?.label ??
+                  ''
+                }
               />
             </div>
           </div>,
           document.body,
         )
       )}
-
-      {/* {isPreview &&
-        createPortal(
-          <div className='fixed inset-0 z-[9999] flex flex-col bg-white'>
-            <div className='border-b'>
-              <div className='flex flex-row justify-between p-2'>
-                <button
-                  onClick={() => setIsPreview(false)}
-                  className='text-3xl font-bold text-gray-800 hover:text-gray-300 transition-all'
-                  aria-label='Tutup preview'
-                >
-                  <MdClose />
-                </button>
-                <InputButton
-                  className='h-9'
-                  onClick={() => {
-                    if (data) {
-                      toast.promise(
-                        exportRenja(
-                          data,
-                          listSKPDPeriode.find(
-                            (item) => item.value === selectedSKPD,
-                          )?.label ?? '', catatan
-                        ),
-                        {
-                          loading: 'Sedang mengunduh...',
-                          success: <b>Berhasil mengunduh.</b>,
-                          error: <b>Gagal mengunduh.</b>,
-                        },
-                      );
-                    } else {
-                      toast.error(
-                        `${!selectedSKPD ? 'SKPD dan' : ''} Tahun belum dipilih`,
-                      );
-                    }
-                  }}
-                >
-                  <span className='inline-flex items-center gap-2 px-2'>
-                    <MdPrint />
-                    Cetak Excel
-                  </span>
-                </InputButton>
-              </div>
-            </div>
-            <div className='p-2 overflow-auto'>
-              <RenjaPreviewTable
-                data={data || []}
-                skpd={
-                  listSKPDPeriode.find((item) => item.value === selectedSKPD)
-                    ?.label ?? ''
-                }
-              />
-            </div>
-          </div>,
-          document.body,
-        )} */}
     </>
   );
 };

@@ -30,6 +30,7 @@ import { renderSatuan, renderUang } from '../../../../lib/helper';
 import DialogModal from '../../../inputs/DialogModal';
 import FormCatatan from '../../../forms/FormCatatan';
 import type { CatatanForm } from '../../../../services/CatatanService';
+import { exportRenstraALL } from '../../../../services/Excel/ExcelRenstraALL';
 
 const tableHead = () => {
   return (
@@ -84,7 +85,7 @@ const RenstraTable = () => {
     dataSKPDPeriode?.map((item) => ({
       label: `${item.skpd_name}`,
       value: item.id?.toString(),
-    })) || [];
+    })) as OptionItem[] || [];
   //#endregion
 
   //#region RKPD Data Flatten
@@ -185,10 +186,10 @@ const RenstraTable = () => {
   // #endregion
 
   const [mode, setMode] = useState<'close' | 'catatan' | 'preview'>('close');
-  const [catatan, setCatatan] = useState<CatatanForm>({})
+  const [catatan, setCatatan] = useState<CatatanForm>({});
 
   useEffect(() => {
-    if (mode==='preview') {
+    if (mode === 'preview') {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -197,7 +198,7 @@ const RenstraTable = () => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [mode==='preview']);
+  }, [mode === 'preview']);
 
   return (
     <>
@@ -223,11 +224,30 @@ const RenstraTable = () => {
           </div>
           <div className='inline-flex gap-2'>
             <InputButton
-              tooltip='Lihat Evaluasi'
+              tooltip='Cetak Semua SKPD'
+              className='btn btn-theme px-2 h-9'
+              onClick={() => {
+                toast.promise(exportRenstraALL(listSKPDPeriode), {
+                  loading: 'Sedang mengunduh, harap tunggu...',
+                  success: <b>Berhasil mengunduh.</b>,
+                  error: (err) => {
+                    console.error(err);
+                    return <b>Gagal mengunduh.</b>;
+                  },
+                });
+              }}
+            >
+              <span className='inline-flex gap-1 items-center'>
+                <MdPrint />
+                Cetak Semua SKPD
+              </span>
+            </InputButton>
+            <InputButton
+              tooltip='Lihat SKPD pilihan'
               className='btn btn-theme w-9 h-9'
               onClick={() => {
                 if (data) {
-                  setMode('catatan')
+                  setMode('catatan');
                 } else {
                   toast.error(`${!selectedSKPD ? 'SKPD' : ''} belum dipilih`);
                 }
@@ -257,14 +277,19 @@ const RenstraTable = () => {
       </div>
       {mode === 'catatan' ? (
         <DialogModal
-        widthLevel={6}
+          widthLevel={6}
           title='Catatan'
           isOpen={mode === 'catatan'}
           onClose={() => {
             setMode('close');
           }}
         >
-          <FormCatatan onPreview={() => setMode('preview')} type='renstra' skpdPerId={Number(selectedSKPD)} setCatatan={setCatatan}/>
+          <FormCatatan
+            onPreview={() => setMode('preview')}
+            type='renstra'
+            skpdPerId={Number(selectedSKPD)}
+            setCatatan={setCatatan}
+          />
         </DialogModal>
       ) : (
         mode === 'preview' &&
@@ -288,7 +313,7 @@ const RenstraTable = () => {
                           (s) => s.id === Number(selectedSKPD),
                         )?.skpd_name ?? '';
                       toast.promise(exportRenstra(data, skpdLabel, catatan), {
-                        loading: 'Sedang mengunduh...',
+                        loading: 'Sedang mengunduh, harap tunggu...',
                         success: <b>Berhasil mengunduh.</b>,
                         error: <b>Gagal mengunduh.</b>,
                       });
