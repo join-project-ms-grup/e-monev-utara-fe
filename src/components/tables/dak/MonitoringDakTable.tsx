@@ -626,15 +626,12 @@ const IdentifikasiDakTable = () => {
   //#endregion
 
   const queryClient = useQueryClient();
-  const [loadingMutation, setLoadingMutation] = useState(false);
   const realisasiMutation = useMutation({
     mutationFn: async (payload: RealisasiMonitoringDAKForm) => {
-      setLoadingMutation(true);
       return realisasiMonitoringDAK(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['list_monitoring_dak'] });
-      // setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
@@ -642,19 +639,14 @@ const IdentifikasiDakTable = () => {
       if (error.status === 400) {
         toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
       }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
     },
   });
   const kunciMutation = useMutation({
     mutationFn: async (payload: any) => {
-      setLoadingMutation(true);
       return kunciMonitoringDAK(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['list_monitoring_dak'] });
-      // setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
@@ -662,16 +654,13 @@ const IdentifikasiDakTable = () => {
       if (error.status === 400) {
         toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
       }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
     },
   });
 
   return (
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
-        <div className='inline-flex gap-2'>
+        <div className='flex flex-wrap gap-2'>
           <div>
             <label htmlFor='jenis'>Jenis DAK</label>
             <InputSearchBox

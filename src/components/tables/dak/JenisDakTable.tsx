@@ -136,8 +136,8 @@ const JenisDakTable = () => {
         tdClassNames: 'text-center',
       },
       cell: (info) => (
-        <span
-          className={`${info.getValue() ? ' text-green-700' : 'text-red-700'}`}
+         <span
+          className={`text-white px-2 py-1 rounded-full font-bold ${info.getValue() ? ' bg-green-700' : 'bg-red-700'}`}
         >
           {info.getValue() ? 'Aktif' : 'Nonaktif'}
         </span>

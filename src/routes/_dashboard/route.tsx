@@ -21,7 +21,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import AksiButton from '../../components/inputs/AksiButton';
 import { getRoleId, isDev } from '../../lib/usercookie';
 import BackToTop from '../../components/BackToTop';
-import toast from 'react-hot-toast';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {
@@ -102,9 +101,18 @@ function PeriodeComponent() {
 
   return (
     <>
-      <div className='h-screen flex items-center justify-center flex-col space-y-2'>
-        <div className='shadow rounded min-w-md'>
-          <div className='w-full bg-red-50 flex items-center justify-center'>
+      <div
+        className='h-screen flex items-center justify-center flex-col space-y-2'
+        style={{
+          backgroundImage: "url('/auth/bg-full2.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className='absolute z-10 inset-0 backdrop-blur-sm bg-black/20 transition-opacity duration-300 opacity-100 pointer-events-auto'></div>
+        <div className='rounded overflow-hidden shadow bg-white/90 z-10'>
+          <div className='w-full flex items-center justify-center'>
             <div className='grid grid-cols-3'>
               <div className='flex justify-start items-center'>
                 {isDev() && (
@@ -120,7 +128,7 @@ function PeriodeComponent() {
                   />
                 )}
               </div>
-              <h4 className='p-2'>Pilih Periode</h4>
+              <h4 className='px-2 py-4'>PILIH PERIODE</h4>
               <div className='flex justify-end items-center'>
                 <AksiButton
                   tooltip='Keluar'
@@ -134,7 +142,7 @@ function PeriodeComponent() {
               </div>
             </div>
           </div>
-          <div className='bg-white flex flex-col items-center justify-center'>
+          <div className='flex flex-col items-center justify-center'>
             <div className='mt-4'>
               <img src='/periode/schedule.png' width={128} />
             </div>

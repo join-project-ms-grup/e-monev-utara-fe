@@ -93,7 +93,7 @@ const BidangDakTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_bidang_dak'] });
-      refetchSub()
+      refetchSub();
       setFormData(initialFormData);
       setOpenModal(false);
       toast.success('Data berhasil ditambahkan');
@@ -125,7 +125,7 @@ const BidangDakTable = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tabel_bidang_dak'] });
-      refetchSub()
+      refetchSub();
       setOpenModal(false);
       toast.success('Data berhasil diperbarui');
     },
@@ -157,7 +157,7 @@ const BidangDakTable = () => {
       },
     },
     {
-        header:'Keterangan',
+      header: 'Keterangan',
       accessorKey: 'keterangan',
     },
     {
@@ -199,7 +199,7 @@ const BidangDakTable = () => {
               <td>{item.keterangan}</td>
               <td className='text-center'>
                 <span
-                  className={`${item.status ? ' text-green-700' : 'text-red-700'}`}
+                  className={`text-white px-2 py-1 rounded-full font-bold ${item.status ? ' bg-green-700' : 'bg-red-700'}`}
                 >
                   {item.status ? 'Aktif' : 'Nonaktif'}
                 </span>
@@ -324,10 +324,7 @@ const BidangDakTable = () => {
             }}
           >
             <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-              >
+              <InputButton type='submit' className='btn btn-theme w-24'>
                 Simpan
               </InputButton>
             </div>
@@ -348,10 +345,7 @@ const BidangDakTable = () => {
             }}
           >
             <div className='flex gap-2 justify-end'>
-              <InputButton
-                type='submit'
-                className='btn btn-theme w-24'
-              >
+              <InputButton type='submit' className='btn btn-theme w-24'>
                 Simpan
               </InputButton>
             </div>

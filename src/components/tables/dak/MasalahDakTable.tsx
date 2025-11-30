@@ -62,13 +62,11 @@ const MasalahDakTable = () => {
       },
       header: 'Status',
       cell: (info) => (
-        <>
-          {Number(info.getValue()) === 1 ? (
-            <span className='text-green-700'>Aktif</span>
-          ) : (
-            <span className='text-red-700'>Nonaktif</span>
-          )}
-        </>
+         <span
+          className={`text-white px-2 py-1 rounded-full font-bold ${info.getValue() ? ' bg-green-700' : 'bg-red-700'}`}
+        >
+          {info.getValue() ? 'Aktif' : 'Nonaktif'}
+        </span>
       ),
     },
     {

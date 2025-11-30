@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createColumnHelper } from '@tanstack/react-table';
+import { type ColumnDef, type Table } from '@tanstack/react-table';
 import {
   deleteUser,
   getUsers,
@@ -7,17 +7,11 @@ import {
   type UserType,
 } from '../../services/UserService';
 import Spinner from '../inputs/Spinner';
-import {
-  MdAdd,
-  MdDelete,
-  MdEdit,
-  MdKey,
-  MdRefresh,
-} from 'react-icons/md';
+import { MdAdd, MdDelete, MdEdit, MdKey, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import DialogModal from '../inputs/DialogModal';
 import InputButton from '../inputs/InputButton';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../lib/api';
 import InputToggle from '../inputs/InputToggle';
@@ -68,108 +62,125 @@ const UserTable = () => {
     },
   });
 
-  // Kolom
-  const columnHelper = createColumnHelper<UserType>();
-  const columns = [
-    columnHelper.display({
-      header: 'No',
-      cell: ({ row }) => `${row.index + 1}`,
-      meta: {
-        thClassNames: 'w-[5%]',
-        tdClassNames: 'text-center',
-      },
-    }),
-    columnHelper.accessor('fullname', {
-      header: 'Nama',
-    }),
-    columnHelper.accessor('name', {
-      header: 'Username',
-    }),
-    columnHelper.accessor('email', {
-      header: 'Email',
-    }),
-    columnHelper.accessor('userRole.name', {
-      header: 'Role',
-    }),
-    columnHelper.accessor('status', {
-      header: 'Status',
-      enableSorting: false,
-      meta: {
-        thClassNames: 'w-[15%]',
-        tdClassNames: 'flex items-center justify-center',
-      },
-      cell: ({ cell, row }) => {
-        return (
-          <div className='w-30'>
-            <InputToggle
-              onLabel='Aktif'
-              offLabel='Nonaktif'
-              checked={cell.getValue()}
-              onToggle={() => setStatusMutation.mutate(row.original.id!)}
-            />
-          </div>
-        );
-      },
-    }),
-    columnHelper.display({
-      header: 'Aksi',
-      enableSorting: false,
-      cell: ({ row }) => (
-        <div className='inline-flex gap-1'>
-          <AksiButton
-            tooltip='Ubah data'
-            Icon={MdEdit}
-            onClick={() => {
-              setSelectedData({
-                id: row.original.id,
-                email: row.original.email ?? '',
-                fullname: row.original.fullname ?? '',
-                name: row.original.name ?? '',
-                password: '',
-                passwordConfirm: '',
-                role_id: row.original.role_id ?? '',
-                skpd_id: row.original.skpd_id ?? '',
-              });
-              setModal('Add');
-            }}
-          />
-          <AksiButton
-            Icon={MdKey}
-            tooltip='Ubah password'
-            onClick={() => {
-              setSelectedDataPass({
-                id: row.original.id,
-                fullname: row.original.fullname,
-                password: '',
-                passwordConfirm: '',
-              });
-              setModal('Password');
-            }}
-          />
-          <AksiButton
-            Icon={MdDelete}
-            tooltip='Hapus user'
-            onClick={() => {
-              setSelectedDataPass({
-                id: row.original.id,
-                fullname: row.original.fullname,
-                password: '',
-                passwordConfirm: '',
-              });
-              setModal('Delete');
-            }}
-          />
-        </div>
-      ),
-      meta: {
-        tdClassNames: 'text-center',
-      },
-    }),
-  ];
-
   const [selectedData, setSelectedData] = useState(initUserSF);
   const [selectedDataPass, setSelectedDataPass] = useState(initUserPassSF);
   const [modal, setModal] = useState<'' | 'Add' | 'Password' | 'Delete'>('');
+
+  //#region Tabel
+  const columns: ColumnDef<UserType>[] = [
+    {
+      header: 'No',
+    },
+    {
+      header: 'Nama',
+    },
+    {
+      header: 'Username',
+    },
+    {
+      header: 'Email',
+    },
+    {
+      header: 'Role',
+    },
+    {
+      header: 'Status',
+    },
+    {
+      header: 'Aksi',
+      meta: {
+        thClassNames: 'w-[10%]',
+        tdClassNames: 'text-center',
+      },
+    },
+  ];
+
+  const tableBody = useCallback(
+    (table: Table<UserType>) => {
+      const rows = table.getRowModel().rows;
+      return (
+        <>
+          {rows.map((row) => {
+            const user = row.original;
+
+            return (
+              <tr key={user.id} className='odd gradeX'>
+                <td className='text-center'>{row.index + 1}</td>
+
+                <td>{user.fullname}</td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.userRole?.name}</td>
+
+                <td className='flex items-center justify-center'>
+                  <div className='w-30'>
+                    <InputToggle
+                      onLabel='Aktif'
+                      offLabel='Nonaktif'
+                      checked={user.status}
+                      onToggle={() => setStatusMutation.mutate(user.id!)}
+                    />
+                  </div>
+                </td>
+
+                <td className='text-center'>
+                  <div className='inline-flex gap-1'>
+                    <AksiButton
+                      tooltip='Ubah data'
+                      Icon={MdEdit}
+                      onClick={() => {
+                        setSelectedData({
+                          id: user.id,
+                          email: user.email ?? '',
+                          fullname: user.fullname ?? '',
+                          name: user.name ?? '',
+                          password: '',
+                          passwordConfirm: '',
+                          role_id: user.role_id ?? '',
+                          skpd_id: user.skpd_id ?? '',
+                        });
+                        setModal('Add');
+                      }}
+                    />
+
+                    <AksiButton
+                      Icon={MdKey}
+                      tooltip='Ubah password'
+                      onClick={() => {
+                        setSelectedDataPass({
+                          id: user.id,
+                          fullname: user.fullname,
+                          password: '',
+                          passwordConfirm: '',
+                        });
+                        setModal('Password');
+                      }}
+                    />
+
+                    <AksiButton
+                      Icon={MdDelete}
+                      tooltip='Hapus user'
+                      onClick={() => {
+                        setSelectedDataPass({
+                          id: user.id,
+                          fullname: user.fullname,
+                          password: '',
+                          passwordConfirm: '',
+                        });
+                        setModal('Delete');
+                      }}
+                    />
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </>
+      );
+    },
+    [setStatusMutation, setSelectedData, setSelectedDataPass, setModal],
+  );
+  //#endregion
 
   return (
     <div className='space-y-2'>
@@ -194,7 +205,11 @@ const UserTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={data || []} columns={columns} />
+      <Tabel
+        data={data || []}
+        columns={columns}
+        renderBody={(table) => tableBody(table)}
+      />
       {modal === 'Add' && (
         <DialogModal
           title={`${selectedData.id ? 'Ubah' : 'Tambah'} data User`}

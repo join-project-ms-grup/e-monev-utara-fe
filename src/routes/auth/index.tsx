@@ -129,12 +129,6 @@ function RouteComponent() {
               Masuk
             </InputButton>
           </form>
-          <p className='mt-4 text-center text-gray-600 text-sm'>
-            Belum punya akun?{' '}
-            <a href='#' className='text-[#E63946]'>
-              Hubungi admin
-            </a>
-          </p>
         </div>
       </div>
       {/* MARK: BLUR EFEK */}
@@ -147,7 +141,7 @@ function RouteComponent() {
         <div className='flex-1/4 py-6 px-16'>
           <div className='flex flex-col justify-start h-full'>
             {/* MARK: LOGO */}
-            <div className='flex flex-col items-center mb-20'>
+            <div className='flex flex-col items-start mb-20'>
               <div>
                 <img src='/mahabbah.png' width={300} alt='E-MAHABBAH LOGO' />
               </div>
@@ -176,8 +170,8 @@ function RouteComponent() {
                 </p>
               </div>
               <button
-                className={`float-start mt-10 shadow bg-red-700 text-gray-100 font-bold active:scale-80
-              px-12 py-2 text-2xl rounded-xl hover:bg-red-600 hover:text-[var(--text-3)] transition-all duration-300`}
+                className={`float-start mt-10 shadow bg-gray-100 text-gray-800 font-bold active:scale-100
+              px-12 py-2 text-2xl rounded-xl hover:scale-105 transition-all duration-300`}
                 onClick={() => setShowLogin(!showLogin)}
               >
                 Login

@@ -31,7 +31,7 @@ const AksiButton = ({
   const btnCN = clsx(
     className,
     `${label ? 'px-2 py-1' : 'p-2'}`,
-    'transition-all bg-red-50 shadow-sm rounded-full hover:text-[var(--text-3)] scale-85 active:scale-70',
+    'transition-all bg-gray-100 shadow-sm rounded-full hover:text-[var(--text-3)] scale-85 active:scale-70 hover:bg-gray-500',
     `hover:${hoverColor}`,
   );
 

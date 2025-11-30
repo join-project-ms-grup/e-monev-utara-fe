@@ -13,7 +13,6 @@ type TopbarProps = {
 const Topbar = ({ toggleSidebar }: TopbarProps) => {
   const { user, refreshPeriodeCookie } = useAuth();
   const matches = useMatches();
-  // Judul Route
   const pageTitle = matches[matches.length - 1].staticData?.title;
 
   return (
@@ -49,9 +48,6 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
             'flex flex-row justify-center items-center gap-2 px-2 py-2 focus-visible:outline-0'
           }
         >
-          {/* <div className='rounded-full overflow-hidden bg-[#921733]'>
-                        <img src='/avatar/default-avatar.png' width={32} />
-                    </div> */}
           <div className='flex flex-col items-start'>
             <span className='font-medium'>{user?.nama}</span>
             <span className='text-sm'>{user?.roleName}</span>
@@ -60,30 +56,11 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
         </MenuButton>
         <MenuItems
           anchor='bottom'
+          modal={false}
           className={
             'right-0 bg-white text-black p-2 w-36 rounded shadow-lg focus-visible:outline-0 z-20'
           }
         >
-          <MenuItem>
-            <a
-              className='block py-1 px-2 hover:bg-gray-200 rounded'
-              href='/#profil'
-            >
-              Profil
-            </a>
-          </MenuItem>
-          {/* <MenuItem>
-            <a
-              className='block py-1 px-2 hover:bg-gray-200 rounded cursor-pointer'
-              onClick={() => {
-                Cookies.remove('skip_periode');
-                Cookies.remove('periode');
-                refreshPeriodeCookie();
-              }}
-            >
-              Ubah Periode
-            </a>
-          </MenuItem> */}
           <MenuItem>
             <Link
               className='block py-1 px-2 hover:bg-gray-200 rounded'

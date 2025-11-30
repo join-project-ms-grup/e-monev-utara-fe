@@ -112,7 +112,7 @@ const DashRKPD = () => {
   return (
     <div className='space-y-2'>
       <div className='grid lg:grid-cols-4 md:grid-cols-2 gap-2'>
-        <div className='flex flex-col px-4 py-6 rounded-lg shadow bg-cyan-600 text-white'>
+        <div className='flex flex-col px-4 py-6 rounded-lg shdaow bg-gradient-to-r from-cyan-600 to-cyan-600/70 text-white'>
           <h1>{dataInfo?.totalSKPD}</h1>
           <p>Jumlah</p>
           <p>
