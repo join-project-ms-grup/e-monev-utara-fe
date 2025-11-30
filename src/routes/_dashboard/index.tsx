@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { getDashInfo } from '../../services/DashRKPDService';
 import DashDAKTable from '../../components/tables/DashDAKTable';
 import DashDAKChart from '../../components/charts/DashDAKChart';
-import InputSearchBox from '../../components/inputs/InputSearchBox';
 import type { CSSProperties } from 'react';
 
 export const Route = createFileRoute('/_dashboard/')({

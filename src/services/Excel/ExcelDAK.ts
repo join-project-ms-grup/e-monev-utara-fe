@@ -79,7 +79,7 @@ export const exportDAK = async (
         // { addr: 'A7', value: `${periodeLaporan}` }, { addr: 'B7', value: `${periodeWaktuLaporan}` },
         { addr: 'A9', value: `TRIWULAN` }, { addr: 'B9', value: `${triwulanList.find(item => item.value === dakData.triwulan)?.label}` },
         { addr: 'A10', value: `SKPD` }, { addr: 'B10', value: `${skpd.toUpperCase()}` },
-        { addr: 'A11', value: `JENIS` }, { addr: 'B11', value: `${dakData.jenis === '1' ? 'FISIK' : 'NON-FISIK'}` },
+        { addr: 'A11', value: `JENIS DAK` }, { addr: 'B11', value: `${dakData.jenis === '1' ? 'FISIK' : 'NON-FISIK'}` },
 
         { addr: 'A12', value: 'NO' }, { addr: 'A15', value: '1' },
 

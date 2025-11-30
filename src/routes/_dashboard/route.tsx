@@ -21,6 +21,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import AksiButton from '../../components/inputs/AksiButton';
 import { getRoleId, isDev } from '../../lib/usercookie';
 import BackToTop from '../../components/BackToTop';
+import toast from 'react-hot-toast';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {
@@ -31,12 +32,6 @@ export const Route = createFileRoute('/_dashboard')({
   },
   component: RouteComponent,
 });
-
-// function RouteComponent() {
-//   const { periodeCookie } = useAuth();
-//   if (!periodeCookie) return <PeriodeComponent />;
-//   return <MainComponent />;
-// }
 
 function RouteComponent() {
   const roleId = getRoleId();
@@ -84,25 +79,6 @@ function MainComponent() {
       <BackToTop />
     </>
   );
-
-  // return (
-  //   <>
-  //     <div className='flex flex-col min-h-screen'>
-  //       <TopBar toggleSidebar={toggleSidebar} />
-  //       <div className='flex'>
-  //         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-  //         <div className='flex flex-1 flex-col'>
-  //           <main className='flex-1 px-8 py-2 z-0'>
-  //             <Breadcrumb className='px-8 pt-2' />
-  //             <Outlet />
-  //           </main>
-  //           <Footer />
-  //         </div>
-  //       </div>
-  //     </div>
-  //     <BackToTop />
-  //   </>
-  // );
 }
 
 function PeriodeComponent() {
@@ -183,6 +159,7 @@ function PeriodeComponent() {
               <InputButton
                 className='px-2 w-full h-9'
                 type='button'
+                disabled={!periode}
                 onClick={() => {
                   if (periode) {
                     const [mulai, akhir] = tahun.split(' - ');
