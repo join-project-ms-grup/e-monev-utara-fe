@@ -267,7 +267,7 @@ const SKPDTable = () => {
               updateMutation.mutate({
                 id,
                 payload: {
-                  kode: Number(payload.kode),
+                  kode: payload.kode,
                   name: payload.name,
                   shortname: payload.shortname,
                   status: payload.status,
