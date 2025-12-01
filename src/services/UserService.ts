@@ -22,6 +22,8 @@ export interface UserType {
 }
 export type UserForm = Pick<UserType, 'id' | 'name' | 'fullname' | 'email' | 'role_id' | 'skpd_id' | 'password' | 'passwordConfirm' >;
 export type UserPassForm = Pick<UserType, 'id' | 'password' | 'passwordConfirm' >;
+export type ProfilForm = Pick<UserType, 'name' | 'fullname' | 'email' >;
+export type ProfilPassForm = Pick<UserType, 'password' | 'passwordConfirm' >;
 
 /**
  * Ambil semua user
@@ -76,4 +78,19 @@ export const setStatusUser = async (id: number) => {
 export const deleteUser = async (id: number) => {
     const response = await api.delete<ApiResponse<null>>(`/config/user/delete/${id}`);
     return response.data;
+};
+
+/**
+ * Update data self
+ */
+export const updateProfil = async (payload: UserForm): Promise<UserForm> => {
+    const response = await api.put<ApiResponse<UserForm>>(`/config/user/update-self`, payload);
+    return response.data.data;
+};
+/**
+ * Update data self
+ */
+export const updatePassProfil = async (payload: UserForm): Promise<UserForm> => {
+    const response = await api.put<ApiResponse<UserForm>>(`/config/user/change-password-self`, payload);
+    return response.data.data;
 };

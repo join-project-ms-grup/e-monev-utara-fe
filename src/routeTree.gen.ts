@@ -14,6 +14,7 @@ import { Route as DashboardRouteRouteImport } from './routes/_dashboard/route'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
 import { Route as AuthLogoutRouteImport } from './routes/auth/logout'
+import { Route as DashboardProfilRouteImport } from './routes/_dashboard/profil'
 import { Route as DashboardRkpdRouteRouteImport } from './routes/_dashboard/rkpd/route'
 import { Route as DashboardKonfigurasiRouteRouteImport } from './routes/_dashboard/konfigurasi/route'
 import { Route as DashboardDakRouteRouteImport } from './routes/_dashboard/dak/route'
@@ -87,6 +88,11 @@ const AuthLogoutRoute = AuthLogoutRouteImport.update({
   id: '/logout',
   path: '/logout',
   getParentRoute: () => AuthRouteRoute,
+} as any)
+const DashboardProfilRoute = DashboardProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardRkpdRouteRoute = DashboardRkpdRouteRouteImport.update({
   id: '/rkpd',
@@ -370,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/dak': typeof DashboardDakRouteRouteWithChildren
   '/konfigurasi': typeof DashboardKonfigurasiRouteRouteWithChildren
   '/rkpd': typeof DashboardRkpdRouteRouteWithChildren
+  '/profil': typeof DashboardProfilRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/': typeof DashboardIndexRoute
   '/auth/': typeof AuthIndexRoute
@@ -421,6 +428,7 @@ export interface FileRoutesByFullPath {
   '/rkpd/renstra_rpjmd/': typeof DashboardRkpdRenstra_rpjmdIndexRoute
 }
 export interface FileRoutesByTo {
+  '/profil': typeof DashboardProfilRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/': typeof DashboardIndexRoute
   '/auth': typeof AuthIndexRoute
@@ -471,6 +479,7 @@ export interface FileRoutesById {
   '/_dashboard/dak': typeof DashboardDakRouteRouteWithChildren
   '/_dashboard/konfigurasi': typeof DashboardKonfigurasiRouteRouteWithChildren
   '/_dashboard/rkpd': typeof DashboardRkpdRouteRouteWithChildren
+  '/_dashboard/profil': typeof DashboardProfilRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/auth/': typeof AuthIndexRoute
@@ -528,6 +537,7 @@ export interface FileRouteTypes {
     | '/dak'
     | '/konfigurasi'
     | '/rkpd'
+    | '/profil'
     | '/auth/logout'
     | '/'
     | '/auth/'
@@ -579,6 +589,7 @@ export interface FileRouteTypes {
     | '/rkpd/renstra_rpjmd/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/profil'
     | '/auth/logout'
     | '/'
     | '/auth'
@@ -628,6 +639,7 @@ export interface FileRouteTypes {
     | '/_dashboard/dak'
     | '/_dashboard/konfigurasi'
     | '/_dashboard/rkpd'
+    | '/_dashboard/profil'
     | '/auth/logout'
     | '/_dashboard/'
     | '/auth/'
@@ -720,6 +732,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/logout'
       preLoaderRoute: typeof AuthLogoutRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/_dashboard/profil': {
+      id: '/_dashboard/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof DashboardProfilRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
     '/_dashboard/rkpd': {
       id: '/_dashboard/rkpd'
@@ -1287,6 +1306,7 @@ interface DashboardRouteRouteChildren {
   DashboardDakRouteRoute: typeof DashboardDakRouteRouteWithChildren
   DashboardKonfigurasiRouteRoute: typeof DashboardKonfigurasiRouteRouteWithChildren
   DashboardRkpdRouteRoute: typeof DashboardRkpdRouteRouteWithChildren
+  DashboardProfilRoute: typeof DashboardProfilRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -1294,6 +1314,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardDakRouteRoute: DashboardDakRouteRouteWithChildren,
   DashboardKonfigurasiRouteRoute: DashboardKonfigurasiRouteRouteWithChildren,
   DashboardRkpdRouteRoute: DashboardRkpdRouteRouteWithChildren,
+  DashboardProfilRoute: DashboardProfilRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 

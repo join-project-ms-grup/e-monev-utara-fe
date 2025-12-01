@@ -221,9 +221,10 @@ const ToggleField = ({
 type SubmitButtonProps = {
   children: React.ReactNode;
   isLoading?: boolean;
+  disable?: boolean;
 };
 
-const SubmitButton = ({ children, isLoading }: SubmitButtonProps) => {
+const SubmitButton = ({ children, isLoading, disable }: SubmitButtonProps) => {
   const form = useFormContext();
   const [isSubmitting, canSubmit] = useStore(form.store, (state) => [
     state.isSubmitting,
@@ -234,7 +235,7 @@ const SubmitButton = ({ children, isLoading }: SubmitButtonProps) => {
     <InputButton
       className='px-2'
       type='submit'
-      disabled={isSubmitting || !canSubmit}
+      disabled={isSubmitting || !canSubmit || disable}
       isLoading={isLoading}
     >
       {children}

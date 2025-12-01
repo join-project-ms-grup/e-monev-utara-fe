@@ -51,6 +51,7 @@ function RouteComponent() {
           roleName: data.roleName,
           userSKPDId: data.opdId,
           username: data.username,
+          email: data.email,
         },
       });
       navigate({ to: '/', replace: true });

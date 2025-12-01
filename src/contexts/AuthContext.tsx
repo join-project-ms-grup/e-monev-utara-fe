@@ -13,6 +13,7 @@ export interface LoggedUserType {
   roleName: string | null;
   userSKPDId: number | null;
   username: string;
+  email: string;
 }
 
 export interface AuthContextType {

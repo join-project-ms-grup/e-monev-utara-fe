@@ -62,6 +62,9 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
           }
         >
           <MenuItem>
+            <Link to={'/profil'} className='block py-1 px-2 hover:bg-gray-200 rounded'>Profil</Link>
+          </MenuItem>
+          <MenuItem>
             <Link
               className='block py-1 px-2 hover:bg-gray-200 rounded'
               to={'/auth/logout'}

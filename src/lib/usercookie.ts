@@ -6,6 +6,7 @@ export interface UserCookie {
   roleName: string;
   userSKPDId: number | null;
   username: string;
+  email: string;
 }
 
 export interface PeriodeCookie{
