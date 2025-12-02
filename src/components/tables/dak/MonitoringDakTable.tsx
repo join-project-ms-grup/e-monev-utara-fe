@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Tabel from '../Tabel';
 import type { ColumnDef, Table } from '@tanstack/react-table';
 import AksiButton from '../../inputs/AksiButton';
@@ -37,6 +37,7 @@ import {
   useListSubJenisDAK,
   useListTahunDAK,
 } from '../../../hooks/DAK/ListDataDAK';
+import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
 
 interface DakData {
   tahun: string;
@@ -240,6 +241,7 @@ const tableHead = () => {
 };
 
 const IdentifikasiDakTable = () => {
+  const userSKPDID = getUserSKPDID();
   const [dakData, setDakData] = useState<DakData>({
     tahun: '',
     opd: '',
@@ -255,6 +257,15 @@ const IdentifikasiDakTable = () => {
   const listTahunDAK = useListTahunDAK();
   const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
   const listOPDDAK = useListOPDDAK();
+
+  useEffect(() => {
+    if (!dakData.tahun) return;
+
+    if (getRoleId() === 4) {
+      changeDakData('opd', userSKPDID?.toString() ?? '');
+      console.log('change dak dulu');
+    }
+  }, [dakData.opd, dakData.tahun]);
 
   const { data, isFetching, refetch } = useQuery({
     queryKey: [
@@ -739,28 +750,30 @@ const IdentifikasiDakTable = () => {
             />
           </div>
 
-          <div>
-            <label htmlFor='opd'>OPD</label>
-            <InputSearchBox
-              id='opd'
-              className='w-72 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih OPD'
-              value={dakData.opd}
-              options={listOPDDAK}
-              onChange={(val) => {
-                changeDakData('opd', val);
-                changeDakData('triwulan', '');
-              }}
-              onClear={() => {
-                changeDakData('opd', '');
-                changeDakData('triwulan', '');
-              }}
-              withSearch
-              tooltip
-              disabled={!dakData.tahun}
-            />
-          </div>
+          {getRoleId() !== 4 && (
+            <div>
+              <label htmlFor='opd'>OPD</label>
+              <InputSearchBox
+                id='opd'
+                className='w-72 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih OPD'
+                value={dakData.opd}
+                options={listOPDDAK}
+                onChange={(val) => {
+                  changeDakData('opd', val);
+                  changeDakData('triwulan', '');
+                }}
+                onClear={() => {
+                  changeDakData('opd', '');
+                  changeDakData('triwulan', '');
+                }}
+                withSearch
+                tooltip
+                disabled={!dakData.tahun}
+              />
+            </div>
+          )}
 
           <div>
             <label htmlFor='triwulan'>Triwulan</label>

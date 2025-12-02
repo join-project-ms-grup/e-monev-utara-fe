@@ -52,10 +52,11 @@ export const useListTahunDAK = () => {
     );
 };
 
-export const useListOPDDAK = () => {
+export const useListOPDDAK = (enabled = true) => {
     const { data } = useQuery({
         queryKey: ['list_opd_dak'],
         queryFn: getOPDDAK,
+        enabled: enabled,
     });
     return (
         data?.map((item) => ({

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import IdentifikasiDakTable from '../../../components/tables/dak/IdentifikasiDakTable';
 import { SITE_NAME } from '../../../lib/config';
 import F_IdentDak from '../../../components/forms/IdentifikasiDak/F_IdentDak';
+import { getUserSKPDID } from '../../../lib/usercookie';
 
 export const Route = createFileRoute('/_dashboard/dak/identifikasi')({
   head: () => ({

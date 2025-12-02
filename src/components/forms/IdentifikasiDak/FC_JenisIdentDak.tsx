@@ -13,6 +13,7 @@ import {
 } from '../../../hooks/DAK/ListDataDAK';
 import { withForm } from '../form-context';
 import { initIdentDAKForm } from './FV_IdentDak';
+import { getRoleId } from '../../../lib/usercookie';
 
 // FC (FORM CHILD)
 export const FC_JenisIdentDak = withForm({
@@ -127,6 +128,7 @@ export const FC_JenisIdentDak = withForm({
                 <field.SelectField
                   label='OPD'
                   placeholder='Pilih OPD'
+                  disabled={getRoleId() === 4}
                   reqLabel
                   options={listOPDDAK}
                 />

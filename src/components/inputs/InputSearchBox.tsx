@@ -129,7 +129,7 @@ export default function InputSearchBox({
             className={`absolute transition-opacity text-red-500 text-lg top-1/2 -translate-y-1/2 right-8 ${invalid ? 'opacity-100' : 'opacity-0'}`}
           />
         </ListboxButton>
-        {onClear && currentValue !== '' && currentValue !== '0' && (
+        {onClear && !disabled && currentValue !== '' && currentValue !== '0' && (
           <button
             type='button'
             className='bg-white transition-all text-red-500 hover:text-red-400 px-1'

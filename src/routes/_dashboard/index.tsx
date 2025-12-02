@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../lib/config';
 import DashRKPDTable from '../../components/tables/DashRKPDTable';
-import { getPeriodeMulaiFromCookie, getRoleId } from '../../lib/usercookie';
+import { getPeriodeMulaiFromCookie, getRoleId, getUserFromCookie } from '../../lib/usercookie';
 import { useQuery } from '@tanstack/react-query';
 import { getDashInfo } from '../../services/DashRKPDService';
 import DashDAKTable from '../../components/tables/DashDAKTable';

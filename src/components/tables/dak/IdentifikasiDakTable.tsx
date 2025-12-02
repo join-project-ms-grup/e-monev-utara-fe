@@ -10,7 +10,7 @@ import {
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   flatIdentifikasiDAK,
   getIdentifikasiDAK,
@@ -26,6 +26,7 @@ import {
   useListTahunDAK,
 } from '../../../hooks/DAK/ListDataDAK';
 import Spinner from '../../inputs/Spinner';
+import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
 
 interface DakData {
   tahun: string;
@@ -88,7 +89,7 @@ const IdentifikasiDakTable = ({
   const listTahunDAK = useListTahunDAK();
   const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
   const listOPDDAK = useListOPDDAK();
-
+  const userSKPDID = getUserSKPDID();
   const { data, refetch, isFetching } = useQuery({
     queryKey: [
       'list_identifikasi_dak',
@@ -101,14 +102,25 @@ const IdentifikasiDakTable = ({
         tahun: Number(
           listTahunDAK.find((item) => item.value === dakData.tahun)?.value,
         ),
-        opd_id: Number(dakData.opd) ?? null,
+        opd_id: userSKPDID ?? Number(dakData.opd) ?? null,
         sub_jenis: Number(dakData.subJenis) ?? null,
       });
       const flatData = flatIdentifikasiDAK(data);
       return flatData;
     },
-    enabled: !!dakData.tahun,
+    enabled:
+      getRoleId() === 4
+        ? Boolean(dakData.tahun) && Boolean(dakData.opd)
+        : Boolean(dakData.tahun),
   });
+
+  useEffect(() => {
+    if (!dakData.tahun) return;
+
+    if (getRoleId() === 4) {
+      changeDakData('opd', userSKPDID?.toString() ?? '');
+    }
+  }, [dakData.opd, dakData.tahun]);
 
   const tableBody = (
     table: Table<FlatIdentifikasiDAK & { level?: string }>,
@@ -258,22 +270,24 @@ const IdentifikasiDakTable = ({
               disabled={!dakData.subJenis}
             />
           </div>
-          <div>
-            <label htmlFor='opd'>OPD</label>
-            <InputSearchBox
-              id='opd'
-              className='w-72 h-9'
-              btnclassName='bg-white'
-              placeholder='Pilih OPD'
-              value={dakData.opd}
-              options={listOPDDAK}
-              onChange={(val) => changeDakData('opd', val)}
-              onClear={() => changeDakData('opd', '')}
-              withSearch
-              tooltip
-              disabled={!dakData.tahun}
-            />
-          </div>
+          {getRoleId() !== 4 && (
+            <div>
+              <label htmlFor='opd'>OPD</label>
+              <InputSearchBox
+                id='opd'
+                className='w-72 h-9'
+                btnclassName='bg-white'
+                placeholder='Pilih OPD'
+                value={dakData.opd}
+                options={listOPDDAK}
+                onChange={(val) => changeDakData('opd', val)}
+                onClear={() => changeDakData('opd', '')}
+                withSearch
+                tooltip
+                disabled={!dakData.tahun}
+              />
+            </div>
+          )}
         </div>
         <div className='flex justify-end items-end gap-2'>
           <InputButton

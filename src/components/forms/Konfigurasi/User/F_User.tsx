@@ -6,6 +6,9 @@ import { useM_User, UserSchema, useUserSFData, type UserSF } from './FH_User';
 import { useAppForm } from '../../form-context';
 import toast from 'react-hot-toast';
 import { useListSKPD } from '../../../../hooks/RKPD/List';
+import { useListOPDDAK } from '../../../../hooks/DAK/ListDataDAK';
+import { useStore } from '@tanstack/react-form';
+import { useEffect } from 'react';
 
 interface F_UserProps {
   data: UserSF;
@@ -53,7 +56,10 @@ export const F_User = ({ data, onSuccess }: F_UserProps) => {
     queryFn: getRoleId() === 1 ? getRoleDev : getRoleAdmin,
   });
 
+  const selectedRoleId = useStore(form.store, (state) => state.values.role_id);
   const listSKPD = useListSKPD();
+  const listOPDDAK = useListOPDDAK();
+  const listSKPDOPD = selectedRoleId.toString() !== '3' ? listOPDDAK : listSKPD;
 
   return (
     <>
@@ -98,6 +104,9 @@ export const F_User = ({ data, onSuccess }: F_UserProps) => {
           {/* MARK: Field Role */}
           <form.AppField
             name='role_id'
+            listeners={{
+              onChange: () => form.setFieldValue('skpd_id', ''),
+            }}
             children={(field) => {
               const roleList =
                 (roleData?.map((item) => ({
@@ -121,7 +130,8 @@ export const F_User = ({ data, onSuccess }: F_UserProps) => {
               <field.SelectField
                 label='Pilih SKPD'
                 placeholder='Pilih SKPD'
-                options={listSKPD}
+                options={listSKPDOPD}
+                disabled={!selectedRoleId}
                 tooltip
                 reqLabel
               />

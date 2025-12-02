@@ -38,10 +38,10 @@ type SubMenuItem = {
 // Base Menu
 const menuUtama: MenuItem[] = [
   { label: 'Dashboard', icon: <MdDashboard />, to: '/' },
-  {
-    type: 'separator',
-    label: 'MENU',
-  },
+  // {
+  //   type: 'separator',
+  //   label: 'MENU',
+  // },
   {
     label: 'Konfigurasi',
     icon: <MdSettings />,
@@ -59,7 +59,7 @@ const menuUtama: MenuItem[] = [
 const menuRKPD: MenuItem[] = [
   {
     type: 'separator',
-    label: '-',
+    label: 'MENU RKPD',
     akses: [2, 3],
   },
   {
@@ -110,7 +110,7 @@ const menuDAK: MenuItem[] = [
   {
     label: 'Master DAK',
     icon: <MdEventNote />,
-    akses: [2, 4],
+    akses: [2],
     submenu: [
       { label: 'Rekening', to: '/dak/master/rekening' },
       { label: 'OPD', to: '/dak/master/opd' },

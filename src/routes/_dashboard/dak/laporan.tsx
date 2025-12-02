@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
 import InputSearchBox from '../../../components/inputs/InputSearchBox';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InputButton from '../../../components/inputs/InputButton';
 import { MdPreview } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
@@ -17,6 +17,7 @@ import {
   getMasalahDAK,
 } from '../../../services/DAK/DAKMonitoringService';
 import { exportDAK } from '../../../services/Excel/ExcelDAK';
+import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
 
 export const Route = createFileRoute('/_dashboard/dak/laporan')({
   head: () => ({
@@ -41,6 +42,7 @@ interface DakData {
 }
 
 function RouteComponent() {
+  const userSKPDID = getUserSKPDID();
   const [dakData, setDakData] = useState<DakData>({
     tahun: '',
     opd: '',
@@ -185,7 +187,8 @@ function RouteComponent() {
             value={dakData.triwulan}
             onChange={(val) => {
               changeDakData('triwulan', val);
-              changeDakData('opd', '');
+              changeDakData('opd', userSKPDID?.toString()!)
+              // changeDakData('opd', '');
             }}
             onClear={() => {
               changeDakData('triwulan', '');
@@ -209,7 +212,8 @@ function RouteComponent() {
             onClear={() => changeDakData('opd', '')}
             withSearch
             tooltip
-            disabled={!dakData.triwulan}
+            // disabled={!dakData.triwulan}
+            disabled={getRoleId() === 4 ? true : !dakData.triwulan}
           />
         </div>
       </div>
@@ -224,7 +228,6 @@ function RouteComponent() {
                 dakData,
                 listOPDDAK.find((i) => i.value === dakData.opd)?.label ?? '',
               );
-
             }
           }}
         >

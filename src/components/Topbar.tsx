@@ -49,7 +49,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
           }
         >
           <div className='flex flex-col items-start'>
-            <span className='font-medium'>{user?.nama}</span>
+            <span className='font-medium text-ellipsis max-w-28 whitespace-nowrap overflow-hidden' data-tooltip-id='tooltip' data-tooltip-content={user?.nama}>{user?.nama}</span>
             <span className='text-sm'>{user?.roleName}</span>
           </div>
           <MdKeyboardArrowDown />
@@ -58,7 +58,7 @@ const Topbar = ({ toggleSidebar }: TopbarProps) => {
           anchor='bottom'
           modal={false}
           className={
-            'right-0 bg-white text-black p-2 w-36 rounded shadow-lg focus-visible:outline-0 z-20'
+            'right-0 bg-white text-black p-2 w-36 rounded shadow-lg focus-visible:outline-0 z-20 border-t-2 border-[var(--color-2)]'
           }
         >
           <MenuItem>

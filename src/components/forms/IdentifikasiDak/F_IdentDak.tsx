@@ -9,6 +9,8 @@ import { FC_DokIdentDak } from './FC_DokIdentDak';
 import { useStore } from '@tanstack/react-form';
 import toast from 'react-hot-toast';
 import { useM_IdentDAK } from './M_IdentifikasiDAK';
+import { useEffect } from 'react';
+import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
 
 type DakData = {
   tahun: string;
@@ -25,6 +27,7 @@ interface F_IdentDakProps {
 
 // F (FORM)
 const F_IdentDak = ({ onBack, dakData }: F_IdentDakProps) => {
+  const userSKPDID = getUserSKPDID();
   const { mutateWithToast, loading } = useM_IdentDAK();
 
   const { initialValues } = useIdentDAKFormData(Number(dakData.id_ident));
@@ -36,7 +39,7 @@ const F_IdentDak = ({ onBack, dakData }: F_IdentDakProps) => {
         sub_jenis_id: Number(value.sub_jenis_id),
         sub_bidang_id: Number(value.sub_bidang_id),
         tahun: Number(value.tahun),
-        opd_id: Number(value.opd_id),
+        opd_id: getRoleId() === 4 ? userSKPDID ?? Number(value.opd_id) : Number(value.opd_id),
         bidang_opd: value.bidang_opd,
         sub_kegiatan_id: Number(value.sub_kegiatan_id),
         catatan: value.catatan,
@@ -82,6 +85,12 @@ const F_IdentDak = ({ onBack, dakData }: F_IdentDakProps) => {
 
   const njenisDAK = useStore(form.store, (s) => s.values.jenis_dak_id);
   const identID = useStore(form.store, (s) => s.values.id_ident);
+
+  useEffect(() => {
+    if (getRoleId() === 4 && userSKPDID) {
+      form.setFieldValue('opd_id', userSKPDID);
+    }
+  }, [dakData.opd]);
   return (
     <div>
       <div className='inline-flex items-center gap-2'>
