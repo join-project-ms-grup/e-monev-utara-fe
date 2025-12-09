@@ -4,10 +4,10 @@
 :root {
   /* Main Color */
   --bg-color: #f8f8f8;
-  --color-1: #dc143c;
-  --color-2: #f75270;
-  --color-3: #f7cac9;
-  --color-4: #fdebd0;
+  --color-1: #c5172e;
+  --color-2: #dc143c;
+  --color-3: #bf092f;
+  --color-4: #f33a62;
   --text-1: #333;
   --text-2: #ccc;
   --text-3: #f8f8f8;
@@ -161,15 +161,26 @@ a:hover {
   z-index: -1;
   pointer-events: none;
 }
+
 /* Tabel */
+.table-spacing td {
+  padding: 8px 12px; /* spasi vertikal dan horizontal */
+  vertical-align: top; /* biar isi sel sejajar ke atas */
+}
+
+.table-spacing tr + tr td {
+  border-top: 8px solid transparent; /* jarak antar baris */
+}
+
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
+  max-height: 100%; 
 }
 .table-responsive table {
-  width: 100%;
   border-collapse: collapse;
-  min-width: 600px;
+  table-layout: auto;
 }
 .table-responsive tbody {
   border-bottom: 2px solid var(--color-2);
@@ -180,21 +191,26 @@ a:hover {
 }
 .table-responsive th,
 .table-responsive td {
-  padding: 12px 15px;
-  border: none;
-  /* text-align: center; */
+  padding: 10px 15px;
 }
 .table-responsive th {
   color: var(--text-3);
   background-color: var(--color-2);
+  border: 1px solid var(--color-3);
   font-weight: bold;
   cursor: pointer;
 }
-.table-responsive th:hover {
-  background-color: var(--color-1);
-}
 .table-responsive tbody tr {
-  border-bottom: 1px solid var(--color-3);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInRow .4s ease forwards;
+}
+
+@keyframes fadeInRow {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .table-responsive tbody tr:nth-child(odd) {
   background-color: white;
@@ -202,9 +218,6 @@ a:hover {
 
 .table-responsive tbody tr:nth-child(even) {
   background-color: var(--bg-color);
-}
-.table-responsive tbody tr:hover {
-  background-color: var(--color-4);
 }
 @media (max-width: 768px) {
   .table-responsive table,
@@ -240,6 +253,49 @@ a:hover {
     font-weight: bold;
   }
 }
+/* Tabel Excel */
+.table-excel {
+  width: 100%;
+  /* overflow-x: auto; */
+}
+
+.table-excel table {
+  /* width: 100%; */
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.table-excel th,
+.table-excel td {
+  border: 1px solid black;
+  padding: 6px 10px;
+}
+
+.table-excel td table {
+  width: 100%;
+  border-collapse: collapse; /* garis menyatu */
+  margin: 2px 0; /* beri jarak agar tidak tumpang tindih */
+}
+
+.table-excel td table tr:nth-child(even) td,
+.table-excel td table tr:nth-child(even) th {
+  border-top: 1px solid black;
+}
+
+.table-excel td table tr:first-child td,
+.table-excel td table tr:first-child th {
+  border-top: 0; /* baris pertama tanpa border */
+}
+
+.table-excel td table td,
+.table-excel td table th {
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  padding: 4px 6px;
+  background-clip: padding-box;
+}
+
 /* Paginasi Tabel */
 .table-button {
   display: inline-flex;
@@ -341,7 +397,7 @@ a:hover {
   opacity: 90%;
 }
 /* Input */
-input[type='number'] {
+/* input[type='number'] {
   -moz-appearance: textfield;
 }
 
@@ -349,7 +405,7 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
-}
+} */
 
 /* Input Wrapper */
 .input-wrapper {
@@ -377,7 +433,7 @@ input::-webkit-inner-spin-button {
 .input-wrapper input {
   color: var(--text-1);
   width: 100%;
-  background-color: var(--color-gray-50);
+  /* background-color: var(--color-gray-50); */
   padding: 0.5rem 0.85rem;
   outline: none;
 }
@@ -429,25 +485,25 @@ input::-webkit-inner-spin-button {
 }
 
 /* Listbox */
-.listbox {
+/* .listbox {
   @apply relative flex;
 }
 
 .listbox .listbox-btn {
-  @apply w-full inline-flex justify-between items-center gap-1 bg-gray-50 rounded-b-none py-2 px-3 rounded;
+  @apply w-full inline-flex justify-between items-center gap-1 rounded-b-none py-2 px-3 rounded whitespace-nowrap overflow-hidden;
 }
 .listbox .listbox-btn::after{
   @apply content-[''] absolute bottom-0 left-0 h-[2px] w-full bg-gray-200 transition-all opacity-100;
-}
-.listbox .listbox-btn:focus::after{
+} */
+/* .listbox .listbox-btn:focus::after{
   @apply bg-[var(--color-2)] opacity-50;
 }
 .listbox .listbox-btn:focus{
   @apply outline-none;
-}
-.listbox-menu{
+} */
+/* .listbox-menu{
   @apply [--anchor-gap:0] [--anchor-max-height:12rem] w-(--button-width) p-1 bg-gray-50 rounded-b shadow-lg focus-visible:outline-0 z-[9999];
-}
+} */
 /* .listbox-menu::after{
 @apply content-[''] absolute top-0 left-0 h-[2px] w-full bg-[var(--color-2)] opacity-50;
 } */

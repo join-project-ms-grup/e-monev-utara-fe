@@ -22,6 +22,7 @@ const ToastComponent = () => {
       toastOptions={{
         duration: 5000,
       }}
+      containerClassName='z-[99999]!'
     >
       {(t) => (
         <ToastBar toast={t}>
@@ -52,7 +53,8 @@ function RootComponent() {
     <>
       <HeadContent />
       <Outlet />
-      <Tooltip id='tooltip' />
+      <Tooltip id='tooltip' className='z-[99999]' />
+      <Tooltip id='tooltip-input' className='z-[99999]' />
       <ToastComponent />
     </>
   );

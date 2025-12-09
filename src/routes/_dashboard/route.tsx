@@ -1,9 +1,26 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { useState } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Breadcrumb from '../../components/Breadcrumb';
 import Footer from '../../components/Footer';
 import TopBar from '../../components/Topbar';
+import InputButton from '../../components/inputs/InputButton';
+import { MdChevronLeft, MdLogout } from 'react-icons/md';
+import { useQuery } from '@tanstack/react-query';
+import { getPeriode } from '../../services/PeriodeService';
+import InputSearchBox, {
+  type OptionItem,
+} from '../../components/inputs/InputSearchBox';
+import Cookies from 'js-cookie';
+import { useAuth } from '../../contexts/AuthContext';
+import AksiButton from '../../components/inputs/AksiButton';
+import { getRoleId, isDev } from '../../lib/usercookie';
+import BackToTop from '../../components/BackToTop';
 
 export const Route = createFileRoute('/_dashboard')({
   beforeLoad: ({ context }) => {
@@ -16,6 +33,23 @@ export const Route = createFileRoute('/_dashboard')({
 });
 
 function RouteComponent() {
+  const roleId = getRoleId();
+  const { periodeCookie, skipPeriodeCookie } = useAuth();
+
+  if (roleId === 1) {
+    if (!periodeCookie && !skipPeriodeCookie) {
+      return <PeriodeComponent />;
+    }
+    return <MainComponent />;
+  } else {
+    if (!periodeCookie) {
+      return <PeriodeComponent />;
+    }
+    return <MainComponent />;
+  }
+}
+
+function MainComponent() {
   // Sidebar
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
@@ -27,7 +61,7 @@ function RouteComponent() {
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Main Content */}
-        <div className='flex-1 flex flex-col'>
+        <div className='flex-1 flex flex-col min-w-0'>
           {/* Topbar */}
           <TopBar toggleSidebar={toggleSidebar} />
 
@@ -39,6 +73,123 @@ function RouteComponent() {
 
           {/* Footer */}
           <Footer />
+        </div>
+      </div>
+      <BackToTop />
+    </>
+  );
+}
+
+function PeriodeComponent() {
+  const navigate = useNavigate();
+  const { periodeCookie, refreshPeriodeCookie } = useAuth();
+  const [periode, setPeriode] = useState('');
+  const [tahun, setTahun] = useState('');
+  const { data: listPeriode } = useQuery({
+    queryKey: ['list_periode_pilih_periode'],
+    queryFn: async () => {
+      const periodeResult = await getPeriode();
+      return (
+        periodeResult?.map((item) => ({
+          label: `${item.mulai} - ${item.akhir}`,
+          value: item.id?.toString(),
+        })) || []
+      );
+    },
+    enabled: !periodeCookie,
+  });
+
+  return (
+    <>
+      <div
+        className='h-screen flex items-center justify-center flex-col space-y-2'
+        style={{
+          backgroundImage: "url('/auth/bg-full2.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className='absolute z-10 inset-0 backdrop-blur-sm bg-black/20 transition-opacity duration-300 opacity-100 pointer-events-auto'></div>
+        <div className='rounded overflow-hidden shadow bg-white/90 z-10'>
+          <div className='w-full flex items-center justify-center'>
+            <div className='grid grid-cols-3'>
+              <div className='flex justify-start items-center'>
+                {isDev() && (
+                  <AksiButton
+                    tooltip='Lewati'
+                    Icon={MdChevronLeft}
+                    className='ms-2 p-1 hover:text-gray-800 hover:opacity-60'
+                    hoverColor='bg-[var(--color-2)]'
+                    onClick={() => {
+                      Cookies.set('skip_periode', '1');
+                      refreshPeriodeCookie();
+                    }}
+                  />
+                )}
+              </div>
+              <h4 className='px-2 py-4'>PILIH PERIODE</h4>
+              <div className='flex justify-end items-center'>
+                <AksiButton
+                  tooltip='Keluar'
+                  Icon={MdLogout}
+                  className='mr-2 p-1 hover:text-gray-800 hover:opacity-60'
+                  hoverColor='bg-[var(--color-2)]'
+                  onClick={() =>
+                    navigate({ to: '/auth/logout', replace: true })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+          <div className='flex flex-col items-center justify-center'>
+            <div className='mt-4'>
+              <img src='/periode/schedule.png' width={128} />
+            </div>
+            <div className='py-4 space-y-2'>
+              <InputSearchBox
+                id='periode'
+                className='w-52 h-9'
+                btnclassName='bg-white'
+                value={periode}
+                onChange={(val, e) => {
+                  setPeriode(val);
+                  setTahun(e?.target.name!);
+                }}
+                options={(listPeriode as OptionItem[]) || []}
+                defaultOptionLabel='Pilih Periode'
+                withSearch
+                onClear={() => {
+                  setPeriode('');
+                  setTahun('');
+                }}
+              />
+              <InputButton
+                className='px-2 w-full h-9'
+                type='button'
+                disabled={!periode}
+                onClick={() => {
+                  if (periode) {
+                    const [mulai, akhir] = tahun.split(' - ');
+                    Cookies.set(
+                      'periode',
+                      JSON.stringify({
+                        id: periode,
+                        mulai: mulai,
+                        akhir: akhir,
+                      }),
+                      {
+                        sameSite: 'strict',
+                      },
+                    );
+                    refreshPeriodeCookie();
+                  }
+                }}
+              >
+                Pilih
+              </InputButton>
+            </div>
+          </div>
         </div>
       </div>
     </>

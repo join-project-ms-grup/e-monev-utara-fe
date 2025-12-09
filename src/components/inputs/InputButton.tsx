@@ -32,7 +32,7 @@ const InputButton = ({
       {...(tooltip ? { 'data-tooltip-content': tooltip } : {})}
       className={`${className} flex flex-row items-center justify-center
         gap-2 bg-[var(--color-2)] text-white py-2 rounded-md
-        hover:opacity-80 active:scale-[95%] disabled:opacity-50 transition-all duration-100`}
+        hover:opacity-80 active:scale-[95%] disabled:opacity-50 transition-all duration-100 disabled:scale-100 disabled:cursor-default!`}
       {...props}
     >
       {Icon && <Icon className={iconClassName} />}

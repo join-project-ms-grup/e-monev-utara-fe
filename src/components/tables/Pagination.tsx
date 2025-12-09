@@ -1,8 +1,12 @@
-import React from 'react';
-import { MdKeyboardDoubleArrowLeft, MdKeyboardArrowLeft, MdKeyboardArrowRight, MdKeyboardDoubleArrowRight } from 'react-icons/md';
+import {
+  MdKeyboardDoubleArrowLeft,
+  MdKeyboardArrowLeft,
+  MdKeyboardArrowRight,
+  MdKeyboardDoubleArrowRight,
+} from 'react-icons/md';
 import InputButton from '../inputs/InputButton';
-import InputSelectBox from '../inputs/InputSelectBox';
 import type { Table } from '@tanstack/react-table';
+import InputSearchBox from '../inputs/InputSearchBox';
 
 type PaginationProps<TData> = {
   table: Table<TData>;
@@ -13,18 +17,23 @@ const Pagination = <TData,>({ table }: PaginationProps<TData>) => {
     <div className='flex flex-row items-center justify-between mt-2'>
       <div className='flex items-center gap-1'>
         <span className='opacity-85'>Tampilkan</span>
-        <InputSelectBox
-          className='h-9'
-          value={table.getState().pagination.pageSize.toString()}
-          options={[
-            { label: '10', value: '10' },
-            { label: '20', value: '20' },
-            { label: '30', value: '30' },
-            { label: '40', value: '40' },
-            { label: '50', value: '50' },
-          ]}
-          onChange={(value) => table.setPageSize(Number(value))}
-        />
+        <div className='w-20'>
+          <InputSearchBox
+            btnclassName='bg-white h-9'
+            value={table.getState().pagination.pageSize.toString()}
+            options={[
+              { label: '10', value: '10' },
+              { label: '20', value: '20' },
+              { label: '30', value: '30' },
+              { label: '40', value: '40' },
+              { label: '50', value: '50' },
+              { label: '100', value: '100' },
+              { label: '200', value: '200' },
+              { label: '1000', value: '1000' },
+            ]}
+            onChange={(value) => table.setPageSize(Number(value))}
+          />
+        </div>
         <span className='opacity-85'>
           dari {table.getRowCount().toLocaleString()} data
         </span>

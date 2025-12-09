@@ -14,7 +14,7 @@ export type RoleForm = Pick<RoleType, 'id' | 'kode' | 'name'>;
  * Ambil semua role untuk Developer
  */
 export const getRoleDev = async (): Promise<RoleType[]> => {
-    const response = await api.get<ApiResponse<RoleType[]>>("/role/list/dev");
+    const response = await api.get<ApiResponse<RoleType[]>>("/config/role/list/dev");
     return response.data.data;
 };
 
@@ -22,7 +22,7 @@ export const getRoleDev = async (): Promise<RoleType[]> => {
  * Ambil semua role untuk Admin
  */
 export const getRoleAdmin = async (): Promise<RoleForm[]> => {
-    const response = await api.get<ApiResponse<RoleForm[]>>("/role/list");
+    const response = await api.get<ApiResponse<RoleForm[]>>("/config/role/list");
     return response.data.data;
 };
 
@@ -30,7 +30,7 @@ export const getRoleAdmin = async (): Promise<RoleForm[]> => {
  * Menambahkan data role
  */
 export const addRole = async (payload: RoleForm): Promise<RoleForm> => {
-    const response = await api.post<ApiResponse<RoleForm>>("/role/add", payload);
+    const response = await api.post<ApiResponse<RoleForm>>("/config/role/add", payload);
     return response.data.data;
 };
 
@@ -38,7 +38,7 @@ export const addRole = async (payload: RoleForm): Promise<RoleForm> => {
  * Update data role
  */
 export const updateRole = async (id: number, payload: RoleForm): Promise<RoleForm> => {
-    const response = await api.put<ApiResponse<RoleForm>>(`/role/update/${id}`, payload);
+    const response = await api.put<ApiResponse<RoleForm>>(`/config/role/update/${id}`, payload);
     return response.data.data;
 };
 
@@ -46,6 +46,6 @@ export const updateRole = async (id: number, payload: RoleForm): Promise<RoleFor
  * Hapus data role
  */
 export const deleteRole = async (id: number) => {
-    const response = await api.delete<ApiResponse<null>>(`/role/delete/${id}`);
+    const response = await api.delete<ApiResponse<null>>(`/config/role/delete/${id}`);
     return response.data;
 };

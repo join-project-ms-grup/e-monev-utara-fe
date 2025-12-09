@@ -1,13 +1,19 @@
 import React from 'react';
 import InputButton from '../inputs/InputButton';
-import type { PeriodeForm } from '../../services/PeriodeService';
+import { type PeriodeForm } from '../../services/PeriodeService';
 import { useForm } from '@tanstack/react-form';
 import { MdCalendarMonth } from 'react-icons/md';
 import InputText from '../inputs/InputText';
 import InputToggle from '../inputs/InputToggle';
-import { periodeSchema, periodeSchemaSubmit } from './schemas/SchemaPeriode';
+import {
+  mapErrors,
+  mapToInput,
+  periodeSchema,
+  periodeSchemaSubmit,
+} from './schemas/SchemaPeriode';
 import ErrorField from './ErrorField';
 
+// #region Types
 interface BaseFormProps {
   children?: React.ReactElement;
   defaultValues: PeriodeForm;
@@ -24,6 +30,7 @@ interface FormEditProps extends BaseFormProps {
 }
 
 type FormProps = FormAddProps | FormEditProps;
+// #endregion
 
 const FormPeriode: React.FC<FormProps> = ({
   type,
@@ -31,7 +38,15 @@ const FormPeriode: React.FC<FormProps> = ({
   onSubmit,
   defaultValues,
 }) => {
-  // Form
+  // #region Form
+  const validateWith = (schema: any, value: any) => {
+    const input = mapToInput(value);
+    const result = schema.safeParse(input);
+    return result.success
+      ? { fields: {} }
+      : { fields: mapErrors(result.error.format()) };
+  };
+
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -46,46 +61,11 @@ const FormPeriode: React.FC<FormProps> = ({
       }
     },
     validators: {
-      onChange: ({ value }) => {
-        const input = {
-          mulai: value.mulai?.toString() ?? '',
-          akhir: value.akhir?.toString() ?? '',
-        };
-
-        const result = periodeSchema.safeParse(input);
-
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              mulai: errors.mulai?._errors[0],
-              akhir: errors.akhir?._errors[0],
-            },
-          };
-        }
-      },
-      onSubmit: ({ value }) => {
-        const input = {
-          mulai: value.mulai?.toString() ?? '',
-          akhir: value.akhir?.toString() ?? '',
-        };
-        const result = periodeSchemaSubmit.safeParse(input);
-        if (result.success) {
-          return { fields: {} };
-        } else {
-          const errors = result.error.format();
-          return {
-            fields: {
-              mulai: errors.mulai?._errors[0],
-              akhir: errors.akhir?._errors[0],
-            },
-          };
-        }
-      },
+      onChange: ({ value }) => validateWith(periodeSchema, value),
+      onSubmit: ({ value }) => validateWith(periodeSchemaSubmit, value),
     },
   });
+  // #endregion
 
   return (
     <>
@@ -143,14 +123,16 @@ const FormPeriode: React.FC<FormProps> = ({
               <div className='flex-1'>
                 <div className='flex flex-col'>
                   <label htmlFor='status'>Status</label>
-                  <InputToggle
-                    id='status'
-                    onLabel='Aktif'
-                    offLabel='Nonaktif'
-                    checked={field.state.value}
-                    defaultChecked={true}
-                    onToggle={(val) => field.handleChange(val)}
-                  />
+                  <div className='w-30'>
+                    <InputToggle
+                      id='status'
+                      onLabel='Aktif'
+                      offLabel='Nonaktif'
+                      checked={field.state.value}
+                      defaultChecked={true}
+                      onToggle={(val) => field.handleChange(val)}
+                    />
+                  </div>
                 </div>
               </div>
             )}
