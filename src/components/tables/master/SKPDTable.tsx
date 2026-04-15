@@ -235,7 +235,7 @@ const SKPDTable = () => {
             onSubmit={(data: SKPDForm) => {
 
               addMutation.mutate({
-                kode: Number(data.kode),
+                kode: data.kode,
                 name: data.name,
                 shortname: data.shortname,
               });

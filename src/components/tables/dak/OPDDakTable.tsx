@@ -9,7 +9,7 @@ import InputButton from '../../inputs/InputButton';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
 import Tabel from '../Tabel';
-import { isDev } from '../../../lib/usercookie';
+import { isAdmin, isDev } from '../../../lib/usercookie';
 import {
   addOPDDAK,
   getOPDDAK,
@@ -166,7 +166,7 @@ const OPDDakTable = () => {
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-end'>
-          {isDev() && (
+          {(isDev() || isAdmin()) && (
             <InputButton
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'
