@@ -2,7 +2,6 @@ import {
   ProfilSchema,
   useM_Profil,
   useProfilSFData,
-  type ProfilSF,
 } from './FH_Profil';
 import { useAppForm } from '../form-context';
 import toast from 'react-hot-toast';

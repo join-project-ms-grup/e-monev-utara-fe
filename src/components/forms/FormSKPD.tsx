@@ -78,8 +78,17 @@ const FormSKPD: React.FC<FormProps> = ({
               {(field) => (
                 <div className='flex-1'>
                   <label htmlFor='kode'>Kode</label>
+                  {/* <InText
+                    id='kode'
+                    placeholder='Kode SKPD'
+                    numberType
+                    maxLength={22}
+                    type='text'
+                    value={field.state.value!}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    invalid={!field.state.meta.isValid}
+                  /> */}
                   <InputText
-                    // Icon={MdKey}
                     inputMode='numeric'
                     type='text'
                     maxLength={22}

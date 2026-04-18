@@ -143,7 +143,7 @@ const RKPD_RealisasiTable = () => {
             <>
               <AksiButton
                 Icon={MdInput}
-                className='hover:bg-[var(--color-2)]!'
+                className='hover:text-gray-800 bg-green-100! hover:bg-green-200!'
                 tooltip='Input Realisasi'
                 onClick={() => {
                   setFormData({

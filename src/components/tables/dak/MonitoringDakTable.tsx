@@ -6,6 +6,7 @@ import {
   MdAssignmentTurnedIn,
   MdContentPasteSearch,
   MdFindReplace,
+  MdInput,
   MdLock,
   MdLockOpen,
   MdRefresh,
@@ -19,14 +20,10 @@ import {
   flatMonitoringDAK,
   getMonitoringDAK,
   kunciMonitoringDAK,
-  realisasiMonitoringDAK,
   type FlatMonitoringDAK,
-  type RealisasiMonitoringDAKForm,
 } from '../../../services/DAK/DAKMonitoringService';
 import Spinner from '../../inputs/Spinner';
 import { formatUang } from '../../../lib/helper';
-import InputText from '../../inputs/InputText';
-import InputTextArea from '../../inputs/InputTextArea';
 import DialogModal from '../../inputs/DialogModal';
 import type { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
@@ -38,6 +35,11 @@ import {
   useListTahunDAK,
 } from '../../../hooks/DAK/ListDataDAK';
 import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
+import F_RealisasiDak from '../../forms/DAK/MonitoringDAK/F_RealisasiDak';
+import {
+  initDAKRekForm,
+  type RealisasiDakForm,
+} from '../../forms/DAK/MonitoringDAK/FV_RealisasiDak';
 
 interface DakData {
   tahun: string;
@@ -205,6 +207,7 @@ const tableHead = () => {
         <th rowSpan={3}>Jenis DAK / Bidang DAK / Nama Paket</th>
         <th colSpan={3}>Perencanaan Kegiatan</th>
         <th colSpan={3}>Mekanisme Pelaksana</th>
+        <th rowSpan={3}>Aksi</th>
         <th colSpan={4}>Realisasi</th>
         <th rowSpan={3}>Sisa Anggaran s.d Triwulan Ini</th>
         <th rowSpan={3} className='w-[150px]'>
@@ -218,7 +221,6 @@ const tableHead = () => {
         <th rowSpan={3}>Catatan</th>
         <th rowSpan={3}>SKPD Pelaksana</th>
         <th rowSpan={3}>Kunci Proses</th>
-        <th rowSpan={3}>Aksi</th>
       </tr>
       <tr>
         <th rowSpan={2}>Volume</th>
@@ -295,9 +297,15 @@ const IdentifikasiDakTable = () => {
     ),
   });
 
+  const [modalState, setModalState] = useState<'Realisasi' | 'Masalah' | ''>(
+    '',
+  );
   const [openModal, setOpenModal] = useState(false);
-  const [formValues, setFormValues] = useState<Record<string, any>>({});
+  // const [formValues, setFormValues] = useState<Record<string, any>>({});
   const [selectedRealisasi, setSelectedRealisasi] = useState(0);
+  const [selectedRealisasiInput, setSelectedRealisasiInput] =
+    useState<RealisasiDakForm>(initDAKRekForm);
+  const [selectedRealisasiPaket, setSelectedRealisasiPaket] = useState('');
 
   //#region TABLE BODY
   const tableBody = (table: Table<FlatMonitoringDAK & { level?: string }>) => {
@@ -308,7 +316,6 @@ const IdentifikasiDakTable = () => {
       <>
         {rows.map((row, i) => {
           const item = row.original;
-          const currentRowValues = formValues[item.id_realisasi ?? 0] || {};
           if (item.level === 'sub_jenis_dak') {
             return (
               <tr key={i}>
@@ -354,279 +361,87 @@ const IdentifikasiDakTable = () => {
               <td>{item.mekanisme?.kegiatan}</td>
               <td>{item.mekanisme?.volume}</td>
               <td>{formatUang(Number(item.mekanisme?.uang))}</td>
-              <td>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    realisasiMutation.mutate(
-                      {
-                        id_realisasi: item.id_realisasi ?? 0,
-                        fisik: Number(currentRowValues.fisik),
-                        anggaran:
-                          Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                        kesesuaian_juknis:
-                          Boolean(item.kesesuaian_juknis) ?? null,
-                        sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
-                        catatan: item.catatan,
-                      },
-                      {
-                        onSuccess: () => {
-                          setFormValues((prev) => {
-                            const updated = { ...prev };
-                            delete updated[item.id_realisasi ?? 0];
-                            return updated;
-                          });
-                        },
-                      },
-                    );
-                  }}
-                >
-                  <InputText
-                    id='rea_fisik_cap'
-                    value={
-                      currentRowValues.fisik ??
-                      item.realisasi?.fisik?.capaian ??
-                      ''
-                    }
-                    inputMode='numeric'
-                    Iconlabel='%'
-                    IconlabelPos='right'
-                    onChange={(e) => {
-                      const newValue = Number(e.target.value);
-                      setFormValues((prev) => ({
-                        ...prev,
-                        [item.id_realisasi ?? 0]: {
-                          ...prev[item.id_realisasi ?? 0],
-                          fisik: newValue,
-                        },
-                      }));
-                    }}
-                    withButton={
-                      (currentRowValues.fisik ??
-                        item.realisasi?.fisik?.capaian ??
-                        '') !== (item.realisasi?.fisik?.capaian ?? '')
-                    }
-                    buttonType='submit'
-                    tooltip={item.realisasi?.fisik?.capaian?.toString()}
-                  />
-                </form>
-              </td>
-              <td>{item.realisasi?.fisik?.totalSd}</td>
-              <td>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    realisasiMutation.mutate(
-                      {
-                        id_realisasi: item.id_realisasi ?? 0,
-                        fisik: Number(item.realisasi?.fisik?.capaian),
-                        anggaran: Number(currentRowValues.uang) ?? 0,
-                        kesesuaian_juknis:
-                          Boolean(item.kesesuaian_juknis) ?? null,
-                        sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
-                        catatan: item.catatan,
-                      },
-                      {
-                        onSuccess: () => {
-                          setFormValues((prev) => {
-                            const updated = { ...prev };
-                            delete updated[item.id_realisasi ?? 0];
-                            return updated;
-                          });
-                        },
-                      },
-                    );
-                  }}
-                >
-                  <InputText
-                    id='rea_keuang_cap'
-                    value={
-                      currentRowValues.uang ??
-                      item.realisasi?.keuangan?.capaian ??
-                      ''
-                    }
-                    inputMode='numeric'
-                    Iconlabel='Rp'
-                    isRibu
-                    onChange={(e) => {
-                      const newValue = Number(e.target.value);
-                      setFormValues((prev) => ({
-                        ...prev,
-                        [item.id_realisasi ?? 0]: {
-                          ...prev[item.id_realisasi ?? 0],
-                          uang: newValue,
-                        },
-                      }));
-                    }}
-                    withButton={
-                      (currentRowValues.uang ??
-                        item.realisasi?.keuangan?.capaian ??
-                        '') !== (item.realisasi?.keuangan?.capaian ?? '')
-                    }
-                    buttonType='submit'
-                    tooltip={formatUang(
-                      Number(item.realisasi?.keuangan?.capaian),
-                    ).toString()}
-                  />
-                </form>
-              </td>
-              <td>{item.realisasi?.keuangan?.persen}</td>
-              <td>{formatUang(Number(item.sisa_anggaran))}</td>
-              <td>
-                <InputSearchBox
-                  id='kese_sasaran'
-                  placeholder='Pilih...'
-                  value={
-                    currentRowValues.sasaran ??
-                    item.sasaran_lokasi?.toString() ??
-                    ''
-                  }
-                  options={[
-                    { label: 'Ya', value: 'true' },
-                    { label: 'Tidak', value: 'false' },
-                  ]}
-                  onChange={(value) => {
-                    setFormValues((prev) => ({
-                      ...prev,
-                      [item.id_realisasi ?? 0]: {
-                        ...prev[item.id_realisasi ?? 0],
-                        sasaran: value,
-                      },
-                    }));
-                    realisasiMutation.mutate(
-                      {
-                        id_realisasi: item.id_realisasi ?? 0,
-                        fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
-                        anggaran:
-                          Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                        kesesuaian_juknis:
-                          Boolean(item.kesesuaian_juknis) ?? null,
-                        sasaran_lokasi: value === 'true',
-                        catatan: item.catatan,
-                      },
-                      {
-                        onSuccess: () => {
-                          setFormValues((prev) => {
-                            const updated = { ...prev };
-                            delete updated[item.id_realisasi ?? 0];
-                            return updated;
-                          });
-                        },
-                      },
-                    );
-                  }}
-                />
-              </td>
-              <td>
-                <InputSearchBox
-                  id='kese_dpaskpd'
-                  placeholder='Pilih...'
-                  value={
-                    currentRowValues.kesesuaian_juknis ??
-                    item.kesesuaian_juknis?.toString() ??
-                    ''
-                  }
-                  options={[
-                    { label: 'Ya', value: 'true' },
-                    { label: 'Tidak', value: 'false' },
-                  ]}
-                  onChange={(value) => {
-                    setFormValues((prev) => ({
-                      ...prev,
-                      [item.id_realisasi ?? 0]: {
-                        ...prev[item.id_realisasi ?? 0],
-                        kesesuaian_juknis: value,
-                      },
-                    }));
-                    realisasiMutation.mutate(
-                      {
-                        id_realisasi: item.id_realisasi ?? 0,
-                        fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
-                        anggaran:
-                          Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                        kesesuaian_juknis: value === 'true',
-                        sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? null,
-                        catatan: item.catatan,
-                      },
-                      {
-                        onSuccess: () => {
-                          setFormValues((prev) => {
-                            const updated = { ...prev };
-                            delete updated[item.id_realisasi ?? 0];
-                            return updated;
-                          });
-                        },
-                      },
-                    );
-                  }}
-                />
-              </td>
-              <td>-</td>
-              <td>-</td>
-              <td>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    realisasiMutation.mutate({
-                      id_realisasi: item.id_realisasi ?? 0,
-                      fisik: Number(item.realisasi?.fisik?.capaian) ?? 0,
-                      anggaran: Number(item.realisasi?.keuangan?.capaian) ?? 0,
-                      kesesuaian_juknis:
-                        Boolean(item.kesesuaian_juknis) ?? null,
-                      sasaran_lokasi: Boolean(item.sasaran_lokasi),
-                      catatan: currentRowValues.catatan ?? '',
-                    });
-                  }}
-                >
-                  <div className='flex flex-col items-center'>
-                    <InputTextArea
-                      id='catatan'
-                      placeholder='Catatan...'
-                      value={currentRowValues.catatan ?? item.catatan ?? ''}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setFormValues((prev) => ({
-                          ...prev,
-                          [item.id_realisasi ?? 0]: {
-                            ...prev[item.id_realisasi ?? 0],
-                            catatan: newValue,
-                          },
-                        }));
-                      }}
-                      withButton={
-                        (currentRowValues.catatan ?? item.catatan ?? '') !==
-                        (item.catatan ?? '')
-                      }
-                    />
-                  </div>
-                </form>
-              </td>
-              <td>-</td>
-              <td>
-                <AksiButton
-                  Icon={!!item.kunci ? MdLock : MdLockOpen}
-                  className={`hover:bg-green-700! ${!!item.kunci ? 'text-red-500' : ''}`}
-                  tooltip={!!item.kunci ? 'Buka ?' : 'Kunci ?'}
-                  label={!!item.kunci ? 'Terkunci' : 'Terbuka'}
-                  onClick={() =>
-                    kunciMutation.mutate({ id_realisasi: item.id_realisasi })
-                  }
-                />
-              </td>
               <td className='text-center'>
                 <div className='inline-flex gap-1'>
                   <AksiButton
+                    Icon={MdInput}
+                    className='hover:text-gray-800 bg-green-100! hover:bg-green-200!'
+                    tooltip='Input Realisasi'
+                    onClick={() => {
+                      if (item.id_realisasi) {
+                        setSelectedRealisasi(item.id_realisasi);
+                        setSelectedRealisasiPaket(item.nama_paket ?? '');
+                        setSelectedRealisasiInput({
+                          id_realisasi: item.id_realisasi,
+                          fisik:
+                            item.realisasi?.fisik?.capaian?.toString() ?? '',
+                          anggaran: item.realisasi?.keuangan?.capaian ?? '',
+                          kesesuaian_juknis:
+                            Boolean(item.kesesuaian_juknis) ?? false,
+                          sasaran_lokasi: Boolean(item.sasaran_lokasi) ?? false,
+                          catatan: item.catatan ?? '',
+                        });
+                        setModalState('Realisasi');
+                        setOpenModal(true);
+                      }
+                    }}
+                  />
+                  <AksiButton
                     Icon={MdFindReplace}
-                    className='hover:bg-red-700!'
+                    className='hover:text-gray-800 bg-green-100! hover:bg-green-200!'
                     tooltip='Identifikasi Masalah'
                     onClick={() => {
                       if (item.id_realisasi) {
-                        setOpenModal(true);
                         setSelectedRealisasi(item.id_realisasi);
+                        setSelectedRealisasiPaket(item.nama_paket ?? '');
+                        setModalState('Masalah');
+                        setOpenModal(true);
                       }
                     }}
                   />
                 </div>
+              </td>
+              <td className='whitespace-nowrap'>
+                {Number(item.realisasi?.fisik?.capaian || 0)
+                  .toFixed(2)
+                  .replace(/\.00$/, '')
+                  .replace('.', ',')}{' '}
+                %
+              </td>
+              <td className='whitespace-nowrap'>
+                {Number(item.realisasi?.fisik?.totalSd || 0)
+                  .toFixed(2)
+                  .replace(/\.00$/, '')
+                  .replace('.', ',')}{' '}
+                %
+              </td>
+              <td>
+                <td>{formatUang(Number(item.realisasi?.keuangan?.capaian))}</td>
+              </td>
+              <td className='whitespace-nowrap'>
+                {Number(item.realisasi?.keuangan?.persen || 0)
+                  .toFixed(2)
+                  .replace(/\.00$/, '')
+                  .replace('.', ',')}{' '}
+                %
+              </td>
+              <td>{formatUang(Number(item.sisa_anggaran))}</td>
+              <td>{item.kesesuaian_juknis ? 'Ya' : 'Tidak'}</td>
+              <td>{item.sasaran_lokasi ? 'Ya' : 'Tidak'}</td>
+              <td>-</td>
+              <td>-</td>
+              <td>{item.catatan}</td>
+              <td>-</td>
+              <td>
+                <AksiButton
+                  Icon={!!item.kunci ? MdLock : MdLockOpen}
+                  className={`hover:text-gray-800 bg-green-100! hover:bg-green-200! ${!!item.kunci ? 'bg-red-500! text-gray-100 hover:bg-red-600! hover:text-gray-100!' : ''}`}
+                  // className={`hover:text-gray-800 bg-green-100! hover:bg-green-200! ${!!item.kunci ? 'text-red-500 hover:text-red-500' : ''}`}
+                  tooltip={!!item.kunci ? 'Terkunci' : 'Terbuka'}
+                  onClick={() =>
+                    kunciMutation.mutate({ id_realisasi: item.id_realisasi })
+                  }
+                />
               </td>
             </tr>
           );
@@ -637,21 +452,21 @@ const IdentifikasiDakTable = () => {
   //#endregion
 
   const queryClient = useQueryClient();
-  const realisasiMutation = useMutation({
-    mutationFn: async (payload: RealisasiMonitoringDAKForm) => {
-      return realisasiMonitoringDAK(payload);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['list_monitoring_dak'] });
-      setOpenModal(false);
-      toast.success('Data berhasil diperbarui');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
-      }
-    },
-  });
+  // const realisasiMutation = useMutation({
+  //   mutationFn: async (payload: RealisasiMonitoringDAKForm) => {
+  //     return realisasiMonitoringDAK(payload);
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['list_monitoring_dak'] });
+  //     setOpenModal(false);
+  //     toast.success('Data berhasil diperbarui');
+  //   },
+  //   onError: (error: AxiosError<ApiResponse<unknown>>) => {
+  //     if (error.status === 400) {
+  //       toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+  //     }
+  //   },
+  // });
   const kunciMutation = useMutation({
     mutationFn: async (payload: any) => {
       return kunciMonitoringDAK(payload);
@@ -813,24 +628,52 @@ const IdentifikasiDakTable = () => {
         renderHeader={tableHead}
         renderBody={(table) => tableBody(table)}
       />
-      <DialogModal
-        title='Identifikasi Masalah Data Monitoring DAK Kabupaten / Kota per Triwulan'
-        isOpen={openModal}
-        onClose={() => {
-          setOpenModal(false);
-          setSelectedRealisasi(0);
-        }}
-        widthLevel={7}
-      >
-        <F_MonitorMasalahDak
-          triwulan={dakData.triwulan ?? ''}
-          id_realisasi={selectedRealisasi}
-          onSuccess={() => {
+      {modalState === 'Realisasi' && (
+        <DialogModal
+          title='Input Realisasi'
+          isOpen={openModal}
+          onClose={() => {
             setOpenModal(false);
+            setModalState('');
             setSelectedRealisasi(0);
           }}
-        />
-      </DialogModal>
+          widthLevel={3}
+        >
+          <F_RealisasiDak
+            data={selectedRealisasiInput}
+            onSuccess={() => {
+              setOpenModal(false);
+              setModalState('');
+              setSelectedRealisasiInput(initDAKRekForm);
+            }}
+          />
+        </DialogModal>
+      )}
+      {modalState === 'Masalah' && (
+        <DialogModal
+          title='Identifikasi Masalah Data Monitoring DAK Kabupaten / Kota per Triwulan'
+          isOpen={openModal}
+          onClose={() => {
+            setOpenModal(false);
+            setModalState('');
+            setSelectedRealisasi(0);
+            setSelectedRealisasiPaket('');
+          }}
+          widthLevel={7}
+        >
+          <F_MonitorMasalahDak
+            triwulan={dakData.triwulan ?? ''}
+            id_realisasi={selectedRealisasi}
+            nama_paket={selectedRealisasiPaket}
+            onSuccess={() => {
+              setOpenModal(false);
+              setModalState('');
+              setSelectedRealisasi(0);
+              setSelectedRealisasiPaket('');
+            }}
+          />
+        </DialogModal>
+      )}
     </div>
   );
 };

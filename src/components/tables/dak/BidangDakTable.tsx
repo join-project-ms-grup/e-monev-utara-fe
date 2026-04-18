@@ -8,7 +8,7 @@ import DialogModal from '../../inputs/DialogModal';
 import InputButton from '../../inputs/InputButton';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
-import { getRoleId, isAdmin, isDev } from '../../../lib/usercookie';
+import { isAdmin, isDev } from '../../../lib/usercookie';
 import Tabel from '../Tabel';
 import {
   useBidangDakData,

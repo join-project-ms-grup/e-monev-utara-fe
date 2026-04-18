@@ -29,6 +29,10 @@ type FieldProps = {
   onClear?: () => void;
   type?: HTMLInputTypeAttribute;
   tooltip?: boolean;
+  Iconlabel?: string;
+  IconlabelPos?: 'left' | 'right';
+  withSearch?: boolean;
+  disableClear?: boolean;
 };
 
 const TextField = ({
@@ -39,6 +43,8 @@ const TextField = ({
   Rupiah = false,
   Nomor = false,
   type = 'text',
+  Iconlabel,
+  IconlabelPos,
   onClear,
 }: FieldProps) => {
   const field = useFieldContext<string>();
@@ -59,6 +65,8 @@ const TextField = ({
           ? { Iconlabel: 'Rp', isRibu: true, inputMode: 'numeric' }
           : {})}
         {...(Nomor ? { inputMode: 'numeric' } : {})}
+        Iconlabel={Iconlabel}
+        IconlabelPos={IconlabelPos}
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
@@ -113,6 +121,8 @@ const SelectField = ({
   placeholder,
   disabled = false,
   tooltip = false,
+  withSearch = true,
+  disableClear = false,
 }: FieldProps) => {
   const field = useFieldContext<string>();
 
@@ -131,15 +141,23 @@ const SelectField = ({
         options={options || []}
         className='h-9'
         btnclassName='bg-white'
-        onClear={() => {
-          field.handleChange('');
-          onClear?.();
-        }}
+        // onClear={() => {
+        //   field.handleChange('');
+        //   onClear?.();
+        // }}
+        {...(disableClear
+          ? {}
+          : {
+              onClear: () => {
+                field.handleChange('');
+                onClear?.();
+              },
+            })}
         invalid={!field.state.meta.isValid}
         placeholder={placeholder}
         disabled={disabled}
         tooltip={tooltip}
-        withSearch
+        withSearch={withSearch}
       />
       <FieldError field={field} />
     </div>

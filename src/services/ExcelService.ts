@@ -93,7 +93,7 @@ export const exportDaftarDak = async (data: any, tahun: string) => {
   );
 };
 
-export const exportRankingRKPD = async (data: any, tahun: string) => {
+export const exportRankingRKPD = async (_data: any, tahun: string) => {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('RKPD');
 

@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { waktuNowGabung } from '../../lib/helper';
-import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
+// import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
 import type { DashboardRankingResult } from '../DashRKPDService';
 
 export const exportRanking = async (
@@ -10,16 +10,16 @@ export const exportRanking = async (
     triwulan: string,
     opts?: { startRow?: number },
 ) => {
-    const mulaiPeriode = Number(getPeriodeMulaiFromCookie()!);
-    const akhirPeriode = Number(getPeriodeAkhirFromCookie()!);
+    // const mulaiPeriode = Number(getPeriodeMulaiFromCookie()!);
+    // const akhirPeriode = Number(getPeriodeAkhirFromCookie()!);
 
-    const periode = [
-        mulaiPeriode - 1,
-        ...Array.from(
-            { length: akhirPeriode - mulaiPeriode + 1 },
-            (_, i) => mulaiPeriode + i,
-        ),
-    ];
+    // const periode = [
+    //     mulaiPeriode - 1,
+    //     ...Array.from(
+    //         { length: akhirPeriode - mulaiPeriode + 1 },
+    //         (_, i) => mulaiPeriode + i,
+    //     ),
+    // ];
     const startRow = opts?.startRow ?? 9;
 
     const workbook = new ExcelJS.Workbook();

@@ -181,33 +181,33 @@ const RoleTable = () => {
       : []),
   ];
 
-  const TableTopbar = () => {
-    return (
-      <>
-        <div className='inline-flex flex-1 gap-2 justify-end'>
-          {getRoleId() === 1 && (
-            <button
-              className='table-button w-9 h-9'
-              onClick={() => {
-                setModalState('Add');
-                setOpenModal(true);
-              }}
-            >
-              <MdAdd />
-            </button>
-          )}
+  // const TableTopbar = () => {
+  //   return (
+  //     <>
+  //       <div className='inline-flex flex-1 gap-2 justify-end'>
+  //         {getRoleId() === 1 && (
+  //           <button
+  //             className='table-button w-9 h-9'
+  //             onClick={() => {
+  //               setModalState('Add');
+  //               setOpenModal(true);
+  //             }}
+  //           >
+  //             <MdAdd />
+  //           </button>
+  //         )}
 
-          <button
-            className='table-button w-9 h-9'
-            onClick={() => refetch()}
-            disabled={isFetching}
-          >
-            {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
-          </button>
-        </div>
-      </>
-    );
-  };
+  //         <button
+  //           className='table-button w-9 h-9'
+  //           onClick={() => refetch()}
+  //           disabled={isFetching}
+  //         >
+  //           {isFetching ? <Spinner color='var(--color-2)' /> : <MdRefresh />}
+  //         </button>
+  //       </div>
+  //     </>
+  //   );
+  // };
 
   return (
     <div className='space-y-2'>

@@ -131,7 +131,7 @@ const RENSTRA_RekeningTable = () => {
       if (levelIndex >= 0) {
         // Tambahkan header parent dari Urusan sampai parent level terpilih
         const parentCodes = item.kodeFull?.slice(0, levelIndex) || [];
-        parentCodes.forEach((code, i) => {
+        parentCodes.forEach((_code, i) => {
           const key = parentCodes.slice(0, i + 1).join('.');
           const nameItem = parentMap[key];
           if (nameItem) {

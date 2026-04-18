@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { SITE_NAME } from '../../../lib/config';
 import InputSearchBox from '../../../components/inputs/InputSearchBox';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import InputButton from '../../../components/inputs/InputButton';
 import { MdPreview } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
@@ -13,7 +13,6 @@ import {
 import {
   getMonitoringDAK,
   flatMonitoringDAK,
-  flatMonitoringDAKLaporan,
   getMasalahDAK,
 } from '../../../services/DAK/DAKMonitoringService';
 import { exportDAK } from '../../../services/Excel/ExcelDAK';
