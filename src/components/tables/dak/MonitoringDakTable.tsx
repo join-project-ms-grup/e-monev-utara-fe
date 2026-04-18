@@ -374,7 +374,9 @@ const IdentifikasiDakTable = () => {
                         setSelectedRealisasiInput({
                           id_realisasi: item.id_realisasi,
                           fisik:
-                            item.realisasi?.fisik?.capaian?.toString() ?? '',
+                            item.realisasi?.fisik?.capaian
+                              ?.toString()
+                              .replace('.', ',') ?? '',
                           anggaran: item.realisasi?.keuangan?.capaian ?? '',
                           kesesuaian_juknis:
                             Boolean(item.kesesuaian_juknis) ?? false,

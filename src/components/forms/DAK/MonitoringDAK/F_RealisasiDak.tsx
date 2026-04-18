@@ -23,7 +23,8 @@ const F_RealisasiDak = ({
       if (data.id_realisasi) {
         const payload = {
           id_realisasi: data.id_realisasi,
-          fisik: Number(value.fisik),
+          // fisik: Number(value.fisik),
+          fisik: Number(String(value.fisik).replace(',', '.')),
           anggaran: Number(value.anggaran),
           sasaran_lokasi:
             String(value.sasaran_lokasi) === 'true' ||
