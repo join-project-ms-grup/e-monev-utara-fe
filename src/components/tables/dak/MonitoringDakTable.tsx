@@ -418,7 +418,7 @@ const IdentifikasiDakTable = () => {
                 %
               </td>
               <td>
-                <td>{formatUang(Number(item.realisasi?.keuangan?.capaian))}</td>
+                {formatUang(Number(item.realisasi?.keuangan?.capaian))}
               </td>
               <td className='whitespace-nowrap'>
                 {Number(item.realisasi?.keuangan?.persen || 0)
