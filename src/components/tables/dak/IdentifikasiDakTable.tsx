@@ -294,6 +294,7 @@ const IdentifikasiDakTable = ({
                 changeDakData('opd', '');
               }}
               withSearch
+              tooltip
               disabled={!dakData.jenis}
             />
           </div>
