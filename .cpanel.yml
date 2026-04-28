@@ -2,6 +2,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/emahabbah/public_html/
+    - /bin/rm -rf $DEPLOYPATH/assets
     - /bin/cp -R  dist/assets  $DEPLOYPATH
     - /bin/cp -R  dist/auth  $DEPLOYPATH
     - /bin/cp -R  dist/avatar  $DEPLOYPATH
