@@ -223,6 +223,11 @@ export const setStatusIdentDak = async (payload: {id_ident: number, status: stri
   return response.data.data;
 };
 
+export const deleteIdent = async (id: number) => {
+    const response = await api.delete<ApiResponse<null>>(`/dak/fisik/delete-ident/${id}`);
+    return response.data;
+};
+
 export interface FileIdentifikasiDAK {
     id_dok?: number;
     file?: File | null;
