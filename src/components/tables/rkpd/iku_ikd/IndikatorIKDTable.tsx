@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react';
 import Tabel from '../../Tabel';
-import { MdPrint, MdRefresh } from 'react-icons/md';
+import { MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, {
   type OptionItem,
@@ -16,16 +16,12 @@ import {
   isDev,
 } from '../../../../lib/usercookie';
 import {
-  flatHasilIK,
   flatIK,
-  getHasilIK,
   getIKD,
   getIKSKPD,
   type FlatIK,
 } from '../../../../services/IKUIKDService';
 import Spinner from '../../../inputs/Spinner';
-import toast from 'react-hot-toast';
-import { exportIKU } from '../../../../services/Excel/ExcelIKU';
 
 const IndikatorIKDTable = () => {
   const idPeriode = Number(getPeriodeIDFromCookie());

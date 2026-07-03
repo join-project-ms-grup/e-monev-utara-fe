@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "built": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",

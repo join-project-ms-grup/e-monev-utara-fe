@@ -21,7 +21,6 @@ interface FormProps {
 // #endregion
 
 const FormRealisasi: React.FC<FormProps> = ({
-  children,
   onSubmit,
   defaultValues,
 }) => {

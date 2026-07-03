@@ -3,15 +3,17 @@ import type { ColumnDef, Table } from '@tanstack/react-table';
 import AksiButton from '../../inputs/AksiButton';
 import {
   MdAdd,
+  MdDelete,
   MdEdit,
   MdRefresh,
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
 import InputButton from '../../inputs/InputButton';
 import InputSearchBox from '../../inputs/InputSearchBox';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import {
+  deleteIdent,
   flatIdentifikasiDAK,
   getIdentifikasiDAK,
   type FlatIdentifikasiDAK,
@@ -27,6 +29,9 @@ import {
 } from '../../../hooks/DAK/ListDataDAK';
 import Spinner from '../../inputs/Spinner';
 import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
+import toast from 'react-hot-toast';
+import type { AxiosError } from 'axios';
+import type { ApiResponse } from '../../../lib/api';
 
 interface DakData {
   tahun: string;
@@ -122,6 +127,14 @@ const IdentifikasiDakTable = ({
     }
   }, [dakData.opd, dakData.tahun]);
 
+  const [idIdent, setIdIdent] = useState(0);
+  const [modal, setModal] = useState<'' | 'Detail' | 'Delete'>('');
+  const initSelectedIdent = {
+    id: 0,
+    name: '',
+  };
+  const [selectedIdent, setSelectedIdent] = useState(initSelectedIdent);
+
   const tableBody = (
     table: Table<FlatIdentifikasiDAK & { level?: string }>,
   ) => {
@@ -185,6 +198,18 @@ const IdentifikasiDakTable = ({
                       changeDakData('id_ident', item.id_ident as any);
                     }}
                   />
+                  <AksiButton
+                    Icon={MdDelete}
+                    className='hover:bg-red-500!'
+                    tooltip='Hapus data'
+                    onClick={() => {
+                      setSelectedIdent({
+                        id: item.id_ident ?? 0,
+                        name: item.paket_detail ?? '',
+                      });
+                      setModal('Delete');
+                    }}
+                  />
                 </div>
               </td>
             </tr>
@@ -194,8 +219,30 @@ const IdentifikasiDakTable = ({
     );
   };
 
-  const [idIdent, setIdIdent] = useState(0);
-  const [modal, setModal] = useState<'' | 'Detail'>('');
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return deleteIdent(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          'list_identifikasi_dak',
+          dakData.tahun,
+          dakData.opd,
+          dakData.subJenis,
+        ],
+      });
+      setModal('');
+      setSelectedIdent(initSelectedIdent);
+      toast.success('Data berhasil dihapus');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
+      }
+    },
+  });
 
   return (
     <div className='space-y-2'>
@@ -231,7 +278,7 @@ const IdentifikasiDakTable = ({
             <label htmlFor='subJenis'>Sub-Jenis DAK</label>
             <InputSearchBox
               id='subJenis'
-              className='w-56 h-9'
+              className='w-100 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
               options={listSubJenisDAK}
@@ -247,6 +294,7 @@ const IdentifikasiDakTable = ({
                 changeDakData('opd', '');
               }}
               withSearch
+              tooltip
               disabled={!dakData.jenis}
             />
           </div>
@@ -324,6 +372,39 @@ const IdentifikasiDakTable = ({
           }}
         >
           <DetailIdentifikasiDak id_ident={idIdent} />
+        </DialogModal>
+      )}
+      {modal === 'Delete' && (
+        <DialogModal
+          title={`Yakin hapus data ?`}
+          isOpen={modal === 'Delete'}
+          onClose={() => {
+            setModal('');
+            setSelectedIdent(initSelectedIdent);
+          }}
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (selectedIdent.id) {
+                deleteMutation.mutate(selectedIdent.id);
+              }
+            }}
+          >
+            <div>
+              <p>
+                Anda akan menghapus data{' '}
+                <b>
+                  <i>{selectedIdent.name}</i>
+                </b>
+              </p>
+              <div className='float-end'>
+                <InputButton className='px-2' type='submit'>
+                  Hapus
+                </InputButton>
+              </div>
+            </div>
+          </form>
         </DialogModal>
       )}
     </div>

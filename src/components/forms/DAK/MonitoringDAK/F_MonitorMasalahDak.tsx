@@ -14,10 +14,12 @@ import { useStore } from '@tanstack/react-form';
 
 const F_MonitorMasalahDak = ({
   id_realisasi,
+  nama_paket,
   triwulan,
   onSuccess,
 }: {
   id_realisasi: number;
+  nama_paket: string;
   triwulan: string;
   onSuccess?: () => void;
 }) => {
@@ -91,6 +93,10 @@ const F_MonitorMasalahDak = ({
       >
         <table className='table-spacing'>
           <tbody>
+            <tr>
+              <td>Nama Paket</td>
+              <td>{nama_paket}</td>
+            </tr>
             <tr>
               <td>Triwulan</td>
               <td>{getTriwulan(Number(triwulan))}</td>

@@ -8,7 +8,7 @@ import DialogModal from '../../inputs/DialogModal';
 import InputButton from '../../inputs/InputButton';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
-import { getRoleId } from '../../../lib/usercookie';
+import { isAdmin, isDev } from '../../../lib/usercookie';
 import Tabel from '../Tabel';
 import {
   useBidangDakData,
@@ -268,8 +268,8 @@ const BidangDakTable = () => {
             />
           </div>
         </div>
-        <div className='inline-flex flex-1 gap-2 justify-end'>
-          {getRoleId() === 1 && (
+        <div className='flex justify-end items-end gap-2'>
+          {(isDev() || isAdmin()) && (
             <InputButton
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'

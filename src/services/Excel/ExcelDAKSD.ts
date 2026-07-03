@@ -13,7 +13,7 @@ import { waktuNowGabung } from '../../lib/helper';
  * @param opts.startRow (optional) baris mulai data (default 16)
  */
 export const exportDAKSD = async (
-    data: any[],
+    _data: any[],
     tahun: string,
     periodeLaporan: string,
     periodeWaktuLaporan: string,

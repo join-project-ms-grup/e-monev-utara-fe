@@ -78,7 +78,6 @@ const RKPD_PerencanaanTable = () => {
       value: item.id?.toString(),
     })) || [];
   //#endregion
-  const [selectedBidang, setSelectedBidang] = useState('');
 
   const { data, isFetching, refetch } = useQuery({
     queryKey: ['list_renja', tahunKe, selectedSKPD],
@@ -166,7 +165,7 @@ const RKPD_PerencanaanTable = () => {
 
           const headerRows: JSX.Element[] = [];
 
-          codes.forEach((code, i) => {
+          codes.forEach((_code, i) => {
             if (i === codes.length - 1) return;
             const key = codes.slice(0, i + 1).join('.');
             if (!renderedHeaderKeys.has(key)) {

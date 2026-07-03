@@ -8,7 +8,6 @@ import toast from 'react-hot-toast';
 import { useListSKPD } from '../../../../hooks/RKPD/List';
 import { useListOPDDAK } from '../../../../hooks/DAK/ListDataDAK';
 import { useStore } from '@tanstack/react-form';
-import { useEffect } from 'react';
 
 interface F_UserProps {
   data: UserSF;

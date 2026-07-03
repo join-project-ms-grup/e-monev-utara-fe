@@ -129,7 +129,7 @@ const RKPD_RekeningTable = () => {
       if (levelIndex >= 0) {
         // Tambahkan header parent dari Urusan sampai parent level terpilih
         const parentCodes = item.kodeFull?.slice(0, levelIndex) || [];
-        parentCodes.forEach((code, i) => {
+        parentCodes.forEach((_code, i) => {
           const key = parentCodes.slice(0, i + 1).join('.');
           const nameItem = parentMap[key];
           if (nameItem) {
@@ -174,26 +174,26 @@ const RKPD_RekeningTable = () => {
   };
 
   // Add
-  const addMutation = useMutation({
-    mutationFn: async (payload: Master) => {
-      setLoadingMutation(true);
-      // return addMaster(payload);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['renja_rkpd_rekening'] });
-      setFormData(initialFormData);
-      setOpenModal(false);
-      toast.success('Data berhasil ditambahkan');
-    },
-    onError: (error: AxiosError<ApiResponse<unknown>>) => {
-      if (error.status === 400) {
-        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
-      }
-    },
-    onSettled: () => {
-      setLoadingMutation(false);
-    },
-  });
+  // const addMutation = useMutation({
+  //   mutationFn: async (payload: Master) => {
+  //     setLoadingMutation(true);
+  //     // return addMaster(payload);
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['renja_rkpd_rekening'] });
+  //     setFormData(initialFormData);
+  //     setOpenModal(false);
+  //     toast.success('Data berhasil ditambahkan');
+  //   },
+  //   onError: (error: AxiosError<ApiResponse<unknown>>) => {
+  //     if (error.status === 400) {
+  //       toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+  //     }
+  //   },
+  //   onSettled: () => {
+  //     setLoadingMutation(false);
+  //   },
+  // });
   // Update
   const updateMutation = useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: Master }) => {
@@ -265,7 +265,7 @@ const RKPD_RekeningTable = () => {
           },
         }),
       ),
-      filterFn: (row, columnId, filterValue) => {
+      filterFn: (row, _columnId, filterValue) => {
         const kodeArray = row.original.kodeFull || [];
         const joined = kodeArray.join('.');
         const search = String(filterValue).trim();
@@ -396,7 +396,7 @@ const RKPD_RekeningTable = () => {
           <FormRekening
             type='Add'
             defaultValues={formData}
-            onSubmit={(data) => {
+            onSubmit={(_data) => {
               // addMutation.mutate({
               //   kode: data.kode,
               //   name: data.name,

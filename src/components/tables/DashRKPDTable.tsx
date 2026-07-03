@@ -288,7 +288,7 @@ const DashRKPDTable = () => {
                   {
                     loading: 'Sedang mengunduh, harap tunggu...',
                     success: <b>Berhasil mengunduh.</b>,
-                    error: (err) => {
+                    error: () => {
                       return <b>Gagal mengunduh.</b>;
                     },
                   },

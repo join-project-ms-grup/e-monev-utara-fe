@@ -1,0 +1,15 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/emahabbah/public_html/
+    - /bin/rm -rf $DEPLOYPATH/assets
+    - /bin/cp -R  dist/assets  $DEPLOYPATH
+    - /bin/cp -R  dist/auth  $DEPLOYPATH
+    - /bin/cp -R  dist/avatar  $DEPLOYPATH
+    - /bin/cp -R  dist/periode  $DEPLOYPATH
+    - /bin/cp  dist/bengkulu-utara-logo.webp  $DEPLOYPATH
+    - /bin/cp  dist/bupatiwabu.png  $DEPLOYPATH
+    - /bin/cp  dist/favicon.ico  $DEPLOYPATH
+    - /bin/cp  dist/index.html  $DEPLOYPATH
+    - /bin/cp  dist/mahabbah-small.png  $DEPLOYPATH
+    - /bin/cp  dist/mahabbah.png  $DEPLOYPATH

@@ -3,7 +3,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 import Spinner from '../../inputs/Spinner';
 import { MdAdd, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import DialogModal from '../../inputs/DialogModal';
 import InputButton from '../../inputs/InputButton';
 import type { AxiosError } from 'axios';
@@ -114,79 +114,78 @@ const TahunDakTable = () => {
   });
 
   // Kolom
-  const columns: ColumnDef<TahunDAKForm>[] = [
-    {
-      header: 'No',
-      enableSorting: true,
-      cell: ({ row }) => `${row.index + 1}`,
-      meta: {
-        thClassNames: 'w-[5%]',
-        tdClassNames: 'text-center',
+  // const columns: ColumnDef<TahunDAKForm>[] = [
+  const columns = useMemo<ColumnDef<TahunDAKForm>[]>(
+    () => [
+      {
+        header: 'No',
+        enableSorting: true,
+        cell: ({ row }) => `${row.index + 1}`,
+        meta: {
+          thClassNames: 'w-[5%]',
+          tdClassNames: 'text-center',
+        },
       },
-    },
-    {
-      accessorKey: 'tahun',
-      header: 'Tahun',
-      meta: {
-        tdClassNames: 'text-center',
+      {
+        accessorKey: 'tahun',
+        header: 'Tahun',
+        meta: {
+          tdClassNames: 'text-center',
+        },
       },
-    },
-    {
-      accessorKey: 'keterangan',
-      header: 'Keterangan',
-      meta: {
-        tdClassNames: 'text-center',
+      {
+        accessorKey: 'keterangan',
+        header: 'Keterangan',
+        meta: {
+          tdClassNames: 'text-center',
+        },
+        cell: ({ getValue }) => getValue() ?? '-',
       },
-      cell: ({ getValue }) => getValue() ?? '-',
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      meta: {
-        tdClassNames: 'text-center w-[50px]',
-      },
-      cell: ({ cell, row }) => (
-        <div className='w-30'>
-          <InputToggle
-            onLabel='Aktif'
-            offLabel='Nonaktif'
-            checked={!!cell.getValue()}
-            onToggle={() => setStatusMutation.mutate(row.original.id!)}
-          />
-        </div>
-      ),
-      //   cell: (info) => (
-      //     <span
-      //       className={`${info.getValue() ? ' text-green-700' : 'text-red-700'}`}
-      //     >
-      //       {info.getValue() ? 'Aktif' : 'Nonaktif'}
-      //     </span>
-      //   ),
-    },
-    {
-      header: 'Aksi',
-      enableSorting: false,
-      cell: ({ row }) => (
-        <>
-          <div className='inline-flex gap-1'>
-            <AksiButton
-              Icon={MdEdit}
-              tooltip='Ubah data'
-              onClick={() => {
-                setModalState('Edit');
-                setFormData(row.original);
-                setOpenModal(true);
-              }}
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        meta: {
+          tdClassNames: 'text-center w-[50px]',
+        },
+        cell: ({ cell, row }) => (
+          <div className='w-30'>
+            <InputToggle
+              id={row.id}
+              onLabel='Aktif'
+              offLabel='Nonaktif'
+              checked={!!cell.getValue()}
+              onToggle={() => setStatusMutation.mutate(row.original.id!)}
             />
           </div>
-        </>
-      ),
-      meta: {
-        thClassNames: 'w-[10%]',
-        tdClassNames: 'text-center',
+        ),
       },
-    },
-  ];
+      {
+        header: 'Aksi',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <>
+            <div className='inline-flex gap-1'>
+              <AksiButton
+                Icon={MdEdit}
+                tooltip='Ubah data'
+                onClick={() => {
+                  setModalState('Edit');
+                  setFormData(row.original);
+                  setOpenModal(true);
+                }}
+              />
+            </div>
+          </>
+        ),
+        meta: {
+          thClassNames: 'w-[10%]',
+          tdClassNames: 'text-center',
+        },
+      },
+      // ];
+    ],
+    [],
+  );
 
   return (
     <div className='space-y-2'>

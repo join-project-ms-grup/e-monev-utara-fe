@@ -193,7 +193,7 @@ const JenisDakTable = () => {
             />
           </div>
         </div>
-        <div className='inline-flex flex-1 gap-2 justify-end'>
+        <div className='flex justify-end items-end gap-2'>
           {getRoleId() === 1 && (
             <InputButton
               tooltip='Tambah data'

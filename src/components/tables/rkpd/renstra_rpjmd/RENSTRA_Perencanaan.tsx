@@ -169,7 +169,7 @@ const RENSTRA_Perencanaan = () => {
 
           const headerRows: JSX.Element[] = [];
 
-          codes.forEach((code, i) => {
+          codes.forEach((_code, i) => {
             if (i === codes.length - 1) return;
             const key = codes.slice(0, i + 1).join('.');
             if (!renderedHeaderKeys.has(key)) {

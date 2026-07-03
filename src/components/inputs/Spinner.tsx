@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface SpinnerType {
   size?: number | string;
   color?: string;

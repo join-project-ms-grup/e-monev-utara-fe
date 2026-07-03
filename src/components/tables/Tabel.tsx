@@ -17,7 +17,7 @@ import {
   MdArrowDropDown,
   MdSubdirectoryArrowRight,
 } from 'react-icons/md';
-import { Fragment, useCallback, useEffect, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import Pagination from './Pagination';
 import clsx from 'clsx';
 import Spinner from '../inputs/Spinner';
@@ -145,35 +145,35 @@ const Tabel = <TData,>({
 
   const baseTableClass = 'table-responsive';
 
-  const defaultRenderBody = useCallback(
-    (table: ReturnType<typeof useReactTable<TData>>) => {
-      const rows = rowModel.rows;
+  // const defaultRenderBody = useCallback(
+  //   (table: ReturnType<typeof useReactTable<TData>>) => {
+  //     const rows = rowModel.rows;
 
-      return (
-        <>
-          {rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => {
-                const meta = cell.column.columnDef.meta || {};
+  //     return (
+  //       <>
+  //         {rows.map((row) => (
+  //           <tr key={row.id}>
+  //             {row.getVisibleCells().map((cell) => {
+  //               const meta = cell.column.columnDef.meta || {};
 
-                return (
-                  <td
-                    key={cell.id}
-                    colSpan={meta.tdColSpan}
-                    className={meta.tdClassNames}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-          {customRowAkhir && customRowAkhir}
-        </>
-      );
-    },
-    [rowModel.rows, customRowAkhir],
-  );
+  //               return (
+  //                 <td
+  //                   key={cell.id}
+  //                   colSpan={meta.tdColSpan}
+  //                   className={meta.tdClassNames}
+  //                 >
+  //                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
+  //                 </td>
+  //               );
+  //             })}
+  //           </tr>
+  //         ))}
+  //         {customRowAkhir && customRowAkhir}
+  //       </>
+  //     );
+  //   },
+  //   [rowModel.rows, customRowAkhir],
+  // );
 
   return (
     <div>

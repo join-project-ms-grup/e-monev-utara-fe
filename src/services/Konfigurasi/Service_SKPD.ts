@@ -2,7 +2,7 @@ import api, { type ApiResponse } from "../../lib/api";
 
 export interface SKPDType {
   id?: number;
-  kode?: string | number;
+  kode?: string;
   name?: string;
   shortname?: string;
   status?: boolean;

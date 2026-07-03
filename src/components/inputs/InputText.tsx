@@ -53,7 +53,7 @@ const InputText = ({
     if (inputMode === 'numeric') {
       const inputEvent = e as unknown as InputEvent;
       const nextValue = inputEvent.data;
-      if (nextValue && !/[\d.]/.test(nextValue)) {
+      if (nextValue && !/[\d.,]/.test(nextValue)) {
         e.preventDefault();
       }
     }
@@ -65,22 +65,25 @@ const InputText = ({
       onChange?.(e);
       return;
     }
-    let rawValue = e.target.value.replace(/[^\d.]/g, '');
-    let cleanValue = rawValue;
-    if (isRibu) {
-      cleanValue = rawValue.replace(/\./g, '');
-      const formatted = cleanValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-      e.target.value = formatted;
-    } else {
-      e.target.value = cleanValue;
-    }
 
-    if (onChange) {
+    let rawValue = e.target.value.replace(/[^\d.,]/g, '');
+
+    if (isRibu) {
+      const numeric = rawValue.replace(/[.,]/g, '');
+
+      const formatted = numeric.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+      e.target.value = formatted;
+
       const syntheticEvent = {
         ...e,
-        target: { ...e.target, value: cleanValue },
+        target: { ...e.target, value: numeric },
       };
-      onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
+
+      onChange?.(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
+    } else {
+      e.target.value = rawValue;
+      onChange?.(e);
     }
   };
 
@@ -90,6 +93,46 @@ const InputText = ({
         ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
         : value.toString()
       : '';
+
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (inputMode !== 'numeric') {
+  //     onChange?.(e);
+  //     return;
+  //   }
+
+  //   onChange?.(e);
+  // };
+
+  // const formatNumeric = (val: string) => {
+  //   if (!val) return '';
+
+  //   // hanya bersihkan karakter selain angka, koma, titik
+  //   return val.replace(/[^\d.,]/g, '');
+  // };
+
+  // const formatRibu = (val: string) => {
+  //   if (!val) return '';
+
+  //   // pisahkan desimal (koma dianggap desimal)
+  //   const normalized = val.replace(/\./g, '');
+  //   const parts = normalized.split(',');
+
+  //   const intPart = parts[0] || '';
+  //   const decPart = parts[1];
+
+  //   const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  //   return decPart !== undefined ? `${formattedInt},${decPart}` : formattedInt;
+  // };
+
+  // const formattedValue =
+  //   typeof value === 'string' || typeof value === 'number'
+  //     ? inputMode === 'numeric'
+  //       ? isRibu
+  //         ? formatRibu(value.toString())
+  //         : formatNumeric(value.toString())
+  //       : value.toString()
+  //     : '';
 
   return (
     <div
