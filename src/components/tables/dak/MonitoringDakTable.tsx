@@ -522,7 +522,7 @@ const IdentifikasiDakTable = () => {
             <label htmlFor='subJenis'>Sub-Jenis DAK</label>
             <InputSearchBox
               id='subJenis'
-              className='w-56 h-9'
+              className='w-100 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
               options={listSubJenisDAK}

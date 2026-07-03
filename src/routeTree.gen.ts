@@ -348,13 +348,13 @@ const DashboardDakMasterBidangRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof DashboardIndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/dak': typeof DashboardDakRouteRouteWithChildren
   '/konfigurasi': typeof DashboardKonfigurasiRouteRouteWithChildren
   '/rkpd': typeof DashboardRkpdRouteRouteWithChildren
   '/profil': typeof DashboardProfilRoute
   '/auth/logout': typeof AuthLogoutRoute
-  '/': typeof DashboardIndexRoute
   '/auth/': typeof AuthIndexRoute
   '/dak/master': typeof DashboardDakMasterRouteRouteWithChildren
   '/rkpd/hasil_evaluasi': typeof DashboardRkpdHasil_evaluasiRouteRouteWithChildren
@@ -499,13 +499,13 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/auth'
     | '/dak'
     | '/konfigurasi'
     | '/rkpd'
     | '/profil'
     | '/auth/logout'
-    | '/'
     | '/auth/'
     | '/dak/master'
     | '/rkpd/hasil_evaluasi'
@@ -664,7 +664,7 @@ declare module '@tanstack/react-router' {
     '/_dashboard': {
       id: '/_dashboard'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }

@@ -89,8 +89,8 @@ export default function InputSearchBox({
     query === ''
       ? allOptions
       : allOptions.filter((o) =>
-          o.label.toLowerCase().includes(query.toLowerCase()),
-        );
+        o.label.toLowerCase().includes(query.toLowerCase()),
+      );
 
   const wrapperClass = clsx('relative flex', className);
   const btnClass = clsx(
@@ -115,9 +115,9 @@ export default function InputSearchBox({
           onBlur={onBlur}
           {...(tooltip &&
             currentValue && {
-              'data-tooltip-id': 'tooltip',
-              'data-tooltip-content': currentLabel,
-            })}
+            'data-tooltip-id': 'tooltip',
+            'data-tooltip-content': currentLabel,
+          })}
         >
           <span
             className={`truncate flex-1 text-left ${(!currentValue || currentValue === '0') && 'text-gray-400'} ${disabled && 'cursor-default'}`}
@@ -154,16 +154,20 @@ export default function InputSearchBox({
               <ListboxOption
                 {...(tooltip &&
                   option.value && {
-                    'data-tooltip-id': 'tooltip',
-                    'data-tooltip-content': option.label,
-                  })}
+                  'data-tooltip-id': 'tooltip',
+                  'data-tooltip-content': option.label,
+                })}
                 // disabled={option.value === ''}
                 key={index}
                 value={option.value}
                 disabled={option.disabled || option.value === ''}
-                className={`truncate data-focus:bg-[var(--color-2)] data-focus:text-[var(--text-3)] cursor-pointer py-1 px-2 rounded ${
-                  option.value === '' ? 'text-gray-400' : ''
-                } ${option.disabled ? 'text-gray-400' : ''}`}
+                className={clsx(
+                  'whitespace-normal break-words py-1 px-2 rounded',
+                  'border-b border-gray-200 last:border-b-0',
+                  'data-focus:bg-[var(--color-2)] data-focus:text-[var(--text-3)]',
+                  option.value === '' && 'text-gray-400',
+                  option.disabled && 'text-gray-400',
+                )}
               >
                 {option.label}
               </ListboxOption>
@@ -182,7 +186,7 @@ export default function InputSearchBox({
           disabled={disabled}
           tabIndex={-1}
           value={currentValue}
-          onChange={() => {}}
+          onChange={() => { }}
           className='absolute left-0 bottom-0 w-full h-px opacity-0 pointer-events-none'
         >
           {allOptions.map((option) => (
