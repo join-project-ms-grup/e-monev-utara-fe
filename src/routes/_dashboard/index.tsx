@@ -156,7 +156,7 @@ const DashDAK = () => {
     <div className='space-y-2'>
       <br />
       <br />
-      <DashDAKChart />
+      {/* <DashDAKChart /> */}
       <br />
       <DashDAKTable />
     </div>

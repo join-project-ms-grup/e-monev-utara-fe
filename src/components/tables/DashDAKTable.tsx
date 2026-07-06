@@ -2,6 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { getOPDDAK } from '../../services/DAK/DAKOPDService';
 import Tabel from './Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
+import InputSearchBox from '../inputs/InputSearchBox';
+import { useEffect, useState } from 'react';
+import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
 
 const tableHead = () => {
   return (
@@ -67,10 +70,29 @@ const tableHead = () => {
 };
 
 const DashDAKTable = () => {
+
+  const [triwulan, setTriwulan] = useState('1');
+  const [tahunKe, setTahunKe] = useState('1');
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
   const { data } = useQuery({
     queryKey: ['list_opd_dak'],
     queryFn: getOPDDAK,
   });
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${i + 1}`,
+    }),
+  );
+
+  const listTriwulan = [
+    { label: 'I', value: '1' },
+    { label: 'II', value: '2' },
+    { label: 'III', value: '3' },
+    { label: 'IV', value: '4' },
+  ];
 
   const columns: ColumnDef<any>[] = [
     {
@@ -134,16 +156,60 @@ const DashDAKTable = () => {
     },
   ];
 
+  const now = new Date();
+
+  const defaultValue = {
+    tahun: now.getFullYear().toString(),
+    triwulan: Math.ceil((now.getMonth() + 1) / 3),
+  };
+
+
+  useEffect(() => {
+    const tahunNow = listTahunKe.find((e) => e.label = defaultValue.tahun)?.value.toString() ?? "1"
+    setTahunKe(tahunNow);
+
+    const twEval = defaultValue.triwulan - 1;
+    setTriwulan(twEval.toString());
+  }, []);
+
   return (
     <div className='space-y-2'>
+
       <h4 className='text-center'>
         Tabel Ranking Kinerja Kegiatan DAK per SKPD Kabupaten Bengkulu Utara
-        dari
+        {/* dari
         <br />
         Tertinggi ke sampai dengan Bulan November
         <br />
-        Tahun Anggaran 2025
+        Tahun Anggaran 2025 */}
       </h4>
+      <div className='inline-flex gap-2'>
+        <div>
+          <label htmlFor='tahun_ke'>Tahun</label>
+          <InputSearchBox
+            id='tahun_ke'
+            className='w-42 h-9'
+            btnclassName='bg-white'
+            placeholder='Pilih Tahun...'
+            value={tahunKe}
+            options={listTahunKe}
+            onChange={(val) => setTahunKe(val)}
+          />
+        </div>
+        <div>
+          <label htmlFor='triwulan'>s.d Triwulan</label>
+          <InputSearchBox
+            id='triwulan'
+            className='w-42 h-9'
+            btnclassName='bg-white'
+            placeholder='Pilih Triwulan...'
+            value={triwulan}
+            onChange={(e) => setTriwulan(e)}
+            options={listTriwulan}
+            disabled={!tahunKe}
+          />
+        </div>
+      </div>
       <div className='flex items-end justify-between'>
         {/* <div className='inline-flex gap-2'>
           <div>
