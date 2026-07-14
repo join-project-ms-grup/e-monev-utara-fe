@@ -5,7 +5,7 @@ import { getPeriodeMulaiFromCookie, getRoleId } from '../../lib/usercookie';
 import { useQuery } from '@tanstack/react-query';
 import { getDashInfo } from '../../services/DashRKPDService';
 import DashDAKTable from '../../components/tables/DashDAKTable';
-import DashDAKChart from '../../components/charts/DashDAKChart';
+// import DashDAKChart from '../../components/charts/DashDAKChart';
 import type { CSSProperties } from 'react';
 
 export const Route = createFileRoute('/_dashboard/')({

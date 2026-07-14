@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
-import { getOPDDAK } from '../../services/DAK/DAKOPDService';
 import Tabel from './Tabel';
 import type { ColumnDef } from '@tanstack/react-table';
 import InputSearchBox from '../inputs/InputSearchBox';
 import { useEffect, useState } from 'react';
 import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
+import { useGetRekapDAK } from '../../hooks/RKPD/TabelDataRkpd';
+import type { RekapDak } from '../../services/DAK/DAKMonitoringService';
 
 const tableHead = () => {
   return (
@@ -32,16 +32,13 @@ const tableHead = () => {
             (Rp.)
           </big>
         </th>
-        <th colSpan={5}>
+        <th colSpan={3}>
           <big>Realisasi (%)</big>
         </th>
       </tr>
       <tr>
         <th colSpan={2}>
           <big>DAK Fisik</big>
-        </th>
-        <th colSpan={2}>
-          <big>DAK Non-Fisik</big>
         </th>
         <th rowSpan={2}>
           <big>
@@ -58,12 +55,6 @@ const tableHead = () => {
         <th>
           <big>Keuangan</big>
         </th>
-        <th>
-          <big>Fisik</big>
-        </th>
-        <th>
-          <big>Keuangan</big>
-        </th>
       </tr>
     </>
   );
@@ -72,20 +63,28 @@ const tableHead = () => {
 const DashDAKTable = () => {
 
   const [triwulan, setTriwulan] = useState('1');
-  const [tahunKe, setTahunKe] = useState('1');
+  const [tahunKe, setTahunKe] = useState('2026');
+  const [jenis, setJenis] = useState('1')
   const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
   const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
-  const { data } = useQuery({
-    queryKey: ['list_opd_dak'],
-    queryFn: getOPDDAK,
-  });
+  const { data } = useGetRekapDAK({
+    triwulan: Number(triwulan),
+    tahun: Number(tahunKe),
+    jenis: Number(jenis),
+  })
+
   const listTahunKe = Array.from(
     { length: tahunAkhir - tahunMulai + 1 },
     (_, i) => ({
       label: `${tahunMulai + i}`,
-      value: `${i + 1}`,
+      value: `${tahunMulai + i}`,
     }),
   );
+
+  const jenisOpt = [
+    { label: "DAK Fisik", value: "1" },
+    { label: "DAK Non-Fisik", value: "2" }
+  ]
 
   const listTriwulan = [
     { label: 'I', value: '1' },
@@ -94,65 +93,57 @@ const DashDAKTable = () => {
     { label: 'IV', value: '4' },
   ];
 
-  const columns: ColumnDef<any>[] = [
+  const columns: ColumnDef<RekapDak>[] = [
     {
       header: 'Ranking',
+      accessorKey: 'rangking',
       meta: {
         tdClassNames: 'text-center',
       },
-      cell: () => `-`,
+      // cell: () => `-`,
     },
     {
-      accessorKey: 'fullname',
+      accessorKey: 'nama_opd',
     },
     {
       header: 'Paket',
+      accessorKey: 'jumlah_paket',
       meta: {
         tdClassNames: 'text-center',
       },
-      cell: () => `-`,
+      // cell: () => `-`,
     },
     {
       header: 'Jumlah Anggaran',
+      accessorKey: 'jumlah_anggaran',
       meta: {
         tdClassNames: 'text-center',
       },
-      cell: () => `-`,
+      // cell: () => `-`,
     },
     {
       header: 'DAK Fisik Fisik',
+      accessorKey: 'realisasi_volume',
       meta: {
         tdClassNames: 'text-center',
       },
-      cell: () => `-`,
+      // cell: () => `-`,
     },
     {
       header: 'Dak Fisik Keuangan',
+      accessorKey: 'realisasi_keuangan',
       meta: {
         tdClassNames: 'text-center',
       },
-      cell: () => `-`,
-    },
-    {
-      header: 'DAK Non Fisik Fisik',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: () => `-`,
-    },
-    {
-      header: 'Dak Non Fisik Keuangan',
-      meta: {
-        tdClassNames: 'text-center',
-      },
-      cell: () => `-`,
+      // cell: () => `-`,
     },
     {
       header: 'Persentase',
+      accessorKey: 'persentase',
       meta: {
         tdClassNames: 'text-center',
       },
-      cell: () => `-`,
+      // cell: () => `-`,
     },
   ];
 
@@ -165,7 +156,7 @@ const DashDAKTable = () => {
 
 
   useEffect(() => {
-    const tahunNow = listTahunKe.find((e) => e.label = defaultValue.tahun)?.value.toString() ?? "1"
+    const tahunNow = defaultValue.tahun.toString();
     setTahunKe(tahunNow);
 
     const twEval = defaultValue.triwulan - 1;
@@ -174,8 +165,7 @@ const DashDAKTable = () => {
 
   return (
     <div className='space-y-2'>
-
-      <h4 className='text-center'>
+      <h4 className='text-center mb-20'>
         Tabel Ranking Kinerja Kegiatan DAK per SKPD Kabupaten Bengkulu Utara
         {/* dari
         <br />
@@ -183,7 +173,19 @@ const DashDAKTable = () => {
         <br />
         Tahun Anggaran 2025 */}
       </h4>
-      <div className='inline-flex gap-2'>
+      <div className='inline-flex gap-5'>
+        <div>
+          <label htmlFor='tahun_ke'>Jenis</label>
+          <InputSearchBox
+            id='tahun_ke'
+            className='w-42 h-9'
+            btnclassName='bg-white'
+            placeholder='Pilih Tahun...'
+            value={jenis}
+            options={jenisOpt}
+            onChange={(val) => setJenis(val)}
+          />
+        </div>
         <div>
           <label htmlFor='tahun_ke'>Tahun</label>
           <InputSearchBox

@@ -138,9 +138,9 @@ export interface FlatMonitoringDAKLaporan {
     level?: string;
     nama?: string;
 
-    nama_sub_jenis?:string;
-    nama_bidang?:string;
-    nama_sub_bidang?:string;
+    nama_sub_jenis?: string;
+    nama_bidang?: string;
+    nama_sub_bidang?: string;
 
     id_realisasi?: number;
     nama_paket?: string;
@@ -239,6 +239,22 @@ export interface MasalahDAK {
     status?: boolean | null;
 }
 
+export interface RekapDak {
+    rangking: number;
+    nama_opd: string;
+    jumlah_paket: string;
+    jumlah_anggaran: string;
+    realisasi_volume: string;
+    realisasi_keuangan: string;
+    persentase: number
+}
+
+export interface RekapDAKPayload {
+    triwulan: number;
+    tahun: number;
+    jenis: number
+}
+
 export const getMasalahDAK = async (kode_jenis: number): Promise<MasalahDAK[]> => {
     const response = await api.post<ApiResponse<MasalahDAK[]>>("/dak/masalah/list", { kode_jenis });
     return response.data.data;
@@ -273,7 +289,7 @@ export const kunciMonitoringDAK = async ({ id_realisasi }: { id_realisasi: numbe
     return response.data.data;
 };
 
-export interface MonitorMasalahDak{
+export interface MonitorMasalahDak {
     id_realisasi?: number;
     masalah?: string;
     masalah_lain?: string;
@@ -289,3 +305,8 @@ export const updateMonitorMasalahDAK = async (payload: MonitorMasalahDak): Promi
     const response = await api.put<ApiResponse<MonitorMasalahDak>>("/dak/fisik/update-masalah-realisasi", payload);
     return response.data.data;
 };
+
+export const GetRekapDAK = async (payload: RekapDAKPayload): Promise<RekapDak[]> => {
+    const response = await api.post<ApiResponse<RekapDak[]>>("/dak/fisik/rekap-realisasi", payload);
+    return response.data.data
+}
