@@ -30,8 +30,8 @@ import toast from 'react-hot-toast';
 import type { ApiResponse } from '../../../lib/api';
 import F_MonitorMasalahDak from '../../forms/DAK/MonitoringDAK/F_MonitorMasalahDak';
 import {
-  useListOPDDAK,
-  useListSubJenisDAK,
+  useListOPDDAKHaveIndent,
+  useListSubJenisDAKExistIdent,
   useListTahunDAK,
 } from '../../../hooks/DAK/ListDataDAK';
 import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
@@ -257,8 +257,8 @@ const IdentifikasiDakTable = () => {
   };
 
   const listTahunDAK = useListTahunDAK();
-  const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
-  const listOPDDAK = useListOPDDAK();
+  const listSubJenisDAK = useListSubJenisDAKExistIdent(Number(dakData.jenis));
+  const listOPDDAK = useListOPDDAKHaveIndent(Number(dakData.subJenis));
 
   useEffect(() => {
     if (!dakData.tahun) return;
