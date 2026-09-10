@@ -39,6 +39,6 @@ export const updateSKPD = async (id: number, payload: SKPDForm): Promise<SKPDFor
  * Hapus data SKPD
  */
 export const deleteSKPD = async (id: number) => {
-  const response = await api.delete<ApiResponse<null>>(`/skpd/delete/${id}`);
+  const response = await api.delete<ApiResponse<null>>(`/config/skpd/delete/${id}`);
   return response.data;
 };

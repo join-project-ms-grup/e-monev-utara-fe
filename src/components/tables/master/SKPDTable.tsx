@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import Spinner from '../../inputs/Spinner';
-import { MdEdit, MdRefresh } from 'react-icons/md';
+import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import toast from 'react-hot-toast';
 import {
   getSKPD,
   deleteSKPD,
   updateSKPD,
   type SKPDForm,
+  addSKPD,
 } from '../../../services/Konfigurasi/Service_SKPD';
 import { useEffect, useState } from 'react';
 import DialogModal from '../../inputs/DialogModal';
@@ -16,6 +17,7 @@ import FormSKPD from '../../forms/FormSKPD';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../lib/api';
 import Tabel from '../Tabel';
+import { isDev } from '../../../lib/usercookie';
 
 const SKPDTable = () => {
   const queryClient = useQueryClient();
@@ -54,26 +56,26 @@ const SKPDTable = () => {
   });
 
   // Add
-  // const addMutation = useMutation({
-  //   mutationFn: async (payload: SKPDForm) => {
-  //     setLoadingMutation(true);
-  //     return addSKPD(payload);
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
-  //     setFormData(initialFormData);
-  //     setOpenModal(false);
-  //     toast.success('Data berhasil ditambahkan');
-  //   },
-  //   onError: (error: AxiosError<ApiResponse<unknown>>) => {
-  //     if (error.status === 400) {
-  //       toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
-  //     }
-  //   },
-  //   onSettled: () => {
-  //     setLoadingMutation(false);
-  //   },
-  // });
+  const addMutation = useMutation({
+    mutationFn: async (payload: SKPDForm) => {
+      setLoadingMutation(true);
+      return addSKPD(payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_skpd'] });
+      setFormData(initialFormData);
+      setOpenModal(false);
+      toast.success('Data berhasil ditambahkan');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal menambahkan data\n${error.response?.data.message}`);
+      }
+    },
+    onSettled: () => {
+      setLoadingMutation(false);
+    },
+  });
   // Update
   const updateMutation = useMutation({
     mutationFn: async ({ id, payload }: { id: number; payload: SKPDForm }) => {
@@ -139,7 +141,7 @@ const SKPDTable = () => {
         tdClassNames: 'text-center'
       },
       cell: (info) => (
-         <span
+        <span
           className={`text-white px-2 py-1 rounded-full font-bold ${info.getValue() ? ' bg-green-700' : 'bg-red-700'}`}
         >
           {info.getValue() ? 'Aktif' : 'Nonaktif'}
@@ -153,7 +155,7 @@ const SKPDTable = () => {
         <>
           <div className='inline-flex gap-1'>
             <button
-              className='p-1 transition-all rounded-full hover:bg-blue-400 hover:text-[var(--text-3)] active:scale-90'
+              className='p-1 transition-all rounded-full hover:bg-blue-400 hover:text-(--text-3) active:scale-90'
               onClick={() => {
                 setModalState('Edit');
                 setFormData({
@@ -168,8 +170,8 @@ const SKPDTable = () => {
             >
               <MdEdit className='text-xl' />
             </button>
-            {/* <button
-              className='p-1 transition-all rounded-full hover:bg-red-400 hover:text-[var(--text-3)] active:scale-90'
+            <button
+              className='p-1 transition-all rounded-full text-red-500 hover:text-white hover:bg-red-400  active:scale-90'
               onClick={() => {
                 setModalState('Delete');
                 setFormData({
@@ -180,7 +182,7 @@ const SKPDTable = () => {
               }}
             >
               <MdDelete className='text-xl' />
-            </button> */}
+            </button>
           </div>
         </>
       ),
@@ -195,7 +197,7 @@ const SKPDTable = () => {
     <div className='space-y-2'>
       <div className='flex gap-2 justify-between'>
         <div className='inline-flex flex-1 gap-2 justify-end'>
-          {/* {isDev() && (
+          {isDev() && (
             <InputButton
               tooltip='Tambah data'
               className='btn btn-theme w-9 h-9'
@@ -206,7 +208,7 @@ const SKPDTable = () => {
             >
               <MdAdd />
             </InputButton>
-          )} */}
+          )}
           <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
@@ -217,8 +219,8 @@ const SKPDTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={data || []} columns={columns}  />
-      {/* {modalState === 'Add' && (
+      <Tabel data={data || []} columns={columns} />
+      {modalState === 'Add' && (
         <DialogModal
           title='Tambah data SKPD'
           isOpen={openModal}
@@ -250,7 +252,7 @@ const SKPDTable = () => {
             </div>
           </FormSKPD>
         </DialogModal>
-      )} */}
+      )}
       {modalState === 'Edit' && (
         <DialogModal
           title='Ubah data SKPD'
