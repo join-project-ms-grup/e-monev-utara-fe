@@ -7,8 +7,8 @@ import { MdPreview } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import {
   useListTahunDAK,
-  useListSubJenisDAK,
-  useListOPDDAK,
+  useListSubJenisDAKExistIdent,
+  useListOPDDAKHaveIndent,
 } from '../../../hooks/DAK/ListDataDAK';
 import {
   getMonitoringDAK,
@@ -55,8 +55,8 @@ function RouteComponent() {
   };
 
   const listTahunDAK = useListTahunDAK();
-  const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
-  const listOPDDAK = useListOPDDAK();
+  const listSubJenisDAK = useListSubJenisDAKExistIdent(Number(dakData.jenis));
+  const listOPDDAK = useListOPDDAKHaveIndent(Number(dakData.subJenis));
 
   const { data } = useQuery({
     queryKey: [
