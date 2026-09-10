@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { getBidangDAK, getSubBidangDAK } from "../../services/DAK/DAKBidangService";
 import { getTahunDAK } from "../../services/DAK/DAKTahunService";
-import { getOPDDAK } from "../../services/DAK/DAKOPDService";
-import { getSubJenisDAK } from "../../services/DAK/DAKJenisService";
+import { getOPDDAK, getOPDDAKHaveIdent } from "../../services/DAK/DAKOPDService";
+import { getExistSubJenisDAK, getSubJenisDAK } from "../../services/DAK/DAKJenisService";
 import { getRekBidangDAK, getRekKegiatanDAK, getRekProgramDAK, getRekSubKegiatanDAK, getRekUrusanDAK } from "../../services/DAK/DAKRekeningService";
 import type { OptionItem } from "../../components/inputs/InputSearchBox";
 import { getIdentifikasiDetailDAK } from "../../services/DAK/DAKIdentifikasiService";
@@ -52,6 +52,22 @@ export const useListTahunDAK = () => {
     );
 };
 
+//list opd DAK yang sudah ada identifikasi
+export const useListOPDDAKHaveIndent = (kode_sub: number) => {
+    const { data } = useQuery({
+        queryKey: ['list_opd_dak', kode_sub],
+        queryFn: () => getOPDDAKHaveIdent(kode_sub),
+        enabled: !!(kode_sub),
+    });
+    return (
+        data?.map((item) => ({
+            label: `${item.fullname}`,
+            value: item.id?.toString(),
+        })) as OptionItem[] || []
+    )
+}
+
+//list semua opd DAK
 export const useListOPDDAK = (enabled = true) => {
     const { data } = useQuery({
         queryKey: ['list_opd_dak'],
@@ -65,6 +81,23 @@ export const useListOPDDAK = (enabled = true) => {
         })) as OptionItem[] || []
     )
 }
+
+// Sub Jenis dak yang sudah ada data identifikasi
+export const useListSubJenisDAKExistIdent = (kode_jenis: number) => {
+    const { data } = useQuery({
+        queryKey: ['list_sub_jenis_dak', kode_jenis],
+        queryFn: () => getExistSubJenisDAK(kode_jenis),
+        enabled: !!(kode_jenis),
+    });
+    return (
+        data?.map((item) => ({
+            label: `${item.nama}`,
+            value: item.id?.toString(),
+        })) as OptionItem[] || []
+    )
+}
+
+//Semua sub jenis DAK
 export const useListSubJenisDAK = (kode_jenis: number) => {
     const { data } = useQuery({
         queryKey: ['list_sub_jenis_dak', kode_jenis],

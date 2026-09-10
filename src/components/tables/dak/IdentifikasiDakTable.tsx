@@ -23,8 +23,8 @@ import { FaInfo } from 'react-icons/fa';
 import DialogModal from '../../inputs/DialogModal';
 import DetailIdentifikasiDak from '../../forms/IdentifikasiDak/DetailIdentifikasiDak';
 import {
-  useListOPDDAK,
-  useListSubJenisDAK,
+  useListOPDDAKHaveIndent,
+  useListSubJenisDAKExistIdent,
   useListTahunDAK,
 } from '../../../hooks/DAK/ListDataDAK';
 import Spinner from '../../inputs/Spinner';
@@ -92,8 +92,8 @@ const IdentifikasiDakTable = ({
   ];
 
   const listTahunDAK = useListTahunDAK();
-  const listSubJenisDAK = useListSubJenisDAK(Number(dakData.jenis));
-  const listOPDDAK = useListOPDDAK();
+  const listSubJenisDAKExistIdent = useListSubJenisDAKExistIdent(Number(dakData.jenis));
+  const listOPDDAKHaveIdent = useListOPDDAKHaveIndent(Number(dakData.subJenis));
   const userSKPDID = getUserSKPDID();
   const { data, refetch, isFetching } = useQuery({
     queryKey: [
@@ -281,7 +281,7 @@ const IdentifikasiDakTable = ({
               className='w-100 h-9'
               btnclassName='bg-white'
               placeholder='Pilih Sub-Jenis DAK'
-              options={listSubJenisDAK}
+              options={listSubJenisDAKExistIdent}
               value={dakData.subJenis}
               onChange={(val) => {
                 changeDakData('subJenis', val);
@@ -327,7 +327,7 @@ const IdentifikasiDakTable = ({
                 btnclassName='bg-white'
                 placeholder='Pilih OPD'
                 value={dakData.opd}
-                options={listOPDDAK}
+                options={listOPDDAKHaveIdent}
                 onChange={(val) => changeDakData('opd', val)}
                 onClear={() => changeDakData('opd', '')}
                 withSearch

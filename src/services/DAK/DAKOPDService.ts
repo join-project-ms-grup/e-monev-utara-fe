@@ -27,6 +27,11 @@ export const getOPDDAK = async (): Promise<OPDDAK[]> => {
     return response.data.data;
 };
 
+export const getOPDDAKHaveIdent = async (kode_sub: number): Promise<OPDDAK[]> => {
+    const response = await api.post<ApiResponse<OPDDAK[]>>("/dak/opd/list-have-ident", { kode_sub });
+    return response.data.data;
+};
+
 /**
  * Menambahkan data SKPD
  */

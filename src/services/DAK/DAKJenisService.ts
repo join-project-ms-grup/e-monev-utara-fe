@@ -22,6 +22,13 @@ export interface SubJenisDAK {
     updated_at?: string,
 }
 
+//mengambil Sub Jenis yang sudah ada ada data identifikasi
+export const getExistSubJenisDAK = async (kode_jenis: number): Promise<SubJenisDAK[]> => {
+    const response = await api.post<ApiResponse<SubJenisDAK[]>>("/dak/jenis/list-sub-ident-exist", { kode_jenis });
+    return response.data.data;
+};
+
+//mengambil semua Sub Jenis
 export const getSubJenisDAK = async (kode_jenis: number): Promise<SubJenisDAK[]> => {
     const response = await api.post<ApiResponse<SubJenisDAK[]>>("/dak/jenis/list-sub", { kode_jenis });
     return response.data.data;
