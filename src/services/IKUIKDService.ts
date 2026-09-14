@@ -1,8 +1,14 @@
+// import type { OptionItem } from "../components/inputs/InputSearchBox";
 import api, { type ApiResponse } from "../lib/api";
 
 /**
  * Ambil semua data skpd indikator kinerja
  */
+
+export const getIKMaster = async (): Promise<any[]> => {
+    const response = await api.get<ApiResponse<any[]>>('ik/target-realisasi/list-master');
+    return response.data.data
+}
 export const getIKSKPD = async (id: number): Promise<any[]> => {
     const response = await api.get<ApiResponse<any[]>>(`/ik/skpd/list/${id}`);
     return response.data.data;
@@ -14,6 +20,7 @@ export interface ListIK {
         name: string;
         kode?: string;
         uraian: {
+            master_id: number;
             id: number;
             name: string;
             satuan: string;
@@ -53,8 +60,53 @@ export const toggleTagIKU = async ({ id, skpd_id, periodeId }: { id: number, skp
     const response = await api.patch<ApiResponse<any>>(`/ik/target-realisasi/toggle-iku-ikd/${id}`, { skpd_id, periodeId });
     return response.data.data;
 };
+export interface payloadTargetIKUIKD {
+    master: number;
+    n_master: string;
+    name: string;
+    satuan: string;
+    base_line: string;
+    perhitungan: string;
+    is_iku: number;
+    target: {
+        tahun: number;
+        tahun_ke: number;
+        target: string
+    }[]
+}
+export const addTargetIKUIKD = async (payload: payloadTargetIKUIKD): Promise<any> => {
+    const response = await api.post<ApiResponse<any>>(`/ik/target-realisasi/add-target`, payload);
+    return response.data.data;
+};
+
+export interface payloadUpdateTargetIKUIKD {
+    master: number;
+    n_master: string;
+    name: string;
+    satuan: string;
+    base_line: string;
+    perhitungan: string;
+    is_iku: number;
+    target: {
+        id: number
+        target: string
+    }[]
+}
+
+export const updateTargetIKUIKD = async (id: number, payload: payloadUpdateTargetIKUIKD): Promise<any> => {
+    const response = await api.put<ApiResponse<any>>(`/ik/target-realisasi/update-target`, { id, ...payload });
+    return response.data.data;
+};
+
+export const deleteTargetIKUIKD = async (id: number): Promise<any> => {
+    const response = await api.delete<ApiResponse<any>>(`/ik/target-realisasi/delete-target/${id}`);
+    return response.data.data;
+}
+
+
 
 export interface FlatIK {
+    masterId: number;
     skpdName: string;
     wMasterName: string;
     uraianId: number;
@@ -122,6 +174,7 @@ export const flatIK = (data: ListIK[]): FlatIK[] => {
                 const flatItem: any = {
                     skpdName: skpd.name,
                     wMasterName: wm.name,
+                    masterId: uraian.master_id,
                     uraianId: uraian.id,
                     uraianName: uraian.name,
                     satuan: uraian.satuan,
@@ -148,7 +201,7 @@ export const flatIK = (data: ListIK[]): FlatIK[] => {
     return flat;
 };
 
-export interface IKUIKDForm{
+export interface IKUIKDForm {
     id_target: number;
     realisasi: string;
 }
@@ -260,7 +313,7 @@ export const flatHasilIK = (data: ListHasilIK[]): FlatHasilIK[] => {
     return flat;
 };
 
-export const getHasilIK = async ({type, skpd_id, periodeId }: {type: string, skpd_id: number | string, periodeId: number }): Promise<any> => {
-    const response = await api.post<ApiResponse<any>>("/ik/target-realisasi/get-hasil", {type, skpd_id, periodeId });
+export const getHasilIK = async ({ type, skpd_id, periodeId }: { type: string, skpd_id: number | string, periodeId: number }): Promise<any> => {
+    const response = await api.post<ApiResponse<any>>("/ik/target-realisasi/get-hasil", { type, skpd_id, periodeId });
     return response.data.data;
 };

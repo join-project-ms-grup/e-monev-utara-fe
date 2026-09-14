@@ -1,7 +1,7 @@
 import { Fragment, memo, useCallback, useMemo, useState } from 'react';
 import Tabel from '../../Tabel';
 import toast from 'react-hot-toast';
-import { MdRefresh } from 'react-icons/md';
+import { MdAdd, MdDelete, MdEdit, MdRefresh } from 'react-icons/md';
 import InputButton from '../../../inputs/InputButton';
 import InputSearchBox, { type OptionItem } from '../../../inputs/InputSearchBox';
 import { type ColumnDef, type Table } from '@tanstack/react-table';
@@ -15,6 +15,7 @@ import {
   isDev,
 } from '../../../../lib/usercookie';
 import {
+  deleteTargetIKUIKD,
   flatIK,
   getIK,
   getIKSKPD,
@@ -25,18 +26,51 @@ import Spinner from '../../../inputs/Spinner';
 import type { AxiosError } from 'axios';
 import type { ApiResponse } from '../../../../lib/api';
 import InputToggle from '../../../inputs/InputToggle';
+import DialogModal from '../../../inputs/DialogModal';
+import { F_TargetIkuIKD } from '../../../forms/IKUIKD/FormAddTarget';
+import { initTargetIKUIKDSF, type TargetIKUIKDSF } from '../../../forms/IKUIKD/FH_targetIKUIKD';
+import AksiButton from '../../../inputs/AksiButton';
 
-const TaggingIndikatorTable = () => {
+interface DataDeleteTarget {
+  id: number;
+  name: string;
+}
+const initDataDeleteTarget: DataDeleteTarget = {
+  id: 0,
+  name: ""
+}
+
+const TaggingIndikatorTable = async () => {
   const idPeriode = Number(getPeriodeIDFromCookie());
   const userSKPDID = getUserSKPDID();
   const [selectedSKPD, setSelectedSKPD] = useState(userSKPDID ?? '');
   const queryClient = useQueryClient();
-
+  const [modal, setModal] = useState<string>("");
+  const [selectedData, setSelectedData] = useState<TargetIKUIKDSF>(initTargetIKUIKDSF);
   const { data: dataIKSKPD } = useQuery({
     queryKey: ['list_ik_skpd', idPeriode],
     queryFn: async () => getIKSKPD(idPeriode),
   });
 
+  const [selectedDataTarget, setSelectedDataTarget] = useState<DataDeleteTarget>(initDataDeleteTarget)
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return deleteTargetIKUIKD(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tabel_target'] });
+      refetch();
+      setModal('');
+      setSelectedDataTarget(initDataDeleteTarget);
+      toast.success('Data berhasil dihapus');
+    },
+    onError: (error: AxiosError<ApiResponse<unknown>>) => {
+      if (error.status === 400) {
+        toast.error(`Gagal menghapus data\n${error.response?.data.message}`);
+      }
+    },
+  });
   const listIKSKPD =
     dataIKSKPD?.map((item) => ({
       label: `${item.name}`,
@@ -183,7 +217,7 @@ const TaggingIndikatorTable = () => {
                   <td>{firstItem.t_5_target}</td>
                   <td>{firstItem.t_6_target}</td>
                   <td className='w-[120px]'>
-                    <div className='h-9'>
+                    <div className='flex h-9 w-40 justify-center gap-1'>
                       <ToggleIndikator
                         checkVal={firstItem.is_iku}
                         id_target={firstItem.uraianId}
@@ -191,6 +225,49 @@ const TaggingIndikatorTable = () => {
                         periodeId={idPeriode}
                         onToggle={handleToggle}
                       />
+                      <AksiButton
+                        tooltip='Ubah data'
+                        className='text-amber-500 hover:text-white hover:bg-amber-500'
+                        Icon={MdEdit}
+                        onClick={() => {
+                          setSelectedData({
+                            id: Number(firstItem.uraianId),
+                            master: `${firstItem.masterId}`,
+                            name: firstItem.uraianName,
+                            satuan: firstItem.satuan,
+                            base_line: firstItem.base_line,
+                            perhitungan: firstItem.perhitungan,
+                            is_iku: firstItem.is_iku ? 1 : 0,
+                            t_1: firstItem.t_1_target,
+                            t_2: firstItem.t_2_target,
+                            t_3: firstItem.t_3_target,
+                            t_4: firstItem.t_4_target,
+                            t_5: firstItem.t_5_target,
+                            t_6: firstItem.t_6_target,
+                            t_1_id: firstItem.t_1_id,
+                            t_2_id: firstItem.t_2_id,
+                            t_3_id: firstItem.t_3_id,
+                            t_4_id: firstItem.t_4_id,
+                            t_5_id: firstItem.t_5_id,
+                            t_6_id: firstItem.t_6_id
+
+                          })
+                          setModal('Add');
+                        }}
+                      />
+                      <AksiButton
+                        Icon={MdDelete}
+                        tooltip='Hapus user'
+                        className='text-red-500 hover:text-white hover:bg-red-500'
+                        onClick={() => {
+                          setSelectedDataTarget({
+                            id: firstItem.uraianId,
+                            name: firstItem.uraianName
+                          });
+                          setModal('Delete');
+                        }}
+                      />
+
                     </div>
                   </td>
                 </tr>
@@ -202,6 +279,7 @@ const TaggingIndikatorTable = () => {
     },
     [periode, handleToggle, idPeriode, selectedSKPD]
   );
+
 
   return (
     <div className='space-y-2'>
@@ -227,6 +305,11 @@ const TaggingIndikatorTable = () => {
         </div>
         <div className='inline-flex gap-2'>
           <InputButton
+            tooltip='Tambah data'
+            className='btn btn-red w-9 h-9'
+            onClick={() => setModal("Add")}
+          ><MdAdd /></InputButton>
+          <InputButton
             tooltip='Refresh'
             className='btn btn-theme w-9 h-9'
             onClick={() => refetch()}
@@ -243,6 +326,55 @@ const TaggingIndikatorTable = () => {
         renderHeader={tableHead}
         renderBody={tableBody}
       />
+      <DialogModal
+        title={`${selectedData.id ? 'Ubah' : 'Tambah'} Target IKU - IKD`}
+        isOpen={modal === 'Add'}
+        onClose={() => {
+          setModal('');
+          setSelectedData(initTargetIKUIKDSF);
+        }}
+      >
+        <F_TargetIkuIKD
+          data={selectedData}
+          onSuccess={() => {
+            refetch();
+            setModal('');
+            setSelectedData(initTargetIKUIKDSF);
+          }}
+        />
+      </DialogModal>
+      <DialogModal
+        title={`Yakin hapus data Indikator ?`}
+        isOpen={modal === 'Delete'}
+        onClose={() => {
+          refetch();
+          setModal('');
+          setSelectedDataTarget(initDataDeleteTarget);
+        }}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (selectedDataTarget.id) {
+              deleteMutation.mutate(selectedDataTarget.id);
+            }
+          }}
+        >
+          <div>
+            <p>
+              Anda akan menghapus data{' '}
+              <b>
+                <i>{selectedDataTarget.name}</i>
+              </b>
+            </p>
+            <div className='float-end mt-5'>
+              <InputButton className='px-2' type='submit'>
+                Hapus
+              </InputButton>
+            </div>
+          </div>
+        </form>
+      </DialogModal>
     </div>
   );
 };
@@ -276,3 +408,4 @@ const ToggleIndikator = memo(
     prev.skpd_id === next.skpd_id &&
     prev.periodeId === next.periodeId
 );
+
