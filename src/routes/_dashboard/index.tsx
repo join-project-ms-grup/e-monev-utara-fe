@@ -7,6 +7,7 @@ import { getDashInfo } from '../../services/DashRKPDService';
 import DashDAKTable from '../../components/tables/DashDAKTable';
 // import DashDAKChart from '../../components/charts/DashDAKChart';
 import type { CSSProperties } from 'react';
+import DashDAKChart from '../../components/charts/DashDAKChart';
 
 export const Route = createFileRoute('/_dashboard/')({
   head: () => ({
@@ -156,7 +157,7 @@ const DashDAK = () => {
     <div className='space-y-2'>
       <br />
       <br />
-      {/* <DashDAKChart /> */}
+      <DashDAKChart />
       <br />
       <DashDAKTable />
     </div>

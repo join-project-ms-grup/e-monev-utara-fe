@@ -11,21 +11,28 @@ import {
 
 const data = [
   {
-    skpd: 'Dinas Pendidikan',
+    skpd: 'TW 1',
     fisikDAK: 0,
     keuanganDAK: 0,
     fisikNonDAK: 0,
     keuanganNonDAK: 0,
   },
   {
-    skpd: 'Dinas Kesehatan',
+    skpd: 'TW 2',
     fisikDAK: 0,
     keuanganDAK: 0,
     fisikNonDAK: 0,
     keuanganNonDAK: 0,
   },
   {
-    skpd: 'Dinas Sosial',
+    skpd: 'TW 3',
+    fisikDAK: 0,
+    keuanganDAK: 0,
+    fisikNonDAK: 0,
+    keuanganNonDAK: 0,
+  },
+  {
+    skpd: 'TW 4',
     fisikDAK: 0,
     keuanganDAK: 0,
     fisikNonDAK: 0,
