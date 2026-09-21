@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getDashRankingRkpd, type DashRankRKPDForm } from "../../services/DashRKPDService";
-import { GetRekapDAK, type RekapDAKPayload } from "../../services/DAK/DAKMonitoringService";
+import { GetDataGrafikDAK, GetRekapDAK, type RekapDAKPayload } from "../../services/DAK/DAKMonitoringService";
 
 export const useGetDashRankRKPD = (payload: DashRankRKPDForm) => {
     return useQuery({
@@ -16,4 +16,12 @@ export const useGetRekapDAK = (payload: RekapDAKPayload) => {
         queryFn: () => GetRekapDAK(payload),
         enabled: !!(payload.jenis, payload.tahun, payload.triwulan)
     });
+}
+
+export const useGetDataGrafikDAK = (payload: { tahun_ke: number }) => {
+    return useQuery({
+        queryKey: ['grafik_hasil_dak', payload.tahun_ke],
+        queryFn: () => GetDataGrafikDAK(payload),
+        enabled: !!(payload.tahun_ke)
+    })
 }

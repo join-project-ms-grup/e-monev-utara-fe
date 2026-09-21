@@ -310,3 +310,15 @@ export const GetRekapDAK = async (payload: RekapDAKPayload): Promise<RekapDak[]>
     const response = await api.post<ApiResponse<RekapDak[]>>("/dak/fisik/rekap-realisasi", payload);
     return response.data.data
 }
+
+export type GrafikDAK = {
+    triwulan: string;
+    fisikDAK: number;
+    keuanganDAK: number;
+    fisikNonDAK: number;
+    keuanganNonDAK: number;
+};
+export const GetDataGrafikDAK = async (payload: { tahun_ke: number }): Promise<GrafikDAK[]> => {
+    const response = await api.post<ApiResponse<GrafikDAK[]>>("/dak/fisik/rekap-realisasi-for-grafik", payload);
+    return response.data.data
+}

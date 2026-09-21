@@ -72,7 +72,7 @@ function RouteComponent() {
     <div
       className='relative flex items-center justify-center h-screen overflow-y-auto'
       style={{
-        backgroundImage: "url('/auth/bg-full2.jpg')",
+        backgroundImage: "url('/auth/bg-full3.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -140,9 +140,9 @@ function RouteComponent() {
 
       <div className='absolute top-0 left-0 flex flex-col lg:flex-row w-full h-full z-0'>
         <div className='flex-1/4 py-6 px-16'>
-          <div className='flex flex-col justify-start h-full'>
+          <div className='flex flex-col justify-start h-full py-100 ps-55'>
             {/* MARK: LOGO */}
-            <div className='flex flex-col items-start mb-20'>
+            {/* <div className='flex flex-col items-start mb-20'>
               <div>
                 <img src='/mahabbah.png' width={300} alt='E-MAHABBAH LOGO' />
               </div>
@@ -153,10 +153,10 @@ function RouteComponent() {
                 <span className='text-[0.9rem]'>b</span>angunan Daer
                 <span className='text-[0.9rem]'>ah</span>
               </p>
-            </div>
+            </div> */}
             {/* MARK: JUDUL & LOGIN BUTTON */}
             <div>
-              <div className='text-white max-w-4xl leading-tight'>
+              {/* <div className='text-white max-w-4xl leading-tight'>
                 <p className='italic font-light text-[clamp(2rem,2vw,3.5rem)]'>
                   Sistem Informasi
                 </p>
@@ -169,13 +169,15 @@ function RouteComponent() {
                 <p className='italic font-light text-[clamp(2rem,2vw,3.5rem)]'>
                   Kabupaten Bengkulu Utara
                 </p>
-              </div>
+              </div> */}
               <button
-                className={`float-start mt-10 shadow bg-gray-100 text-gray-800 font-bold active:scale-100
-              px-12 py-2 text-2xl rounded-xl hover:scale-105 transition-all duration-300`}
+                className={`float-start mt-10 shadow bg-white text-gray-800 font-bold active:scale-100
+              px-10 py-2 text-xl rounded-xl hover:scale-105 transition-all duration-300`}
                 onClick={() => setShowLogin(!showLogin)}
               >
-                Login
+                <span className='bg-gradient-to-r from-red-500 to-red-900 bg-clip-text text-transparent'>
+                  Login
+                </span>
               </button>
             </div>
           </div>
@@ -185,7 +187,7 @@ function RouteComponent() {
           <img
             src='/auth/bupati-wa.png'
             alt='Bupati dan wakil bupati'
-            className='lg:max-w-[calc(100%-10rem)] w-full h-auto'
+            className='lg:max-w-[calc(100%-20rem)] w-full h-auto me-90'
           />
         </div>
       </div>

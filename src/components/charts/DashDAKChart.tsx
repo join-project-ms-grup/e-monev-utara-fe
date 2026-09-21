@@ -8,44 +8,49 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from 'recharts';
+import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
+import InputSearchBox from '../inputs/InputSearchBox';
+import { useEffect, useState } from 'react';
+import { useGetDataGrafikDAK } from '../../hooks/RKPD/TabelDataRkpd';
 
-const data = [
-  {
-    skpd: 'TW 1',
-    fisikDAK: 0,
-    keuanganDAK: 0,
-    fisikNonDAK: 0,
-    keuanganNonDAK: 0,
-  },
-  {
-    skpd: 'TW 2',
-    fisikDAK: 0,
-    keuanganDAK: 0,
-    fisikNonDAK: 0,
-    keuanganNonDAK: 0,
-  },
-  {
-    skpd: 'TW 3',
-    fisikDAK: 0,
-    keuanganDAK: 0,
-    fisikNonDAK: 0,
-    keuanganNonDAK: 0,
-  },
-  {
-    skpd: 'TW 4',
-    fisikDAK: 0,
-    keuanganDAK: 0,
-    fisikNonDAK: 0,
-    keuanganNonDAK: 0,
-  },
-];
 
 const DashDAKChart = () => {
+  const tahunMulai = Number(getPeriodeMulaiFromCookie()!);
+  const tahunAkhir = Number(getPeriodeAkhirFromCookie()!);
+  const [tahun, setTahun] = useState<number>(0)
+
+  const { data } = useGetDataGrafikDAK({ tahun_ke: tahun });
+
+  const listTahunKe = Array.from(
+    { length: tahunAkhir - tahunMulai + 1 },
+    (_, i) => ({
+      label: `${tahunMulai + i}`,
+      value: `${tahunMulai + i}`,
+    }),
+  );
+
+  useEffect(() => {
+    const now = new Date();
+    const tahun = now.getFullYear().toString();
+    setTahun(Number(listTahunKe.find((v) => v.label === tahun)?.label || 0))
+  }, [])
   return (
     <div className='space-y-2'>
       <h4 className='text-center'>
-        Grafik Progress Kegiatan per SKPD s.d Bulan November Tahun Anggaran 2025
+        Grafik Progress Kegiatan per SKPD s.d Bulan November Tahun Anggaran {listTahunKe.find((v) => v.value === tahun.toString())?.label}
       </h4>
+      <div className='ps-25'>
+        {/* <label htmlFor="tahun_ke">Pilih tahun</label> */}
+        <InputSearchBox
+          id="tahun_ke"
+          className="w-42 h-9"
+          btnclassName="bg-white"
+          placeholder="Pilih Tahun..."
+          value={tahun.toString()}
+          options={listTahunKe}
+          onChange={(val) => setTahun(Number(val))}
+        />
+      </div>
       <ResponsiveContainer width='100%' height={400}>
         <BarChart
           data={data}
@@ -58,27 +63,27 @@ const DashDAKChart = () => {
             domain={[0, 100]}
             tickFormatter={(v) => `${v}%`}
           />
-          <YAxis type='category' dataKey='skpd' />
+          <YAxis type='category' dataKey='triwulan' />
           <Tooltip formatter={(value) => `${value}%`} />
           <Legend />
           <Bar
             dataKey='fisikDAK'
-            fill='#dc143c'
-            name='Realisasi DAK Fisik - Progress Fisik'
+            fill='#e80000'
+            name='Realisasi DAK Fisik - Progress Volume'
           />
           <Bar
             dataKey='keuanganDAK'
-            fill='#ff6b81'
+            fill='#fa6464'
             name='Realisasi DAK Fisik - Progress Keuangan'
           />
           <Bar
             dataKey='fisikNonDAK'
-            fill='#ff878d'
-            name='Realisasi DAK Non-Fisik - Progress Fisik'
+            fill='#ffc807'
+            name='Realisasi DAK Non-Fisik - Progress Volume'
           />
           <Bar
             dataKey='keuanganNonDAK'
-            fill='#ffa6a6'
+            fill='#ffe37f'
             name='Realisasi DAK Non-Fisik - Progress Keuangan'
           />
         </BarChart>

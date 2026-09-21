@@ -157,9 +157,9 @@ const DashDAK = () => {
     <div className='space-y-2'>
       <br />
       <br />
-      <DashDAKChart />
-      <br />
       <DashDAKTable />
+      <br />
+      <DashDAKChart />
     </div>
   );
 };
