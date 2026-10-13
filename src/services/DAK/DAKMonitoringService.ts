@@ -45,6 +45,11 @@ export const getMonitoringDAK = async ({ tahun, opd_id, sub_jenis, triwulan }: {
     return response.data.data;
 };
 
+export const getLaporanDAK = async ({ tahun, opd_id, sub_jenis, triwulan }: { tahun: number, opd_id: number | null, sub_jenis: number | null, triwulan: number }): Promise<DAKMonitoring[]> => {
+    const response = await api.post<ApiResponse<DAKMonitoring[]>>("/dak/fisik/list-laporan", { tahun, opd_id, sub_jenis, triwulan });
+    return response.data.data;
+};
+
 export interface FlatMonitoringDAK {
     level?: string;
     nama?: string;

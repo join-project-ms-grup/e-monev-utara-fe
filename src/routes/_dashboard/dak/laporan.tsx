@@ -11,9 +11,9 @@ import {
   useListOPDDAKHaveIndent,
 } from '../../../hooks/DAK/ListDataDAK';
 import {
-  getMonitoringDAK,
   flatMonitoringDAK,
   getMasalahDAK,
+  getLaporanDAK,
 } from '../../../services/DAK/DAKMonitoringService';
 import { exportDAK } from '../../../services/Excel/ExcelDAK';
 import { getRoleId, getUserSKPDID } from '../../../lib/usercookie';
@@ -67,7 +67,7 @@ function RouteComponent() {
       dakData.triwulan,
     ],
     queryFn: async () => {
-      const data = await getMonitoringDAK({
+      const data = await getLaporanDAK({
         tahun: Number(dakData.tahun),
         opd_id: Number(dakData.opd) ?? null,
         sub_jenis: Number(dakData.subJenis) ?? null,
