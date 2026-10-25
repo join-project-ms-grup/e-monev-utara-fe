@@ -13,12 +13,12 @@ import toast from "react-hot-toast";
 import { MdPrint } from "react-icons/md";
 import InputButton from "../inputs/InputButton";
 
-const tableHead = () => {
+const tableHead = (jenis: number) => {
   return (
     <>
       <tr>
         <th rowSpan={3}>
-          <big>Ranking</big>
+          <big>No</big>
         </th>
         <th rowSpan={3}>
           <big>Nama SKPD</big>
@@ -45,7 +45,7 @@ const tableHead = () => {
       </tr>
       <tr>
         <th colSpan={2}>
-          <big>DAK Fisik</big>
+          <big>DAK  {jenis === 1 ? "" : "Non-"}Fisik</big>
         </th>
         <th rowSpan={2}>
           <big>
@@ -99,6 +99,9 @@ const DashDAKTable = () => {
     { label: "IV", value: "4" },
   ];
 
+
+
+
   const columns: ColumnDef<RekapDak>[] = [
     {
       header: "Ranking",
@@ -128,7 +131,7 @@ const DashDAKTable = () => {
       // cell: () => `-`,
     },
     {
-      header: "DAK Fisik Fisik",
+      header: `DAK Fisik Fisik`,
       accessorKey: "realisasi_volume",
       meta: {
         tdClassNames: "text-center",
@@ -167,6 +170,8 @@ const DashDAKTable = () => {
     const twEval = defaultValue.triwulan - 1;
     setTriwulan(twEval.toString());
   }, []);
+
+  const headOfTable = () => tableHead(Number(jenis));
 
   return (
     <div className="space-y-2">
@@ -224,7 +229,7 @@ const DashDAKTable = () => {
                     data || [],
                     jenisOpt.find((item) => item.value === jenis)?.label ?? "",
                     listTahunKe.find((item) => item.value === tahunKe)?.label ??
-                      "",
+                    "",
                     listTriwulan.find((item) => item.value === triwulan)
                       ?.label ?? "",
                   ),
@@ -243,7 +248,7 @@ const DashDAKTable = () => {
           </InputButton>
         </div>
       </div>
-      <Tabel data={data || []} columns={columns} renderHeader={tableHead} />
+      <Tabel data={data || []} columns={columns} renderHeader={headOfTable} />
     </div>
   );
 };

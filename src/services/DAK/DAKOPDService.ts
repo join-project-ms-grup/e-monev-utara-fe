@@ -4,7 +4,7 @@ import api, { type ApiResponse } from "../../lib/api";
 export interface OPDDAK {
     id?: number;
     kode?: string | number;
-    fullname?: string;
+    fullname: string;
     shortname?: string;
     status?: boolean;
     created_at?: string;
@@ -24,12 +24,22 @@ export interface OPDDAKForm {
  */
 export const getOPDDAK = async (): Promise<OPDDAK[]> => {
     const response = await api.get<ApiResponse<OPDDAK[]>>("/dak/opd/list");
-    return response.data.data;
+    const res = response.data.data;
+    const dataSorted = [...res].sort((a, b) =>
+        a.fullname.localeCompare(b.fullname, "id")
+    );
+
+    return dataSorted
 };
 
 export const getOPDDAKHaveIdent = async (kode_sub: number): Promise<OPDDAK[]> => {
     const response = await api.post<ApiResponse<OPDDAK[]>>("/dak/opd/list-have-ident", { kode_sub });
-    return response.data.data;
+    const res = response.data.data;
+    const dataSorted = [...res].sort((a, b) =>
+        a.fullname.localeCompare(b.fullname, "id")
+    );
+
+    return dataSorted
 };
 
 /**

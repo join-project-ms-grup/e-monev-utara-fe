@@ -313,7 +313,16 @@ export const updateMonitorMasalahDAK = async (payload: MonitorMasalahDak): Promi
 
 export const GetRekapDAK = async (payload: RekapDAKPayload): Promise<RekapDak[]> => {
     const response = await api.post<ApiResponse<RekapDak[]>>("/dak/fisik/rekap-realisasi", payload);
-    return response.data.data
+    const res = response.data.data;
+
+    const dataSorted = [...res].sort((a, b) =>
+        a.nama_opd.localeCompare(b.nama_opd, "id")
+    );
+    const newRangkingDAK = dataSorted.map((a, i) => {
+        return { ...a, rangking: i + 1 }
+    })
+
+    return newRangkingDAK
 }
 
 export type GrafikDAK = {
