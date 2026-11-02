@@ -2,7 +2,6 @@ import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { waktuNowGabung } from '../../lib/helper';
 // import { getPeriodeAkhirFromCookie, getPeriodeMulaiFromCookie } from '../../lib/usercookie';
-import type { DashboardRankingResult } from '../DashRKPDService';
 import type { RekapDak } from '../DAK/DAKMonitoringService';
 
 export const exportRanking = async (
@@ -27,7 +26,7 @@ export const exportRanking = async (
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Worksheet');
 
-    if(jenis === 'DAK Fisik'){
+    if (jenis === 'DAK Fisik') {
         const merges = [
             'A2:G2',
             'A4:A6',
@@ -41,15 +40,16 @@ export const exportRanking = async (
         merges.forEach((m) => {
             try { worksheet.mergeCells(m); } catch (e) { }
         });
-    }else{
+    } else {
         const merges = [
             'A2:G2',
             'A4:A6',
             'B4:B6',
             'C4:C6',
             'D4:D6',
-            'E4:F4',
-            'F5:F6'
+            'E4:G4',
+            'E5:F5',
+            'G5:G6'
         ];
         merges.forEach((m) => {
             try { worksheet.mergeCells(m); } catch (e) { }
@@ -66,30 +66,30 @@ export const exportRanking = async (
 
     let fixedCells: Array<{ addr: string; value: string; style?: Partial<ExcelJS.Style> }> = []
 
-    if(jenis === 'DAK Fisik'){
-            fixedCells = [
-                { addr: 'A2', value: `REALISASI ${jenis.toUpperCase()} TRIWULAN ${triwulan} TAHUN ${tahun}` },
-                { addr: 'A4', value: 'No' },
-                { addr: 'B4', value: 'Nama OPD' },
-                { addr: 'C4', value: 'Jumlah Paket' },
-                { addr: 'D4', value: 'Jumlah Anggaran (Rp.)' },
-                { addr: 'E4', value: 'Realisasi (%)' },
-                { addr: 'E5', value: `${jenis}` }, { addr: 'E6', value: 'Fisik' }, { addr: 'F6', value: 'Keuangan' },
-                { addr: 'G5', value: 'Total Persentase' },
-
-            ];
-    }else{
+    if (jenis === 'DAK Fisik') {
         fixedCells = [
-                { addr: 'A2', value: `REALISASI ${jenis.toUpperCase()} TRIWULAN ${triwulan} TAHUN ${tahun}` },
-                { addr: 'A4', value: 'No' },
-                { addr: 'B4', value: 'Nama OPD' },
-                { addr: 'C4', value: 'Jumlah Paket' },
-                { addr: 'D4', value: 'Jumlah Anggaran (Rp.)' },
-                { addr: 'E4', value: 'Realisasi (%)' },
-                { addr: 'E5', value: `${jenis}` }, { addr: 'E6', value: 'Keuangan' },
-                { addr: 'F5', value: 'Total Persentase' },
+            { addr: 'A2', value: `REALISASI ${jenis.toUpperCase()} TRIWULAN ${triwulan} TAHUN ${tahun}` },
+            { addr: 'A4', value: 'No' },
+            { addr: 'B4', value: 'Nama OPD' },
+            { addr: 'C4', value: 'Jumlah Paket' },
+            { addr: 'D4', value: 'Jumlah Anggaran (Rp.)' },
+            { addr: 'E4', value: 'Realisasi (%)' },
+            { addr: 'E5', value: `${jenis}` }, { addr: 'E6', value: 'Fisik' }, { addr: 'F6', value: 'Keuangan' },
+            { addr: 'G5', value: 'Total Persentase' },
 
-            ];
+        ];
+    } else {
+        fixedCells = [
+            { addr: 'A2', value: `REALISASI ${jenis.toUpperCase()} TRIWULAN ${triwulan} TAHUN ${tahun}` },
+            { addr: 'A4', value: 'No' },
+            { addr: 'B4', value: 'Nama OPD' },
+            { addr: 'C4', value: 'Jumlah Paket' },
+            { addr: 'D4', value: 'Jumlah Anggaran (Rp.)' },
+            { addr: 'E4', value: 'Realisasi (%)' },
+            { addr: 'E5', value: `${jenis}` }, { addr: 'E6', value: 'Fisik' }, { addr: 'F6', value: 'Keuangan' },
+            { addr: 'G5', value: 'Total Persentase' },
+
+        ];
     }
 
     fixedCells.forEach((c) => {
@@ -114,7 +114,7 @@ export const exportRanking = async (
 
     // console.log(data);
 
-    if(jenis === 'DAK Fisik'){
+    if (jenis === 'DAK Fisik') {
         data.forEach((item) => {
             const row = worksheet.getRow(rowIndex);
 
@@ -143,7 +143,7 @@ export const exportRanking = async (
 
             rowIndex++;
         });
-    }else{
+    } else {
         data.forEach((item) => {
             const row = worksheet.getRow(rowIndex);
 
@@ -151,10 +151,11 @@ export const exportRanking = async (
             row.getCell('B').value = item.nama_opd;
             row.getCell('C').value = item.jumlah_paket;
             row.getCell('D').value = item.jumlah_anggaran;
-            row.getCell('E').value = item.realisasi_keuangan;
-            row.getCell('F').value = item.persentase;
+            row.getCell('E').value = item.realisasi_volume;
+            row.getCell('F').value = item.realisasi_keuangan;
+            row.getCell('G').value = item.persentase + "%";
 
-            for (let c = 1; c <= 6; c++) {
+            for (let c = 1; c <= 7; c++) {
                 const cell = row.getCell(c);
                 cell.border = {
                     top: { style: 'thin' },
@@ -176,12 +177,12 @@ export const exportRanking = async (
     const lastRow = rowIndex;
     const startCol = 1;
     let endCol = 0;
-    if(jenis === 'DAK Fisik'){
+    if (jenis === 'DAK Fisik') {
         endCol = 7;
-    }else{
-        endCol = 6;
+    } else {
+        endCol = 7;
     }
-   
+
 
     for (let r = startRow - 3; r <= lastRow; r++) {
         const row = worksheet.getRow(r);

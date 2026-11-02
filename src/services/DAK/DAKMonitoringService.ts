@@ -251,7 +251,7 @@ export interface RekapDak {
     jumlah_anggaran: string;
     realisasi_volume: string;
     realisasi_keuangan: string;
-    persentase: number
+    persentase: number | string
 }
 
 export interface RekapDAKPayload {
@@ -319,8 +319,15 @@ export const GetRekapDAK = async (payload: RekapDAKPayload): Promise<RekapDak[]>
         a.nama_opd.localeCompare(b.nama_opd, "id")
     );
     const newRangkingDAK = dataSorted.map((a, i) => {
-        return { ...a, rangking: i + 1 }
-    })
+        const volume = Number(a.realisasi_volume.replace("%", "").replace(",", ".").trim());
+        const keuangan = Number(a.realisasi_keuangan.replace("%", "").replace(",", ".").trim());
+
+        return {
+            ...a,
+            persentase: ((volume + keuangan) / 2).toFixed(2),
+            rangking: i + 1
+        }
+    });
 
     return newRangkingDAK
 }
