@@ -100,7 +100,7 @@ export const exportDAK = async (
         { addr: 'I14', value: '(Rp)' }, { addr: 'I15', value: '11' },
         { addr: 'J14', value: '(%)' }, { addr: 'J15', value: '12' },
         { addr: 'K13', value: 'FISIK' },
-        { addr: 'K14', value: 'VOLUME' }, { addr: 'K15', value: '13' },
+        { addr: 'K14', value: '%' }, { addr: 'K15', value: '13' },
         { addr: 'L14', value: 'sd' }, { addr: 'L15', value: '14' },
 
         { addr: 'M12', value: 'IDENTIFIKASI PERMASALAHAN' },
@@ -178,7 +178,95 @@ export const exportDAK = async (
         rowIndex++;
     });
 
-    const lastRow = rowIndex;
+    //#region TOTAL DATA
+
+    // Hanya mengambil baris paket
+    const paketData = data.filter(item => !!item.nama_paket);
+
+    const sumBy = (getter: (item: FlatMonitoringDAK) => unknown): number => {
+        return paketData.reduce((sum, item) => {
+            return sum + (parseIndonesianNumber(getter(item)) ?? 0);
+        }, 0);
+    };
+
+    const averageBy = (getter: (item: FlatMonitoringDAK) => unknown): number => {
+        const values = paketData
+            .map(item => parseIndonesianNumber(getter(item)))
+            .filter((value): value is number => value !== null);
+
+        if (!values.length) return 0;
+
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+    };
+
+    // Perhitungan total
+    const totals = {
+        C: sumBy(item => item.perencanaan?.volume),
+        D: sumBy(item => item.perencanaan?.jumlah_penerima),
+        E: sumBy(item => item.perencanaan?.anggaran),
+        G: sumBy(item => item.mekanisme?.volume),
+        H: sumBy(item => item.mekanisme?.uang),
+        I: sumBy(item => item.realisasi?.keuangan?.capaian),
+
+        J: averageBy(item => item.realisasi?.keuangan?.persen),
+        K: averageBy(item => item.realisasi?.fisik?.capaian),
+        L: averageBy(item => item.realisasi?.fisik?.totalSd),
+    };
+
+    // Buat row total
+    const totalRowIndex = rowIndex;
+    const totalRow = worksheet.getRow(totalRowIndex);
+
+    // Merge A-C untuk label TOTAL
+    worksheet.mergeCells(`A${totalRowIndex}:B${totalRowIndex}`);
+
+    totalRow.getCell('A').value = 'TOTAL';
+
+    // Masukkan hasil perhitungan
+    Object.entries(totals).forEach(([col, value]) => {
+        const cell = totalRow.getCell(col);
+
+        cell.value = value;
+
+        // Angka tanpa Rp dan %
+        cell.numFmt = '#,##0.00';
+    });
+
+    // Styling row total
+    for (let col = 1; col <= 14; col++) {
+        const cell = totalRow.getCell(col);
+
+        cell.font = {
+            ...defaultFont,
+            bold: true,
+        };
+
+        cell.alignment = {
+            vertical: 'middle',
+            horizontal: col <= 3 ? 'center' : 'right',
+            wrapText: true,
+        };
+
+        cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' },
+        };
+
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFD9D9D9' },
+        };
+    }
+
+    // Pindahkan posisi row untuk TTD dan keterangan
+    rowIndex++;
+
+    //endregion
+
+    const lastRow = rowIndex - 1;
     const startCol = 1;
     const endCol = 14;
 
@@ -271,4 +359,29 @@ export const exportDAK = async (
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
     saveAs(blob, `Laporan Kemajuan Pelaksanaan Kegiatan DAK - Kabupaten Bengkulu Utara Tahun Anggaran ${dakData.tahun} Triwulan ${triwulanList.find(item => item.value === dakData.triwulan)?.label} ${waktuNowGabung}.xlsx`);
+};
+
+
+const parseIndonesianNumber = (value: unknown): number | null => {
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : null;
+    }
+
+    if (typeof value !== 'string' || !value.trim()) return null;
+
+    let cleaned = value.replace(/[^\d,.-]/g, '');
+
+    if (!cleaned) return null;
+
+    if (cleaned.includes(',')) {
+        cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+    } else if ((cleaned.match(/\./g) || []).length > 1) {
+        cleaned = cleaned.replace(/\./g, '');
+    } else if (/\.\d{3}$/.test(cleaned)) {
+        cleaned = cleaned.replace('.', '');
+    }
+
+    const result = Number(cleaned);
+
+    return Number.isFinite(result) ? result : null;
 };

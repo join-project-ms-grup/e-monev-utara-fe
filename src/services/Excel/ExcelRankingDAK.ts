@@ -57,7 +57,7 @@ export const exportRanking = async (
     }
 
     const widthMap: Record<string, number> = {
-        A: 10, B: 40, C: 15, D: 25, E: 15, F: 15, G: 15
+        A: 10, B: 40, C: 15, D: 30, E: 15, F: 15, G: 15
     };
     const colLetters = Object.keys(widthMap);
     colLetters.forEach((col, idx) => {
@@ -114,65 +114,114 @@ export const exportRanking = async (
 
     // console.log(data);
 
-    if (jenis === 'DAK Fisik') {
-        data.forEach((item) => {
-            const row = worksheet.getRow(rowIndex);
+    data.forEach((item) => {
+        const row = worksheet.getRow(rowIndex);
 
-            row.getCell('A').value = item.rangking;
-            row.getCell('B').value = item.nama_opd;
-            row.getCell('C').value = item.jumlah_paket;
-            row.getCell('D').value = item.jumlah_anggaran;
-            row.getCell('E').value = item.realisasi_volume;
-            row.getCell('F').value = item.realisasi_keuangan;
-            row.getCell('G').value = item.persentase;
+        row.getCell('A').value = item.rangking;
+        row.getCell('B').value = item.nama_opd;
+        row.getCell('C').value = parseIndonesianNumber(item.jumlah_paket);
+        row.getCell('D').value = parseIndonesianNumber(item.jumlah_anggaran);
+        row.getCell('E').value = parseIndonesianNumber(item.realisasi_volume);
+        row.getCell('F').value = parseIndonesianNumber(item.realisasi_keuangan);
+        row.getCell('G').value = parseIndonesianNumber(item.persentase);
 
-            for (let c = 1; c <= 7; c++) {
-                const cell = row.getCell(c);
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' },
-                };
-                cell.alignment = {
-                    vertical: 'middle',
-                    horizontal: c === 1 ? 'center' : c === 2 ? 'left' : 'right',
-                    wrapText: true,
-                };
+        for (let c = 1; c <= 7; c++) {
+            const cell = row.getCell(c);
+
+            cell.border = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' },
+            };
+
+            cell.alignment = {
+                vertical: 'middle',
+                horizontal: c === 1 ? 'center' : c === 2 ? 'left' : 'right',
+                wrapText: true,
+            };
+
+            // Format angka 2 desimal untuk kolom C-G
+            if (c >= 3) {
+                cell.numFmt = '#,##0.00';
             }
+        }
 
-            rowIndex++;
-        });
-    } else {
-        data.forEach((item) => {
-            const row = worksheet.getRow(rowIndex);
+        rowIndex++;
+    });
 
-            row.getCell('A').value = item.rangking;
-            row.getCell('B').value = item.nama_opd;
-            row.getCell('C').value = item.jumlah_paket;
-            row.getCell('D').value = item.jumlah_anggaran;
-            row.getCell('E').value = item.realisasi_volume;
-            row.getCell('F').value = item.realisasi_keuangan;
-            row.getCell('G').value = item.persentase + "%";
+    // Row total
+    const totalRowIndex = rowIndex;
+    const totalRow = worksheet.getRow(totalRowIndex);
 
-            for (let c = 1; c <= 7; c++) {
-                const cell = row.getCell(c);
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' },
-                };
-                cell.alignment = {
-                    vertical: 'middle',
-                    horizontal: c === 1 ? 'center' : c === 2 ? 'left' : 'right',
-                    wrapText: true,
-                };
-            }
+    // Merge A dan B
+    worksheet.mergeCells(`A${totalRowIndex}:B${totalRowIndex}`);
 
-            rowIndex++;
-        });
+    // Agregasi data
+    const totalPaket = data.reduce(
+        (sum, item) => sum + parseIndonesianNumber(item.jumlah_paket),
+        0
+    );
+
+    const totalAnggaran = data.reduce(
+        (sum, item) => sum + parseIndonesianNumber(item.jumlah_anggaran),
+        0
+    );
+
+    const averageVolume = data.length
+        ? data.reduce(
+            (sum, item) => sum + parseIndonesianNumber(item.realisasi_volume),
+            0
+        ) / data.length
+        : 0;
+
+    const averageKeuangan = data.length
+        ? data.reduce(
+            (sum, item) => sum + parseIndonesianNumber(item.realisasi_keuangan),
+            0
+        ) / data.length
+        : 0;
+
+    const totalPersentase = (averageVolume + averageKeuangan) / 2;
+
+    // Isi row total
+    totalRow.getCell('A').value = 'TOTAL';
+    totalRow.getCell('C').value = formatNumber(totalPaket);
+    totalRow.getCell('D').value = `${formatNumber(totalAnggaran)}`;
+    totalRow.getCell('E').value = formatNumber(averageVolume);
+    totalRow.getCell('F').value = formatNumber(averageKeuangan);
+    totalRow.getCell('G').value = formatNumber(totalPersentase);
+
+    // Styling
+    for (let col = 1; col <= 7; col++) {
+        const cell = totalRow.getCell(col);
+
+        cell.font = {
+            name: 'Bookman Old Style',
+            bold: true,
+        };
+
+        cell.alignment = {
+            vertical: 'middle',
+            horizontal: col <= 2 ? 'center' : 'right',
+            wrapText: false,
+        };
+
+        cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' },
+        };
+
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFFF' },
+        };
     }
+
+    rowIndex++;
 
     const lastRow = rowIndex;
     const startCol = 1;
@@ -184,7 +233,7 @@ export const exportRanking = async (
     }
 
 
-    for (let r = startRow - 3; r <= lastRow; r++) {
+    for (let r = startRow - 3; r < lastRow; r++) {
         const row = worksheet.getRow(r);
         for (let c = startCol; c <= endCol; c++) {
             const cell = row.getCell(c);
@@ -221,4 +270,25 @@ export const exportRanking = async (
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
     saveAs(blob, `RANKING EVALUASI ${jenis} ${tahun} TRIWULAN ${triwulan} ${waktuNowGabung}.xlsx`);
+};
+
+// Mengubah format angka Indonesia menjadi number
+const parseIndonesianNumber = (value: unknown): number => {
+    if (typeof value === 'number') return value;
+    if (!value) return 0;
+
+    return Number(
+        String(value)
+            .replace(/[^\d,.-]/g, '')
+            .replace(/\./g, '')
+            .replace(',', '.')
+    ) || 0;
+};
+
+// Mengubah number menjadi format desimal Indonesia
+const formatNumber = (value: number, suffix = ''): string => {
+    return `${value.toLocaleString('id-ID', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })}${suffix}`;
 };
