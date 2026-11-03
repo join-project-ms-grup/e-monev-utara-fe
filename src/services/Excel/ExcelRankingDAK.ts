@@ -183,7 +183,6 @@ export const exportRanking = async (
         : 0;
 
     const totalPersentase = (averageVolume + averageKeuangan) / 2;
-    console.log(totalPersentase)
 
     // Isi row total
     totalRow.getCell('A').value = 'TOTAL';
