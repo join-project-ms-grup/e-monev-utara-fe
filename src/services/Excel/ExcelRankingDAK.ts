@@ -125,6 +125,7 @@ export const exportRanking = async (
         row.getCell('F').value = parseIndonesianNumber(item.realisasi_keuangan);
         row.getCell('G').value = item.persentase;
 
+
         for (let c = 1; c <= 7; c++) {
             const cell = row.getCell(c);
 
