@@ -123,7 +123,7 @@ export const exportRanking = async (
         row.getCell('D').value = parseIndonesianNumber(item.jumlah_anggaran);
         row.getCell('E').value = parseIndonesianNumber(item.realisasi_volume);
         row.getCell('F').value = parseIndonesianNumber(item.realisasi_keuangan);
-        row.getCell('G').value = parseIndonesianNumber(item.persentase);
+        row.getCell('G').value = item.persentase;
 
         for (let c = 1; c <= 7; c++) {
             const cell = row.getCell(c);
@@ -183,14 +183,15 @@ export const exportRanking = async (
         : 0;
 
     const totalPersentase = (averageVolume + averageKeuangan) / 2;
+    console.log(totalPersentase)
 
     // Isi row total
     totalRow.getCell('A').value = 'TOTAL';
-    totalRow.getCell('C').value = formatNumber(totalPaket);
-    totalRow.getCell('D').value = `${formatNumber(totalAnggaran)}`;
-    totalRow.getCell('E').value = formatNumber(averageVolume);
-    totalRow.getCell('F').value = formatNumber(averageKeuangan);
-    totalRow.getCell('G').value = formatNumber(totalPersentase);
+    totalRow.getCell('C').value = totalPaket;
+    totalRow.getCell('D').value = `${totalAnggaran}`;
+    totalRow.getCell('E').value = averageVolume.toFixed(2);
+    totalRow.getCell('F').value = averageKeuangan.toFixed(2);
+    totalRow.getCell('G').value = totalPersentase.toFixed(2);
 
     // Styling
     for (let col = 1; col <= 7; col++) {
@@ -286,9 +287,9 @@ const parseIndonesianNumber = (value: unknown): number => {
 };
 
 // Mengubah number menjadi format desimal Indonesia
-const formatNumber = (value: number, suffix = ''): string => {
-    return `${value.toLocaleString('id-ID', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    })}${suffix}`;
-};
+// const formatNumber = (value: number, suffix = ''): string => {
+//     return `${value.toLocaleString('id-ID', {
+//         minimumFractionDigits: 2,
+//         maximumFractionDigits: 2,
+//     })}${suffix}`;
+// };
